@@ -3,7 +3,7 @@
 > **Bảng đích:** `[dbo].[FACT_Player_Match_Perf]`  
 > **Tệp dữ liệu nguồn:** `appearances.csv` (1.89 triệu lượt ra sân)  
 > **Database:** `DW_Football_Analytics`  
-> **Tối ưu hiệu năng:** Kết hợp luồng **Fast Load Staging** + **SQL Set-Based JOIN** trên SQL Engine giúp nạp 1.89M dòng chỉ trong **vài chục giây**.
+> **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`).
 
 ---
 
@@ -28,7 +28,7 @@
 * **Connection Manager**: `FF_Appearances` (Code page `65001 - UTF-8`, Text qualifier `"`).
 * **Selected Columns** (9 cột): `appearance_id`, `game_id`, `player_id`, `player_club_id`, `competition_id`, `goals`, `assists`, `minutes_played`, `yellow_cards`, `red_cards`.
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu)
+### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
 
 | Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
 | :--- | :--- | :--- | :--- | :--- |
@@ -36,7 +36,7 @@
 | `game_id` | **`dc_game_id`** | Four-byte signed integer `[DT_I4]` | - | Mã trận đấu |
 | `player_id` | **`dc_player_id`** | Four-byte signed integer `[DT_I4]` | - | Mã cầu thủ |
 | `player_club_id` | **`dc_player_club_id`** | Four-byte signed integer `[DT_I4]` | - | Mã câu lạc bộ |
-| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **50** | Mã giải đấu |
+| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **100** | Mã giải đấu |
 | `goals` | **`dc_goals`** | Four-byte signed integer `[DT_I4]` | - | Số bàn thắng |
 | `assists` | **`dc_assists`** | Four-byte signed integer `[DT_I4]` | - | Số đường kiến tạo |
 | `minutes_played` | **`dc_minutes_played`** | Four-byte signed integer `[DT_I4]` | - | Phút thi đấu |
@@ -50,7 +50,7 @@
 * **Cấu hình Fast Load quan trọng**:
   * **Rows per batch**: `50000`
   * **Maximum insert commit size**: `50000`
-  * Tick chọn: **`Table lock`** và **`Check constraints`** (Giúp SQL Server bỏ qua ghi log giao dịch từng dòng, tăng tốc độ nạp gấp 10 lần).
+  * Tick chọn: **`Table lock`** và **`Check constraints`**.
 
 ---
 
@@ -66,10 +66,8 @@
 USE DW_Football_Analytics;
 GO
 
--- 1. Xóa sạch dữ liệu cũ
 TRUNCATE TABLE dbo.FACT_Player_Match_Perf;
 
--- 2. Nạp dữ liệu sự kiện kết hợp liên kết 5 bảng DIM và tính toán độ đo
 INSERT INTO dbo.FACT_Player_Match_Perf (
     Player_SK,
     Club_SK,

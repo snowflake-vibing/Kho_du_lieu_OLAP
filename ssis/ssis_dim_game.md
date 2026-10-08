@@ -3,7 +3,7 @@
 > **Bảng đích:** `[dbo].[DIM_Game]`  
 > **Tệp dữ liệu nguồn:** `cleaned_games.csv` (hoặc `games.csv`)  
 > **Database:** `DW_Football_Analytics`  
-> **Chuẩn độ dài:** Chuẩn Unicode `[DT_WSTR]` độ dài **200**, **100**, đảm bảo **100% SẠCH WARNING**.
+> **Chuẩn độ dài Chuỗi (String Length Standard):** Chỉ sử dụng duy nhất chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), đảm bảo **100% SẠCH WARNING**.
 
 ---
 
@@ -37,7 +37,7 @@
 * **Selected Columns** (8 cột): `game_id`, `season`, `round`, `home_club_id`, `away_club_id`, `home_club_goals`, `away_club_goals`, `stadium`.
 * **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu)
+### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
 
 | Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
 | :--- | :--- | :--- | :--- | :--- |
@@ -77,7 +77,7 @@
 * **Input Path**: Chọn nhánh **`Valid_Game`**.
 * **Pass Through Columns**: Tick chọn cả 8 cột.
 * **Sort Column**: Tick chọn `dc_game_id` (Sort Type: `Ascending`, Sort Order: `1`).
-* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`** (Đảm bảo mỗi `Game_ID` duy nhất 1 dòng trong `DIM_Game`).
+* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
 
 ### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
 * **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
@@ -92,4 +92,3 @@
   * `der_home_goals` $\rightarrow$ **`Home_Club_Goals`** (`int`)
   * `der_away_goals` $\rightarrow$ **`Away_Club_Goals`** (`int`)
   * `der_stadium` $\rightarrow$ **`Stadium`** (`nvarchar(200)`)
-  * *(Bỏ qua `Game_SK` vì đây là Surrogate Key tự tăng IDENTITY)*.

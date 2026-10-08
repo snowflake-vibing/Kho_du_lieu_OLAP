@@ -3,7 +3,7 @@
 > **Bảng đích:** `[dbo].[DIM_Competition]`  
 > **Tệp dữ liệu nguồn:** `cleaned_competitions.csv` (hoặc `competitions.csv`)  
 > **Database:** `DW_Football_Analytics`  
-> **Chuẩn độ dài:** Chuẩn Unicode `[DT_WSTR]` độ dài **200**, **100**, **50**, đảm bảo **100% SẠCH WARNING**.
+> **Chuẩn độ dài Chuỗi (String Length Standard):** Chỉ sử dụng duy nhất chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), đảm bảo **100% SẠCH WARNING**.
 
 ---
 
@@ -13,7 +13,7 @@
 [1. Flat File Source (competitions.csv)]
        │
        ▼
-[2. Data Conversion (Ép kiểu DT_WSTR 50/100/200)]
+[2. Data Conversion (Ép kiểu DT_WSTR 100/200)]
        │
        ▼
 [3. Derived Column (Chuẩn hóa Competition_Type & Xử lý NULL Country_Name)]
@@ -37,11 +37,11 @@
 * **Selected Columns** (4 cột): `competition_id`, `name`, `country_name`, `type`.
 * **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu)
+### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
 
 | Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
 | :--- | :--- | :--- | :--- | :--- |
-| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **50** | Mã giải đấu ngắn (BK như `GB1`, `ES1`, `CL`) |
+| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **100** | Mã giải đấu ngắn (BK như `GB1`, `ES1`, `CL`) |
 | `name` | **`dc_name`** | Unicode string `[DT_WSTR]` | **200** | Tên thương hiệu giải đấu |
 | `country_name` | **`dc_country_name`** | Unicode string `[DT_WSTR]` | **200** | Quốc gia đăng cai |
 | `type` | **`dc_type`** | Unicode string `[DT_WSTR]` | **100** | Phân loại (*domestic_league, international_cup*) |
@@ -67,15 +67,14 @@
 * **Input Path**: Chọn nhánh **`Valid_Competition`**.
 * **Pass Through Columns**: Tick chọn cả 4 cột.
 * **Sort Column**: Tick chọn `dc_competition_id` (Sort Type: `Ascending`, Sort Order: `1`).
-* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`** (Đảm bảo mã giải duy nhất 1 dòng).
+* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
 
 ### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
 * **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
 * **Data Access Mode**: `Table or view - fast load`.
 * **Table**: `[dbo].[DIM_Competition]`.
 * **Mappings**:
-  * `dc_competition_id` $\rightarrow$ **`Competition_ID`** (`nvarchar(50)`)
+  * `dc_competition_id` $\rightarrow$ **`Competition_ID`** (`nvarchar(100)`)
   * `dc_name` $\rightarrow$ **`Competition_Name`** (`nvarchar(200)`)
   * `der_country_name` $\rightarrow$ **`Country_Name`** (`nvarchar(200)`)
   * `der_competition_type` $\rightarrow$ **`Competition_Type`** (`nvarchar(100)`)
-  * *(Bỏ qua `Competition_SK` vì đây là Surrogate Key tự tăng IDENTITY)*.
