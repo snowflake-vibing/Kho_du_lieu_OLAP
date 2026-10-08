@@ -13,7 +13,7 @@ Dự án xây dựng một **Kho dữ liệu (Data Warehouse)** hoàn chỉnh th
 * **7 tệp CSV gốc:** `appearances.csv`, `players.csv`, `clubs.csv`, `competitions.csv`, `games.csv`, `player_valuations.csv`, `club_games.csv`.
 * **Dữ liệu đã qua làm sạch trong thư mục [`data/`](data/):** `cleaned_appearances.csv`, `cleaned_clubs.csv`, `cleaned_competitions.csv`, `cleaned_games.csv`, `cleaned_players.csv`.
 * **118 thuộc tính tổng cộng** và hơn **1.890.000 lượt ra sân thi đấu** của các cầu thủ chuyên nghiệp.
-* **Mục tiêu phân tích:** Đánh giá năng suất ghi bàn/kiến tạo chuẩn hóa 90 phút (P90 Metrics), mối tương quan giữa giá trị thị trường và đóng góp chuyên môn, ảnh hưởng của tính kỷ luật (thẻ phạt) và yếu tố sân bãi (sân nhà/sân khách).
+* **Mục tiêu phân tích:** Đánh giá năng suất ghi bàn/kiến tạo chuẩn hóa 90 phút (P90 Metrics), mối tương quan giữa khối lượng thi đấu và đóng góp chuyên môn, ảnh hưởng của tính kỷ luật (thẻ phạt) và yếu tố sân bãi (sân nhà/sân khách).
 
 ---
 
@@ -41,8 +41,6 @@ erDiagram
         nvarchar Sub_Position "Vị trí chi tiết"
         nvarchar Foot "Chân thuận (Left, Right, Both)"
         int Height_In_Cm "Chiều cao (cm)"
-        float Market_Value_In_EUR "Giá trị thị trường hiện tại (€)"
-        float Highest_Market_Value_In_EUR "Giá trị thị trường cao nhất (€)"
     }
 
     DIM_Club {
@@ -117,7 +115,7 @@ erDiagram
 | Tên bảng DW | Loại bảng | Mô tả chức năng & Đối chiếu Kaggle | Tệp tài liệu chi tiết |
 | :--- | :--- | :--- | :--- |
 | **`FACT_Player_Match_Perf`** | Fact Table | Lưu trữ chỉ số đóng góp thi đấu, số phút, bàn thắng, thẻ phạt | 📄 [fact_player_match_perf.md](docs/fact_player_match_perf.md) |
-| **`DIM_Player`** | Dimension | Quản lý tiểu sử, vị trí, chân thuận, chiều cao, tuổi tác, định giá cầu thủ | 📄 [dim_player.md](docs/dim_player.md) |
+| **`DIM_Player`** | Dimension | Quản lý tiểu sử, vị trí, chân thuận, chiều cao, tuổi tác cầu thủ | 📄 [dim_player.md](docs/dim_player.md) |
 | **`DIM_Club`** | Dimension | Quản lý tên CLB, sân vận động, sức chứa, HLV trưởng, quy mô đội hình | 📄 [dim_club.md](docs/dim_club.md) |
 | **`DIM_Competition`** | Dimension | Phân loại giải đấu (VĐQG vs Cúp Châu Âu), quốc gia đăng cai | 📄 [dim_competition.md](docs/dim_competition.md) |
 | **`DIM_Game`** | Dimension | Chi tiết bối cảnh trận đấu, vòng đấu, đội nhà/khách, tỷ số | 📄 [dim_game.md](docs/dim_game.md) |

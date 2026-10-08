@@ -57,7 +57,7 @@ Bảng `DIM_Club` quản lý thông tin hồ sơ của các câu lạc bộ bón
 | :--- | :--- | :--- |
 | `club_code` | `string` | **Chuỗi dư thừa:** Mã viết tắt trên web (VD: `real-madrid`), dư thừa vì đã có `club_id` làm số nguyên. |
 | `url`, `filename` | `string` | **Dữ liệu hệ thống/Web:** Link bài viết web và tên tệp lưu trữ gốc, không có giá trị phân tích OLAP. |
-| `total_market_value`, `net_transfer_record` | `float64 / string` | **Chỉ số tài chính biến động:** Có thể tính trực tiếp từ `Market_Value_In_EUR` trong `FACT_Player_Match_Perf`. |
+| `total_market_value`, `net_transfer_record` | `float64 / string` | **Thông tin tài chính biến động theo thời gian:** Đã loại bỏ để tập trung vào phân tích hiệu suất thi đấu chuyên môn. |
 | `average_age`, `foreigners_number`, `foreigners_percentage`, `national_team_players` | `float64 / Int64` | **Chỉ số thống kê tổng hợp tĩnh (Aggregate metrics):** Là các chỉ số dư thừa vì trong OLAP, người dùng hoàn toàn tính toán động từ `DIM_Player` (`AVG`, `COUNT`), tránh lưu trữ tĩnh gây bất đồng bộ. |
 | `last_season` | `Int64` | **Thông tin quản lý nguồn:** Mùa giải cuối cùng dữ liệu cập nhật. |
 
