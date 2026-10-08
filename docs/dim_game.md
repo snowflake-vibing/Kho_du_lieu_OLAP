@@ -28,23 +28,44 @@ Bảng `DIM_Game` lưu trữ chi tiết bối cảnh tổ chức trận đấu, 
 
 ---
 
-## 3. ĐỐI CHIẾU & MAPPING VỚI BỘ DỮ LIỆU KAGGLE (TRANSFERMARKT)
+## 3. PHÂN TÍCH ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE (KAGGLE CROSS-CHECKING)
 
-* **Tệp CSV nguồn gốc từ Kaggle:** `games.csv` (Tổng cộng 23 cột thuộc tính gốc).
+* **Tệp CSV nguồn gốc từ Kaggle:** `games.csv` (Tổng cộng **23 cột thuộc tính gốc**).
 * **Đường dẫn dataset gốc:** [Kaggle - Transfermarkt Player Scores](https://www.kaggle.com/datasets/davidcariboo/player-scores)
 
-### Bảng Ma Trận Ánh Xạ (Mapping Matrix Kaggle $\rightarrow$ DW)
+### 3.1. Các cột được giữ lại và chuyển thành thuộc tính DW (Maintained & Mapped)
 
-| Tệp CSV Nguồn | Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Quy tắc chuyển đổi ETL & Xử lý dữ liệu |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `games.csv` | `game_id` | `Int64` | `Game_ID` | `INT` | Ép kiểu `(DT_I4)` giữ nguyên mã định danh |
-| `games.csv` | `season` | `Int64` | `Season` | `INT` | Ép kiểu `(DT_I4)` năm bắt đầu mùa giải |
-| `games.csv` | `round` | `string` | `Round` | `NVARCHAR(100)` | Ép kiểu `(DT_WSTR, 100)` định dạng vòng đấu |
-| `games.csv` | `home_club_id` | `Int64` | `Home_Club_ID` | `INT` | Ép kiểu `(DT_I4)` mã đội nhà |
-| `games.csv` | `away_club_id` | `Int64` | `Away_Club_ID` | `INT` | Ép kiểu `(DT_I4)` mã đội khách |
-| `games.csv` | `home_club_goals` | `Int64` | `Home_Club_Goals` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `games.csv` | `away_club_goals` | `Int64` | `Away_Club_Goals` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `games.csv` | `stadium` | `string` | `Stadium` | `NVARCHAR(200)` | Chuẩn hóa Unicode `(DT_WSTR)`, điền `'Unknown Stadium'` nếu NULL |
+| Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Đánh giá & Quy tắc chuyển đổi |
+| :--- | :--- | :--- | :--- | :--- |
+| `game_id` | `Int64` | `Game_ID` | `INT` | **Giữ nguyên:** Mã định danh trận đấu chính xác (BK) |
+| `season` | `Int64` | `Season` | `INT` | **Giữ nguyên:** Năm bắt đầu mùa giải |
+| `round` | `string` | `Round` | `NVARCHAR(100)` | **Giữ nguyên:** Tên vòng đấu (*Matchday 1, Final...*) |
+| `home_club_id` | `Int64` | `Home_Club_ID` | `INT` | **Giữ nguyên:** Mã CLB chủ nhà |
+| `away_club_id` | `Int64` | `Away_Club_ID` | `INT` | **Giữ nguyên:** Mã CLB khách |
+| `home_club_goals` | `Int64` | `Home_Club_Goals` | `INT` | **Giữ nguyên:** Tỷ số bàn thắng đội nhà |
+| `away_club_goals` | `Int64` | `Away_Club_Goals` | `INT` | **Giữ nguyên:** Tỷ số bàn thắng đội khách |
+| `stadium` | `string` | `Stadium` | `NVARCHAR(200)` | **Giữ nguyên:** Tên sân vận động tổ chức trận đấu |
+
+### 3.2. Các cột Khóa (Key/FK) trong Kaggle BỊ BỎ QUA trong DIM_Game và lý do (Omitted Keys)
+
+| Cột Khóa nguồn (Kaggle) | Loại Khóa | Lý do bỏ qua không đưa vào `DIM_Game` |
+| :--- | :--- | :--- |
+| `competition_id` | Foreign Key | **Tách biệt chiều chuẩn Star Schema:** Mã giải đấu. Đã được đưa thành khóa ngoại `Competition_SK` độc lập trong bảng Sự kiện `FACT_Player_Match_Perf`. Thiết kế này tuân thủ nguyên tắc Star Schema thuần túy, tránh liên kết trực tiếp giữa 2 bảng Dim với nhau (`DIM_Game` $\leftrightarrow$ `DIM_Competition`). |
+| `date` | Date | **Tách biệt chiều thời gian:** Ngày diễn ra trận đấu. Đã được chuyển thành khóa ngoại `Time_SK` trong Fact để tham chiếu tới `DIM_Time` tập trung. |
+
+### 3.3. Các cột DƯ THỪA / KHÔNG CẦN THIẾT trong Kaggle (Surplus & Redundant Columns)
+
+| Cột Dư thừa (Kaggle) | Kiểu dữ liệu | Lý do xác định dư thừa & Loại bỏ |
+| :--- | :--- | :--- |
+| `home_club_name`, `away_club_name` | `string` | **Dư thừa văn bản:** Tên chuỗi của đội nhà/đội khách. Đã được quản lý tập trung trong bảng `DIM_Club` qua `Club_ID`. |
+| `home_club_manager_name`, `away_club_manager_name` | `string` | **Dư thừa thông tin HLV:** Đã được lưu trữ trong `DIM_Club.Coach_Name`. |
+| `home_club_position`, `away_club_position` | `float64` | **Dữ liệu thứ hạng biến động:** Thứ hạng BXH tại thời điểm trận đấu, khuyết nhiều dữ liệu NULL và không thuộc phạm vi bài toán. |
+| `home_club_formation`, `away_club_formation` | `string` | **Chuỗi sơ đồ chiến thuật:** Sơ đồ 4-3-3, 4-2-3-1..., chứa nhiều dạng chuỗi không chuẩn hóa, khó phân tích đa chiều. |
+| `referee` | `string` | **Thông tin trọng tài:** Họ tên trọng tài chính, không nằm trong phạm vi đo lường hiệu suất thi đấu cầu thủ/CLB. |
+| `attendance` | `float64` | **Dữ liệu khuyết thiếu:** Số lượng khán giả đến sân, bị khuyết giá trị NULL rất lớn trong bộ dữ liệu gốc Kaggle. |
+| `url` | `string` | **Dữ liệu giao diện Web:** Link bài viết trận đấu, hoàn toàn dư thừa. |
+| `aggregate` | `string` | **Tổng tỷ số 2 lượt trận:** Chỉ áp dụng cho các vòng knock-out cúp Châu Âu, gây dư thừa đối với các trận giải VĐQG. |
+| `competition_type` | `string` | **Dư thừa phân loại:** Đã được lưu trữ chuẩn hóa trong `DIM_Competition.Competition_Type`. |
 
 ---
 

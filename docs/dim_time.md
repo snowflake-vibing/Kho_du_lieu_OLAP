@@ -29,24 +29,31 @@ Bảng `DIM_Time` đóng vai trò là chiều thời gian chuẩn hóa trong Kho
 
 ---
 
-## 3. ĐỐI CHIẾU & MAPPING VỚI BỘ DỮ LIỆU KAGGLE (TRANSFERMARKT)
+## 3. PHÂN TÍCH ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE (KAGGLE CROSS-CHECKING)
 
 * **Nguồn trích xuất thời gian:** Trích xuất từ thuộc tính `date` trong `appearances.csv` và `games.csv`.
 * **Đường dẫn dataset gốc:** [Kaggle - Transfermarkt Player Scores](https://www.kaggle.com/datasets/davidcariboo/player-scores)
 
-### Bảng Ma Trận Ánh Xạ (Mapping Matrix Kaggle $\rightarrow$ DW)
+### 3.1. Các thuộc tính được sinh ra và tính toán chuẩn hóa (Generated Time Attributes)
 
-| Tệp CSV Nguồn | Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Quy tắc chuyển đổi ETL & Biểu thức SSIS |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `appearances.csv` | `date` | `string (YYYY-MM-DD)` | `Time_ID` | `INT` | Tính toán: `(YEAR(date) * 10000) + (MONTH(date) * 100) + DAY(date)` |
-| `appearances.csv` | `date` | `string` | `Full_Date` | `NVARCHAR(50)` | Chuyển đổi định dạng `YYYY-MM-DD` |
-| `appearances.csv` | Calculated / `date` | `string` | `Day_Of_Week` | `NVARCHAR(50)` | Tên thứ trong tuần (`DATENAME(dw, date)`) |
-| `appearances.csv` | Calculated / `date` | `string` | `Day` | `INT` | Trích xuất ngày: `DAY(date)` |
-| `appearances.csv` | Calculated / `date` | `string` | `Month` | `INT` | Trích xuất tháng: `MONTH(date)` |
-| `appearances.csv` | Calculated / `date` | `string` | `Quarter` | `INT` | Trích xuất quý: `DATEPART(quarter, date)` |
-| `appearances.csv` | Calculated / `date` | `string` | `Year` | `INT` | Trích xuất năm: `YEAR(date)` |
-| `appearances.csv` | Calculated / `date` | `string` | `Season` | `NVARCHAR(50)` | Ghép chuỗi mùa giải: `Month >= 8 ? Year + "/" + (Year+1) : (Year-1) + "/" + Year` |
-| `appearances.csv` | Calculated / `date` | `string` | `Is_Weekend` | `INT` | Cờ cuối tuần: `(Day_Of_Week IN ('Saturday', 'Sunday')) ? 1 : 0` |
+Trong bộ dữ liệu gốc Kaggle, thuộc tính thời gian chỉ là 1 cột chuỗi ký tự đơn lẻ `date` (`YYYY-MM-DD`). Trong Kho dữ liệu, cột này đã được **phân rã đa chiều** thành các thuộc tính phong phú:
+
+| Cột nguồn (Kaggle) | Thuộc tính DW sinh ra | Kiểu dữ liệu DW | Quy tắc tính toán & Giá trị tạo ra |
+| :--- | :--- | :--- | :--- |
+| `date` | `Time_ID` | `INT` | **Khóa số nguyên `YYYYMMDD`:** `(YEAR(date) * 10000) + (MONTH(date) * 100) + DAY(date)` |
+| `date` | `Full_Date` | `NVARCHAR(50)` | **Chuỗi ngày đầy đủ:** Định dạng chuẩn `YYYY-MM-DD` |
+| `date` | `Day_Of_Week` | `NVARCHAR(50)` | **Tên thứ trong tuần:** `DATENAME(dw, date)` (*Monday, Tuesday...*) |
+| `date` | `Day` | `INT` | **Ngày trong tháng:** `DAY(date)` (1 - 31) |
+| `date` | `Month` | `INT` | **Tháng trong năm:** `MONTH(date)` (1 - 12) |
+| `date` | `Quarter` | `INT` | **Quý trong năm:** `DATEPART(quarter, date)` (1 - 4) |
+| `date` | `Year` | `INT` | **Năm:** `YEAR(date)` |
+| `date` | `Season` | `NVARCHAR(50)` | **Ghép chuỗi Mùa giải:** `Month >= 8 ? Year + "/" + (Year+1) : (Year-1) + "/" + Year` |
+| `date` | `Is_Weekend` | `INT` | **Cờ cuối tuần:** `(Day_Of_Week IN ('Saturday', 'Sunday')) ? 1 : 0` |
+
+### 3.2. Đánh giá sự dư thừa của phép tính ngày tháng động trong SQL truyền thống
+
+* **Vấn đề trong SQL truyền thống:** Nếu không tạo `DIM_Time`, mỗi khi chạy câu truy vấn OLAP nhóm theo Tháng/Quý/Thứ/Mùa giải, cơ sở dữ liệu phải liên tục gọi các hàm xử lý chuỗi và thời gian đắt đỏ như `DATEPART()`, `DATENAME()`, `MONTH()`, `YEAR()` trên hàng triệu dòng Fact.
+* **Giải pháp Kho dữ liệu:** `DIM_Time` giúp **tính toán sẵn 1 lần (Pre-computed)** toàn bộ cấp bậc thời gian, biến các phép lọc phức tạp thành phép toán JOIN cực nhanh trên khóa số nguyên `Time_ID`.
 
 ---
 

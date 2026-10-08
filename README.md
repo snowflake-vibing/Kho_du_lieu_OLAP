@@ -108,11 +108,11 @@ erDiagram
 
 ---
 
-## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & ĐỐI CHIẾU KAGGLE
+## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE
 
-Chi tiết thông tin thuộc tính, kiểu dữ liệu, các bước chuyển đổi SSIS ETL và bảng ma trận đối chiếu với bộ dữ liệu nguồn Kaggle được lưu trữ tại các tệp tài liệu riêng biệt:
+Chi tiết thuộc tính, các bước chuyển đổi SSIS ETL và **phân tích đối chiếu sâu với bộ dữ liệu nguồn Kaggle** (xác định các cột đúng, các cột khóa bị loại bỏ và các cột dư thừa/không cần thiết cho OLAP) được trình bày cụ thể trong 6 tệp tài liệu:
 
-| Tên bảng DW | Loại bảng | Mô tả chức năng | Tệp tài liệu chi tiết & Đối chiếu Kaggle |
+| Tên bảng DW | Loại bảng | Mô tả chức năng & Đối chiếu Kaggle | Tệp tài liệu chi tiết |
 | :--- | :--- | :--- | :--- |
 | **`FACT_Player_Match_Perf`** | Fact Table | Lưu trữ chỉ số đóng góp thi đấu, số phút, bàn thắng, thẻ phạt | 📄 [fact_player_match_perf.md](docs/fact_player_match_perf.md) |
 | **`DIM_Player`** | Dimension | Quản lý tiểu sử, vị trí, chân thuận, chiều cao, tuổi tác cầu thủ | 📄 [dim_player.md](docs/dim_player.md) |
@@ -129,23 +129,6 @@ Hệ thống cung cấp **15 câu truy vấn nghiệp vụ đa chiều (OLAP Que
 
 👉 **Xem toàn bộ câu lệnh T-SQL và giải trình chi tiết:** 📄 [15_queries.md](docs/15_queries.md)
 
-### Tóm tắt danh mục 15 câu truy vấn:
-1. **Top 10 Vua dội bom Ngoại Hạng Anh (GB1) mùa 2023/2024.**
-2. **Top 10 tiền vệ kiến tạo nhiều nhất tại các giải VĐQG.**
-3. **Thống kê tổng số phút thi đấu & đóng góp bàn thắng cho cầu thủ xuất sắc (> 20 G+A).**
-4. **Phân tích hiệu suất thi đấu và số phút trung bình theo từng độ tuổi.**
-5. **So sánh bàn thắng giữa chân Trái, chân Phải & 2 Chân theo vị trí chi tiết.**
-6. **Tương quan chiều cao, khả năng ghi bàn và thẻ vàng theo vị trí thi đấu chính.**
-7. **Thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu thuộc Nước Anh.**
-8. **Danh sách các "Siêu dự bị" ghi nhiều bàn thắng nhất từ ghế dự bị.**
-9. **So sánh hiệu năng Sân nhà vs Sân khách vào Cuối tuần vs Ngày thường.**
-10. **Thống kê bàn thắng của Real Madrid vào lưới các đối thủ theo Quý.**
-11. **Số lượng trận đấu tại các sân vận động có sức chứa > 60.000 khán giả.**
-12. **Thống kê thẻ phạt của các đội bóng phân theo HLV trưởng & Tháng.**
-13. **Thống kê số lượt ra sân và lực lượng cầu thủ theo quy mô đội hình (`Squad_Size`).**
-14. **Thống kê các trận cầu mưa bàn thắng ($\ge 5$ bàn) qua các vòng đấu.**
-15. **Theo dõi phong độ & thẻ phạt của lứa cầu thủ trẻ (Sinh từ 01/01/2004) theo ngày.**
-
 ---
 
 ## 🔄 5. QUY TRÌNH TÍCH HỢP DỮ LIỆU SSIS ETL
@@ -160,18 +143,3 @@ Quy trình ETL được thực hiện tự động qua **SSIS Integration Servic
    * Trích xuất từ `appearances.csv`.
    * Thực hiện **6 biến đổi Lookup nối tiếp** (`Lookup_Player`, `Lookup_Club`, `Lookup_Opponent`, `Lookup_Competition`, `Lookup_Game`, `Lookup_Time`).
    * Cấu hình **Redirect rows to no match output**: Gán giá trị khóa mặc định `-1` (Unknown Record) cho các bản ghi khuyết tham chiếu, tránh thất thoát dữ liệu.
-
----
-
-## 🛠️ 6. HƯỚNG DẪN CÀI ĐẶT & KHÔI PHỤC DATABASE
-
-### Khôi phục Database từ file Backup (.bak):
-1. Mở **SQL Server Management Studio (SSMS)**.
-2. Nhấp chuột phải vào `Databases` $\rightarrow$ Chọn **Restore Database...**
-3. Chọn nguồn **Device** $\rightarrow$ Trỏ tới tệp backup `DW_Football_Analytics.bak` tại thư mục gốc.
-4. Nhấn **OK** để khôi phục cơ sở dữ liệu `DW_Football_Analytics`.
-
-### Chạy Package SSIS ETL:
-1. Mở solution `football/SSIS_Football_New/SSIS_Football_New.sln` bằng **Visual Studio 2022**.
-2. Kiểm tra Connection Manager kết nối tới SQL Server của bạn.
-3. Nhấn **Start (F5)** để khởi chạy toàn bộ quy trình ETL tự động.

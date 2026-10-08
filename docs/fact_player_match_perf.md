@@ -36,32 +36,44 @@ Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact 
 
 ---
 
-## 3. ĐỐI CHIẾU & MAPPING VỚI BỘ DỮ LIỆU KAGGLE (TRANSFERMARKT)
+## 3. PHÂN TÍCH ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE (KAGGLE CROSS-CHECKING)
 
 * **Tệp CSV nguồn chính:** `appearances.csv` (13 cột thuộc tính gốc).
 * **Tệp CSV nguồn bổ trợ:** `players.csv`, `games.csv`, `player_valuations.csv`, `club_games.csv`.
 * **Đường dẫn dataset gốc:** [Kaggle - Transfermarkt Player Scores](https://www.kaggle.com/datasets/davidcariboo/player-scores)
 
-### Bảng Ma Trận Ánh Xạ Chi Tiết (Kaggle Sources $\rightarrow$ DW Fact)
+### 3.1. Các cột được chuyển thành Khóa thay thế và Độ đo trong Fact
 
-| Tệp CSV Nguồn | Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW Fact) | Kiểu dữ liệu DW | Quy tắc biến đổi SSIS ETL / Lookup / Derived |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `appearances.csv` | `player_id` | `Int64` | `Player_SK` | `INT` | Lookup vào `DIM_Player` theo `player_id` $\rightarrow$ Trích xuất `Player_SK` |
-| `appearances.csv` | `player_club_id` | `Int64` | `Club_SK` | `INT` | Lookup vào `DIM_Club` theo `player_club_id` $\rightarrow$ Trích xuất `Club_SK` |
-| `games.csv` / `club_games.csv` | `opponent_id` | `Int64` | `Opponent_Club_SK` | `INT` | Lookup vào `DIM_Club` theo `opponent_id` $\rightarrow$ Trích xuất `Opponent_Club_SK` |
-| `appearances.csv` | `competition_id` | `string` | `Competition_SK` | `INT` | Lookup vào `DIM_Competition` theo `competition_id` $\rightarrow$ Trích xuất `Competition_SK` |
-| `appearances.csv` | `game_id` | `Int64` | `Game_SK` | `INT` | Lookup vào `DIM_Game` theo `game_id` $\rightarrow$ Trích xuất `Game_SK` |
-| `appearances.csv` | `date` | `string` | `Time_SK` | `INT` | Calculated `Time_ID` $\rightarrow$ Lookup vào `DIM_Time` theo `Time_ID` $\rightarrow$ Trích xuất `Time_SK` |
-| `appearances.csv` | `game_id` | `Int64` | `Game_ID` | `INT` | Ép kiểu `(DT_I4)` giữ nguyên mã trận |
-| `appearances.csv` | `minutes_played` | `Int64` | `Minutes_Played` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `appearances.csv` | `goals` | `Int64` | `Goals` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `appearances.csv` | `assists` | `Int64` | `Assists` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| Calculated | `goals` + `assists` | `Int64` | `Goal_Contributions` | `INT` | Derived Column SSIS: `goals + assists` |
-| `appearances.csv` | `yellow_cards` | `Int64` | `Yellow_Cards` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `appearances.csv` | `red_cards` | `Int64` | `Red_Cards` | `INT` | Ép kiểu `(DT_I4)`, thay NULL bằng `0` |
-| `player_valuations.csv` | `market_value_in_eur`| `float64` | `Market_Value_In_EUR`| `FLOAT` | Lookup định giá cầu thủ gần nhất theo ngày $\rightarrow$ Gán giá trị |
-| `appearances.csv` | `minutes_played` | `Int64` | `Is_Starter` | `INT` | Derived Column: `minutes_played > 45 ? 1 : 0` |
-| `club_games.csv` | `is_win` / `hosting` | `string` | `Is_Home_Game` | `INT` | Derived Column: `hosting == "Home" ? 1 : 0` |
+| Cột nguồn (Kaggle) | Tệp CSV nguồn | Cột đích (DW Fact) | Vai trò / Kiểu dữ liệu | Đánh giá & Biến đổi SSIS ETL |
+| :--- | :--- | :--- | :--- | :--- |
+| `player_id` | `appearances.csv` | `Player_SK` | Foreign Key (`INT`) | SSIS Lookup vào `DIM_Player` $\rightarrow$ Lấy `Player_SK` |
+| `player_club_id` | `appearances.csv` | `Club_SK` | Foreign Key (`INT`) | SSIS Lookup vào `DIM_Club` $\rightarrow$ Lấy `Club_SK` |
+| `opponent_id` | `club_games.csv` | `Opponent_Club_SK` | Foreign Key (`INT`) | SSIS Lookup vào `DIM_Club` $\rightarrow$ Lấy `Opponent_Club_SK` |
+| `competition_id` | `appearances.csv` | `Competition_SK` | Foreign Key (`INT`) | SSIS Lookup vào `DIM_Competition` $\rightarrow$ Lấy `Competition_SK` |
+| `game_id` | `appearances.csv` | `Game_SK` | Foreign Key (`INT`) | SSIS Lookup vào `DIM_Game` $\rightarrow$ Lấy `Game_SK` |
+| `date` | `appearances.csv` | `Time_SK` | Foreign Key (`INT`) | Calculated `Time_ID` $\rightarrow$ SSIS Lookup `DIM_Time` $\rightarrow$ Lấy `Time_SK` |
+| `minutes_played` | `appearances.csv` | `Minutes_Played` | Measure (`INT`) | **Giữ nguyên:** Số phút thi đấu trên sân |
+| `goals` | `appearances.csv` | `Goals` | Measure (`INT`) | **Giữ nguyên:** Số bàn thắng ghi được |
+| `assists` | `appearances.csv` | `Assists` | Measure (`INT`) | **Giữ nguyên:** Số đường kiến tạo thành bàn |
+| `yellow_cards` | `appearances.csv` | `Yellow_Cards` | Measure (`INT`) | **Giữ nguyên:** Số thẻ vàng nhận phải |
+| `red_cards` | `appearances.csv` | `Red_Cards` | Measure (`INT`) | **Giữ nguyên:** Số thẻ đỏ nhận phải |
+| `market_value_in_eur` | `player_valuations.csv`| `Market_Value_In_EUR`| Measure (`FLOAT`) | **Bổ trợ:** Tra cứu mốc định giá gần nhất của cầu thủ tại ngày thi đấu |
+| Calculated | - | `Goal_Contributions` | Measure (`INT`) | **Thêm mới:** `Goals + Assists` (Tổng số lần in dấu giày vào bàn thắng) |
+| Calculated | - | `Is_Starter` | Flag (`INT`) | **Thêm mới:** `minutes_played > 45 ? 1 : 0` (Cờ đá chính) |
+| `hosting` | `club_games.csv` | `Is_Home_Game` | Flag (`INT`) | **Thêm mới:** `hosting == "Home" ? 1 : 0` (Cờ sân nhà) |
+
+### 3.2. Các cột Khóa nguồn (Kaggle) BỊ BỎ QUA trong Fact và lý do (Omitted Keys)
+
+| Cột Khóa nguồn (Kaggle) | Tệp Nguồn | Lý do bỏ qua không đưa vào Fact |
+| :--- | :--- | :--- |
+| `player_current_club_id` | `appearances.csv` | **Sai lệch lịch sử:** Mã CLB hiện tại của cầu thủ. Đã bị loại bỏ vì Fact cần lưu vết `player_club_id` (CLB mà cầu thủ khoác áo thi đấu **tại thời điểm trận đấu diễn ra**). Nếu dùng `player_current_club_id`, thống kê lịch sử của các mùa trước sẽ bị sai khi cầu thủ chuyển nhượng CLB mới. |
+
+### 3.3. Các cột DƯ THỪA / KHÔNG CẦN THIẾT trong Kaggle (Surplus & Redundant Columns)
+
+| Cột Dư thừa (Kaggle) | Tệp Nguồn | Lý do xác định dư thừa & Loại bỏ |
+| :--- | :--- | :--- |
+| `player_name` | `appearances.csv` | **Dư thừa văn bản trong Fact:** Tên dạng chuỗi ký tự của cầu thủ. Đã bị loại bỏ vì trong mô hình Star Schema chuẩn, bảng Fact **tuyệt đối không lưu các trường mô tả văn bản chuỗi dài**. Tên cầu thủ được truy xuất linh hoạt bằng phép JOIN qua `Player_SK` vào `DIM_Player`. Việc lưu `player_name` trong Fact sẽ gây phình to dung lượng Fact table (vốn lưu hàng triệu bản ghi). |
+| `date`, `competition_id`, `player_id`, `player_club_id`, `game_id` (văn bản/nguyên gốc) | `appearances.csv` | **Thay thế bằng Khóa thay thế (Surrogate Keys):** Các mã định danh gốc của hệ thống nguồn đã được thay thế bằng các khóa số nguyên tự tăng `Player_SK`, `Club_SK`, `Competition_SK`, `Game_SK`, `Time_SK` giúp tối ưu hóa dung lượng lưu trữ index và tăng tốc độ các phép JOIN OLAP. |
 
 ---
 
@@ -101,14 +113,6 @@ flowchart TD
     T6 --> Dest
 ```
 
-### Chi Tiết Cấu Hình 6 Transform Lookup:
-1. **`Lookup_Player`:** Join `Input.player_id == DIM_Player.Player_ID`. Lấy `Player_SK`. Nếu No-Match $\rightarrow$ Redirect / Gán `Player_SK = -1`.
-2. **`Lookup_Club`:** Join `Input.player_club_id == DIM_Club.Club_ID`. Lấy `Club_SK`. Nếu No-Match $\rightarrow$ Gán `Club_SK = -1`.
-3. **`Lookup_Opponent`:** Join `Input.opponent_id == DIM_Club.Club_ID`. Lấy `Opponent_Club_SK`. Nếu No-Match $\rightarrow$ Gán `Opponent_Club_SK = -1`.
-4. **`Lookup_Competition`:** Join `Input.competition_id == DIM_Competition.Competition_ID`. Lấy `Competition_SK`. Nếu No-Match $\rightarrow$ Gán `Competition_SK = -1`.
-5. **`Lookup_Game`:** Join `Input.game_id == DIM_Game.Game_ID`. Lấy `Game_SK`. Nếu No-Match $\rightarrow$ Gán `Game_SK = -1`.
-6. **`Lookup_Time`:** Join `Input.Time_ID == DIM_Time.Time_ID`. Lấy `Time_SK`. Nếu No-Match $\rightarrow$ Gán `Time_SK = -1`.
-
 ---
 
 ## 5. KIỂM THỨC VẸN TOÀN & CHẤT LƯỢNG DỮ LIỆU (DATA INTEGRITY)
@@ -116,6 +120,6 @@ flowchart TD
 * **Ràng buộc khóa ngoại (Foreign Key Constraints):** Toàn bộ 6 trường khóa ngoại trong Fact đều được thiết lập ràng buộc `FOREIGN KEY REFERENCES` với các bảng Dim tương ứng.
 * **Xử lý triệt để No-Match Output:** 100% dòng dữ liệu không bị thất thoát khi nạp ETL nhờ chiến lược gán Khóa mặc định `-1` (Unknown Record) cho các bản ghi khuyết tham chiếu.
 * **Kiểm tra hợp lệ chỉ số:**
-  * `Minutes_Played`: Phải nằm trong khoảng `[0, 130]` phút (bao gồm cả bù giờ & hiệp phụ).
+  * `Minutes_Played`: Phải nằm trong khoảng `[0, 130]` phút.
   * `Goals` & `Assists`: Phải $\ge 0$.
   * `Goal_Contributions = Goals + Assists` được tính toán nhất quán.

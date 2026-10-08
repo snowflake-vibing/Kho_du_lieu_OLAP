@@ -24,19 +24,36 @@ Bảng `DIM_Competition` phân loại các giải đấu bóng đá chuyên nghi
 
 ---
 
-## 3. ĐỐI CHIẾU & MAPPING VỚI BỘ DỮ LIỆU KAGGLE (TRANSFERMARKT)
+## 3. PHÂN TÍCH ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE (KAGGLE CROSS-CHECKING)
 
-* **Tệp CSV nguồn gốc từ Kaggle:** `competitions.csv` (Tổng cộng 11 cột thuộc tính gốc).
+* **Tệp CSV nguồn gốc từ Kaggle:** `competitions.csv` (Tổng cộng **11 cột thuộc tính gốc**).
 * **Đường dẫn dataset gốc:** [Kaggle - Transfermarkt Player Scores](https://www.kaggle.com/datasets/davidcariboo/player-scores)
 
-### Bảng Ma Trận Ánh Xạ (Mapping Matrix Kaggle $\rightarrow$ DW)
+### 3.1. Các cột được giữ lại và chuyển thành thuộc tính DW (Maintained & Mapped)
 
-| Tệp CSV Nguồn | Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Quy tắc chuyển đổi ETL & Xử lý dữ liệu |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `competitions.csv` | `competition_id` | `string` | `Competition_ID` | `NVARCHAR(50)` | Ép kiểu `(DT_WSTR, 50)`, giữ nguyên mã ký tự nguồn |
-| `competitions.csv` | `name` | `string` | `Competition_Name` | `NVARCHAR(200)` | Chuẩn hóa Unicode UTF-8 (`DT_WSTR`), loại bỏ khoảng trắng thừa |
-| `competitions.csv` | `country_name` | `string` | `Country_Name` | `NVARCHAR(200)` | Chuẩn hóa tên quốc gia đăng cai (`England`, `Spain`, `Germany`...) |
-| `competitions.csv` | `type` | `string` | `Competition_Type` | `NVARCHAR(100)` | Chuẩn hóa phân loại giải đấu (`domestic_league`, `domestic_cup`, `international_cup`) |
+| Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Đánh giá & Quy tắc chuyển đổi |
+| :--- | :--- | :--- | :--- | :--- |
+| `competition_id` | `string` | `Competition_ID` | `NVARCHAR(50)` | **Giữ nguyên:** Mã ký tự giải đấu chuẩn (BK như `GB1`, `ES1`, `L1`, `CL`) |
+| `name` | `string` | `Competition_Name` | `NVARCHAR(200)` | **Giữ nguyên:** Tên thương hiệu chính thức của giải đấu |
+| `country_name` | `string` | `Country_Name` | `NVARCHAR(200)` | **Giữ nguyên:** Tên quốc gia hoặc khu vực đăng cai (`England`, `Spain`, `Europe`...) |
+| `type` | `string` | `Competition_Type` | `NVARCHAR(100)` | **Giữ nguyên:** Phân loại cốt lõi (`domestic_league`, `international_cup`) |
+
+### 3.2. Các cột Khóa (Key/FK) trong Kaggle BỊ BỎ QUA trong DIM_Competition và lý do (Omitted Keys)
+
+| Cột Khóa nguồn (Kaggle) | Loại Khóa | Lý do bỏ qua không đưa vào `DIM_Competition` |
+| :--- | :--- | :--- |
+| `country_id` | Foreign Key | **Dư thừa phân cấp:** Mã ID quốc gia. Được bỏ qua vì DW dùng trực tiếp tên quốc gia `Country_Name` làm thuộc tính phân tích rõ ràng, không cần tách thành bảng chiều quốc gia riêng (tránh Snowflaking không cần thiết). |
+| `domestic_league_code` | Foreign Key | **Trùng lặp tham chiếu:** Mã giải VĐQG tương ứng. Đã được thay thế hoàn toàn bằng thuộc tính `Competition_Type`. |
+
+### 3.3. Các cột DƯ THỪA / KHÔNG CẦN THIẾT trong Kaggle (Surplus & Redundant Columns)
+
+| Cột Dư thừa (Kaggle) | Kiểu dữ liệu | Lý do xác định dư thừa & Loại bỏ |
+| :--- | :--- | :--- |
+| `competition_code` | `string` | **Chuỗi dư thừa:** Mã định danh chuỗi trên web (VD: `premier-league`), dư thừa vì đã có `competition_id` làm khóa nghiệp vụ chuẩn gọn (`GB1`). |
+| `sub_type` | `string` | **Phân loại phụ dư thừa:** Phân loại chi tiết cúp quốc gia/cúp liên đoàn, đã được chuẩn hóa đơn giản về 2 dạng `domestic_league` và `international_cup`. |
+| `confederation` | `string` | **Thông tin liên đoàn:** Tên liên đoàn châu lục (UEFA, CONMEBOL...), không mang lại giá trị cao cho bài toán phân tích bàn thắng/thẻ phạt cấp CLB. |
+| `is_major_national_league` | `Int64` | **Cờ đánh dấu phụ:** Cờ giải VĐQG hàng đầu, dư thừa vì có thể phân loại dễ dàng bằng `Competition_ID` (Top 5 giải Châu Âu: `GB1`, `ES1`, `L1`, `IT1`, `L1`). |
+| `url` | `string` | **Dữ liệu giao diện Web:** Đường dẫn bài viết, hoàn toàn không có giá trị phân tích OLAP. |
 
 ---
 
