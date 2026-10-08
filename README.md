@@ -108,7 +108,7 @@ erDiagram
 
 ---
 
-## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & ĐỐI CHIẾU DỮ LIỆU NGUỒN KAGGLE
+## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & ĐỐI CHIẾU KAGGLE
 
 Chi tiết thuộc tính, các bước chuyển đổi SSIS ETL và **phân tích đối chiếu sâu với bộ dữ liệu nguồn Kaggle** (xác định các cột đúng, các cột khóa bị loại bỏ và các cột dư thừa/không cần thiết cho OLAP) được trình bày cụ thể trong 6 tệp tài liệu:
 
@@ -123,23 +123,24 @@ Chi tiết thuộc tính, các bước chuyển đổi SSIS ETL và **phân tíc
 
 ---
 
-## 📊 4. BÁO CÁO 15 CÂU TRUY VẤN NGHIỆP VỤ OLAP
+## ⚙️ 4. HƯỚNG DẪN CẤU HÌNH CHI TIẾT TỪNG KHỐI SSIS (SSIS BLOCK GUIDES)
+
+Thư mục [`ssis/`](ssis/) chứa các hướng dẫn cấu hình chi tiết cho từng khối (Flat File Source, Data Conversion, Derived Column, Conditional Split, Sort, OLE DB Destination):
+
+| Đối tượng / Bảng SSIS | Mô tả chi tiết cấu hình khối Data Flow | Tệp tài liệu khối SSIS |
+| :--- | :--- | :--- |
+| **Tổng quan Kiến trúc & Nguyên tắc 0 Warning** | Chuẩn 6 khối Data Flow & Quy tắc vàng triệt tiêu 100% Warning | ⚙️ [overview_pipeline.ssis.md](ssis/overview_pipeline.ssis.md) |
+| **`FACT_Player_Match_Perf`** | Cấu hình nạp Staging Fast Load & Execute SQL Task Populate Fact | ⚙️ [fact_player_match_perf.ssis.md](ssis/fact_player_match_perf.ssis.md) |
+| **`DIM_Club`** | Cấu hình ép kiểu, xử lý NULL sân vận động/HLV và khử trùng lặp | ⚙️ [dim_club.ssis.md](ssis/dim_club.ssis.md) |
+| **`DIM_Player`** | Cấu hình ép kiểu, tính toán tuổi tác và validation cầu thủ | ⚙️ [dim_player.ssis.md](ssis/dim_player.ssis.md) |
+| **`DIM_Competition`** | Cấu hình mã giải đấu `GB1`/`ES1` và phân loại cúp | ⚙️ [dim_competition.ssis.md](ssis/dim_competition.ssis.md) |
+| **`DIM_Game`** | Cấu hình nạp bối cảnh trận đấu, vòng đấu và tỷ số | ⚙️ [dim_game.ssis.md](ssis/dim_game.ssis.md) |
+| **`DIM_Time`** | Cấu hình bóc tách YYYYMMDD, thứ, tháng, quý, cờ cuối tuần | ⚙️ [dim_time.ssis.md](ssis/dim_time.ssis.md) |
+
+---
+
+## 📊 5. BÁO CÁO 15 CÂU TRUY VẤN NGHIỆP VỤ OLAP
 
 Hệ thống cung cấp **15 câu truy vấn nghiệp vụ đa chiều (OLAP Queries)** bao phủ 100% các thuộc tính trong mô hình Kho dữ liệu.
 
 👉 **Xem toàn bộ câu lệnh T-SQL và giải trình chi tiết:** 📄 [15_queries.md](docs/15_queries.md)
-
----
-
-## 🔄 5. QUY TRÌNH TÍCH HỢP DỮ LIỆU SSIS ETL
-
-Quy trình ETL được thực hiện tự động qua **SSIS Integration Services (Visual Studio 2022)**:
-1. **Control Flow:**
-   * Execute SQL Task `Drop All Tables`: Xóa bảng Fact trước, xóa 5 bảng Dim sau.
-   * Execute SQL Task `Create All Tables`: Khởi tạo lại cấu trúc 6 bảng với đầy đủ ràng buộc PK/FK.
-   * Data Flow Task `Load Dimensions`: Nạp dữ liệu sạch từ Flat Files vào `DIM_Player`, `DIM_Club`, `DIM_Competition`, `DIM_Game`, `DIM_Time`.
-   * Data Flow Task `Load Fact`: Nạp dữ liệu vào `FACT_Player_Match_Perf`.
-2. **Data Flow Pipeline của Fact Table:**
-   * Trích xuất từ `appearances.csv`.
-   * Thực hiện **6 biến đổi Lookup nối tiếp** (`Lookup_Player`, `Lookup_Club`, `Lookup_Opponent`, `Lookup_Competition`, `Lookup_Game`, `Lookup_Time`).
-   * Cấu hình **Redirect rows to no match output**: Gán giá trị khóa mặc định `-1` (Unknown Record) cho các bản ghi khuyết tham chiếu, tránh thất thoát dữ liệu.
