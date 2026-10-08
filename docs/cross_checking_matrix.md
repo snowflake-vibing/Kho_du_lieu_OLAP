@@ -22,8 +22,6 @@ Tài liệu này cung cấp **Bảng ma trận đối chiếu 3 chiều (3-Way C
 | 7 | `sub_position` | `string` (VD: `Right Winger`) | `Data Conversion` (`DT_WSTR, 100`) $\rightarrow$ Position chi tiết | `Sub_Position` | `NVARCHAR(100)` | ✅ Khớp 100% |
 | 8 | `foot` | `string` (VD: `Left`) | `Data Conversion` (`DT_WSTR, 100`) $\rightarrow$ `Derived` (replace NULL = 'Unknown') | `Foot` | `NVARCHAR(100)` | ✅ Khớp 100% |
 | 9 | `height_in_cm` | `int` (VD: `170`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Derived` (gán 175 nếu NULL/ngoài lề) | `Height_In_Cm` | `INT` | ✅ Khớp 100% |
-| 10 | `market_value_in_eur` | `float` (VD: `180000000.0`) | `Data Conversion` (`DT_R8`) $\rightarrow$ `Derived` (NULL = 0.0) | `Market_Value_In_EUR` | `FLOAT` | ✅ Khớp 100% |
-| 11 | `highest_market_value_in_eur` | `float` (VD: `200000000.0`) | `Data Conversion` (`DT_R8`) $\rightarrow$ `Derived` (NULL = 0.0) | `Highest_Market_Value_In_EUR` | `FLOAT` | ✅ Khớp 100% |
 
 ---
 
