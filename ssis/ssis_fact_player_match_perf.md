@@ -1,7 +1,7 @@
 # HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: FACT_PLAYER_MATCH_PERF
 
 > **Bảng đích:** `[dbo].[FACT_Player_Match_Perf]`  
-> **Tệp dữ liệu nguồn:** `appearances.csv` (1.89 triệu lượt ra sân)  
+> **Tệp dữ liệu nguồn:** `appearances.csv` (1.89 triệu lượt ra sân) & `player_valuations.csv`  
 > **Database:** `DW_Football_Analytics`  
 > **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`).
 
@@ -10,14 +10,14 @@
 ## 1. MÔ HÌNH NẠP FACT 2 BƯỚC (TWO-STAGE FACT ETL ARCHITECTURE)
 
 ```
-[BƯỚC 1: Data Flow Task - Load Staging Appearances]
+[BƯỚC 1: Data Flow Task - Load Staging Appearances & Valuations]
    Flat File Source (appearances.csv) ──➔ Data Conversion ──➔ OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)
 
                                   │
                                   ▼
 [BƯỚC 2: Execute SQL Task - Populate FACT via SQL Join]
    TRUNCATE TABLE FACT_Player_Match_Perf;
-   INSERT INTO FACT_Player_Match_Perf WITH (LEFT JOIN 5 BẢNG DIM);
+   INSERT INTO FACT_Player_Match_Perf WITH (LEFT JOIN 5 BẢNG DIM & STG_Valuations);
 ```
 
 ---
@@ -66,8 +66,10 @@
 USE DW_Football_Analytics;
 GO
 
+-- 1. Xóa sạch dữ liệu cũ
 TRUNCATE TABLE dbo.FACT_Player_Match_Perf;
 
+-- 2. Nạp dữ liệu sự kiện kết hợp liên kết 5 bảng DIM và tính toán độ đo
 INSERT INTO dbo.FACT_Player_Match_Perf (
     Player_SK,
     Club_SK,
@@ -82,6 +84,7 @@ INSERT INTO dbo.FACT_Player_Match_Perf (
     Goal_Contributions,
     Yellow_Cards,
     Red_Cards,
+    Market_Value_In_EUR,
     Is_Starter
 )
 SELECT 
@@ -98,11 +101,13 @@ SELECT
     (ISNULL(s.goals, 0) + ISNULL(s.assists, 0)) AS Goal_Contributions,
     ISNULL(s.yellow_cards, 0),
     ISNULL(s.red_cards, 0),
+    ISNULL(v.market_value_in_eur, 0.0) AS Market_Value_In_EUR,
     CASE WHEN ISNULL(s.minutes_played, 0) >= 45 THEN 1 ELSE 0 END AS Is_Starter
 FROM dbo.STG_Appearances s
 LEFT JOIN dbo.DIM_Player p ON s.player_id = p.Player_ID
 LEFT JOIN dbo.DIM_Club c ON s.player_club_id = c.Club_ID
 LEFT JOIN dbo.DIM_Competition comp ON s.competition_id = comp.Competition_ID
-LEFT JOIN dbo.DIM_Game g ON s.game_id = g.Game_ID;
+LEFT JOIN dbo.DIM_Game g ON s.game_id = g.Game_ID
+LEFT JOIN dbo.STG_Player_Valuations v ON s.player_id = v.player_id;
 GO
 ```
