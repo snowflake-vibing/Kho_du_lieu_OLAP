@@ -9,7 +9,7 @@
 
 ## 1. MÔ HÌNH NẠP FACT 2 BƯỚC (TWO-STAGE FACT ETL ARCHITECTURE)
 
-```
+```text
 [BƯỚC 1: Data Flow Task - Load Staging Appearances]
    Flat File Source (appearances.csv) ──➔ Data Conversion ──➔ Conditional Split (Validation 10 cột) ──➔ OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)
 
@@ -47,7 +47,7 @@
 * **Input Columns**: Đưa ĐẦY ĐỦ 10 CỘT (`dc_appearance_id`, `dc_game_id`, `dc_player_id`, `dc_player_club_id`, `dc_competition_id`, `dc_goals`, `dc_assists`, `dc_minutes_played`, `dc_yellow_cards`, `dc_red_cards`) vào Input.
 * **Output Name**: `Valid_Appearance`
 * **Condition Expression**:
-  ```c
+  ```csharp
   !ISNULL(dc_appearance_id) && LEN(TRIM(dc_appearance_id)) > 0 &&
   !ISNULL(dc_game_id) && dc_game_id > 0 &&
   !ISNULL(dc_player_id) && dc_player_id > 0 &&
@@ -126,6 +126,7 @@ LEFT JOIN dbo.DIM_Club c ON s.player_club_id = c.Club_ID
 LEFT JOIN dbo.DIM_Competition comp ON s.competition_id = comp.Competition_ID
 LEFT JOIN dbo.DIM_Game g ON s.game_id = g.Game_ID;
 GO
+```
 
 ---
 
@@ -134,7 +135,7 @@ GO
 Nếu bạn muốn thực hiện tra cứu và chuyển đổi các khóa tự nhiên (`Business Keys`) thành khóa thay thế (`Surrogate Keys - *_SK`) **trực tiếp trong Data Flow Task của SSIS** thay vì dùng câu lệnh `INSERT ... SELECT LEFT JOIN` ở Execute SQL Task, bạn cấu hình chuỗi các khối theo hướng dẫn chi tiết từng khối dưới đây:
 
 ### 4.1. Sơ đồ Luồng Data Flow (Lookup Chain)
-```
+```text
 [Flat File Source (appearances.csv)]
        │
        ▼
