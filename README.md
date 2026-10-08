@@ -11,6 +11,7 @@
 
 Dự án xây dựng một **Kho dữ liệu (Data Warehouse)** hoàn chỉnh theo mô hình Hình sao (Star Schema) kết hợp với quy trình **ETL tự động bằng Microsoft SSIS (SQL Server Integration Services)**. Hệ thống lưu trữ và phân tích khối dữ liệu lịch sử bóng đá quy mô lớn với:
 * **7 tệp CSV gốc:** `appearances.csv`, `players.csv`, `clubs.csv`, `competitions.csv`, `games.csv`, `player_valuations.csv`, `club_games.csv`.
+* **Dữ liệu đã qua làm sạch trong thư mục [`data/`](data/):** `cleaned_appearances.csv`, `cleaned_clubs.csv`, `cleaned_competitions.csv`, `cleaned_games.csv`, `cleaned_players.csv`.
 * **118 thuộc tính tổng cộng** và hơn **1.890.000 lượt ra sân thi đấu** của các cầu thủ chuyên nghiệp.
 * **Mục tiêu phân tích:** Đánh giá năng suất ghi bàn/kiến tạo chuẩn hóa 90 phút (P90 Metrics), mối tương quan giữa giá trị thị trường và đóng góp chuyên môn, ảnh hưởng của tính kỷ luật (thẻ phạt) và yếu tố sân bãi (sân nhà/sân khách).
 
@@ -108,9 +109,9 @@ erDiagram
 
 ---
 
-## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & ĐỐI CHIẾU KAGGLE
+## 🗂️ 3. DANH MỤC HỒ SƠ BẢNG DỮ LIỆU & BẢNG ĐỐI CHIẾU 3 CHIỀU
 
-Chi tiết thuộc tính, các bước chuyển đổi SSIS ETL và **phân tích đối chiếu sâu với bộ dữ liệu nguồn Kaggle** (xác định các cột đúng, các cột khóa bị loại bỏ và các cột dư thừa/không cần thiết cho OLAP) được trình bày cụ thể trong 6 tệp tài liệu:
+👉 **Bảng Ma Trận Đối Chiếu 3 Chiều:** 📋 [docs/cross_checking_matrix.md](docs/cross_checking_matrix.md) (Kiểm tra khớp 100% giữa **Data Cleaned CSV** $\leftrightarrow$ **SSIS ETL Blocks** $\leftrightarrow$ **DW Schema Docs**).
 
 | Tên bảng DW | Loại bảng | Mô tả chức năng & Đối chiếu Kaggle | Tệp tài liệu chi tiết |
 | :--- | :--- | :--- | :--- |
@@ -129,13 +130,13 @@ Thư mục [`ssis/`](ssis/) chứa các hướng dẫn cấu hình chi tiết ch
 
 | Đối tượng / Bảng SSIS | Mô tả chi tiết cấu hình khối Data Flow | Tệp tài liệu khối SSIS |
 | :--- | :--- | :--- |
-| **Tổng quan Kiến trúc & Nguyên tắc 0 Warning** | Chuẩn 6 khối Data Flow & Quy tắc vàng triệt tiêu 100% Warning | ⚙️ [overview_pipeline.ssis.md](ssis/overview_pipeline.ssis.md) |
-| **`FACT_Player_Match_Perf`** | Cấu hình nạp Staging Fast Load & Execute SQL Task Populate Fact | ⚙️ [fact_player_match_perf.ssis.md](ssis/fact_player_match_perf.ssis.md) |
-| **`DIM_Club`** | Cấu hình ép kiểu, xử lý NULL sân vận động/HLV và khử trùng lặp | ⚙️ [dim_club.ssis.md](ssis/dim_club.ssis.md) |
-| **`DIM_Player`** | Cấu hình ép kiểu, tính toán tuổi tác và validation cầu thủ | ⚙️ [dim_player.ssis.md](ssis/dim_player.ssis.md) |
-| **`DIM_Competition`** | Cấu hình mã giải đấu `GB1`/`ES1` và phân loại cúp | ⚙️ [dim_competition.ssis.md](ssis/dim_competition.ssis.md) |
-| **`DIM_Game`** | Cấu hình nạp bối cảnh trận đấu, vòng đấu và tỷ số | ⚙️ [dim_game.ssis.md](ssis/dim_game.ssis.md) |
-| **`DIM_Time`** | Cấu hình bóc tách YYYYMMDD, thứ, tháng, quý, cờ cuối tuần | ⚙️ [dim_time.ssis.md](ssis/dim_time.ssis.md) |
+| **Tổng quan Kiến trúc & Nguyên tắc 0 Warning** | Chuẩn 6 khối Data Flow & Quy tắc vàng triệt tiêu 100% Warning | ⚙️ [ssis_overview_pipeline.md](ssis/ssis_overview_pipeline.md) |
+| **`FACT_Player_Match_Perf`** | Cấu hình nạp Staging Fast Load & Execute SQL Task Populate Fact | ⚙️ [ssis_fact_player_match_perf.md](ssis/ssis_fact_player_match_perf.md) |
+| **`DIM_Club`** | Cấu hình ép kiểu, xử lý NULL sân vận động/HLV và khử trùng lặp | ⚙️ [ssis_dim_club.md](ssis/ssis_dim_club.md) |
+| **`DIM_Player`** | Cấu hình ép kiểu, tính toán tuổi tác và validation cầu thủ | ⚙️ [ssis_dim_player.md](ssis/ssis_dim_player.md) |
+| **`DIM_Competition`** | Cấu hình mã giải đấu `GB1`/`ES1` và phân loại cúp | ⚙️ [ssis_dim_competition.md](ssis/ssis_dim_competition.md) |
+| **`DIM_Game`** | Cấu hình nạp bối cảnh trận đấu, vòng đấu và tỷ số | ⚙️ [ssis_dim_game.md](ssis/ssis_dim_game.md) |
+| **`DIM_Time`** | Cấu hình bóc tách YYYYMMDD, thứ, tháng, quý, cờ cuối tuần | ⚙️ [ssis_dim_time.md](ssis/ssis_dim_time.md) |
 
 ---
 
