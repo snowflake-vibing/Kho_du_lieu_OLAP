@@ -19,7 +19,7 @@
 [3. Derived Column (Chuẩn hóa Competition_Type & Xử lý NULL Country_Name)]
        │
        ▼
-[4. Conditional Split (Validation kiểm tra thuộc tính Giải đấu)]
+[4. Conditional Split (Validation kiểm tra toàn bộ 4 cột)]
        │
        ▼ (Output: Valid_Competition)
 [5. Sort (Sort Ascending theo Competition_ID & Distinct loại trùng)]
@@ -53,13 +53,15 @@
 * **`der_competition_type`** (`[DT_WSTR]`, 100):  
   `ISNULL(dc_type) || LEN(TRIM(dc_type)) == 0 ? "domestic_league" : TRIM(dc_type)`
 
-### Khối 4: `Conditional Split` (Validation kiểm tra dữ liệu)
+### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 4 CỘT)
 * **Input Columns**: Đưa ĐẦY ĐỦ 4 CỘT (`dc_competition_id`, `dc_name`, `der_country_name`, `der_competition_type`) vào Input.
 * **Output Name**: `Valid_Competition`
 * **Condition Expression**:
   ```c
   !ISNULL(dc_competition_id) && LEN(TRIM(dc_competition_id)) > 0 &&
-  !ISNULL(dc_name) && LEN(TRIM(dc_name)) > 0
+  !ISNULL(dc_name) && LEN(TRIM(dc_name)) > 0 &&
+  !ISNULL(der_country_name) && LEN(TRIM(der_country_name)) > 0 &&
+  !ISNULL(der_competition_type) && LEN(TRIM(der_competition_type)) > 0
   ```
 * **Default Output Name**: `Invalid_Competition`
 

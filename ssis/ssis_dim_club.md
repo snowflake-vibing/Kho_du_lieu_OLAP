@@ -64,9 +64,9 @@
   ```c
   !ISNULL(dc_club_id) && dc_club_id > 0 &&
   !ISNULL(dc_club_name) && LEN(TRIM(dc_club_name)) > 0 &&
-  !ISNULL(der_stadium_name) &&
+  !ISNULL(der_stadium_name) && LEN(TRIM(der_stadium_name)) > 0 &&
   !ISNULL(der_stadium_seats) && der_stadium_seats >= 0 &&
-  !ISNULL(der_coach_name) &&
+  !ISNULL(der_coach_name) && LEN(TRIM(der_coach_name)) > 0 &&
   !ISNULL(dc_squad_size) && dc_squad_size >= 0
   ```
 * **Default Output Name**: `Invalid_Club`

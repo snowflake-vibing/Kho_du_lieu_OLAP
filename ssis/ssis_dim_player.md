@@ -19,7 +19,7 @@
 [3. Derived Column (Tính toán Age & Xử lý NULL Name, Country, Position, Foot, Height)]
        │
        ▼
-[4. Conditional Split (Validation kiểm tra toàn bộ thuộc tính Cầu thủ)]
+[4. Conditional Split (Validation kiểm tra toàn bộ 9 cột)]
        │
        ▼ (Output: Valid_Player)
 [5. Sort (Sort Ascending theo Player_ID & Distinct loại trùng)]
@@ -63,15 +63,20 @@
 * **`der_height`** (`[DT_I4]`):  
   `ISNULL(dc_height_in_cm) || dc_height_in_cm < 150 || dc_height_in_cm > 220 ? 175 : dc_height_in_cm`
 
-### Khối 4: `Conditional Split` (Validation kiểm tra dữ liệu)
-* **Input Columns**: Đưa ĐẦY ĐỦ các cột (`dc_player_id`, `der_player_name`, `dc_date_of_birth`, `der_age`, `der_country`, `dc_main_position`, `dc_sub_position`, `der_foot`, `der_height`) vào Input.
+### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 9 CỘT)
+* **Input Columns**: Đưa ĐẦY ĐỦ 9 CỘT (`dc_player_id`, `der_player_name`, `dc_date_of_birth`, `der_age`, `der_country`, `dc_main_position`, `dc_sub_position`, `der_foot`, `der_height`) vào Input.
 * **Output Name**: `Valid_Player`
 * **Condition Expression**:
   ```c
   !ISNULL(dc_player_id) && dc_player_id > 0 &&
   !ISNULL(der_player_name) && LEN(TRIM(der_player_name)) > 0 &&
-  !ISNULL(der_country) &&
-  !ISNULL(dc_main_position)
+  !ISNULL(dc_date_of_birth) && LEN(TRIM(dc_date_of_birth)) > 0 &&
+  !ISNULL(der_age) && der_age > 0 &&
+  !ISNULL(der_country) && LEN(TRIM(der_country)) > 0 &&
+  !ISNULL(dc_main_position) && LEN(TRIM(dc_main_position)) > 0 &&
+  !ISNULL(dc_sub_position) && LEN(TRIM(dc_sub_position)) > 0 &&
+  !ISNULL(der_foot) && LEN(TRIM(der_foot)) > 0 &&
+  !ISNULL(der_height) && der_height > 0
   ```
 * **Default Output Name**: `Invalid_Player`
 

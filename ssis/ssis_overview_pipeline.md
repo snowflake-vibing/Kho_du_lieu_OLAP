@@ -31,7 +31,7 @@ Mỗi luồng dữ liệu Dimension (DIM) tuân thủ mô hình 6 khối tuần 
 
 1. **Đồng bộ độ dài 100% (Nguồn = Đích = 200 hoặc 100)**:
    * Độ dài chuỗi tại `Data Conversion` và `Sort` phải **bằng chính xác** độ dài cột `NVARCHAR` trong CSDL SQL Server (chỉ dùng duy nhất chuẩn **200** hoặc **100**).
-2. **Đưa toàn bộ các cột vào Conditional Split Input**:
-   * Khi dùng `Conditional Split`, phải tick chọn **tất cả các cột** của luồng dữ liệu vào danh sách `InputColumns` để dữ liệu chảy qua đúng passthrough stream, tránh lỗi đứt đoạn `LineageID`.
+2. **Kiểm tra điều kiện toàn bộ các cột trong Conditional Split**:
+   * Khi dùng `Conditional Split` cho các bảng DIM và FACT (Staging), phải tick chọn **tất cả các cột** của luồng dữ liệu vào danh sách `InputColumns` và thiết lập biểu thức điều kiện kiểm tra toàn bộ các cột (`!ISNULL(...)`, `LEN(TRIM(...)) > 0`, `> 0`, `>= 0`) để đảm bảo không bỏ sót cột nào và tránh lỗi đứt đoạn `LineageID`.
 3. **Lưu toàn bộ Project (`Ctrl + Shift + S`)**:
    * Sau khi chỉnh sửa UI trên Visual Studio, luôn bấm **Save All** để Visual Studio ghi nhận cấu hình từ RAM xuống đĩa `.dtsx` và làm mới Cache Validation.

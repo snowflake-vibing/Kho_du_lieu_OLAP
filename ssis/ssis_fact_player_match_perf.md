@@ -11,7 +11,7 @@
 
 ```
 [BƯỚC 1: Data Flow Task - Load Staging Appearances]
-   Flat File Source (appearances.csv) ──➔ Data Conversion ──➔ OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)
+   Flat File Source (appearances.csv) ──➔ Data Conversion ──➔ Conditional Split (Validation 10 cột) ──➔ OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)
 
                                   │
                                   ▼
@@ -26,7 +26,7 @@
 
 ### Khối 1: `Flat File Source` (Đọc file `appearances.csv`)
 * **Connection Manager**: `FF_Appearances` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (9 cột): `appearance_id`, `game_id`, `player_id`, `player_club_id`, `competition_id`, `goals`, `assists`, `minutes_played`, `yellow_cards`, `red_cards`.
+* **Selected Columns** (10 cột): `appearance_id`, `game_id`, `player_id`, `player_club_id`, `competition_id`, `goals`, `assists`, `minutes_played`, `yellow_cards`, `red_cards`.
 
 ### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
 
@@ -43,7 +43,26 @@
 | `yellow_cards` | **`dc_yellow_cards`** | Four-byte signed integer `[DT_I4]` | - | Thẻ vàng |
 | `red_cards` | **`dc_red_cards`** | Four-byte signed integer `[DT_I4]` | - | Thẻ đỏ |
 
-### Khối 3: `OLE DB Destination` (Cấu hình Fast Load tối ưu cho 1.89M dòng)
+### Khối 3: `Conditional Split` (Validation kiểm tra TOÀN BỘ 10 CỘT)
+* **Input Columns**: Đưa ĐẦY ĐỦ 10 CỘT (`dc_appearance_id`, `dc_game_id`, `dc_player_id`, `dc_player_club_id`, `dc_competition_id`, `dc_goals`, `dc_assists`, `dc_minutes_played`, `dc_yellow_cards`, `dc_red_cards`) vào Input.
+* **Output Name**: `Valid_Appearance`
+* **Condition Expression**:
+  ```c
+  !ISNULL(dc_appearance_id) && LEN(TRIM(dc_appearance_id)) > 0 &&
+  !ISNULL(dc_game_id) && dc_game_id > 0 &&
+  !ISNULL(dc_player_id) && dc_player_id > 0 &&
+  !ISNULL(dc_player_club_id) && dc_player_club_id > 0 &&
+  !ISNULL(dc_competition_id) && LEN(TRIM(dc_competition_id)) > 0 &&
+  !ISNULL(dc_goals) && dc_goals >= 0 &&
+  !ISNULL(dc_assists) && dc_assists >= 0 &&
+  !ISNULL(dc_minutes_played) && dc_minutes_played >= 0 &&
+  !ISNULL(dc_yellow_cards) && dc_yellow_cards >= 0 &&
+  !ISNULL(dc_red_cards) && dc_red_cards >= 0
+  ```
+* **Default Output Name**: `Invalid_Appearance`
+
+### Khối 4: `OLE DB Destination` (Cấu hình Fast Load tối ưu cho 1.89M dòng)
+* **Input Path**: Chọn nhánh **`Valid_Appearance`**.
 * **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
 * **Data Access Mode**: `Table or view - fast load`.
 * **Table**: `[dbo].[STG_Appearances]`.
@@ -107,4 +126,48 @@ LEFT JOIN dbo.DIM_Club c ON s.player_club_id = c.Club_ID
 LEFT JOIN dbo.DIM_Competition comp ON s.competition_id = comp.Competition_ID
 LEFT JOIN dbo.DIM_Game g ON s.game_id = g.Game_ID;
 GO
+
+---
+
+## 4. PHƯƠNG PHÁP BỔ SUNG: NẠP FACT TRỰC TIẾP BẰNG SSIS LOOKUP TRANSFORMATIONS
+
+Nếu muốn thực hiện tra cứu khóa ngoại (`Surrogate Keys`) **trực tiếp trong Data Flow Task** của SSIS thay vì SQL Join 2 bước, cấu hình luồng xử lý như sau:
+
+### 4.1. Luồng Data Flow dùng Lookup Transformations
+```
+[Flat File Source / Staging] 
+       │
+       ▼
+[Data Conversion] (Chuẩn hóa kiểu dữ liệu INT & WSTR 100/200)
+       │
+       ▼
+[Conditional Split] (Validation 10 cột hợp lệ)
+       │
+       ▼
+[Lookup Player_SK] (Join: dc_player_id == DIM_Player.Player_ID ➔ Lấy Player_SK)
+       │
+       ▼
+[Lookup Club_SK] (Join: dc_player_club_id == DIM_Club.Club_ID ➔ Lấy Club_SK)
+       │
+       ▼
+[Lookup Opponent_Club_SK] (Join: dc_opponent_club_id == DIM_Club.Club_ID ➔ Lấy Opponent_Club_SK)
+       │
+       ▼
+[Lookup Competition_SK] (Join: dc_competition_id == DIM_Competition.Competition_ID ➔ Lấy Competition_SK)
+       │
+       ▼
+[Lookup Game_SK] (Join: dc_game_id == DIM_Game.Game_ID ➔ Lấy Game_SK)
+       │
+       ▼
+[Lookup Time_SK] (Join: dc_time_id == DIM_Time.Time_ID ➔ Lấy Time_SK)
+       │
+       ▼
+[OLE DB Destination (dbo.FACT_Player_Match_Perf)]
+```
+
+### 4.2. Cấu hình quan trọng cho các khối Lookup
+* **Cache Mode**: `Full cache` (Nạp toàn bộ bảng Dim vào bộ nhớ RAM của SSIS để tra cứu cực nhanh).
+* **No Match Handling**: Chọn **`Ignore failure`** (dòng không khớp sẽ tự động gán `NULL` cho `*_SK`) hoặc **`Redirect rows to No Match Output`** nếu có khối Derived Column xử lý giá trị mặc định `-1`.
+* **Ràng buộc SQL Server**: Tất cả cột `Business Key` (`Player_ID`, `Club_ID`, `Competition_ID`, `Game_ID`, `Time_ID`) trên các bảng Dim **bắt buộc có ràng buộc `UNIQUE` hoặc chỉ mục Index** để SSIS Lookup đạt hiệu năng tối đa.
+
 ```

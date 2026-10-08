@@ -19,10 +19,13 @@
 [3. Derived Column (Bóc tách Time_ID YYYYMMDD, Full_Date, Day, Month, Quarter, Year, Season, Is_Weekend)]
        │
        ▼
-[4. Sort (Sort Ascending theo Time_ID & Distinct loại trùng ngày)]
+[4. Conditional Split (Validation kiểm tra toàn bộ 9 cột thời gian)]
+       │
+       ▼ (Output: Valid_Time)
+[5. Sort (Sort Ascending theo Time_ID & Distinct loại trùng ngày)]
        │
        ▼
-[5. OLE DB Destination (dbo.DIM_Time - Table lock, Fast Load)]
+[6. OLE DB Destination (dbo.DIM_Time - Table lock, Fast Load)]
 ```
 
 ---
@@ -51,11 +54,29 @@
 | **`Season`** | `[DT_WSTR]` | **100** | `"Mùa " + dc_season` (Ví dụ: `"Mùa 2023"`) |
 | **`Is_Weekend`** | `[DT_I4]` | - | `DATEPART("dw", (DT_DBTIMESTAMP)dc_date) == 1 \|\| DATEPART("dw", (DT_DBTIMESTAMP)dc_date) == 7 ? 1 : 0` |
 
-### Khối 4: `Sort` (Khử trùng lặp theo Time_ID)
+### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 9 CỘT THỜI GIAN)
+* **Input Columns**: Đưa ĐẦY ĐỦ 9 CỘT (`dc_date`, `dc_season`, `Time_ID`, `Full_Date`, `Day`, `Month`, `Quarter`, `Year`, `Season`) vào Input.
+* **Output Name**: `Valid_Time`
+* **Condition Expression**:
+  ```c
+  !ISNULL(dc_date) && LEN(TRIM(dc_date)) > 0 &&
+  !ISNULL(dc_season) && LEN(TRIM(dc_season)) > 0 &&
+  !ISNULL(Time_ID) && Time_ID > 0 &&
+  !ISNULL(Full_Date) && LEN(TRIM(Full_Date)) > 0 &&
+  !ISNULL(Day) && Day > 0 &&
+  !ISNULL(Month) && Month > 0 &&
+  !ISNULL(Quarter) && Quarter > 0 &&
+  !ISNULL(Year) && Year > 0 &&
+  !ISNULL(Season) && LEN(TRIM(Season)) > 0
+  ```
+* **Default Output Name**: `Invalid_Time`
+
+### Khối 5: `Sort` (Khử trùng lặp theo Time_ID)
+* **Input Path**: Chọn nhánh **`Valid_Time`**.
 * **Sort Column**: Tick chọn `Time_ID` (Sort Type: `Ascending`, Sort Order: `1`).
 * **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
 
-### Khối 5: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
+### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
 * **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
 * **Data Access Mode**: `Table or view - fast load`.
 * **Table**: `[dbo].[DIM_Time]`.

@@ -69,7 +69,7 @@
   !ISNULL(dc_away_club_id) && dc_away_club_id > 0 &&
   !ISNULL(der_home_goals) && der_home_goals >= 0 &&
   !ISNULL(der_away_goals) && der_away_goals >= 0 &&
-  !ISNULL(der_stadium)
+  !ISNULL(der_stadium) && LEN(TRIM(der_stadium)) > 0
   ```
 * **Default Output Name**: `Invalid_Game`
 
