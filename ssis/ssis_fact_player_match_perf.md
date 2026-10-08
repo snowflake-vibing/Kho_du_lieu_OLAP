@@ -129,45 +129,158 @@ GO
 
 ---
 
-## 4. PHƯƠNG PHÁP BỔ SUNG: NẠP FACT TRỰC TIẾP BẰNG SSIS LOOKUP TRANSFORMATIONS
+## 4. PHƯƠNG PHÁP NẠP FACT BẰNG CHUỖI LOOKUP TRANSFORMATIONS TRONG DATA FLOW
 
-Nếu muốn thực hiện tra cứu khóa ngoại (`Surrogate Keys`) **trực tiếp trong Data Flow Task** của SSIS thay vì SQL Join 2 bước, cấu hình luồng xử lý như sau:
+Nếu bạn muốn thực hiện tra cứu và chuyển đổi các khóa tự nhiên (`Business Keys`) thành khóa thay thế (`Surrogate Keys - *_SK`) **trực tiếp trong Data Flow Task của SSIS** thay vì dùng câu lệnh `INSERT ... SELECT LEFT JOIN` ở Execute SQL Task, bạn cấu hình chuỗi các khối theo hướng dẫn chi tiết từng khối dưới đây:
 
-### 4.1. Luồng Data Flow dùng Lookup Transformations
+### 4.1. Sơ đồ Luồng Data Flow (Lookup Chain)
 ```
-[Flat File Source / Staging] 
+[Flat File Source (appearances.csv)]
        │
        ▼
-[Data Conversion] (Chuẩn hóa kiểu dữ liệu INT & WSTR 100/200)
+[Data Conversion] (Chuẩn hóa dc_player_id, dc_player_club_id, dc_competition_id, dc_game_id, dc_date_str)
        │
        ▼
-[Conditional Split] (Validation 10 cột hợp lệ)
+[Conditional Split] (Lọc dòng hợp lệ Valid_Appearance)
        │
        ▼
-[Lookup Player_SK] (Join: dc_player_id == DIM_Player.Player_ID ➔ Lấy Player_SK)
+[Khối 1: Lookup Player_SK]
        │
        ▼
-[Lookup Club_SK] (Join: dc_player_club_id == DIM_Club.Club_ID ➔ Lấy Club_SK)
+[Khối 2: Lookup Club_SK]
        │
        ▼
-[Lookup Opponent_Club_SK] (Join: dc_opponent_club_id == DIM_Club.Club_ID ➔ Lấy Opponent_Club_SK)
+[Khối 3: Lookup Opponent_Club_SK]
        │
        ▼
-[Lookup Competition_SK] (Join: dc_competition_id == DIM_Competition.Competition_ID ➔ Lấy Competition_SK)
+[Khối 4: Lookup Competition_SK]
        │
        ▼
-[Lookup Game_SK] (Join: dc_game_id == DIM_Game.Game_ID ➔ Lấy Game_SK)
+[Khối 5: Lookup Game_SK]
        │
        ▼
-[Lookup Time_SK] (Join: dc_time_id == DIM_Time.Time_ID ➔ Lấy Time_SK)
+[Khối 6: Lookup Time_SK]
        │
        ▼
-[OLE DB Destination (dbo.FACT_Player_Match_Perf)]
+[Khối 7: Derived Column - Fact Measures]
+       │
+       ▼
+[Khối 8: OLE DB Destination (dbo.FACT_Player_Match_Perf)]
 ```
 
-### 4.2. Cấu hình quan trọng cho các khối Lookup
-* **Cache Mode**: `Full cache` (Nạp toàn bộ bảng Dim vào bộ nhớ RAM của SSIS để tra cứu cực nhanh).
-* **No Match Handling**: Chọn **`Ignore failure`** (dòng không khớp sẽ tự động gán `NULL` cho `*_SK`) hoặc **`Redirect rows to No Match Output`** nếu có khối Derived Column xử lý giá trị mặc định `-1`.
-* **Ràng buộc SQL Server**: Tất cả cột `Business Key` (`Player_ID`, `Club_ID`, `Competition_ID`, `Game_ID`, `Time_ID`) trên các bảng Dim **bắt buộc có ràng buộc `UNIQUE` hoặc chỉ mục Index** để SSIS Lookup đạt hiệu năng tối đa.
+---
 
-```
+### 4.2. Hướng dẫn cấu hình chi tiết từng Khối (Block-by-Block Configuration)
+
+#### Khối 1: `Lookup Player_SK` (Tra cứu khóa Cầu thủ)
+* **Tab General**:
+  * **Cache mode**: Chọn **`Full cache`** (Nạp toàn bộ bảng DIM_Player vào RAM).
+  * **Connection type**: Chọn **`OLE DB connection manager`**.
+  * **Specify how to handle rows with no matching entries**: Chọn **`Ignore failure`** (Nếu không tìm thấy cầu thủ, trả về `NULL` cho `Player_SK`).
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Player]`** (hoặc nhập SQL query: `SELECT Player_SK, Player_ID FROM dbo.DIM_Player`).
+* **Tab Columns**:
+  * Đốt nối đường kẻ từ cột đầu vào **`dc_player_id`** sang cột Lookup **`Player_ID`**.
+  * Tích chọn ô **`Player_SK`** ở bảng bên phải.
+  * **Output Alias**: Nhập **`Player_SK`**.
+
+---
+
+#### Khối 2: `Lookup Club_SK` (Tra cứu khóa Câu lạc bộ của Cầu thủ)
+* **Tab General**:
+  * **Cache mode**: **`Full cache`**.
+  * **Connection type**: **`OLE DB connection manager`**.
+  * **No matching entries**: **`Ignore failure`**.
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Club]`** (hoặc SQL: `SELECT Club_SK, Club_ID FROM dbo.DIM_Club`).
+* **Tab Columns**:
+  * Nối cột đầu vào **`dc_player_club_id`** sang cột Lookup **`Club_ID`**.
+  * Tích chọn ô **`Club_SK`**.
+  * **Output Alias**: Nhập **`Club_SK`**.
+
+---
+
+#### Khối 3: `Lookup Opponent_Club_SK` (Tra cứu khóa Câu lạc bộ Đối thủ)
+* **Tab General**:
+  * **Cache mode**: **`Full cache`**.
+  * **Connection type**: **`OLE DB connection manager`**.
+  * **No matching entries**: **`Ignore failure`**.
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Club]`** (hoặc SQL: `SELECT Club_SK, Club_ID FROM dbo.DIM_Club`).
+* **Tab Columns**:
+  * Nối cột đầu vào **`dc_opponent_club_id`** (hoặc mã đội đối thủ) sang cột Lookup **`Club_ID`**.
+  * Tích chọn ô **`Club_SK`**.
+  * **Output Alias**: Nhập **`Opponent_Club_SK`** *(Lưu ý bắt buộc đổi tên Alias thành Opponent_Club_SK để không bị đè lên cột Club_SK đã lấy ở Khối 2)*.
+
+---
+
+#### Khối 4: `Lookup Competition_SK` (Tra cứu khóa Giải đấu)
+* **Tab General**:
+  * **Cache mode**: **`Full cache`**.
+  * **Connection type**: **`OLE DB connection manager`**.
+  * **No matching entries**: **`Ignore failure`**.
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Competition]`** (hoặc SQL: `SELECT Competition_SK, Competition_ID FROM dbo.DIM_Competition`).
+* **Tab Columns**:
+  * Nối cột đầu vào **`dc_competition_id`** sang cột Lookup **`Competition_ID`**.
+  * Tích chọn ô **`Competition_SK`**.
+  * **Output Alias**: Nhập **`Competition_SK`**.
+
+---
+
+#### Khối 5: `Lookup Game_SK` (Tra cứu khóa Trận đấu)
+* **Tab General**:
+  * **Cache mode**: **`Full cache`**.
+  * **Connection type**: **`OLE DB connection manager`**.
+  * **No matching entries**: **`Ignore failure`**.
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Game]`** (hoặc SQL: `SELECT Game_SK, Game_ID FROM dbo.DIM_Game`).
+* **Tab Columns**:
+  * Nối cột đầu vào **`dc_game_id`** sang cột Lookup **`Game_ID`**.
+  * Tích chọn ô **`Game_SK`**.
+  * **Output Alias**: Nhập **`Game_SK`**.
+
+---
+
+#### Khối 6: `Lookup Time_SK` (Tra cứu khóa Thời gian)
+* **Tab General**:
+  * **Cache mode**: **`Full cache`**.
+  * **Connection type**: **`OLE DB connection manager`**.
+  * **No matching entries**: **`Ignore failure`**.
+* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Time]`** (hoặc SQL: `SELECT Time_SK, Time_ID FROM dbo.DIM_Time`).
+* **Tab Columns**:
+  * Nối cột đầu vào **`Time_ID`** (dạng số YYYYMMDD thu được từ ngày đấu) sang cột Lookup **`Time_ID`**.
+  * Tích chọn ô **`Time_SK`**.
+  * **Output Alias**: Nhập **`Time_SK`**.
+
+---
+
+#### Khối 7: `Derived Column` (Tính toán độ đo - Fact Measures)
+* **Tên khối**: `Derived Column - Fact Measures`
+* Cấu hình tạo các cột độ đo tính toán mới trong luồng:
+
+| Derived Column Name | Derived Column | Expression | Data Type |
+| :--- | :--- | :--- | :--- |
+| **`Goal_Contributions`** | Add as new column | `dc_goals + dc_assists` | `[DT_I4]` |
+| **`Is_Starter`** | Add as new column | `dc_minutes_played >= 45 ? 1 : 0` | `[DT_I4]` |
+
+---
+
+#### Khối 8: `OLE DB Destination` (Nạp dữ liệu vào bảng Fact)
+* **Connection Manager**: OLE DB Connection đến database `DW_Football_Transfermarkt`.
+* **Data Access Mode**: `Table or view - fast load`.
+* **Table**: `[dbo].[FACT_Player_Match_Perf]`.
+* **Cấu hình Fast Load**:
+  * **Rows per batch**: `50000`
+  * **Maximum insert commit size**: `50000`
+  * Tick chọn: **`Table lock`** và **`Check constraints`**.
+* **Mappings (Ánh xạ cột)**:
+  - `Player_SK` ➔ `Player_SK`
+  - `Club_SK` ➔ `Club_SK`
+  - `Opponent_Club_SK` ➔ `Opponent_Club_SK`
+  - `Competition_SK` ➔ `Competition_SK`
+  - `Game_SK` ➔ `Game_SK`
+  - `Time_SK` ➔ `Time_SK`
+  - `dc_game_id` ➔ `Game_ID`
+  - `dc_minutes_played` ➔ `Minutes_Played`
+  - `dc_goals` ➔ `Goals`
+  - `dc_assists` ➔ `Assists`
+  - `Goal_Contributions` ➔ `Goal_Contributions`
+  - `dc_yellow_cards` ➔ `Yellow_Cards`
+  - `dc_red_cards` ➔ `Red_Cards`
+  - `Is_Starter` ➔ `Is_Starter`
