@@ -2,7 +2,7 @@
 
 ## 1. TỔNG QUAN & VAI TRÒ TRONG KHO DỮ LIỆU
 
-Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu trữ toàn bộ thông tin tiểu sử, nhân trắc học và vị trí thi đấu chuyên môn của cầu thủ bóng đá. 
+Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu trữ toàn bộ thông tin tiểu sử, nhân trắc học, vị trí thi đấu chuyên môn và định giá thị trường của cầu thủ bóng đá. 
 
 * **Tên bảng:** `dbo.DIM_Player`
 * **Loại bảng:** Dimension Table (SCD Type 1)
@@ -26,6 +26,8 @@ Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu tr
 | Thuộc tính | `Sub_Position` | `NVARCHAR(100)` | `NULL` | Vị trí chi tiết (*Centre-Back, Right Winger, Centre-Forward...*) |
 | Thuộc tính | `Foot` | `NVARCHAR(100)` | `NULL` | Chân thuận (*Left, Right, Both*) |
 | Thuộc tính | `Height_In_Cm` | `INT` | `CHECK (Height_In_Cm BETWEEN 150 AND 220)` | Chiều cao thực tế tính bằng centimet |
+| Thuộc tính | `Market_Value_In_EUR` | `FLOAT` | `DEFAULT 0.0, CHECK >= 0` | Giá trị thị trường hiện tại của cầu thủ (Euro) từ `players.csv` |
+| Thuộc tính | `Highest_Market_Value_In_EUR` | `FLOAT` | `DEFAULT 0.0, CHECK >= 0` | Giá trị thị trường cao nhất từng đạt được của cầu thủ (Euro) |
 
 ---
 
@@ -47,6 +49,8 @@ Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu tr
 | `sub_position` | `string` | `Sub_Position` | `NVARCHAR(100)` | **Giữ nguyên:** Vị trí chi tiết, ép kiểu `[DT_WSTR, 100]` |
 | `foot` | `string` | `Foot` | `NVARCHAR(100)` | **Giữ nguyên:** Chân thuận, ép kiểu `[DT_WSTR, 100]` |
 | `height_in_cm` | `float64` | `Height_In_Cm` | `INT` | **Giữ nguyên:** Chiều cao (cm), ép kiểu `[DT_I4]` |
+| `market_value_in_eur` | `float64` | `Market_Value_In_EUR` | `FLOAT` | **Giữ nguyên:** Giá trị thị trường hiện tại (Euro), ép kiểu `[DT_R8]` |
+| `highest_market_value_in_eur` | `float64` | `Highest_Market_Value_In_EUR` | `FLOAT` | **Giữ nguyên:** Giá trị thị trường đỉnh cao (Euro), ép kiểu `[DT_R8]` |
 
 ### 3.2. Các cột Khóa (Key/FK) trong Kaggle BỊ BỎ QUA trong DIM_Player và lý do (Omitted Keys)
 
@@ -68,7 +72,6 @@ Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu tr
 | `contract_expiration_date` | `string` | **Thông tin biến động ngắn hạn:** Ngày hết hạn hợp đồng. |
 | `last_season` | `Int64` | **Thông tin hệ thống nguồn:** Mùa giải gần nhất cập nhật. |
 | `international_caps`, `international_goals` | `Int64` | **Nằm ngoài phạm vi:** Số trận/bàn thắng cấp ĐTQG. |
-| `market_value_in_eur`, `highest_market_value_in_eur` | `float64` | **Chuyển đổi lưu trữ:** Đã chuyển sang `FACT_Player_Match_Perf.Market_Value_In_EUR`. |
 
 ---
 
@@ -84,12 +87,15 @@ Bảng `DIM_Player` đóng vai trò là bảng chiều (Dimension Table) lưu tr
      * `sub_position` $\rightarrow$ `dc_sub_position` (`[DT_WSTR, 100]`)
      * `foot` $\rightarrow$ `dc_foot` (`[DT_WSTR, 100]`)
    * Ép kiểu số nguyên (`[DT_I4]`) cho `player_id`, `height_in_cm`.
+   * Ép kiểu số thực (`[DT_R8]`) cho `market_value_in_eur`, `highest_market_value_in_eur`.
 3. **Derived Column Component (Xử lý NULL & Gán mặc định):**
    * `der_age`: `ISNULL(dc_date_of_birth) ? 25 : DATEDIFF("yy", (DT_DBTIMESTAMP)dc_date_of_birth, GETDATE())`
    * `der_player_name`: `ISNULL(dc_player_name) || LEN(TRIM(dc_player_name)) == 0 ? "Unknown Player" : TRIM(dc_player_name)`
    * `der_country`: `ISNULL(dc_country) || LEN(TRIM(dc_country)) == 0 ? "Unknown" : TRIM(dc_country)`
    * `der_foot`: `ISNULL(dc_foot) || LEN(TRIM(dc_foot)) == 0 ? "Unknown" : TRIM(dc_foot)`
    * `der_height`: `ISNULL(dc_height_in_cm) || dc_height_in_cm < 150 || dc_height_in_cm > 220 ? 175 : dc_height_in_cm`
+   * `der_market_value`: `ISNULL(dc_market_value_in_eur) || dc_market_value_in_eur < 0 ? 0.0 : dc_market_value_in_eur`
+   * `der_highest_market_value`: `ISNULL(dc_highest_market_value) || dc_highest_market_value < 0 ? 0.0 : dc_highest_market_value`
 4. **Bản ghi đặc biệt (Unknown Record Key = -1):**
    * Khởi tạo dòng mặc định `Player_SK = -1`, `Player_ID = -1`, `Player_Name = 'Unknown Player'` để phục vụ tra cứu Lookup trong Fact.
 5. **OLE DB Destination:** Đẩy dữ liệu sạch vào bảng `dbo.DIM_Player`.

@@ -10,13 +10,13 @@
 ## 1. SƠ ĐỒ LUỒNG DỮ LIỆU (DATA FLOW ARCHITECTURE)
 
 ```
-[1. Flat File Source (players.csv)]
+[1. Flat File Source (cleaned_players.csv)]
        │
        ▼
-[2. Data Conversion (Ép kiểu DT_I4 & DT_WSTR 100/200)]
+[2. Data Conversion (Ép kiểu DT_I4, DT_R8 & DT_WSTR 100/200)]
        │
        ▼
-[3. Derived Column (Tính toán Age & Xử lý NULL Name, Country, Position, Foot, Height)]
+[3. Derived Column (Tính toán Age & Xử lý NULL Name, Country, Position, Foot, Height, Market Values)]
        │
        ▼
 [4. Conditional Split (Validation kiểm tra toàn bộ thuộc tính Cầu thủ)]
@@ -34,7 +34,7 @@
 
 ### Khối 1: `Flat File Source` (Đọc file `cleaned_players.csv`)
 * **Connection Manager**: `FF_Player` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (8 cột): `player_id`, `name`, `date_of_birth`, `country_of_citizenship`, `position`, `sub_position`, `foot`, `height_in_cm`.
+* **Selected Columns** (10 cột): `player_id`, `name`, `date_of_birth`, `country_of_citizenship`, `position`, `sub_position`, `foot`, `height_in_cm`, `market_value_in_eur`, `highest_market_value_in_eur`.
 * **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
 
 ### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
@@ -49,6 +49,8 @@
 | `sub_position` | **`dc_sub_position`** | Unicode string `[DT_WSTR]` | **100** | Vị trí chi tiết (*Centre-Back...*) |
 | `foot` | **`dc_foot`** | Unicode string `[DT_WSTR]` | **100** | Chân thuận (*Left, Right, Both*) |
 | `height_in_cm` | **`dc_height_in_cm`** | Four-byte signed integer `[DT_I4]` | - | Chiều cao tính bằng cm |
+| `market_value_in_eur` | **`dc_market_value_in_eur`** | Double-precision float `[DT_R8]` | - | Giá trị thị trường hiện tại (EUR) |
+| `highest_market_value_in_eur` | **`dc_highest_market_value`** | Double-precision float `[DT_R8]` | - | Giá trị thị trường đỉnh cao (EUR) |
 
 ### Khối 3: `Derived Column` (Tính toán thuộc tính & Xử lý NULL)
 
@@ -62,9 +64,13 @@
   `ISNULL(dc_foot) || LEN(TRIM(dc_foot)) == 0 ? "Unknown" : TRIM(dc_foot)`
 * **`der_height`** (`[DT_I4]`):  
   `ISNULL(dc_height_in_cm) || dc_height_in_cm < 150 || dc_height_in_cm > 220 ? 175 : dc_height_in_cm`
+* **`der_market_value`** (`[DT_R8]`):  
+  `ISNULL(dc_market_value_in_eur) || dc_market_value_in_eur < 0 ? 0.0 : dc_market_value_in_eur`
+* **`der_highest_market_value`** (`[DT_R8]`):  
+  `ISNULL(dc_highest_market_value) || dc_highest_market_value < 0 ? 0.0 : dc_highest_market_value`
 
 ### Khối 4: `Conditional Split` (Validation kiểm tra dữ liệu)
-* **Input Columns**: Đưa ĐẦY ĐỦ các cột (`dc_player_id`, `der_player_name`, `dc_date_of_birth`, `der_age`, `der_country`, `dc_main_position`, `dc_sub_position`, `der_foot`, `der_height`) vào Input.
+* **Input Columns**: Đưa ĐẦY ĐỦ các cột (`dc_player_id`, `der_player_name`, `dc_date_of_birth`, `der_age`, `der_country`, `dc_main_position`, `dc_sub_position`, `der_foot`, `der_height`, `der_market_value`, `der_highest_market_value`) vào Input.
 * **Output Name**: `Valid_Player`
 * **Condition Expression**:
   ```c
@@ -77,7 +83,7 @@
 
 ### Khối 5: `Sort` (Khử trùng lặp theo Player_ID)
 * **Input Path**: Chọn nhánh **`Valid_Player`**.
-* **Pass Through Columns**: Tick chọn tất cả 9 cột thuộc tính.
+* **Pass Through Columns**: Tick chọn tất cả 11 cột thuộc tính.
 * **Sort Column**: Tick chọn `dc_player_id` (Sort Type: `Ascending`, Sort Order: `1`).
 * **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
 
@@ -95,3 +101,5 @@
   * `dc_sub_position` $\rightarrow$ **`Sub_Position`** (`nvarchar(100)`)
   * `der_foot` $\rightarrow$ **`Foot`** (`nvarchar(100)`)
   * `der_height` $\rightarrow$ **`Height_In_Cm`** (`int`)
+  * `der_market_value` $\rightarrow$ **`Market_Value_In_EUR`** (`float`)
+  * `der_highest_market_value` $\rightarrow$ **`Highest_Market_Value_In_EUR`** (`float`)

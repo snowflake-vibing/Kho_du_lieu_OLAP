@@ -2,7 +2,7 @@
 
 ## 1. TỔNG QUAN & VAI TRÒ TRONG KHO DỮ LIỆU
 
-Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact Table) trong sơ đồ hình sao (Star Schema) của Kho dữ liệu bóng đá. Bảng này lưu trữ chi tiết mức độ đóng góp chuyên môn, chỉ số hiệu suất thi đấu, số phút có mặt trên sân, các sự kiện bàn thắng, kiến tạo, thẻ phạt và giá trị thị trường ước tính của từng cầu thủ trong mỗi lượt ra sân thi đấu.
+Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact Table) trong sơ đồ hình sao (Star Schema) của Kho dữ liệu bóng đá. Bảng này lưu trữ chi tiết mức độ đóng góp chuyên môn, chỉ số hiệu suất thi đấu, số phút có mặt trên sân, các sự kiện bàn thắng, kiến tạo, thẻ phạt của từng cầu thủ trong mỗi lượt ra sân thi đấu.
 
 * **Tên bảng:** `dbo.FACT_Player_Match_Perf`
 * **Loại bảng:** Fact Table (Transactional Grain: Single Player Appearance per Match)
@@ -17,7 +17,7 @@ Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact 
 | Khóa / Độ đo | Tên thuộc tính trong DW | Kiểu dữ liệu DW | Ràng buộc / Constraint | Mô tả chi tiết |
 | :---: | :--- | :--- | :--- | :--- |
 | 🔑 **PK** | `Appearance_ID` | `INT` | `IDENTITY(1,1)`, `PRIMARY KEY` | Mã định danh lượt ra sân tự tăng |
-| 🔗 **FK 1** | `Player_SK` | `INT` | `FOREIGN KEY` $\rightarrow$ `DIM_Player` | Khóa ngoại tra cứu thông tin tiểu sử cầu thủ |
+| 🔗 **FK 1** | `Player_SK` | `INT` | `FOREIGN KEY` $\rightarrow$ `DIM_Player` | Khóa ngoại tra cứu thông tin tiểu sử & định giá cầu thủ |
 | 🔗 **FK 2** | `Club_SK` | `INT` | `FOREIGN KEY` $\rightarrow$ `DIM_Club` | Khóa ngoại tra cứu câu lạc bộ chủ quản của cầu thủ |
 | 🔗 **FK 3** | `Opponent_Club_SK` | `INT` | `FOREIGN KEY` $\rightarrow$ `DIM_Club` | Khóa ngoại tra cứu câu lạc bộ đối thủ |
 | 🔗 **FK 4** | `Competition_SK` | `INT` | `FOREIGN KEY` $\rightarrow$ `DIM_Competition` | Khóa ngoại tra cứu thông tin giải đấu |
@@ -30,7 +30,6 @@ Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact 
 | 📊 **Measure** | `Goal_Contributions` | `INT` | `DEFAULT 0` | Tổng đóng góp bàn thắng (`Goals + Assists`) |
 | 📊 **Measure** | `Yellow_Cards` | `INT` | `DEFAULT 0, CHECK >= 0` | Số thẻ vàng cầu thủ phải nhận trong trận |
 | 📊 **Measure** | `Red_Cards` | `INT` | `DEFAULT 0, CHECK >= 0` | Số thẻ đỏ cầu thủ phải nhận trong trận |
-| 📊 **Measure** | `Market_Value_In_EUR`| `FLOAT` | `DEFAULT 0.0, CHECK >= 0` | Giá trị thị trường ước tính của cầu thủ (Euro) |
 | 🚩 **Flag** | `Is_Starter` | `INT` | `CHECK (Is_Starter IN (0, 1))` | Cờ đá chính (`1`: Đá chính, `0`: Vào sân từ ghế dự bị) |
 | 🚩 **Flag** | `Is_Home_Game` | `INT` | `CHECK (Is_Home_Game IN (0, 1))` | Cờ sân nhà (`1`: Thi đấu sân nhà, `0`: Thi đấu sân khách) |
 
@@ -48,13 +47,13 @@ Bảng `FACT_Player_Match_Perf` là bảng Sự kiện trung tâm (Central Fact 
 | `competition_id` | `appearances.csv` | `Competition_SK` | Foreign Key (`INT`) | SSIS / SQL JOIN `DIM_Competition` $\rightarrow$ Lấy `Competition_SK` |
 | `game_id` | `appearances.csv` | `Game_SK` | Foreign Key (`INT`) | SSIS / SQL JOIN `DIM_Game` $\rightarrow$ Lấy `Game_SK` |
 | `date` | `appearances.csv` | `Time_SK` | Foreign Key (`INT`) | Calculated `Time_ID` $\rightarrow$ JOIN `DIM_Time` $\rightarrow$ Lấy `Time_SK` |
+| `game_id` | `appearances.csv` | `Game_ID` | Business Key (`INT`) | **Giữ nguyên:** Mã trận đấu tự nhiên |
 | `minutes_played` | `appearances.csv` | `Minutes_Played` | Measure (`INT`) | **Giữ nguyên:** Số phút thi đấu trên sân |
 | `goals` | `appearances.csv` | `Goals` | Measure (`INT`) | **Giữ nguyên:** Số bàn thắng ghi được |
 | `assists` | `appearances.csv` | `Assists` | Measure (`INT`) | **Giữ nguyên:** Số đường kiến tạo thành bàn |
+| Calculated | - | `Goal_Contributions` | Measure (`INT`) | **Thêm mới:** `Goals + Assists` |
 | `yellow_cards` | `appearances.csv` | `Yellow_Cards` | Measure (`INT`) | **Giữ nguyên:** Số thẻ vàng nhận phải |
 | `red_cards` | `appearances.csv` | `Red_Cards` | Measure (`INT`) | **Giữ nguyên:** Số thẻ đỏ nhận phải |
-| `market_value_in_eur` | `player_valuations.csv`| `Market_Value_In_EUR`| Measure (`FLOAT`) | **Bổ trợ:** Tra cứu mốc định giá gần nhất của cầu thủ |
-| Calculated | - | `Goal_Contributions` | Measure (`INT`) | **Thêm mới:** `Goals + Assists` |
 | Calculated | - | `Is_Starter` | Flag (`INT`) | **Thêm mới:** `minutes_played >= 45 ? 1 : 0` |
 | `hosting` | `club_games.csv` | `Is_Home_Game` | Flag (`INT`) | **Thêm mới:** `hosting == "Home" ? 1 : 0` |
 

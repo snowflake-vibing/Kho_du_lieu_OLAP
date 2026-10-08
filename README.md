@@ -41,6 +41,8 @@ erDiagram
         nvarchar Sub_Position "Vị trí chi tiết"
         nvarchar Foot "Chân thuận (Left, Right, Both)"
         int Height_In_Cm "Chiều cao (cm)"
+        float Market_Value_In_EUR "Giá trị thị trường hiện tại (€)"
+        float Highest_Market_Value_In_EUR "Giá trị thị trường cao nhất (€)"
     }
 
     DIM_Club {
@@ -101,7 +103,6 @@ erDiagram
         int Goal_Contributions "Tổng bàn thắng + kiến tạo"
         int Yellow_Cards "Số thẻ vàng nhận phải"
         int Red_Cards "Số thẻ đỏ nhận phải"
-        float Market_Value_In_EUR "Giá trị thị trường ước tính (€)"
         int Is_Starter "Cờ đá chính (1/0)"
         int Is_Home_Game "Cờ thi đấu sân nhà (1/0)"
     }
@@ -116,7 +117,7 @@ erDiagram
 | Tên bảng DW | Loại bảng | Mô tả chức năng & Đối chiếu Kaggle | Tệp tài liệu chi tiết |
 | :--- | :--- | :--- | :--- |
 | **`FACT_Player_Match_Perf`** | Fact Table | Lưu trữ chỉ số đóng góp thi đấu, số phút, bàn thắng, thẻ phạt | 📄 [fact_player_match_perf.md](docs/fact_player_match_perf.md) |
-| **`DIM_Player`** | Dimension | Quản lý tiểu sử, vị trí, chân thuận, chiều cao, tuổi tác cầu thủ | 📄 [dim_player.md](docs/dim_player.md) |
+| **`DIM_Player`** | Dimension | Quản lý tiểu sử, vị trí, chân thuận, chiều cao, tuổi tác, định giá cầu thủ | 📄 [dim_player.md](docs/dim_player.md) |
 | **`DIM_Club`** | Dimension | Quản lý tên CLB, sân vận động, sức chứa, HLV trưởng, quy mô đội hình | 📄 [dim_club.md](docs/dim_club.md) |
 | **`DIM_Competition`** | Dimension | Phân loại giải đấu (VĐQG vs Cúp Châu Âu), quốc gia đăng cai | 📄 [dim_competition.md](docs/dim_competition.md) |
 | **`DIM_Game`** | Dimension | Chi tiết bối cảnh trận đấu, vòng đấu, đội nhà/khách, tỷ số | 📄 [dim_game.md](docs/dim_game.md) |
