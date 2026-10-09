@@ -138,7 +138,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **`Time_ID`** | Add as new column | `ISNULL(dc_date_str) \|\| LEN(TRIM(dc_date_str)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date_str, 1, 4) + SUBSTRING(dc_date_str, 6, 2) + SUBSTRING(dc_date_str, 9, 2))` | `[DT_I4]` | - |
 | **`Goal_Contributions`** | Add as new column | `dc_goals + dc_assists` | `[DT_I4]` | - |
-| **`Is_Starter`** | Add as new column | `dc_minutes_played >= 45 ? 1 : 0` | `[DT_I4]` | - |
+| **`Is_Starter`** | Add as new column | `dc_minutes_played >= 60 ? 1 : 0` *(Hoặc >= 45 tùy quy tắc nghiệp vụ)* | `[DT_I4]` | - |
 | **`Is_Home_Game`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? 1 : 0` | `[DT_I4]` | - |
 | **`Opponent_Club_ID`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? Away_Club_ID : Home_Club_ID` | `[DT_I4]` | - |
 | **`Player_ID`** | Add as new column | `ISNULL(lk_player_id) ? -1 : lk_player_id` | `[DT_I4]` | - |
