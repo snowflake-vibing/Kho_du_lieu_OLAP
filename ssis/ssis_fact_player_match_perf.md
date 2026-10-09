@@ -109,16 +109,24 @@
 
 ---
 
-### Khối 7: `Lookup Game Info` (Tra cứu Trận đấu lấy Đội nhà / Đội khách)
-* **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
-* **Tab Connection**: Tùy chọn **Use results of an SQL query**:
-  ```sql
-  SELECT Game_ID, Home_Club_ID, Away_Club_ID FROM dbo.DIM_Game
-  ```
-* **Tab Columns**:
-  * Nối `dc_game_id` $\rightarrow$ `Game_ID`.
-  * Tích chọn `Home_Club_ID` $\rightarrow$ Output Alias: **`lk_home_club_id`**.
-  * Tích chọn `Away_Club_ID` $\rightarrow$ Output Alias: **`lk_away_club_id`**.
+### Khối 7: `Lookup Game Info` (Tra cứu Trận đấu lấy Đội nhà & Đội khách)
+* **Mục đích:** Trong file nguồn `appearances.csv` chỉ chứa `game_id` và `player_club_id` (đội của cầu thủ), **KHÔNG CÓ** thông tin trận đó ai là Đội nhà, ai là Đội khách, hay Đội đối thủ là ai. Khối này tra cứu vào `DIM_Game` để lấy về **`Home_Club_ID`** và **`Away_Club_ID`**.
+* **Cấu hình chi tiết:**
+  * **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
+  * **Tab Connection**: Chọn tùy chọn **Use results of an SQL query**:
+    ```sql
+    SELECT Game_ID, Home_Club_ID, Away_Club_ID 
+    FROM dbo.DIM_Game
+    ```
+  * **Tab Columns**:
+    * Nối cột đầu vào `dc_game_id` $\rightarrow$ `Game_ID`.
+    * Tích chọn ô `Home_Club_ID` $\rightarrow$ Output Alias: **`lk_home_club_id`**.
+    * Tích chọn ô `Away_Club_ID` $\rightarrow$ Output Alias: **`lk_away_club_id`**.
+
+> 💡 **Ví dụ minh họa dễ hiểu:**  
+> Trận đấu `Game_ID = 555` giữa **Real Madrid (Home_Club_ID = 10)** và **Barcelona (Away_Club_ID = 20)**.  
+> * **Vinicius** (`player_club_id = 10`): Khối 7 nhả ra `lk_home_club_id = 10`, `lk_away_club_id = 20`. Tại Khối 8 (Derived Column), SSIS so sánh `player_club_id (10) == lk_home_club_id (10)` $\rightarrow$ **`Is_Home_Game = 1`** và đối thủ **`Opponent_Club_ID = 20 (Barcelona)`**.  
+> * **Lewandowski** (`player_club_id = 20`): Khối 7 nhả ra `lk_home_club_id = 10`, `lk_away_club_id = 20`. SSIS thấy `20 != 10` $\rightarrow$ **`Is_Home_Game = 0`** (sân khách) và đối thủ **`Opponent_Club_ID = 10 (Real Madrid)`**.
 
 ---
 
