@@ -13,26 +13,26 @@ Dự án xây dựng một **Kho dữ liệu (Data Warehouse)** hoàn chỉnh th
 * **7 tệp CSV gốc:** `appearances.csv`, `players.csv`, `clubs.csv`, `competitions.csv`, `games.csv`, `player_valuations.csv`, `club_games.csv`.
 * **Dữ liệu đã qua làm sạch trong thư mục [`data/`](data/):** `cleaned_appearances.csv`, `cleaned_clubs.csv`, `cleaned_competitions.csv`, `cleaned_games.csv`, `cleaned_players.csv`.
 * **118 thuộc tính tổng cộng** và hơn **1.890.000 lượt ra sân thi đấu** của các cầu thủ chuyên nghiệp.
-* **Mục tiêu phân tích:** Đánh giá năng suất ghi bàn/kiến tạo chuẩn hóa 90 phút (P90 Metrics), mối tương quan giữa khối lượng thi đấu và đóng góp chuyên môn, ảnh hưởng của tính kỷ luật (thẻ phạt) và yếu tố sân bãi (sân nhà/sân khách).
+* **Mô hình Khóa:** **Natural Keys (ID Trực tiếp)** - Loại bỏ hoàn toàn Surrogate Keys (`*_SK`) rườm rà.
+* **Phương pháp Nạp ETL:** **Nạp trực tiếp từ CSV vào Data Warehouse (Bỏ qua bảng đệm Staging)** giúp tối ưu dung lượng ổ đĩa và tăng tốc độ xử lý gấp 2 lần.
 
 ---
 
 ## 📐 2. KIẾN TRÚC SƠ ĐỒ HÌNH SAO (STAR SCHEMA ERD)
 
-Mô hình Kho dữ liệu được thiết kế gồm **1 bảng Sự kiện (Fact Table)** trung tâm và **5 bảng Chiều (Dimension Tables)** liên kết qua các Khóa thay thế (Surrogate Keys):
+Mô hình Kho dữ liệu được thiết kế gồm **1 bảng Sự kiện (Fact Table)** trung tâm và **5 bảng Chiều (Dimension Tables)** liên kết qua các Khóa tự nhiên (Natural Keys):
 
 ```mermaid
 erDiagram
-    DIM_Player ||--o{ FACT_Player_Match_Perf : "1 - N (Player_SK)"
-    DIM_Club ||--o{ FACT_Player_Match_Perf : "1 - N (Club_SK)"
-    DIM_Club ||--o{ FACT_Player_Match_Perf : "1 - N (Opponent_Club_SK)"
-    DIM_Competition ||--o{ FACT_Player_Match_Perf : "1 - N (Competition_SK)"
-    DIM_Game ||--o{ FACT_Player_Match_Perf : "1 - N (Game_SK)"
-    DIM_Time ||--o{ FACT_Player_Match_Perf : "1 - N (Time_SK)"
+    DIM_Player ||--o{ FACT_Player_Match_Perf : "1 - N (Player_ID)"
+    DIM_Club ||--o{ FACT_Player_Match_Perf : "1 - N (Club_ID)"
+    DIM_Club ||--o{ FACT_Player_Match_Perf : "1 - N (Opponent_Club_ID)"
+    DIM_Competition ||--o{ FACT_Player_Match_Perf : "1 - N (Competition_ID)"
+    DIM_Game ||--o{ FACT_Player_Match_Perf : "1 - N (Game_ID)"
+    DIM_Time ||--o{ FACT_Player_Match_Perf : "1 - N (Time_ID)"
 
     DIM_Player {
-        int Player_SK PK "Surrogate Key (Identity)"
-        int Player_ID BK "Natural Key (Kaggle)"
+        int Player_ID PK "Khóa chính Cầu thủ"
         nvarchar Player_Name "Họ tên cầu thủ"
         nvarchar Date_Of_Birth "Ngày sinh (YYYY-MM-DD)"
         int Age "Tuổi cầu thủ"
@@ -44,8 +44,7 @@ erDiagram
     }
 
     DIM_Club {
-        int Club_SK PK "Surrogate Key (Identity)"
-        int Club_ID BK "Natural Key (Kaggle)"
+        int Club_ID PK "Khóa chính Câu lạc bộ"
         nvarchar Club_Name "Tên câu lạc bộ"
         nvarchar Stadium_Name "Tên sân vận động"
         int Stadium_Seats "Sức chứa khán đài"
@@ -54,16 +53,15 @@ erDiagram
     }
 
     DIM_Competition {
-        int Competition_SK PK "Surrogate Key (Identity)"
-        nvarchar Competition_ID BK "Mã giải đấu (GB1, ES1, CL...)"
+        nvarchar Competition_ID PK "Khóa chính Giải đấu (GB1, ES1, CL...)"
         nvarchar Competition_Name "Tên chính thức giải đấu"
         nvarchar Country_Name "Quốc gia đăng cai"
         nvarchar Competition_Type "domestic_league / international_cup"
     }
 
     DIM_Game {
-        int Game_SK PK "Surrogate Key (Identity)"
-        int Game_ID BK "Natural Key (Kaggle)"
+        int Game_ID PK "Khóa chính Trận đấu"
+        int Season "Mùa giải"
         nvarchar Round "Vòng đấu / Giai đoạn"
         int Home_Club_ID "Mã đội chủ nhà"
         int Away_Club_ID "Mã đội khách"
@@ -73,8 +71,7 @@ erDiagram
     }
 
     DIM_Time {
-        int Time_SK PK "Surrogate Key (Identity)"
-        int Time_ID BK "Khóa YYYYMMDD"
+        int Time_ID PK "Khóa chính Thời gian (YYYYMMDD)"
         nvarchar Full_Date "Ngày thi đấu đầy đủ"
         nvarchar Day_Of_Week "Thứ trong tuần"
         int Day "Ngày (1-31)"
@@ -86,21 +83,20 @@ erDiagram
     }
 
     FACT_Player_Match_Perf {
-        int Appearance_ID PK "Surrogate Key (Identity)"
-        int Player_SK FK "Khóa ngoại DIM_Player"
-        int Club_SK FK "Khóa ngoại DIM_Club (Chủ quản)"
-        int Opponent_Club_SK FK "Khóa ngoại DIM_Club (Đối thủ)"
-        int Competition_SK FK "Khóa ngoại DIM_Competition"
-        int Game_SK FK "Khóa ngoại DIM_Game"
-        int Time_SK FK "Khóa ngoại DIM_Time"
-        int Game_ID BK "Mã trận đấu"
+        int Appearance_ID PK "Khóa chính Tự tăng (Identity)"
+        int Player_ID FK "Khóa ngoại Cầu thủ"
+        int Club_ID FK "Khóa ngoại CLB Chủ quản"
+        int Opponent_Club_ID FK "Khóa ngoại CLB Đối thủ"
+        nvarchar Competition_ID FK "Khóa ngoại Giải đấu"
+        int Game_ID FK "Khóa ngoại Trận đấu"
+        int Time_ID FK "Khóa ngoại Thời gian (YYYYMMDD)"
         int Minutes_Played "Số phút thi đấu trên sân"
         int Goals "Số bàn thắng ghi được"
         int Assists "Số đường kiến tạo thành bàn"
         int Goal_Contributions "Tổng bàn thắng + kiến tạo"
         int Yellow_Cards "Số thẻ vàng nhận phải"
         int Red_Cards "Số thẻ đỏ nhận phải"
-        int Is_Starter "Cờ đá chính (1/0)"
+        int Is_Starter "Cờ đá chính (>= 60 phút)"
         int Is_Home_Game "Cờ thi đấu sân nhà (1/0)"
     }
 ```
@@ -124,17 +120,17 @@ erDiagram
 
 ## ⚙️ 4. HƯỚNG DẪN CẤU HÌNH CHI TIẾT TỪNG KHỐI SSIS (SSIS BLOCK GUIDES)
 
-Thư mục [`ssis/`](ssis/) chứa các hướng dẫn cấu hình chi tiết cho từng khối (Flat File Source, Data Conversion, Derived Column, Conditional Split, Sort, OLE DB Destination):
+Thư mục [`ssis/`](ssis/) chứa các hướng dẫn cấu hình chi tiết cho từng khối (Flat File Source, Data Conversion, Derived Column, Conditional Split, Lookup, OLE DB Destination):
 
 | Đối tượng / Bảng SSIS | Mô tả chi tiết cấu hình khối Data Flow | Tệp tài liệu khối SSIS |
 | :--- | :--- | :--- |
-| **Tổng quan Kiến trúc & Nguyên tắc 0 Warning** | Chuẩn 6 khối Data Flow & Quy tắc vàng triệt tiêu 100% Warning | ⚙️ [ssis_overview_pipeline.md](ssis/ssis_overview_pipeline.md) |
-| **`FACT_Player_Match_Perf`** | Cấu hình nạp Staging Fast Load & Execute SQL Task Populate Fact | ⚙️ [ssis_fact_player_match_perf.md](ssis/ssis_fact_player_match_perf.md) |
-| **`DIM_Club`** | Cấu hình ép kiểu, xử lý NULL sân vận động/HLV và khử trùng lặp | ⚙️ [ssis_dim_club.md](ssis/ssis_dim_club.md) |
-| **`DIM_Player`** | Cấu hình ép kiểu, tính toán tuổi tác và validation cầu thủ | ⚙️ [ssis_dim_player.md](ssis/ssis_dim_player.md) |
-| **`DIM_Competition`** | Cấu hình mã giải đấu `GB1`/`ES1` và phân loại cúp | ⚙️ [ssis_dim_competition.md](ssis/ssis_dim_competition.md) |
-| **`DIM_Game`** | Cấu hình nạp bối cảnh trận đấu, vòng đấu và tỷ số | ⚙️ [ssis_dim_game.md](ssis/ssis_dim_game.md) |
-| **`DIM_Time`** | Cấu hình bóc tách YYYYMMDD, thứ, tháng, quý, cờ cuối tuần | ⚙️ [ssis_dim_time.md](ssis/ssis_dim_time.md) |
+| **Control Flow Master (SSIS Main)** | Chuẩn Control Flow 3 bước: Drop/Create Tables $\rightarrow$ Load 5 DIMs $\rightarrow$ Load Fact Direct CSV | ⚙️ [ssis_main.md](ssis/ssis_main.md) |
+| **`FACT_Player_Match_Perf`** | Cấu hình Luồng 9 khối nạp trực tiếp từ `appearances.csv` qua Lookup & 1 Derived Column | ⚙️ [ssis_fact_player_match_perf.md](ssis/ssis_fact_player_match_perf.md) |
+| **`DIM_Club`** | Cấu hình ép kiểu, xử lý NULL sân vận động/HLV và nạp `clubs.csv` | ⚙️ [ssis_dim_club.md](ssis/ssis_dim_club.md) |
+| **`DIM_Player`** | Cấu hình ép kiểu, tính toán tuổi tác và validation `players.csv` | ⚙️ [ssis_dim_player.md](ssis/ssis_dim_player.md) |
+| **`DIM_Competition`** | Cấu hình mã giải đấu `GB1`/`ES1` và phân loại cúp `competitions.csv` | ⚙️ [ssis_dim_competition.md](ssis/ssis_dim_competition.md) |
+| **`DIM_Game`** | Cấu hình nạp bối cảnh trận đấu, vòng đấu và tỷ số `games.csv` | ⚙️ [ssis_dim_game.md](ssis/ssis_dim_game.md) |
+| **`DIM_Time`** | Cấu hình bóc tách YYYYMMDD, thứ, tháng, quý, cờ cuối tuần `games.csv` / `appearances.csv` | ⚙️ [ssis_dim_time.md](ssis/ssis_dim_time.md) |
 
 ---
 

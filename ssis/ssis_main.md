@@ -1,8 +1,10 @@
-# HƯỚNG DẪN CẤU HÌNH CONTROL FLOW MASTER PACKAGE: SSIS_MAIN
+# HƯỚNG DẪN CẤU HÌNH CONTROL FLOW MASTER PACKAGE: SSIS_MAIN (LUỒNG NẠP TRỰC TIẾP KHÔNG QUA STAGING)
 
 > **Package chính:** `Master_ETL_Pipeline.dtsx` (hoặc `Main.dtsx`)  
 > **Mô hình kiến trúc:** **Master Control Flow Architecture (Visual Studio SSIS)**  
 > **Database:** `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`)  
+> **Kiểu Khóa:** **Natural Keys (ID trực tiếp)** - Không sử dụng Surrogate Keys (`*_SK`).  
+> **Phương pháp nạp:** **Nạp trực tiếp từ CSV vào Data Warehouse (Bỏ qua các bảng đệm Staging `STG_*`)** để tối ưu dung lượng đệm và tăng tốc độ xử lý gấp 2 lần.  
 > **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), bảo đảm **100% SẠCH WARNING (0 tam giác vàng)**.
 
 ---
@@ -18,13 +20,7 @@
                                     ▼
                ┌─────────────────────────────────────────┐
                │   Execute SQL Task: Create All Tables   │
-               │ (Tạo lại cấu trúc 6 bảng với PK/FK)     │
-               └────────────────────┬────────────────────┘
-                                    │ (Success)
-                                    ▼
-               ┌─────────────────────────────────────────┐
-               │ Execute SQL Task: Prepare Staging Table │
-               │ (Dọn dẹp/Chuẩn bị bảng Staging STG_*)   │
+               │  (Tạo lại cấu trúc 6 bảng với Natural PK/FK) │
                └────────────────────┬────────────────────┘
                                     │ (Success)
                                     ▼
@@ -34,7 +30,7 @@
 │ ┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────┐ │
 │ │  Data Flow Task:     │   │  Data Flow Task:     │   │Data Flow Task│ │
 │ │  Load DIM_Competition│   │  Load DIM_Club       │   │Load DIM_Time │ │
-│ └──────────┬───────────┘   └──────────┬───────────┘   └──────┬───────┘ │
+│ └──────────┬───────────┘   └──────────┬───────────┘   ──────┬───────┘ │
 │            │                          │                      │         │
 │            │                          ▼                      │         │
 │            │               ┌──────────────────────┐          │         │
@@ -53,14 +49,8 @@
                                     │ (Success)
                                     ▼
                ┌─────────────────────────────────────────┐
-               │ Data Flow Task: Load Staging Tables     │
-               │ (Nạp thô appearances.csv -> STG)        │
-               └────────────────────┬────────────────────┘
-                                    │ (Success)
-                                    ▼
-               ┌─────────────────────────────────────────┐
-               │ Data Flow Task: Load Fact               │
-               │ (FACT_Player_Match_Perf - Dùng Lookup)  │
+               │ Data Flow Task: Load Fact Direct CSV    │
+               │ (Nạp trực tiếp appearances.csv -> Fact) │
                └─────────────────────────────────────────┘
 ```
 
@@ -70,19 +60,27 @@
 
 ### Bước 1: Khối `Execute SQL Task: Drop All Tables`
 * **Loại khối**: `Execute SQL Task`
-* **Mục đích**: Xóa sạch toàn bộ các bảng trong CSDL theo đúng thứ tự tham chiếu ràng buộc Khóa ngoại (xóa bảng Fact trước, xóa các bảng Staging và 5 bảng Dimension sau) để chuẩn bị cho chu trình nạp mới.
+* **Mục đích**: Xóa sạch toàn bộ các bảng trong CSDL theo đúng thứ tự tham chiếu ràng buộc Khóa ngoại (xóa bảng Fact trước, xóa 5 bảng Dimension sau) để chuẩn bị cho chu trình nạp mới.
 * **SQLStatement**:
   ```sql
-  USE DW_Football_Analytics;
+  USE DW_Football_Analytics; -- Hoặc DW_Football_Transfermarkt
   GO
 
-  -- 1. Xóa bảng Fact & Staging trước
+  -- 1. Xóa các VIEWS trước
+  IF OBJECT_ID('dbo.v_FACT_Player_Match_Perf', 'V') IS NOT NULL DROP VIEW dbo.v_FACT_Player_Match_Perf;
+  IF OBJECT_ID('dbo.v_DIM_Competition', 'V') IS NOT NULL DROP VIEW dbo.v_DIM_Competition;
+  IF OBJECT_ID('dbo.v_DIM_Club', 'V') IS NOT NULL DROP VIEW dbo.v_DIM_Club;
+  IF OBJECT_ID('dbo.v_DIM_Player', 'V') IS NOT NULL DROP VIEW dbo.v_DIM_Player;
+  IF OBJECT_ID('dbo.v_DIM_Time', 'V') IS NOT NULL DROP VIEW dbo.v_DIM_Time;
+
+  -- 2. Xóa các ràng buộc khóa ngoại (Foreign Keys)
+  EXEC sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
+
+  -- 3. Xóa bảng Fact trước
   IF OBJECT_ID('dbo.FACT_Player_Match_Perf', 'U') IS NOT NULL DROP TABLE dbo.FACT_Player_Match_Perf;
   IF OBJECT_ID('dbo.FACT_Player_Match_Perf_Error', 'U') IS NOT NULL DROP TABLE dbo.FACT_Player_Match_Perf_Error;
-  IF OBJECT_ID('dbo.STG_Appearances', 'U') IS NOT NULL DROP TABLE dbo.STG_Appearances;
-  IF OBJECT_ID('dbo.STG_Games', 'U') IS NOT NULL DROP TABLE dbo.STG_Games;
 
-  -- 2. Xóa các bảng Dimension sau
+  -- 4. Xóa 5 bảng Dimension sau
   IF OBJECT_ID('dbo.DIM_Game', 'U') IS NOT NULL DROP TABLE dbo.DIM_Game;
   IF OBJECT_ID('dbo.DIM_Player', 'U') IS NOT NULL DROP TABLE dbo.DIM_Player;
   IF OBJECT_ID('dbo.DIM_Club', 'U') IS NOT NULL DROP TABLE dbo.DIM_Club;
@@ -96,10 +94,10 @@
 ### Bước 2: Khối `Execute SQL Task: Create All Tables`
 * **Loại khối**: `Execute SQL Task`
 * **Precedence Constraint**: Nối từ `Drop All Tables` (Success).
-* **Mục đích**: Khởi tạo lại toàn bộ cấu trúc CSDL kho dữ liệu OLAP (bao gồm 5 bảng Dimension, bảng Staging và bảng Fact) với đầy đủ các thuộc tính, kiểu dữ liệu và ràng buộc Khóa chính (PK), Khóa ngoại (FK).
+* **Mục đích**: Khởi tạo lại toàn bộ cấu trúc CSDL kho dữ liệu OLAP (bao gồm 5 bảng Dimension và bảng Fact) sử dụng Natural Keys (ID trực tiếp) với đầy đủ các thuộc tính, kiểu dữ liệu và ràng buộc Khóa chính (PK), Khóa ngoại (FK).
 * **SQLStatement**:
   ```sql
-  USE DW_Football_Analytics;
+  USE DW_Football_Analytics; -- Hoặc DW_Football_Transfermarkt
   GO
 
   -- 1. Bảng DIM_Competition
@@ -136,6 +134,7 @@
   -- 4. Bảng DIM_Game
   CREATE TABLE dbo.DIM_Game (
       Game_ID INT CONSTRAINT PK_DIM_Game PRIMARY KEY,
+      Season INT NULL,
       Round NVARCHAR(100) NULL,
       Home_Club_ID INT NULL,
       Away_Club_ID INT NULL,
@@ -157,22 +156,7 @@
       Is_Weekend INT NULL
   );
 
-  -- 6. Bảng Staging STG_Appearances
-  CREATE TABLE dbo.STG_Appearances (
-      appearance_id VARCHAR(100),
-      game_id INT,
-      player_id INT,
-      player_club_id INT,
-      date_str VARCHAR(100),
-      competition_id VARCHAR(100),
-      goals INT,
-      assists INT,
-      minutes_played INT,
-      yellow_cards INT,
-      red_cards INT
-  );
-
-  -- 7. Bảng FACT_Player_Match_Perf
+  -- 6. Bảng FACT_Player_Match_Perf (Natural Foreign Keys: Player_ID, Club_ID, Competition_ID, Game_ID, Time_ID)
   CREATE TABLE dbo.FACT_Player_Match_Perf (
       Appearance_ID INT IDENTITY(1,1) CONSTRAINT PK_FACT_Player_Match_Perf PRIMARY KEY,
       Player_ID INT NOT NULL,
@@ -197,6 +181,7 @@
       CONSTRAINT FK_Fact_Time FOREIGN KEY (Time_ID) REFERENCES dbo.DIM_Time(Time_ID)
   );
 
+  -- 7. Bảng FACT_Player_Match_Perf_Error
   CREATE TABLE dbo.FACT_Player_Match_Perf_Error (
       Error_ID INT IDENTITY(1,1) PRIMARY KEY,
       Appearance_ID VARCHAR(100),
@@ -209,49 +194,35 @@
       Error_Timestamp DATETIME DEFAULT GETDATE()
   );
   GO
-  ```
 
----
-
-### Bước 3: Khối `Execute SQL Task: Prepare Staging Table`
-* **Loại khối**: `Execute SQL Task`
-* **Precedence Constraint**: Nối từ `Create All Tables` (Success).
-* **Mục đích**: Dọn dẹp và làm sạch bảng Staging (`STG_Appearances`) trước khi thực hiện luồng trích xuất dữ liệu.
-* **SQLStatement**:
-  ```sql
-  USE DW_Football_Analytics;
-  GO
-
-  TRUNCATE TABLE dbo.STG_Appearances;
+  -- 8. Tạo Views hỗ trợ truy vấn (v_*)
+  CREATE VIEW dbo.v_DIM_Competition AS SELECT Competition_ID, Competition_Name, Country_Name, Competition_Type FROM dbo.DIM_Competition;
+  CREATE VIEW dbo.v_DIM_Club AS SELECT Club_ID, Club_Name, Stadium_Name, Stadium_Seats, Coach_Name, Squad_Size FROM dbo.DIM_Club;
+  CREATE VIEW dbo.v_DIM_Player AS SELECT Player_ID, Player_Name, Date_Of_Birth, Age, Country_Of_Citizenship, Main_Position, Sub_Position, Foot, Height_In_Cm FROM dbo.DIM_Player;
+  CREATE VIEW dbo.v_DIM_Time AS SELECT Time_ID, Full_Date, Day_Of_Week, Day, Month, Quarter, Year, Season, Is_Weekend FROM dbo.DIM_Time;
+  CREATE VIEW dbo.v_FACT_Player_Match_Perf AS SELECT Appearance_ID, Player_ID, Club_ID, Opponent_Club_ID, Competition_ID, Game_ID, Time_ID, Minutes_Played, Goals, Assists, Goal_Contributions, Yellow_Cards, Red_Cards, Is_Starter, Is_Home_Game FROM dbo.FACT_Player_Match_Perf;
   GO
   ```
 
 ---
 
-### Bước 4: Khối `Sequence Container: Load Dimensions` (Chứa 5 Data Flow Tasks)
+### Bước 3: Khối `Sequence Container: Load Dimensions` (Chứa 5 Data Flow Tasks)
 * **Loại khối**: `Sequence Container`
-* **Precedence Constraint**: Nối từ `Prepare Staging Table` (Success).
-* **Mục đích**: Nhóm 5 tiến trình Data Flow Task nạp dữ liệu vào 5 bảng Dimension thành một cụm thực thi tập trung, đảm bảo quản lý luồng dữ liệu song song và độc lập:
+* **Precedence Constraint**: Nối từ `Create All Tables` (Success).
+* **Mục đích**: Nhóm 5 tiến trình Data Flow Task nạp dữ liệu vào 5 bảng Dimension thành một cụm thực thi tập trung:
 
-1. **`DFT - Load DIM_Competition`**: Đọc `cleaned_competitions.csv` $\rightarrow$ Nạp vào `dbo.DIM_Competition` ([Chi tiết ssis_dim_competition.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_competition.md)).
-2. **`DFT - Load DIM_Club`**: Đọc `cleaned_clubs.csv` $\rightarrow$ Nạp vào `dbo.DIM_Club` ([Chi tiết ssis_dim_club.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_club.md)).
-3. **`DFT - Load DIM_Player`**: Đọc `cleaned_players.csv` $\rightarrow$ Nạp vào `dbo.DIM_Player` ([Chi tiết ssis_dim_player.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_player.md)).
+1. **`DFT - Load DIM_Competition`**: Đọc `competitions.csv` $\rightarrow$ Nạp vào `dbo.DIM_Competition` ([Chi tiết ssis_dim_competition.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_competition.md)).
+2. **`DFT - Load DIM_Club`**: Đọc `clubs.csv` $\rightarrow$ Nạp vào `dbo.DIM_Club` ([Chi tiết ssis_dim_club.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_club.md)).
+3. **`DFT - Load DIM_Player`**: Đọc `players.csv` $\rightarrow$ Nạp vào `dbo.DIM_Player` ([Chi tiết ssis_dim_player.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_player.md)).
 4. **`DFT - Load DIM_Time`**: Đọc `games.csv` / `appearances.csv` $\rightarrow$ Nạp vào `dbo.DIM_Time` ([Chi tiết ssis_dim_time.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_time.md)).
-5. **`DFT - Load DIM_Game`**: Đọc `cleaned_games.csv` $\rightarrow$ Nạp vào `dbo.DIM_Game` (Nối Success từ `Load DIM_Club`) ([Chi tiết ssis_dim_game.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_game.md)).
+5. **`DFT - Load DIM_Game`**: Đọc `games.csv` $\rightarrow$ Nạp vào `dbo.DIM_Game` ([Chi tiết ssis_dim_game.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_game.md)).
 
 ---
 
-### Bước 5: Khối `Data Flow Task: Load Staging Tables`
-* **Loại khối**: `Data Flow Task`
-* **Precedence Constraint**: Nối từ **`Sequence Container: Load Dimensions`** (Success).
-* **Mục đích**: Trích xuất dữ liệu từ `appearances.csv`, thực hiện Data Conversion và Conditional Split kiểm tra tính hợp lệ rồi Fast Load vào bảng Staging `[dbo].[STG_Appearances]`.
-
----
-
-### Bước 6: Khối `Data Flow Task: Load Fact` (`FACT_Player_Match_Perf`)
+### Bước 4: Khối `Data Flow Task: Load Fact Direct CSV` (`FACT_Player_Match_Perf`)
 * **Loại khối**: `Data Flow Task` (`Load Fact`)
-* **Precedence Constraint**: Nối từ **`Data Flow Task: Load Staging Tables`** (Success).
-* **Mục đích**: Nạp dữ liệu vào `dbo.FACT_Player_Match_Perf` qua chuỗi **5 khối Lookup Transformations** (`Lookup_Player`, `Lookup_Club`, `Lookup_Opponent`, `Lookup_Competition`, `Lookup_Game`, `Lookup_Time`) để tra cứu khóa chính/khóa ngoại và tính toán các độ đo ([Chi tiết ssis_fact_player_match_perf.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_fact_player_match_perf.md)).
+* **Precedence Constraint**: Nối từ **`Sequence Container: Load Dimensions`** (Success).
+* **Mục đích**: Đọc TRỰC TIẾP từ `appearances.csv` (không qua bảng Staging), nạp vào `dbo.FACT_Player_Match_Perf` qua chuỗi 9 khối tối ưu (Data Conversion, Validation, Lookup Player, Lookup Club, Lookup Competition, Lookup Game Info, 1 Derived Column duy nhất tính `Time_ID`, `Is_Starter`, `Is_Home_Game`, `Opponent_Club_ID`, và OLE DB Destination Fast Load) ([Chi tiết ssis_fact_player_match_perf.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_fact_player_match_perf.md)).
 
 ---
 
@@ -259,10 +230,11 @@
 
 | STT | Tên Tệp Hướng Dẫn | Thành Phần Control / Data Flow | Nhiệm Vụ SSIS |
 | :---: | :--- | :--- | :--- |
-| 1 | [ssis_main.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_main.md) | **Control Flow Master** | `Drop All Tables` $\rightarrow$ `Create All Tables` $\rightarrow$ `Prepare Staging Table` $\rightarrow$ `Sequence Container (5 DIMs)` $\rightarrow$ `Load Staging Tables` $\rightarrow$ `Load Fact` |
-| 2 | [ssis_dim_competition.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_competition.md) | Data Flow Task | Nạp `dbo.DIM_Competition` từ `cleaned_competitions.csv` |
-| 3 | [ssis_dim_club.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_club.md) | Data Flow Task | Nạp `dbo.DIM_Club` từ `cleaned_clubs.csv` |
-| 4 | [ssis_dim_player.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_player.md) | Data Flow Task | Nạp `dbo.DIM_Player` từ `cleaned_players.csv` |
+| 1 | [ssis_main.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_main.md) | **Control Flow Master** | `Drop All Tables` $\rightarrow$ `Create All Tables` $\rightarrow$ `Sequence Container (5 DIMs)` $\rightarrow$ `Load Fact Direct CSV` |
+| 2 | [ssis_dim_competition.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_competition.md) | Data Flow Task | Nạp `dbo.DIM_Competition` từ `competitions.csv` |
+| 3 | [ssis_dim_club.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_club.md) | Data Flow Task | Nạp `dbo.DIM_Club` từ `clubs.csv` |
+| 4 | [ssis_dim_player.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_player.md) | Data Flow Task | Nạp `dbo.DIM_Player` từ `players.csv` |
 | 5 | [ssis_dim_time.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_time.md) | Data Flow Task | Nạp `dbo.DIM_Time` từ `games.csv` / `appearances.csv` |
-| 6 | [ssis_dim_game.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_game.md) | Data Flow Task | Nạp `dbo.DIM_Game` từ `cleaned_games.csv` |
-| 7 | [ssis_fact_player_match_perf.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_fact_player_match_perf.md) | Data Flow Task | Nạp `dbo.FACT_Player_Match_Perf` từ `appearances.csv` / `STG_Appearances` dùng Lookup Transformations |
+| 6 | [ssis_dim_game.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_dim_game.md) | Data Flow Task | Nạp `dbo.DIM_Game` từ `games.csv` |
+| 7 | [ssis_fact_player_match_perf.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_fact_player_match_perf.md) | Data Flow Task | Nạp `dbo.FACT_Player_Match_Perf` trực tiếp từ `appearances.csv` qua Luồng Tối Ưu 9 Khối |
+| 8 | [ssis_stg_appearances.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_stg_appearances.md) | Data Flow Task | *(Tùy chọn/Đã bỏ qua)* Nạp Staging đệm |
