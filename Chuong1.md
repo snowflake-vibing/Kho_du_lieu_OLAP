@@ -285,6 +285,36 @@ Table FACT_Player_Match_Perf {
 
 ---
 
+### 1.2.3. Quy trình chuyển đổi SSIS ETL cho từng bảng DIM và FACT
+
+Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối **Derived Column** và quy trình luồng dữ liệu SSIS Data Flow cho từng bảng Chiều (DIM) và bảng Sự kiện (FACT):
+
+| Tên Bảng DW | Sử Dụng Khối `Derived Column` | Cơ Chế Hoạt Động Của `Derived Column` | Các Cột Sinh Mới / Xử Lý Trong SSIS |
+| :--- | :---: | :--- | :--- |
+| **`DIM_Competition`** | **Có** | **Replace Existing Column** *(Không sinh cột mới trong DW)* | Xử lý làm sạch NULL: `country_name` $\rightarrow$ `"Europe"`, `type` $\rightarrow$ `"domestic_league"`. |
+| **`DIM_Club`** | **Có** | **Replace Existing Column** *(Không sinh cột mới trong DW)* | Xử lý làm sạch NULL: `stadium_name` $\rightarrow$ `"Unknown Stadium"`, `coach_name` $\rightarrow$ `"Unknown Coach"`, `stadium_seats` $\rightarrow$ `0`. |
+| **`DIM_Player`** | **Có** | **Add as New Column & Replace Column** | **Sinh cột mới `Age`** từ `date_of_birth`; làm sạch NULL cho `Player_Name`, `Country_Of_Citizenship`, `Foot`, `Height_In_Cm`. |
+| **`DIM_Game`** | **Có** | **Replace Existing Column** *(Không sinh cột mới trong DW)* | Xử lý làm sạch NULL: `stadium` $\rightarrow$ `"Unknown Stadium"`, `home_club_goals` $\rightarrow$ `0`, `away_club_goals` $\rightarrow$ `0`. |
+| **`DIM_Time`** | **Có** | **Add as New Columns** *(Sinh tập hợp cột thuộc tính lịch)* | **Sinh 9 cột mới:** `Time_ID` (`YYYYMMDD`), `Full_Date`, `Day`, `Month`, `Quarter`, `Year`, `Day_Of_Week`, `Season`, `Is_Weekend`. |
+| **`FACT_Player_Match_Perf`** | **Có** | **Add as New Columns** *(Sinh cờ nhận diện & độ đo tính toán)* | **Sinh 4 chỉ số/cờ mới:** `Goal_Contributions`, `Is_Starter`, `Is_Home_Game`, `Opponent_Club_ID` và gán mặc định `-1` cho bản ghi tra cứu khuyết. |
+
+#### Chi tiết quy trình nạp dữ liệu SSIS Data Flow từng bảng:
+
+1. **`DIM_Competition` (4 cột):**
+   - `Flat File Source (cleaned_competitions.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Gán mặc định NULL)` $\rightarrow$ `Conditional Split (Validation 4 cột)` $\rightarrow$ `Sort (Unique Competition_ID)` $\rightarrow$ `OLE DB Destination`.
+2. **`DIM_Club` (6 cột):**
+   - `Flat File Source (cleaned_clubs.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Gán mặc định NULL)` $\rightarrow$ `Conditional Split (Validation 6 cột)` $\rightarrow$ `Sort (Unique Club_ID)` $\rightarrow$ `OLE DB Destination`.
+3. **`DIM_Player` (9 cột):**
+   - `Flat File Source (cleaned_players.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Sinh cột Age & Gán mặc định NULL)` $\rightarrow$ `Conditional Split (Validation 9 cột)` $\rightarrow$ `Sort (Unique Player_ID)` $\rightarrow$ `OLE DB Destination`.
+4. **`DIM_Game` (7 cột):**
+   - `Flat File Source (cleaned_games.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Gán mặc định NULL)` $\rightarrow$ `Conditional Split (Validation 7 cột)` $\rightarrow$ `Sort (Unique Game_ID)` $\rightarrow$ `OLE DB Destination`.
+5. **`DIM_Time` (9 cột):**
+   - `Flat File Source (games.csv/appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Bóc tách 9 cột thời gian & Time_ID YYYYMMDD)` $\rightarrow$ `Conditional Split (Validation 9 cột)` $\rightarrow$ `Sort (Unique Time_ID)` $\rightarrow$ `OLE DB Destination`.
+6. **`FACT_Player_Match_Perf`:**
+   - `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Tính Goal_Contributions, Is_Starter, Is_Home_Game, Opponent_Club_ID)` $\rightarrow$ `OLE DB Destination (Fast Load 50.000 rows/batch)`.
+
+---
+
 ## 1.3. Các câu truy vấn nghiệp vụ (15 OLAP Queries)
 
 Để phục vụ việc khai thác đa chiều và đảm bảo mọi thuộc tính được thiết kế trong bảng Sự kiện (FACT) và các bảng Chiều (DIM) đều có ý nghĩa thực tế, hệ thống 15 câu truy vấn nghiệp vụ dưới đây được diễn giải rõ ràng, dễ hiểu và bao phủ 100% các trường thuộc tính trong Kho dữ liệu:
