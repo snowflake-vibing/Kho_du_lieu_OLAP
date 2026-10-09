@@ -61,6 +61,7 @@ GO
 -- 5. TẠO BẢNG DIMENSION (DIM_Game) - PK: Game_ID
 CREATE TABLE dbo.DIM_Game (
     Game_ID INT CONSTRAINT PK_DIM_Game PRIMARY KEY,
+    Season INT NULL,
     Round NVARCHAR(100) NULL,
     Home_Club_ID INT NULL,
     Away_Club_ID INT NULL,
@@ -103,6 +104,7 @@ GO
 CREATE TABLE dbo.STG_Games (
     game_id INT,
     competition_id NVARCHAR(100),
+    season INT,
     round NVARCHAR(100),
     date_str NVARCHAR(100),
     home_club_id INT,
