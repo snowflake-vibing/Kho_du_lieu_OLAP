@@ -17,7 +17,7 @@
 [2. Data Conversion (Ép kiểu DT_I4, DT_WSTR 100/200)]
        │
        ▼
-[3. Derived Column - Prep Time ID (Tạo der_time_id dạng YYYYMMDD)]
+[3. Derived Column - Prep Time ID (Tạo Time_ID dạng YYYYMMDD)]
        │
        ▼
 [4. Conditional Split (Validation kiểm tra dữ liệu 11 cột)]
@@ -75,16 +75,16 @@
 
 ### Khối 3: `Derived Column` - Chuẩn bị khóa Thời gian (`Prep Time ID`)
 * **Tên khối**: `Derived Column - Prep Time ID`
-* **Mục đích**: Chuyển đổi chuỗi ngày `YYYY-MM-DD` (`dc_date_str`) thành số nguyên `YYYYMMDD` (`[DT_I4]`) để tra cứu với khóa `Time_ID` trong `DIM_Time`.
+* **Mục đích**: Chuyển đổi chuỗi ngày `YYYY-MM-DD` (`dc_date_str`) thành số nguyên `YYYYMMDD` (`[DT_I4]`) đặt tên trực tiếp là `Time_ID` để tra cứu với khóa `Time_ID` trong `DIM_Time`.
 
 | Derived Column Name | Derived Column | Expression | Data Type |
 | :--- | :--- | :--- | :--- |
-| **`der_time_id`** | Add as new column | `ISNULL(dc_date_str) \|\| LEN(TRIM(dc_date_str)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date_str, 1, 4) + SUBSTRING(dc_date_str, 6, 2) + SUBSTRING(dc_date_str, 9, 2))` | `[DT_I4]` |
+| **`Time_ID`** | Add as new column | `ISNULL(dc_date_str) \|\| LEN(TRIM(dc_date_str)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date_str, 1, 4) + SUBSTRING(dc_date_str, 6, 2) + SUBSTRING(dc_date_str, 9, 2))` | `[DT_I4]` |
 
 ---
 
 ### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 11 CỘT)
-* **Input Columns**: Tick ĐẦY ĐỦ 11 CỘT (`dc_appearance_id`, `dc_game_id`, `dc_player_id`, `dc_player_club_id`, `dc_date_str`, `der_time_id`, `dc_competition_id`, `dc_goals`, `dc_assists`, `dc_minutes_played`, `dc_yellow_cards`, `dc_red_cards`).
+* **Input Columns**: Tick ĐẦY ĐỦ 11 CỘT (`dc_appearance_id`, `dc_game_id`, `dc_player_id`, `dc_player_club_id`, `dc_date_str`, `Time_ID`, `dc_competition_id`, `dc_goals`, `dc_assists`, `dc_minutes_played`, `dc_yellow_cards`, `dc_red_cards`).
 * **Output Name**: `Valid_Appearance`
 * **Condition Expression**:
   ```c
@@ -93,7 +93,7 @@
   !ISNULL(dc_player_id) && dc_player_id > 0 &&
   !ISNULL(dc_player_club_id) && dc_player_club_id > 0 &&
   !ISNULL(dc_competition_id) && LEN(TRIM(dc_competition_id)) > 0 &&
-  !ISNULL(der_time_id) && der_time_id > 0 &&
+  !ISNULL(Time_ID) && Time_ID > 0 &&
   !ISNULL(dc_goals) && dc_goals >= 0 &&
   !ISNULL(dc_assists) && dc_assists >= 0 &&
   !ISNULL(dc_minutes_played) && dc_minutes_played >= 0 &&
@@ -150,7 +150,7 @@
   * **No matching entries**: **`Ignore failure`**.
 * **Tab Connection**: Chọn bảng **`[dbo].[DIM_Time]`** (SQL: `SELECT Time_ID FROM dbo.DIM_Time`).
 * **Tab Columns**:
-  * Nối cột đầu vào **`der_time_id`** sang cột Lookup **`Time_ID`**.
+  * Nối cột đầu vào **`Time_ID`** sang cột Lookup **`Time_ID`**.
   * Tích chọn ô **`Time_ID`**.
   * **Output Alias**: Nhập **`lk_time_id`** *(hoặc `Time_SK` nếu dùng mô hình Surrogate Key)*.
 
