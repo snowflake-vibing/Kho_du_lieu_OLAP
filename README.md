@@ -138,3 +138,16 @@ Thư mục [`ssis/`](ssis/) chứa các hướng dẫn cấu hình chi tiết ch
 Hệ thống cung cấp **15 câu truy vấn nghiệp vụ đa chiều (OLAP Queries)** bao phủ 100% các thuộc tính trong mô hình Kho dữ liệu.
 
 👉 **Xem toàn bộ câu lệnh T-SQL và giải trình chi tiết:** 📄 [15_queries.md](docs/15_queries.md)
+
+---
+
+## 📚 6. DANH MỤC TÀI LIỆU TOÀN BỘ CÁC CHƯƠNG (CHAPTER GUIDES MAP)
+
+| Chương | Tên Chương & Chủ đề | Tệp Tổng quan | Thư mục Hướng dẫn Kỹ thuật Chi tiết |
+| :---: | :--- | :--- | :--- |
+| **Chương 1** | **Giới thiệu Tổng quan về Dữ liệu** | 📄 [Chuong1.md](Chuong1.md) | 📁 [`docs/`](docs/) (Hồ sơ thuộc tính Fact/Dim & Đối chiếu) |
+| **Chương 2** | **Tích hợp Dữ liệu vào Kho (SSIS ETL)** | 📄 [ssis/ssis_main.md](ssis/ssis_main.md) | 📁 [`ssis/`](ssis/) (Hướng dẫn từng khối Data Flow & Control Flow) |
+| **Chương 3** | **Thực hiện Phân tích trên Kho dữ liệu (SSAS)** | 📄 [Chuong3.md](Chuong3.md) | 📁 [`ssas/`](ssas/) (Project SSAS, DSV, Dimensions, Cube, MDX) |
+| **Chương 4** | **Quá trình Lập Báo biểu (Power BI & Dashboards)** | 📄 [Chuong4.md](Chuong4.md) | 📁 [`powerbi/`](powerbi/) (Project Power BI, DAX, 3 Trang Dashboard) |
+| **Chương 5** | **Quá trình Khai thác Dữ liệu (Data Mining & ML)** | 📄 [Chuong5.md](Chuong5.md) | 📁 [`data_mining/`](data_mining/) (Preprocess, XGBoost, Stacking Classifier) |
+
