@@ -120,13 +120,13 @@
     ```
   * **Tab Columns**:
     * Nối cột đầu vào `dc_game_id` $\rightarrow$ `Game_ID`.
-    * Tích chọn ô `Home_Club_ID` $\rightarrow$ Output Alias: **`lk_home_club_id`**.
-    * Tích chọn ô `Away_Club_ID` $\rightarrow$ Output Alias: **`lk_away_club_id`**.
+    * Tích chọn ô `Home_Club_ID` $\rightarrow$ Giữ nguyên Output Alias: **`Home_Club_ID`**.
+    * Tích chọn ô `Away_Club_ID` $\rightarrow$ Giữ nguyên Output Alias: **`Away_Club_ID`**.
 
 > 💡 **Ví dụ minh họa dễ hiểu:**  
 > Trận đấu `Game_ID = 555` giữa **Real Madrid (Home_Club_ID = 10)** và **Barcelona (Away_Club_ID = 20)**.  
-> * **Vinicius** (`player_club_id = 10`): Khối 7 nhả ra `lk_home_club_id = 10`, `lk_away_club_id = 20`. Tại Khối 8 (Derived Column), SSIS so sánh `player_club_id (10) == lk_home_club_id (10)` $\rightarrow$ **`Is_Home_Game = 1`** và đối thủ **`Opponent_Club_ID = 20 (Barcelona)`**.  
-> * **Lewandowski** (`player_club_id = 20`): Khối 7 nhả ra `lk_home_club_id = 10`, `lk_away_club_id = 20`. SSIS thấy `20 != 10` $\rightarrow$ **`Is_Home_Game = 0`** (sân khách) và đối thủ **`Opponent_Club_ID = 10 (Real Madrid)`**.
+> * **Vinicius** (`player_club_id = 10`): Khối 7 nhả ra `Home_Club_ID = 10`, `Away_Club_ID = 20`. Tại Khối 8 (Derived Column), SSIS so sánh `player_club_id (10) == Home_Club_ID (10)` $\rightarrow$ **`Is_Home_Game = 1`** và đối thủ **`Opponent_Club_ID = 20 (Barcelona)`**.  
+> * **Lewandowski** (`player_club_id = 20`): Khối 7 nhả ra `Home_Club_ID = 10`, `Away_Club_ID = 20`. SSIS thấy `20 != 10` $\rightarrow$ **`Is_Home_Game = 0`** (sân khách) và đối thủ **`Opponent_Club_ID = 10 (Real Madrid)`**.
 
 ---
 
@@ -139,8 +139,8 @@
 | **`Time_ID`** | Add as new column | `ISNULL(dc_date_str) \|\| LEN(TRIM(dc_date_str)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date_str, 1, 4) + SUBSTRING(dc_date_str, 6, 2) + SUBSTRING(dc_date_str, 9, 2))` | `[DT_I4]` | - |
 | **`Goal_Contributions`** | Add as new column | `dc_goals + dc_assists` | `[DT_I4]` | - |
 | **`Is_Starter`** | Add as new column | `dc_minutes_played >= 45 ? 1 : 0` | `[DT_I4]` | - |
-| **`Is_Home_Game`** | Add as new column | `!ISNULL(lk_home_club_id) && dc_player_club_id == lk_home_club_id ? 1 : 0` | `[DT_I4]` | - |
-| **`Opponent_Club_ID`** | Add as new column | `!ISNULL(lk_home_club_id) && dc_player_club_id == lk_home_club_id ? lk_away_club_id : lk_home_club_id` | `[DT_I4]` | - |
+| **`Is_Home_Game`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? 1 : 0` | `[DT_I4]` | - |
+| **`Opponent_Club_ID`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? Away_Club_ID : Home_Club_ID` | `[DT_I4]` | - |
 | **`Player_ID`** | Add as new column | `ISNULL(lk_player_id) ? -1 : lk_player_id` | `[DT_I4]` | - |
 | **`Club_ID`** | Add as new column | `ISNULL(lk_club_id) ? -1 : lk_club_id` | `[DT_I4]` | - |
 | **`Competition_ID`** | Add as new column | `ISNULL(lk_competition_id) \|\| LEN(TRIM(lk_competition_id)) == 0 ? "UNKNOWN" : lk_competition_id` | `[DT_WSTR]` | **100** |
