@@ -1,5 +1,5 @@
 // ===============================================================================
-// DBDATABASE DIAGRAM (DBML CODE FOR DBDIAGRAM.IO)
+// DBML CODE FOR DBDIAGRAM.IO
 // MÔ HÌNH HÌNH SAO KHO DỮ LIỆU BÓNG ĐÁ CHÂU ÂU (FOOTBALL DATA WAREHOUSE)
 // ===============================================================================
 
@@ -33,7 +33,6 @@ Table DIM_Player {
 
 Table DIM_Game {
   Game_ID int [pk, note: 'Khóa tự nhiên Trận đấu']
-  Season int
   Round nvarchar(100)
   Home_Club_ID int
   Away_Club_ID int

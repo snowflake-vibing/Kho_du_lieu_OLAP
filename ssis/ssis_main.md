@@ -134,7 +134,6 @@
   -- 4. Bảng DIM_Game
   CREATE TABLE dbo.DIM_Game (
       Game_ID INT CONSTRAINT PK_DIM_Game PRIMARY KEY,
-      Season INT NULL,
       Round NVARCHAR(100) NULL,
       Home_Club_ID INT NULL,
       Away_Club_ID INT NULL,

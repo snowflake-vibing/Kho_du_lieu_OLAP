@@ -61,7 +61,6 @@ erDiagram
 
     DIM_Game {
         int Game_ID PK "Khóa chính Trận đấu"
-        int Season "Mùa giải"
         nvarchar Round "Vòng đấu / Giai đoạn"
         int Home_Club_ID "Mã đội chủ nhà"
         int Away_Club_ID "Mã đội khách"
