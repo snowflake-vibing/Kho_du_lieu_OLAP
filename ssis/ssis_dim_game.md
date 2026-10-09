@@ -19,7 +19,7 @@
 [3. Derived Column (Xử lý NULL Stadium & Tỷ số bàn thắng)]
        │
        ▼
-[4. Conditional Split (Validation kiểm tra toàn bộ 8 cột)]
+[4. Conditional Split (Validation kiểm tra toàn bộ 7 cột)]
        │
        ▼ (Output: Valid_Game)
 [5. Sort (Sort Ascending theo Game_ID & Distinct loại trùng)]
@@ -34,7 +34,7 @@
 
 ### Khối 1: `Flat File Source` (Đọc file `cleaned_games.csv`)
 * **Connection Manager**: `FF_Game` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (8 cột): `game_id`, `season`, `round`, `home_club_id`, `away_club_id`, `home_club_goals`, `away_club_goals`, `stadium`.
+* **Selected Columns** (7 cột): `game_id`, `round`, `home_club_id`, `away_club_id`, `home_club_goals`, `away_club_goals`, `stadium`.
 * **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
 
 ### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
@@ -42,7 +42,6 @@
 | Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
 | :--- | :--- | :--- | :--- | :--- |
 | `game_id` | **`dc_game_id`** | Four-byte signed integer `[DT_I4]` | - | Mã trận đấu (BK) |
-| `season` | **`dc_season`** | Four-byte signed integer `[DT_I4]` | - | Mùa giải (Năm bắt đầu) |
 | `round` | **`dc_round`** | Unicode string `[DT_WSTR]` | **100** | Vòng đấu (*Matchday 1...*) |
 | `home_club_id` | **`dc_home_club_id`** | Four-byte signed integer `[DT_I4]` | - | Mã đội chủ nhà |
 | `away_club_id` | **`dc_away_club_id`** | Four-byte signed integer `[DT_I4]` | - | Mã đội khách |
@@ -57,13 +56,12 @@
 * **`der_home_goals`** (`[DT_I4]`): `ISNULL(dc_home_club_goals) ? 0 : dc_home_club_goals`
 * **`der_away_goals`** (`[DT_I4]`): `ISNULL(dc_away_club_goals) ? 0 : dc_away_club_goals`
 
-### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 8 CỘT)
-* **Input Columns**: Đưa ĐẦY ĐỦ 8 CỘT (`dc_game_id`, `dc_season`, `dc_round`, `dc_home_club_id`, `dc_away_club_id`, `der_home_goals`, `der_away_goals`, `der_stadium`) vào Input.
+### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 7 CỘT)
+* **Input Columns**: Đưa ĐẦY ĐỦ 7 CỘT (`dc_game_id`, `dc_round`, `dc_home_club_id`, `dc_away_club_id`, `der_home_goals`, `der_away_goals`, `der_stadium`) vào Input.
 * **Output Name**: `Valid_Game`
 * **Condition Expression**:
   ```c
   !ISNULL(dc_game_id) && dc_game_id > 0 &&
-  !ISNULL(dc_season) && dc_season > 0 &&
   !ISNULL(dc_round) && LEN(TRIM(dc_round)) > 0 &&
   !ISNULL(dc_home_club_id) && dc_home_club_id > 0 &&
   !ISNULL(dc_away_club_id) && dc_away_club_id > 0 &&
@@ -75,7 +73,7 @@
 
 ### Khối 5: `Sort` (Khử trùng lặp theo Game_ID)
 * **Input Path**: Chọn nhánh **`Valid_Game`**.
-* **Pass Through Columns**: Tick chọn cả 8 cột.
+* **Pass Through Columns**: Tick chọn cả 7 cột.
 * **Sort Column**: Tick chọn `dc_game_id` (Sort Type: `Ascending`, Sort Order: `1`).
 * **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
 
@@ -85,7 +83,6 @@
 * **Table**: `[dbo].[DIM_Game]`.
 * **Mappings**:
   * `dc_game_id` $\rightarrow$ **`Game_ID`** (`int`)
-  * `dc_season` $\rightarrow$ **`Season`** (`int`)
   * `dc_round` $\rightarrow$ **`Round`** (`nvarchar(100)`)
   * `dc_home_club_id` $\rightarrow$ **`Home_Club_ID`** (`int`)
   * `dc_away_club_id` $\rightarrow$ **`Away_Club_ID`** (`int`)
