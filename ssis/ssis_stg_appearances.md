@@ -1,9 +1,13 @@
 # HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: LOAD STAGING APPEARANCES (STG_APPEARANCES)
 
-> **Bảng đích:** `[dbo].[STG_Appearances]`  
+> [!NOTE]
+> **TÙY CHỌN (OPTIONAL) - CÓ THỂ BỎ QUA KHÔNG CẦN THỰC HIỆN**:  
+> Bạn hoàn toàn có thể bỏ qua bước nạp Staging này. Quy trình nạp TRỰC TIẾP từ tệp `appearances.csv` vào bảng Fact `[dbo].[FACT_Player_Match_Perf]` (hướng dẫn chi tiết tại [ssis_fact_player_match_perf.md](file:///d:/Kho_du_lieu_OLAP/ssis/ssis_fact_player_match_perf.md)) được khuyến nghị áp dụng để đơn giản hóa quy trình SSIS, tiết kiệm dung lượng ổ đĩa và tăng tốc độ nạp dữ liệu gấp 2 lần.
+
+> **Bảng đích:** `[dbo].[STG_Appearances]` *(Tùy chọn)*  
 > **Tệp dữ liệu nguồn:** `appearances.csv` (hoặc `cleaned_appearances.csv` - 1.89 triệu bản ghi)  
 > **Database:** `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`)  
-> **Mục đích:** Nạp thô siêu tốc dữ liệu lượt ra sân vào bảng đệm trung gian, ép kiểu dữ liệu chuẩn, và lọc loại bỏ bản ghi không hợp lệ. (Lưu ý: `Time_ID` dạng số nguyên `YYYYMMDD` sẽ được tính toán qua Derived Column tại luồng nạp **Fact** `FACT_Player_Match_Perf`).  
+> **Mục đích:** Nạp thô dữ liệu lượt ra sân vào bảng đệm trung gian.  
 > **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), bảo đảm **100% SẠCH WARNING (0 tam giác vàng)**.
 
 ---
