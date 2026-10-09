@@ -300,7 +300,7 @@ Table FACT_Player_Match_Perf {
 
 * **Vai trò trong kiến trúc ETL 2 giai đoạn (Two-Stage Fact Load Architecture):**
   1. **BƯỚC 1 (Load Staging):** `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)`.
-  2. **BƯỚC 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Fact Measures)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf)`.
+  2. **BƯỚC 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Chuẩn hóa ngày sang YYYYMMDD để Lookup Time_ID)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Fact Measures)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf)`.
 
 ---
 
@@ -332,7 +332,7 @@ Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối 
    - `Flat File Source (games.csv/appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Bóc tách 9 cột thời gian & Time_ID YYYYMMDD)` $\rightarrow$ `Conditional Split (Validation 9 cột)` $\rightarrow$ `Sort (Unique Time_ID)` $\rightarrow$ `OLE DB Destination`.
 6. **`STG_Appearances` & `FACT_Player_Match_Perf` (Mô hình nạp Fact 2 giai đoạn):**
    - **Giai đoạn 1 (Load Staging):** `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)`.
-   - **Giai đoạn 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Tính Goal_Contributions, Is_Starter, Is_Home_Game, Opponent_Club_ID)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf - Fast Load 50.000 rows/batch)`.
+   - **Giai đoạn 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Chuẩn hóa ngày sang YYYYMMDD để Lookup Time_ID)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Tính Goal_Contributions, Is_Starter, Is_Home_Game, Opponent_Club_ID)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf - Fast Load 50.000 rows/batch)`.
 
 ---
 
