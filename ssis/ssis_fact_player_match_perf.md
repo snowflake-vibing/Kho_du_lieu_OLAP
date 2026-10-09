@@ -1,7 +1,7 @@
 # HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: FACT_PLAYER_MATCH_PERF (SỬ DỤNG LOOKUP TRANSFORMATIONS)
 
 > **Bảng đích:** `[dbo].[FACT_Player_Match_Perf]`  
-> **Tệp dữ liệu nguồn:** `appearances.csv` (1.89 triệu lượt ra sân)  
+> **Tệp dữ liệu nguồn:** `appearances.csv` (hoặc `STG_Appearances` - 1.89 triệu lượt ra sân)  
 > **Database:** `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`)  
 > **Phương pháp ETL:** Pure Data Flow Task (Nạp trực tiếp qua chuỗi **Lookup Transformations** trong Data Flow, không dùng `Execute SQL Task` hay câu lệnh SQL JOIN).  
 > **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), bảo đảm **100% SẠCH WARNING (0 tam giác vàng)**.
