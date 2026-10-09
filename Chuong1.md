@@ -283,11 +283,30 @@ Table FACT_Player_Match_Perf {
 | | `Season` | Varchar(20) | Mùa giải bóng đá (*2022/2023, 2023/2024*) |
 | Flag | `Is_Weekend` | Int | Cờ cuối tuần (`1`: Thứ 7 / Chủ Nhật, `0`: Ngày thường) |
 
+#### 1.2.2.7. Bảng Staging trung gian `STG_Appearances`
+| Khóa | Tên thuộc tính | Kiểu dữ liệu | Mô tả thuộc tính |
+| :---: | :--- | :--- | :--- |
+| | `appearance_id` | Varchar(100) | Mã lượt ra sân từ tệp thô |
+| | `game_id` | Int | Mã trận đấu |
+| | `player_id` | Int | Mã cầu thủ |
+| | `player_club_id` | Int | Mã câu lạc bộ cầu thủ thi đấu |
+| | `date_str` | Varchar(100) | Chuỗi ngày thi đấu |
+| | `competition_id` | Varchar(100) | Mã giải đấu |
+| | `goals` | Int | Số bàn thắng |
+| | `assists` | Int | Số đường kiến tạo |
+| | `minutes_played` | Int | Số phút thi đấu |
+| | `yellow_cards` | Int | Số thẻ vàng |
+| | `red_cards` | Int | Số thẻ đỏ |
+
+* **Vai trò trong kiến trúc ETL 2 giai đoạn (Two-Stage Fact Load Architecture):**
+  1. **BƯỚC 1 (Load Staging):** `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)`.
+  2. **BƯỚC 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Fact Measures)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf)`.
+
 ---
 
 ### 1.2.3. Quy trình chuyển đổi SSIS ETL cho từng bảng DIM và FACT
 
-Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối **Derived Column** và quy trình luồng dữ liệu SSIS Data Flow cho từng bảng Chiều (DIM) và bảng Sự kiện (FACT):
+Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối **Derived Column** và quy trình luồng dữ liệu SSIS Data Flow cho từng bảng Chiều (DIM), bảng Staging và bảng Sự kiện (FACT):
 
 | Tên Bảng DW | Sử Dụng Khối `Derived Column` | Cơ Chế Hoạt Động Của `Derived Column` | Các Cột Sinh Mới / Xử Lý Trong SSIS |
 | :--- | :---: | :--- | :--- |
@@ -296,6 +315,7 @@ Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối 
 | **`DIM_Player`** | **Có** | **Add as New Column & Replace Column** | **Sinh cột mới `Age`** từ `date_of_birth`; làm sạch NULL cho `Player_Name`, `Country_Of_Citizenship`, `Foot`, `Height_In_Cm`. |
 | **`DIM_Game`** | **Có** | **Replace Existing Column** *(Không sinh cột mới trong DW)* | Xử lý làm sạch NULL: `stadium` $\rightarrow$ `"Unknown Stadium"`, `home_club_goals` $\rightarrow$ `0`, `away_club_goals` $\rightarrow$ `0`. |
 | **`DIM_Time`** | **Có** | **Add as New Columns** *(Sinh tập hợp cột thuộc tính lịch)* | **Sinh 9 cột mới:** `Time_ID` (`YYYYMMDD`), `Full_Date`, `Day`, `Month`, `Quarter`, `Year`, `Day_Of_Week`, `Season`, `Is_Weekend`. |
+| **`STG_Appearances`** | **Không** | **Pass Through** *(Lưu trữ thô dữ liệu hợp lệ)* | Ép kiểu chuẩn và validation 11 cột trước khi nạp Fast Load. |
 | **`FACT_Player_Match_Perf`** | **Có** | **Add as New Columns** *(Sinh cờ nhận diện & độ đo tính toán)* | **Sinh 4 chỉ số/cờ mới:** `Goal_Contributions`, `Is_Starter`, `Is_Home_Game`, `Opponent_Club_ID` và gán mặc định `-1` cho bản ghi tra cứu khuyết. |
 
 #### Chi tiết quy trình nạp dữ liệu SSIS Data Flow từng bảng:
@@ -310,8 +330,9 @@ Dưới đây là tổng hợp chi tiết cơ chế hoạt động của khối 
    - `Flat File Source (cleaned_games.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Gán mặc định NULL)` $\rightarrow$ `Conditional Split (Validation 7 cột)` $\rightarrow$ `Sort (Unique Game_ID)` $\rightarrow$ `OLE DB Destination`.
 5. **`DIM_Time` (9 cột):**
    - `Flat File Source (games.csv/appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Bóc tách 9 cột thời gian & Time_ID YYYYMMDD)` $\rightarrow$ `Conditional Split (Validation 9 cột)` $\rightarrow$ `Sort (Unique Time_ID)` $\rightarrow$ `OLE DB Destination`.
-6. **`FACT_Player_Match_Perf`:**
-   - `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Tính Goal_Contributions, Is_Starter, Is_Home_Game, Opponent_Club_ID)` $\rightarrow$ `OLE DB Destination (Fast Load 50.000 rows/batch)`.
+6. **`STG_Appearances` & `FACT_Player_Match_Perf` (Mô hình nạp Fact 2 giai đoạn):**
+   - **Giai đoạn 1 (Load Staging):** `Flat File Source (appearances.csv)` $\rightarrow$ `Data Conversion` $\rightarrow$ `Conditional Split (Validation 11 cột)` $\rightarrow$ `OLE DB Destination (STG_Appearances - Fast Load 50.000 rows/batch)`.
+   - **Giai đoạn 2 (Populate Fact):** `OLE DB Source (STG_Appearances)` $\rightarrow$ `Derived Column (Prep der_time_id)` $\rightarrow$ `5 Khối Lookup (Player, Club, Competition, Time, Game Info)` $\rightarrow$ `Derived Column (Tính Goal_Contributions, Is_Starter, Is_Home_Game, Opponent_Club_ID)` $\rightarrow$ `OLE DB Destination (FACT_Player_Match_Perf - Fast Load 50.000 rows/batch)`.
 
 ---
 
