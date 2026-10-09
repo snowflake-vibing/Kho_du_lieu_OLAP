@@ -3,9 +3,6 @@
 -- MÔ HÌNH HÌNH SAO SỬ DỤNG NATURAL KEYS (ID TRỰC TIẾP), BỎ SURROGATE KEYS (*_SK)
 -- ===============================================================================
 
-USE DW_Football_Transfermarkt;
-GO
-
 -- 1. XÓA CÁC VIEWS VÀ BẢNG CŨ THEO ĐÚNG THỨ TỰ THAM CHIẾU
 IF OBJECT_ID('dbo.v_FACT_Player_Match_Perf', 'V') IS NOT NULL DROP VIEW dbo.v_FACT_Player_Match_Perf;
 IF OBJECT_ID('dbo.v_DIM_Competition', 'V') IS NOT NULL DROP VIEW dbo.v_DIM_Competition;
