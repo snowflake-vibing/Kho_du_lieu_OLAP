@@ -16,7 +16,7 @@
 [2. Data Conversion (Ép kiểu dc_date & dc_season 100)]
        │
        ▼
-[3. Derived Column (Bóc tách Time_ID YYYYMMDD, Full_Date, Day, Month, Quarter, Year, Season, Is_Weekend)]
+[3. Derived Column (Bóc tách Time_ID YYYYMMDD, Full_Date, Day, Month, Quarter, Year, Season, Is_Weekend, Day_Of_Week)]
        │
        ▼
 [4. Conditional Split (Validation kiểm tra toàn bộ 9 cột thời gian)]
@@ -44,19 +44,19 @@
 
 ---
 
-### Khối 3: `Derived Column` (Bóc tách thuộc tính thời gian)
+### Khối 3: `Derived Column` (Bóc tách thuộc tính thời gian - Theo chuẩn IS217)
 
-| Derived Column Name | Derived Column | Expression | Data Type | Length |
-| :--- | :--- | :--- | :--- | :--- |
-| **`Time_ID`** | Add as new column | `ISNULL(dc_date) \|\| LEN(TRIM(dc_date)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date, 1, 4) + SUBSTRING(dc_date, 6, 2) + SUBSTRING(dc_date, 9, 2))` | `[DT_I4]` | - |
-| **`Full_Date`** | Add as new column | `TRIM(dc_date)` | `[DT_WSTR]` | **100** |
-| **`Day`** | Add as new column | `(DT_I4)SUBSTRING(dc_date, 9, 2)` *(hoặc `DATEPART("dd", (DT_DBTIMESTAMP)dc_date)`)* | `[DT_I4]` | - |
-| **`Month`** | Add as new column | `(DT_I4)SUBSTRING(dc_date, 6, 2)` *(hoặc `DATEPART("mm", (DT_DBTIMESTAMP)dc_date)`)* | `[DT_I4]` | - |
-| **`Quarter`** | Add as new column | `(DT_I4)SUBSTRING(dc_date, 6, 2) <= 3 ? 1 : ((DT_I4)SUBSTRING(dc_date, 6, 2) <= 6 ? 2 : ((DT_I4)SUBSTRING(dc_date, 6, 2) <= 9 ? 3 : 4))` | `[DT_I4]` | - |
-| **`Year`** | Add as new column | `(DT_I4)SUBSTRING(dc_date, 1, 4)` *(hoặc `DATEPART("yy", (DT_DBTIMESTAMP)dc_date)`)* | `[DT_I4]` | - |
-| **`Day_Of_Week`** | Add as new column | `DATENAME("dw", (DT_DATE)dc_date)` | `[DT_WSTR]` | **100** |
-| **`Season`** | Add as new column | `FINDSTRING(dc_season, "Mùa", 1) > 0 ? dc_season : "Mùa " + TRIM(dc_season)` | `[DT_WSTR]` | **100** |
-| **`Is_Weekend`** | Add as new column | `DATEPART("dw", (DT_DATE)dc_date) == 1 \|\| DATEPART("dw", (DT_DATE)dc_date) == 7 ? 1 : 0` | `[DT_I4]` | - |
+| Derived Column Name | Derived Column | Expression |
+| :--- | :--- | :--- |
+| **`Time_ID`** | `<add as new column>` | `(YEAR((DT_DATE)dc_date) * 10000) + (MONTH((DT_DATE)dc_date) * 100) + DAY((DT_DATE)dc_date)` |
+| **`Full_Date`** | `<add as new column>` | `TRIM(dc_date)` |
+| **`Day`** | `<add as new column>` | `DATEPART("dd",(DT_DBTIMESTAMP)dc_date)` |
+| **`Month`** | `<add as new column>` | `DATEPART("mm",(DT_DBTIMESTAMP)dc_date)` |
+| **`Quarter`** | `<add as new column>` | `DATEPART("qq",(DT_DBTIMESTAMP)dc_date)` |
+| **`Year`** | `<add as new column>` | `DATEPART("yy",(DT_DBTIMESTAMP)dc_date)` |
+| **`Is_Weekend`** | `<add as new column>` | `DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 1 \|\| DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 7 ? 1 : 0` |
+| **`Day_Of_Week`** | `<add as new column>` | `(DT_WSTR,50)(DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 1 ? "Sunday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 2 ? "Monday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 3 ? "Tuesday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 4 ? "Wednesday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 5 ? "Thursday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 6 ? "Friday" : "Saturday")` |
+| **`Season`** | `<add as new column>` | `"Mùa " + TRIM(dc_season)` |
 
 ---
 
