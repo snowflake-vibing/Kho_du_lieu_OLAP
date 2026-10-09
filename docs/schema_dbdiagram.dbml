@@ -1,0 +1,81 @@
+// ===============================================================================
+// DBDATABASE DIAGRAM (DBML CODE FOR DBDIAGRAM.IO)
+// MÔ HÌNH HÌNH SAO KHO DỮ LIỆU BÓNG ĐÁ CHÂU ÂU (FOOTBALL DATA WAREHOUSE)
+// ===============================================================================
+
+Table DIM_Competition {
+  Competition_ID nvarchar(100) [pk, note: 'Khóa tự nhiên (GB1, ES1, CL...)']
+  Competition_Name nvarchar(200)
+  Country_Name nvarchar(200)
+  Competition_Type nvarchar(100)
+}
+
+Table DIM_Club {
+  Club_ID int [pk, note: 'Khóa tự nhiên CLB']
+  Club_Name nvarchar(200)
+  Stadium_Name nvarchar(200)
+  Stadium_Seats int
+  Coach_Name nvarchar(200)
+  Squad_Size int
+}
+
+Table DIM_Player {
+  Player_ID int [pk, note: 'Khóa tự nhiên Cầu thủ']
+  Player_Name nvarchar(200)
+  Date_Of_Birth nvarchar(100)
+  Age int
+  Country_Of_Citizenship nvarchar(200)
+  Main_Position nvarchar(100)
+  Sub_Position nvarchar(100)
+  Foot nvarchar(100)
+  Height_In_Cm int
+}
+
+Table DIM_Game {
+  Game_ID int [pk, note: 'Khóa tự nhiên Trận đấu']
+  Season int
+  Round nvarchar(100)
+  Home_Club_ID int
+  Away_Club_ID int
+  Home_Club_Goals int
+  Away_Club_Goals int
+  Stadium nvarchar(200)
+}
+
+Table DIM_Time {
+  Time_ID int [pk, note: 'Khóa YYYYMMDD']
+  Full_Date nvarchar(100)
+  Day_Of_Week nvarchar(100)
+  Day int
+  Month int
+  Quarter int
+  Year int
+  Season nvarchar(100)
+  Is_Weekend int
+}
+
+Table FACT_Player_Match_Perf {
+  Appearance_ID int [pk, increment, note: 'Khóa chính tự tăng']
+  Player_ID int [not null]
+  Club_ID int [not null]
+  Opponent_Club_ID int
+  Competition_ID nvarchar(100) [not null]
+  Game_ID int [not null]
+  Time_ID int [not null]
+  Minutes_Played int [default: 0]
+  Goals int [default: 0]
+  Assists int [default: 0]
+  Goal_Contributions int [default: 0]
+  Yellow_Cards int [default: 0]
+  Red_Cards int [default: 0]
+  Is_Starter int [default: 0]
+  Is_Home_Game int [default: 0]
+}
+
+// Foreign Keys / Relationships (Mối quan hệ 1 - N)
+Ref: FACT_Player_Match_Perf.Player_ID > DIM_Player.Player_ID
+Ref: FACT_Player_Match_Perf.Club_ID > DIM_Club.Club_ID
+Ref: FACT_Player_Match_Perf.Opponent_Club_ID > DIM_Club.Club_ID
+Ref: FACT_Player_Match_Perf.Competition_ID > DIM_Competition.Competition_ID
+Ref: FACT_Player_Match_Perf.Game_ID > DIM_Game.Game_ID
+Ref: FACT_Player_Match_Perf.Time_ID > DIM_Time.Time_ID
