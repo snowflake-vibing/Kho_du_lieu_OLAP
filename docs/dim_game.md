@@ -19,7 +19,6 @@ Bảng `DIM_Game` lưu trữ chi tiết bối cảnh tổ chức trận đấu, 
 | :---: | :--- | :--- | :--- | :--- |
 | 🔑 **PK** | `Game_SK` | `INT` | `IDENTITY(1,1)`, `NOT NULL` | Khóa thay thế tự tăng làm khóa chính trong DW |
 | 📌 **BK** | `Game_ID` | `INT` | `NOT NULL` | Mã định danh trận đấu duy nhất từ Transfermarkt |
-| Thuộc tính | `Season` | `INT` | `CHECK (Season BETWEEN 2000 AND 2030)` | Mùa giải bóng đá (*2022, 2023, 2024*) |
 | Thuộc tính | `Round` | `NVARCHAR(100)` | `NULL` | Vòng đấu hoặc giai đoạn thi đấu (*Matchday 1, Quarter-Finals, Final...*) |
 | Thuộc tính | `Home_Club_ID` | `INT` | `NULL` | Mã câu lạc bộ đóng vai trò đội chủ nhà |
 | Thuộc tính | `Away_Club_ID` | `INT` | `NULL` | Mã câu lạc bộ đóng vai trò đội khách |
@@ -39,7 +38,6 @@ Bảng `DIM_Game` lưu trữ chi tiết bối cảnh tổ chức trận đấu, 
 | Cột thuộc tính nguồn (Kaggle) | Kiểu dữ liệu Kaggle | Cột thuộc tính đích (DW) | Kiểu dữ liệu DW | Đánh giá & Quy tắc chuyển đổi SSIS |
 | :--- | :--- | :--- | :--- | :--- |
 | `game_id` | `Int64` | `Game_ID` | `INT` | **Giữ nguyên:** Mã định danh trận đấu chính xác (BK) |
-| `season` | `Int64` | `Season` | `INT` | **Giữ nguyên:** Năm bắt đầu mùa giải |
 | `round` | `string` | `Round` | `NVARCHAR(100)` | **Giữ nguyên:** Tên vòng đấu, ép kiểu `[DT_WSTR, 100]` |
 | `home_club_id` | `Int64` | `Home_Club_ID` | `INT` | **Giữ nguyên:** Mã CLB chủ nhà |
 | `away_club_id` | `Int64` | `Away_Club_ID` | `INT` | **Giữ nguyên:** Mã CLB khách |
@@ -74,7 +72,7 @@ Bảng `DIM_Game` lưu trữ chi tiết bối cảnh tổ chức trận đấu, 
 
 1. **Flat File Source:** Đọc tệp `cleaned_games.csv`.
 2. **Data Conversion Component:**
-   * Ép kiểu số nguyên (`[DT_I4]`) cho: `game_id`, `season`, `home_club_id`, `away_club_id`, `home_club_goals`, `away_club_goals`.
+   * Ép kiểu số nguyên (`[DT_I4]`) cho: `game_id`, `home_club_id`, `away_club_id`, `home_club_goals`, `away_club_goals`.
    * Ép kiểu chuỗi ký tự Unicode (`[DT_WSTR]`) chuẩn **100** hoặc **200**:
      * `round` $\rightarrow$ `dc_round` (`[DT_WSTR, 100]`)
      * `stadium` $\rightarrow$ `dc_stadium` (`[DT_WSTR, 200]`)

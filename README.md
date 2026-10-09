@@ -64,7 +64,6 @@ erDiagram
     DIM_Game {
         int Game_SK PK "Surrogate Key (Identity)"
         int Game_ID BK "Natural Key (Kaggle)"
-        int Season "Mùa giải (2022, 2023, 2024)"
         nvarchar Round "Vòng đấu / Giai đoạn"
         int Home_Club_ID "Mã đội chủ nhà"
         int Away_Club_ID "Mã đội khách"

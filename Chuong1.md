@@ -114,7 +114,7 @@ Dưới đây là mô tả các thuộc tính cốt lõi trong các tệp tin CS
 ### 1.2.1. Thiết kế lược đồ (Star Schema)
 Kho dữ liệu được thiết kế theo **Lược đồ Hình sao (Star Schema)** gồm **1 Bảng Sự kiện (Fact Table)** và **5 Bảng Chiều (Dimension Tables)**:
 
-```
+```text
                   ┌──────────────────┐
                   │    DIM_Player    │
                   └────────┬─────────┘
@@ -130,6 +130,79 @@ Kho dữ liệu được thiết kế theo **Lược đồ Hình sao (Star Schem
  ┌──────────────────┐      │      ┌──────────────────┐
  │     DIM_Game     ├──────┴──────┤     DIM_Time     │
  └──────────────────┘             └──────────────────┘
+```
+
+#### Mã Code DBDiagram.io (DBML Script):
+```dbml
+// Copy đoạn code này dán trực tiếp vào https://dbdiagram.io để sinh ERD tự động
+
+Table DIM_Player {
+  Player_ID int [primary key]
+  Player_Name nvarchar(200)
+  Date_Of_Birth nvarchar(100)
+  Age int
+  Country_Of_Citizenship nvarchar(200)
+  Main_Position nvarchar(100)
+  Sub_Position nvarchar(100)
+  Foot nvarchar(100)
+  Height_In_Cm int
+}
+
+Table DIM_Club {
+  Club_ID int [primary key]
+  Club_Name nvarchar(200)
+  Stadium_Name nvarchar(200)
+  Stadium_Seats int
+  Coach_Name nvarchar(200)
+  Squad_Size int
+}
+
+Table DIM_Competition {
+  Competition_ID nvarchar(100) [primary key]
+  Competition_Name nvarchar(200)
+  Country_Name nvarchar(200)
+  Competition_Type nvarchar(100)
+}
+
+Table DIM_Game {
+  Game_ID int [primary key]
+  Round nvarchar(100)
+  Home_Club_ID int
+  Away_Club_ID int
+  Home_Club_Goals int
+  Away_Club_Goals int
+  Stadium nvarchar(200)
+}
+
+Table DIM_Time {
+  Time_ID int [primary key]
+  Full_Date nvarchar(100)
+  Day_Of_Week nvarchar(100)
+  Day int
+  Month int
+  Quarter int
+  Year int
+  Season nvarchar(100)
+  Is_Weekend int
+}
+
+Table FACT_Player_Match_Perf {
+  Appearance_ID int [pk, increment]
+  Player_ID int [not null, ref: > DIM_Player.Player_ID]
+  Club_ID int [not null, ref: > DIM_Club.Club_ID]
+  Opponent_Club_ID int [ref: > DIM_Club.Club_ID]
+  Competition_ID nvarchar(100) [not null, ref: > DIM_Competition.Competition_ID]
+  Game_ID int [not null, ref: > DIM_Game.Game_ID]
+  Time_ID int [not null, ref: > DIM_Time.Time_ID]
+  Minutes_Played int
+  Goals int
+  Assists int
+  Goal_Contributions int
+  Yellow_Cards int
+  Red_Cards int
+  Is_Starter int
+  Is_Home_Game int
+}
 ```
 
 ---
@@ -190,7 +263,6 @@ Kho dữ liệu được thiết kế theo **Lược đồ Hình sao (Star Schem
 | Khóa | Tên thuộc tính | Kiểu dữ liệu | Mô tả thuộc tính |
 | :---: | :--- | :--- | :--- |
 | 🔑 PK | `Game_ID` | Int | Mã định danh trận đấu |
-| | `Season` | Int | Mùa giải bóng đá (*2022, 2023*) |
 | | `Round` | Nvarchar | Vòng đấu hoặc giai đoạn thi đấu |
 | | `Home_Club_ID` | Int | Mã câu lạc bộ chủ nhà |
 | | `Away_Club_ID` | Int | Mã câu lạc bộ khách |

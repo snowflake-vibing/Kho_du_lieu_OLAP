@@ -54,13 +54,12 @@ Tài liệu này cung cấp **Bảng ma trận đối chiếu 3 chiều (3-Way C
 | STT | Cột trong Data Cleaned CSV (`data/cleaned_games.csv`) | Kiểu dữ liệu CSV & Ví dụ | Khối xử lý SSIS ETL (`ssis/ssis_dim_game.md`) | Thuộc tính trong DW Table Docs (`docs/dim_game.md`) | Kiểu dữ liệu DW | Trạng thái Đối chiếu |
 | :---: | :--- | :--- | :--- | :--- | :--- | :---: |
 | 1 | `game_id` | `int` (VD: `2212345`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Sort` (Asc 1, Unique) | `Game_ID` | `INT (BK)` | ✅ Khớp 100% |
-| 2 | `season` | `int` (VD: `2023`) | `Data Conversion` (`DT_I4`) $\rightarrow$ Validation `Season BETWEEN 2000 AND 2030` | `Season` | `INT` | ✅ Khớp 100% |
-| 3 | `round` | `string` (VD: `Matchday 1`) | `Data Conversion` (`DT_WSTR, 100`) $\rightarrow$ `Derived Column` (TRIM) | `Round` | `NVARCHAR(100)` | ✅ Khớp 100% |
-| 4 | `home_club_id` | `int` (VD: `418`) | `Data Conversion` (`DT_I4`) $\rightarrow$ Mã CLB chủ nhà | `Home_Club_ID` | `INT` | ✅ Khớp 100% |
-| 5 | `away_club_id` | `int` (VD: `131`) | `Data Conversion` (`DT_I4`) $\rightarrow$ Mã CLB khách | `Away_Club_ID` | `INT` | ✅ Khớp 100% |
-| 6 | `home_club_goals` | `int` (VD: `3`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Derived Column` (NULL = 0) | `Home_Club_Goals` | `INT` | ✅ Khớp 100% |
-| 7 | `away_club_goals` | `int` (VD: `1`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Derived Column` (NULL = 0) | `Away_Club_Goals` | `INT` | ✅ Khớp 100% |
-| 8 | `stadium` | `string` (VD: `Camp Nou`) | `Data Conversion` (`DT_WSTR, 200`) $\rightarrow$ `Derived` (NULL = 'Unknown Stadium') | `Stadium` | `NVARCHAR(200)` | ✅ Khớp 100% |
+| 2 | `round` | `string` (VD: `Matchday 1`) | `Data Conversion` (`DT_WSTR, 100`) $\rightarrow$ `Derived Column` (TRIM) | `Round` | `NVARCHAR(100)` | ✅ Khớp 100% |
+| 3 | `home_club_id` | `int` (VD: `418`) | `Data Conversion` (`DT_I4`) $\rightarrow$ Mã CLB chủ nhà | `Home_Club_ID` | `INT` | ✅ Khớp 100% |
+| 4 | `away_club_id` | `int` (VD: `131`) | `Data Conversion` (`DT_I4`) $\rightarrow$ Mã CLB khách | `Away_Club_ID` | `INT` | ✅ Khớp 100% |
+| 5 | `home_club_goals` | `int` (VD: `3`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Derived Column` (NULL = 0) | `Home_Club_Goals` | `INT` | ✅ Khớp 100% |
+| 6 | `away_club_goals` | `int` (VD: `1`) | `Data Conversion` (`DT_I4`) $\rightarrow$ `Derived Column` (NULL = 0) | `Away_Club_Goals` | `INT` | ✅ Khớp 100% |
+| 7 | `stadium` | `string` (VD: `Camp Nou`) | `Data Conversion` (`DT_WSTR, 200`) $\rightarrow$ `Derived` (NULL = 'Unknown Stadium') | `Stadium` | `NVARCHAR(200)` | ✅ Khớp 100% |
 
 ---
 
