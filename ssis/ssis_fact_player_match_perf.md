@@ -130,9 +130,9 @@
 
 ---
 
-### Khối 8: `Derived Column` - Fact Calculations & Time_ID (GOM DUY NHẤT 1 KHỐI)
+#### Khối 8: `Derived Column` - Fact Calculations & Time_ID (ĐÚNG 5 CỘT BIẾN ĐỔI CHƯƠNG 1)
 * **Tên khối**: `Derived Column - Fact Calculations`
-* **Mục đích**: Tập trung toàn bộ logic tạo khóa `Time_ID` (`YYYYMMDD`), tính toán chỉ số độ đo (Measures), xử lý cờ động sân nhà/sân khách và thay thế giá trị `NULL` trực tiếp (không tạo cột `*_Final` dư thừa).
+* **Mục đích**: Chỉ tính toán và bóc tách **ĐÚNG 5 CỘT DỮ LIỆU TÍNH TOÁN (DERIVED)** đã quy định trong Chương 1 (`Time_ID`, `Goal_Contributions`, `Is_Starter`, `Is_Home_Game`, `Opponent_Club_ID`). Các cột ID khác (`lk_player_id`, `lk_club_id`, `lk_competition_id`, `dc_game_id`) được truyền thẳng từ khối Lookup/Source sang OLE DB Destination.
 
 | Derived Column Name | Derived Column | Expression | Data Type | Length |
 | :--- | :--- | :--- | :--- | :--- |
@@ -141,9 +141,6 @@
 | **`Is_Starter`** | Add as new column | `dc_minutes_played >= 60` *(hoặc `dc_minutes_played >= 60 ? 1 : 0`)* | `[DT_BOOL]` | - |
 | **`Is_Home_Game`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID` *(hoặc `? 1 : 0`)* | `[DT_BOOL]` | - |
 | **`Opponent_Club_ID`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? Away_Club_ID : Home_Club_ID` | `[DT_I4]` | - |
-| **`Player_ID`** | Add as new column | `ISNULL(lk_player_id) ? -1 : lk_player_id` | `[DT_I4]` | - |
-| **`Club_ID`** | Add as new column | `ISNULL(lk_club_id) ? -1 : lk_club_id` | `[DT_I4]` | - |
-| **`Competition_ID`** | Add as new column | `ISNULL(lk_competition_id) \|\| LEN(TRIM(lk_competition_id)) == 0 ? "UNKNOWN" : lk_competition_id` | `[DT_WSTR]` | **100** |
 
 ---
 
@@ -155,24 +152,24 @@
   * **Rows per batch**: `50000`
   * **Maximum insert commit size**: `50000`
   * Tick chọn: **`Table lock`** và **`Check constraints`**.
-* **Mappings (Ánh xạ gọn gàng 100% khớp tên cột)**:
+* **Mappings (Ánh xạ chuẩn xác từng cột)**:
 
 | Cột Luồng SSIS (Input Column) | Cột Đích SQL Server (Target Column) | Kiểu Dữ Liệu CSDL |
 | :--- | :--- | :--- |
-| `Player_ID` | **`Player_ID`** | `INT` |
-| `Club_ID` | **`Club_ID`** | `INT` |
-| `Opponent_Club_ID` | **`Opponent_Club_ID`** | `INT` |
-| `Competition_ID` | **`Competition_ID`** | `NVARCHAR(100)` |
-| `dc_game_id` | **`Game_ID`** | `INT` |
-| `Time_ID` | **`Time_ID`** | `INT` |
-| `dc_minutes_played` | **`Minutes_Played`** | `INT` |
-| `dc_goals` | **`Goals`** | `INT` |
-| `dc_assists` | **`Assists`** | `INT` |
-| `Goal_Contributions` | **`Goal_Contributions`** | `INT` |
-| `dc_yellow_cards` | **`Yellow_Cards`** | `INT` |
-| `dc_red_cards` | **`Red_Cards`** | `INT` |
-| `Is_Starter` | **`Is_Starter`** | `INT` |
-| `Is_Home_Game` | **`Is_Home_Game`** | `INT` |
+| `lk_player_id` *(từ Lookup Player)* | **`Player_ID`** | `INT` |
+| `lk_club_id` *(từ Lookup Club)* | **`Club_ID`** | `INT` |
+| `Opponent_Club_ID` *(từ Derived Column)* | **`Opponent_Club_ID`** | `INT` |
+| `lk_competition_id` *(từ Lookup Competition)* | **`Competition_ID`** | `NVARCHAR(100)` |
+| `dc_game_id` *(từ Data Conversion)* | **`Game_ID`** | `INT` |
+| `Time_ID` *(từ Derived Column)* | **`Time_ID`** | `INT` |
+| `dc_minutes_played` *(từ Data Conversion)* | **`Minutes_Played`** | `INT` |
+| `dc_goals` *(từ Data Conversion)* | **`Goals`** | `INT` |
+| `dc_assists` *(từ Data Conversion)* | **`Assists`** | `INT` |
+| `Goal_Contributions` *(từ Derived Column)* | **`Goal_Contributions`** | `INT` |
+| `dc_yellow_cards` *(từ Data Conversion)* | **`Yellow_Cards`** | `INT` |
+| `dc_red_cards` *(từ Data Conversion)* | **`Red_Cards`** | `INT` |
+| `Is_Starter` *(từ Derived Column)* | **`Is_Starter`** | `INT` / `BIT` |
+| `Is_Home_Game` *(từ Derived Column)* | **`Is_Home_Game`** | `INT` / `BIT` |
 
 ---
 
