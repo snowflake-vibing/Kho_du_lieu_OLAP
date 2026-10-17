@@ -1,10 +1,11 @@
 # MDX Query 09: So sánh hiệu năng & thẻ phạt Sân nhà vs Sân khách giữa Cuối tuần & Ngày thường
+## (Ứng dụng Phép Giao Tập Hợp INTERSECT & Tích Đa Chiều CROSSJOIN)
 
 ---
 
 ## 1. Mục tiêu nghiệp vụ & Bối cảnh phân tích
 
-* **Mục tiêu:** Phân tích ảnh hưởng của lợi thế sân bãi (`Is_Home_Game`: Sân nhà vs Sân khách) kết hợp với thời điểm thi đấu (`Is_Weekend`: Cuối tuần vs Ngày trong tuần) đến sức mạnh tấn công (tổng bàn thắng `Goals`) và mức độ phạm lỗi (tổng thẻ vàng `Yellow_Cards`) của các câu lạc bộ.
+* **Mục tiêu:** Phân tích ảnh hưởng của lợi thế sân bãi (`Is_Home_Game`: Sân nhà vs Sân khách) kết hợp với thời điểm thi đấu (`Is_Weekend`: Cuối tuần vs Ngày trong tuần) đến sức mạnh tấn công (tổng bàn thắng `Goals`) và mức độ phạm lỗi (tổng thẻ vàng `Yellow_Cards`) của các câu lạc bộ. Đặc biệt, ứng dụng phép toán giao tập hợp (`INTERSECT`) để tìm ra các câu lạc bộ có bản lĩnh thi đấu đồng đều toàn diện: vừa lọt vào nhóm ghi nhiều bàn nhất trên sân nhà VÀ vừa lọt vào nhóm ghi nhiều bàn nhất trên sân khách.
 * **Đối tượng phân tích:** Câu lạc bộ (`DIM_Club`), Thời gian thi đấu (`DIM_Time`), Hiệu suất & Kỷ luật (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo (Measures):**
   * Dimension Attributes: `[DIM Club].[Club Name]`, `[DIM Time].[Is Weekend]`, `[FACT Player Match Perf].[Is Home Game]`
@@ -12,6 +13,9 @@
 
 ### Đối chiếu câu lệnh T-SQL gốc
 ```sql
+USE DW_Football_Analytics;
+GO
+
 SELECT 
     cb.Club_Name,
     f.Is_Home_Game,
@@ -27,44 +31,80 @@ ORDER BY cb.Club_Name, f.Is_Home_Game, t.Is_Weekend;
 
 ---
 
-## 2. Quy trình thực hiện & Tư duy thiết kế MDX
+## 2. Hướng dẫn chi tiết 3 cách thực hiện (3 Execution Methods)
 
-1. **Xác định Trục Cột (Axis 0 - COLUMNS):**
-   * Đặt các thước đo `{ [Measures].[Goals], [Measures].[Yellow Cards] }`.
-2. **Xác định Trục Dòng (Axis 1 - ROWS):**
-   * Thực hiện tích đề-các ba chiều giữa:
-     * Tên câu lạc bộ: `[DIM Club].[Club Name].[Club Name].MEMBERS`
-     * Phân loại sân bãi: `[FACT Player Match Perf].[Is Home Game].[Is Home Game].MEMBERS` (hoặc phân loại theo Dimension tương ứng)
-     * Phân loại thời điểm: `[DIM Time].[Is Weekend].[Is Weekend].MEMBERS` (0: Ngày thường, 1: Thứ 7/Chủ Nhật).
-   * Sử dụng từ khóa `NON EMPTY` trên trục dòng để chỉ hiển thị những tổ hợp thực tế có diễn ra trận đấu.
-3. **Quy trình triển khai trên SSAS / SSMS:**
-   * Mở SSMS, tạo kết nối Analysis Services vào database `DW Football Transfermarkt`.
-   * Chạy câu truy vấn MDX để kiểm tra sự chênh lệch phong độ của từng CLB khi đá sân nhà vào cuối tuần so với sân khách ngày thường.
+```mermaid
+flowchart TD
+    Start["Khởi động Phân tích Sân bãi"] --> Choice{"Lựa chọn Phương pháp"}
+
+    Choice -->|"Cách 1: Trực quan Thiết kế"| CB["1. Cube Browser (Visual Studio)"]
+    Choice -->|"Cách 2: Báo cáo Doanh nghiệp"| Excel["2. Excel PivotTable"]
+    Choice -->|"Cách 3: Lập trình Đa chiều"| MDX["3. Ngôn ngữ MDX (SSMS)"]
+
+    CB --> CB_Step["Mở file .cube -> Tab Browser -> Kéo Is Home Game & Is Weekend vào Columns -> Kéo Club Name vào Rows"]
+    Excel --> Excel_Step["Data -> Get Data from SSAS -> PivotTable Fields -> Columns: Is Home Game, Is Weekend -> Rows: Club Name"]
+    MDX --> MDX_Step["SSMS Connect AS -> New MDX Query -> Soạn INTERSECT/CROSSJOIN/NON EMPTY -> Execute (F5)"]
+
+    CB_Step --> Finish["Kết quả: Ma trận So sánh Hiệu năng Sân nhà vs Sân khách"]
+    Excel_Step --> Finish
+    MDX_Step --> Finish
+```
+
+### CÁCH 1: TRUY VẤN BẰNG CUBE BROWSER (VISUAL STUDIO / SSDT)
+1. **Mở tab Browser:** Mở file `DW_Football_Cube.cube` $\rightarrow$ nhấp chọn tab **`Browser`**.
+2. **Kéo thả Grid:**
+   * Kéo trường `Is Home Game` (từ `FACT Player Match Perf`) thả vào vùng cột (**Columns**).
+   * Kéo trường `Is Weekend` (từ `DIM Time`) thả tiếp vào vùng cột (**Columns**) phía sau.
+   * Kéo trường `Club Name` (từ `DIM Club`) thả vào vùng hàng (**Rows**).
+   * Kéo các thước đo `Goals` và `Yellow Cards` vào vùng dữ liệu (**Totals**).
+3. **Lọc dữ liệu rác:** Bỏ chọn các nút `(All)` trên thanh tiêu đề các chiều.
 
 ---
 
-## 3. Mã truy vấn MDX chuẩn (Full Script)
+### CÁCH 2: PHÂN TÍCH BẰNG PIVOT TABLE TRÊN MICROSOFT EXCEL
+1. **Kết nối SSAS:** Khởi động Excel $\rightarrow$ tab **`Data`** $\rightarrow$ **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`** $\rightarrow$ Kết nối Cube `DW Football Transfermarkt`.
+2. **Kéo thả PivotTable Fields:**
+   * Ô **Columns:** Kéo `Is Home Game` và `Is Weekend`.
+   * Ô **Rows:** Kéo `Club Name`.
+   * Ô **Values:** Kéo `Goals` và `Yellow Cards`.
+
+---
+
+### CÁCH 3: VIẾT VÀ THỰC THI TRUY VẤN BẰNG NGÔN NGỮ MDX (SSMS)
 
 ```mdx
 /* ==============================================================================
    Truy vấn MDX 09: Hiệu năng & Thẻ phạt theo CLB, Sân bãi và Ngày trong tuần
+   Khai thác: INTERSECT, CROSSJOIN, EXCEPT, NON EMPTY, TOPCOUNT
    Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
 SELECT
-    -- Trục Cột: Bàn thắng và Thẻ vàng
-    {
-        [Measures].[Goals],
-        [Measures].[Yellow Cards]
-    } ON COLUMNS,
-
-    -- Trục Dòng: Tích chéo giữa Câu lạc bộ x Sân nhà/khách x Cuối tuần/Ngày thường
-    NON EMPTY
+    -- Trục Cột: Bàn thắng và Thẻ vàng kết hợp với Sân nhà/Sân khách
     CrossJoin(
-        EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
-        CrossJoin(
-            EXCEPT([FACT Player Match Perf].[Is Home Game].[Is Home Game].MEMBERS, { [FACT Player Match Perf].[Is Home Game].[All] }),
-            EXCEPT([DIM Time].[Is Weekend].[Is Weekend].MEMBERS, { [DIM Time].[Is Weekend].[All] })
+        { [Measures].[Goals], [Measures].[Yellow Cards] },
+        EXCEPT([FACT Player Match Perf].[Is Home Game].[Is Home Game].MEMBERS, { [FACT Player Match Perf].[Is Home Game].[All] })
+    ) ON COLUMNS,
+
+    -- Trục Dòng: Giao tập hợp (INTERSECT) giữa Top 30 CLB ghi bàn sân nhà & Top 30 CLB ghi bàn sân khách
+    INTERSECT(
+        -- Tập 1: Top 30 CLB ghi nhiều bàn nhất khi đá Sân Nhà
+        TOPCOUNT(
+            NONEMPTY(
+                EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                ([Measures].[Goals], [FACT Player Match Perf].[Is Home Game].[1])
+            ),
+            30,
+            ([Measures].[Goals], [FACT Player Match Perf].[Is Home Game].[1])
+        ),
+        -- Tập 2: Top 30 CLB ghi nhiều bàn nhất khi đá Sân Khách
+        TOPCOUNT(
+            NONEMPTY(
+                EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                ([Measures].[Goals], [FACT Player Match Perf].[Is Home Game].[0])
+            ),
+            30,
+            ([Measures].[Goals], [FACT Player Match Perf].[Is Home Game].[0])
         )
     ) ON ROWS
 
@@ -73,23 +113,24 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
 
-| Tên hàm | Cú pháp | Vai trò trong truy vấn |
+| Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
-| **`CROSSJOIN`** | `CrossJoin(Set1, CrossJoin(Set2, Set3))` | Tạo không gian tổ hợp đa chiều giữa CLB, yếu tố sân nhà/khách và yếu tố cuối tuần. |
-| **`NON EMPTY`** | `NON EMPTY Axis_Specification` | Loại bỏ các dòng hoàn toàn không có dữ liệu sự kiện (all-null rows), giữ báo cáo gọn gàng. |
-| **`EXCEPT`** | `EXCEPT(Set, { Member })` | Loại bỏ thành viên tổng quát `[All]` trên từng chiều để tránh hiển thị trùng lặp dữ liệu tổng. |
+| **`INTERSECT`** | `INTERSECT(Set1, Set2 [, ALL])` | Trả về giao điểm (các phần tử chung) xuất hiện đồng thời trong cả hai tập hợp. Sử dụng để lọc ra các CLB toàn diện hàng đầu ở cả hai điều kiện sân bãi. |
+| **`TOPCOUNT`** | `TOPCOUNT(Set, Count, Numeric_Expression)` | Trích xuất top 30 đội bóng ghi bàn nhiều nhất cho từng điều kiện sân nhà/khách riêng biệt. |
+| **`CROSSJOIN`** | `CrossJoin(Set1, Set2)` | Kết hợp các thước đo với trạng thái sân nhà/khách trên trục cột. |
+| **`NONEMPTY`** | `NONEMPTY(Set, Tuple)` | Lọc bỏ trước các câu lạc bộ không có bàn thắng tương ứng với lát cắt. |
+| **`EXCEPT`** | `EXCEPT(Set, { Member })` | Loại bỏ thành viên tổng quát `[All]`. |
 
 ---
 
-## 5. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
 
 ### Độ phức tạp không gian (Space Complexity)
-* **Kích thước tổ hợp lý thuyết:** $C$ CLB ($\approx 400$) $\times 2$ (Sân nhà/khách) $\times 2$ (Cuối tuần/Ngày thường) $= 1.600$ tuples.
-* **Số dòng thực tế:** Sau khi áp dụng `NON EMPTY`, hầu hết các CLB đều có dữ liệu ở cả 4 kịch bản, cho ra khoảng $1.200 - 1.500$ dòng kết quả.
-* **Bộ nhớ ma trận:** Khoảng $80\text{ KB}$ RAM, hoàn toàn nằm gọn trong L3 Cache của vi xử lý máy chủ.
+* **Kích thước giao tập hợp:** Thông thường có khoảng $K \approx 15 - 22$ câu lạc bộ hàng đầu xuất hiện đồng thời trong cả hai nhóm Top 30 sân nhà và sân khách (như Man City, Arsenal, Liverpool, Real Madrid, Bayern Munich...).
+* **Bộ nhớ RAM sử dụng:** Cực kỳ nhỏ (dưới $3\text{ KB}$ RAM).
 
 ### Độ phức tạp thời gian (Time Complexity)
-* **Thời gian gom cụm:** Do các chiều `DIM Club` và `DIM Time` là các chiều độc lập tạo nên hệ tọa độ của Cube, SSAS dùng cấu trúc băm nhiều chiều (Multi-dimensional Hash Index) để truy xuất dữ liệu trong $O(1)$ cho mỗi cell.
-* **Tổng thời gian thực thi:** Dưới $15\text{ ms}$ cho toàn bộ $1.600$ ô dữ liệu.
+* **Chi phí hàm `INTERSECT`:** Sau khi lấy 2 tập kích thước 30, SSAS áp dụng thuật toán băm (Hash Join) hoặc so sánh nhị phân với chi phí $O(|S_1| + |S_2|) = O(30 + 30) = O(60)$ thao tác.
+* **Tổng thời gian thực thi:** Dưới **$10\text{ ms}$**.

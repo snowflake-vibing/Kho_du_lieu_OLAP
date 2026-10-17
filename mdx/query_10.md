@@ -1,17 +1,22 @@
 # MDX Query 10: Thống kê bàn thắng của Real Madrid vào lưới các đối thủ theo từng Quý trong năm
+## (Ứng dụng Điều hướng Phân cấp Thời gian: CHILDREN, DESCENDANTS, PREVMEMBER)
 
 ---
 
 ## 1. Mục tiêu nghiệp vụ & Bối cảnh phân tích
 
-* **Mục tiêu:** Khảo sát chi tiết số bàn thắng của câu lạc bộ Real Madrid ghi vào lưới từng câu lạc bộ đối thủ, phân bổ qua 4 Quý thời gian trong năm (`Quarter` 1, 2, 3, 4) nhằm đánh giá phong độ ghi bàn theo chu kỳ mùa giải.
+* **Mục tiêu:** Khảo sát chi tiết số bàn thắng của câu lạc bộ Real Madrid ghi vào lưới từng câu lạc bộ đối thủ, phân bổ qua 4 Quý thời gian trong năm (`Quarter` 1, 2, 3, 4) và đánh giá biến động tăng trưởng bàn thắng giữa các quý liên tiếp ($Q_t - Q_{t-1}$) nhằm phục vụ đánh giá chu kỳ phong độ đỉnh cao của đội bóng.
 * **Đối tượng phân tích:** Câu lạc bộ chủ quản (`DIM_Club`), Câu lạc bộ đối thủ (`Opponent Club` - Role-Playing Dimension), Thời gian (`DIM_Time`), Hiệu suất bàn thắng (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo (Measures):**
-  * Dimension Attributes: `[DIM Club].[Club Name]`, `[Opponent Club].[Club Name]`, `[DIM Time].[Quarter]`
+  * Dimension Attributes: `[DIM Club].[Club Name]`, `[Opponent Club].[Club Name]`, `[DIM Time].[Quarter]`, `[DIM Time].[Year]`
   * Cube Measures: `[Measures].[Goals]`
+  * Calculated Measure: `[Measures].[QoQ Goals Growth]` (Mức tăng trưởng bàn thắng so với Quý liền trước)
 
 ### Đối chiếu câu lệnh T-SQL gốc
 ```sql
+USE DW_Football_Analytics;
+GO
+
 SELECT 
     cb.Club_ID,
     cb.Club_Name AS Real_Madrid,
@@ -29,40 +34,83 @@ ORDER BY t.Quarter, Goals_Scored DESC;
 
 ---
 
-## 2. Quy trình thực hiện & Tư duy thiết kế MDX
+## 2. Hướng dẫn chi tiết 3 cách thực hiện (3 Execution Methods)
 
-1. **Khai thác Chiều đóng vai (Role-Playing Dimension):**
-   * Trong thiết kế Cube `DW Football Transfermarkt`, bảng `DIM_Club` đóng hai vai trò độc lập:
-     * `[DIM Club]`: Đại diện cho câu lạc bộ của cầu thủ ghi bàn.
-     * `[Opponent Club]`: Đại diện cho câu lạc bộ đối phương bị thủng lưới.
-2. **Xác định Trục Cột (Axis 0 - COLUMNS):**
-   * Để tạo báo cáo Pivot dạng bảng ma trận (Cross-tab) trực quan, ta đặt 4 Quý trên cột:
-     `{ [DIM Time].[Quarter].[1], [DIM Time].[Quarter].[2], [DIM Time].[Quarter].[3], [DIM Time].[Quarter].[4] } * { [Measures].[Goals] }`.
-3. **Xác định Trục Dòng (Axis 1 - ROWS):**
-   * Lấy danh sách tên đối thủ từ chiều `[Opponent Club].[Club Name].[Club Name].MEMBERS`.
-   * Sử dụng hàm `NONEMPTY()` kết hợp với Real Madrid để chỉ giữ lại các đối thủ mà Real Madrid đã từng ghi bàn.
-   * Sử dụng `ORDER()` để sắp xếp đối thủ bị Real Madrid chọc thủng lưới nhiều nhất lên hàng đầu.
-4. **Xác định Lát cắt (Slicer Axis / WHERE Clause):**
-   * Cố định đội chủ quản là Real Madrid: `[DIM Club].[Club Name].[Real Madrid]`.
+```mermaid
+flowchart TD
+    Start["Khởi động Phân tích Quý"] --> Choice{"Lựa chọn Phương pháp"}
+
+    Choice -->|"Cách 1: Trực quan Thiết kế"| CB["1. Cube Browser (Visual Studio)"]
+    Choice -->|"Cách 2: Báo cáo Doanh nghiệp"| Excel["2. Excel PivotTable"]
+    Choice -->|"Cách 3: Lập trình Đa chiều"| MDX["3. Ngôn ngữ MDX (SSMS)"]
+
+    CB --> CB_Step["Mở file .cube -> Tab Browser -> Filter Real Madrid -> Kéo Quarter vào Columns -> Opponent vào Rows"]
+    Excel --> Excel_Step["Data -> Get Data from SSAS -> PivotTable Fields -> Filter Real Madrid -> Quarter Columns -> Opponent Rows"]
+    MDX --> MDX_Step["SSMS Connect AS -> New MDX Query -> Soạn WITH MEMBER/PREVMEMBER/DESCENDANTS -> Execute (F5)"]
+
+    CB_Step --> Finish["Kết quả: Ma trận Bàn thắng & Tăng trưởng theo Quý của Real Madrid"]
+    Excel_Step --> Finish
+    MDX_Step --> Finish
+```
+
+### CÁCH 1: TRUY VẤN BẰNG CUBE BROWSER (VISUAL STUDIO / SSDT)
+1. **Mở tab Browser:** Mở file `DW_Football_Cube.cube` trong Visual Studio $\rightarrow$ nhấp chọn thẻ tab **`Browser`**.
+2. **Thiết lập Vùng Filter (Bộ lọc phía trên):**
+   * *Dimension:* Chọn **`DIM Club`**.
+   * *Hierarchy:* Chọn **`Club Name`**.
+   * *Operator:* Chọn **`Equal`** ($=$).
+   * *Filter Expression:* Tick chọn **`Real Madrid`** $\rightarrow$ bấm **OK**.
+3. **Kéo thả thuộc tính vào Lưới:**
+   * Từ cây Metadata: Mở chiều **`DIM Time`** $\rightarrow$ kéo thuộc tính **`Quarter`** thả vào vùng cột (**Columns**).
+   * Mở chiều đóng vai **`Opponent Club`** $\rightarrow$ kéo thuộc tính **`Club Name`** thả vào vùng hàng (**Rows**).
+   * Mở nhóm **`Measures`** $\rightarrow$ kéo thước đo **`Goals`** thả vào vùng dữ liệu (**Totals**).
+4. **Sắp xếp đối thủ:** Chuột phải vào tiêu đề cột `Club Name` của đối thủ $\rightarrow$ chọn **Sort** $\rightarrow$ **Sort Descending by Goals**.
 
 ---
 
-## 3. Mã truy vấn MDX chuẩn (Full Script)
+### CÁCH 2: PHÂN TÍCH BẰNG PIVOT TABLE TRÊN MICROSOFT EXCEL
+1. **Kết nối SSAS:** Khởi động Excel $\rightarrow$ vô tab **`Data`** $\rightarrow$ **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`** $\rightarrow$ Nhập server `localhost` $\rightarrow$ Chọn Database `DW_Football_SSAS` và Cube `DW Football Transfermarkt`.
+2. **Kéo thả 4 ô trong PivotTable Fields:**
+   * Ô **Filters:** Kéo `Club Name` (từ `DIM Club`) $\rightarrow$ Chọn giá trị `Real Madrid`.
+   * Ô **Columns:** Kéo `Quarter` (từ `DIM Time`).
+   * Ô **Rows:** Kéo `Club Name` (từ chiều `Opponent Club`).
+   * Ô **Values:** Kéo `Goals` (hiển thị `Sum of Goals`).
+3. **Thêm trường tính toán chênh lệch (Difference from Previous Quarter):**
+   * Chuột phải vào một ô giá trị bất kỳ trong bảng Pivot $\rightarrow$ **Show Values As** $\rightarrow$ Chọn **Difference From...** $\rightarrow$ Base field: `Quarter`, Base item: `(previous)`.
+
+---
+
+### CÁCH 3: VIẾT VÀ THỰC THI TRUY VẤN BẰNG NGÔN NGỮ MDX (SSMS)
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 10: Bàn thắng của Real Madrid vào lưới đối thủ theo từng Quý
+   Truy vấn MDX 10: Bàn thắng Real Madrid theo Quý & Tăng trưởng Quý (QoQ Growth)
+   Khai thác: CHILDREN, DESCENDANTS, PREVMEMBER, IIF, Role-Playing Dimension
    Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
+WITH 
+    -- Tính toán mức tăng trưởng bàn thắng so với Quý liền trước (QoQ Growth)
+    MEMBER [Measures].[QoQ Goals Growth] AS
+        IIF(
+            IsEmpty(([Measures].[Goals], [DIM Time].[Quarter].CURRENTMEMBER.PREVMEMBER)),
+            NULL,
+            [Measures].[Goals] - ([Measures].[Goals], [DIM Time].[Quarter].CURRENTMEMBER.PREVMEMBER)
+        ),
+        FORMAT_STRING = "+#,##0;-#,##0;0"
+
 SELECT
-    -- Trục Cột: Phân bổ bàn thắng qua 4 Quý (Q1, Q2, Q3, Q4)
-    (
-        EXCEPT([DIM Time].[Quarter].[Quarter].MEMBERS, { [DIM Time].[Quarter].[All] }),
-        { [Measures].[Goals] }
+    -- Trục Cột: Kết hợp 4 Quý với thước đo Bàn thắng và Mức tăng trưởng
+    CrossJoin(
+        -- Điều hướng phân cấp: Lấy tất cả các Quý (con của Năm)
+        DESCENDANTS([DIM Time].[Quarter].[All], [DIM Time].[Quarter].[Quarter]),
+        {
+            [Measures].[Goals],
+            [Measures].[QoQ Goals Growth]
+        }
     ) ON COLUMNS,
 
-    -- Trục Dòng: Các đối thủ từng bị Real Madrid ghi bàn, xếp giảm dần
+    -- Trục Dòng: Các đối thủ từng bị Real Madrid chọc thủng lưới, xếp giảm dần
     ORDER(
         NONEMPTY(
             EXCEPT([Opponent Club].[Club Name].[Club Name].MEMBERS, { [Opponent Club].[Club Name].[All] }),
@@ -77,7 +125,7 @@ SELECT
 
 FROM [DW Football Transfermarkt]
 
--- Lát cắt ngữ cảnh: Câu lạc bộ ghi bàn là Real Madrid
+-- Lát cắt ngữ cảnh: Đội ghi bàn là Real Madrid
 WHERE (
     [DIM Club].[Club Name].[Real Madrid]
 );
@@ -85,24 +133,28 @@ WHERE (
 
 ---
 
-## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
 
-| Tên hàm | Cú pháp | Vai trò trong truy vấn |
+| Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
-| **`NONEMPTY`** | `NONEMPTY(Opponent_Set, (Goals, Real_Madrid))` | Lọc chỉ giữ lại những câu lạc bộ đối đầu thực tế từng để Real Madrid ghi bàn, loại bỏ hàng trăm CLB chưa từng chạm trán. |
-| **`EXCEPT`** | `EXCEPT(Set1, Set2)` | Loại bỏ nút tổng quát `[All]` trên chiều `Quarter` và `Opponent Club`. |
-| **`ORDER` (BDESC)** | `ORDER(Set, Measure, BDESC)` | Sắp xếp các câu lạc bộ đối thủ theo tổng số bàn thua phải nhận từ Real Madrid giảm dần. |
+| **`PREVMEMBER`** | `Member.PREVMEMBER` | Trả về thành viên liền trước trong cùng cấp bậc phân cấp thời gian. Sử dụng để lấy giá trị số bàn thắng của Quý trước đó ($Q_{t-1}$). |
+| **`DESCENDANTS`** | `DESCENDANTS(Member, Level [, Flags])` | Truy xuất toàn bộ các thành viên hậu duệ ở cấp độ `Quarter` trong cây phân cấp thời gian. |
+| **`CHILDREN`** | `Member.CHILDREN` | Trả về tập hợp tất cả các nút con trực tiếp của một nút cha (ví dụ: các Quý con của Năm). |
+| **`IIF`** | `IIF(Condition, True_Val, False_Val)` | Kiểm tra nếu Quý trước không tồn tại (như Quý 1 đầu kỳ) thì trả về `NULL` để tránh sai lệch báo cáo. |
+| **`NONEMPTY`** | `NONEMPTY(Set1, Set2)` | Lọc chỉ giữ lại những câu lạc bộ đối đầu thực tế từng để Real Madrid ghi bàn. |
+| **`ORDER` (BDESC)** | `ORDER(Set, Measure, BDESC)` | Sắp xếp các câu lạc bộ đối thủ theo tổng số bàn thua phải nhận từ Real Madrid giảm dần trên toàn cục. |
 
 ---
 
-## 5. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
 
 ### Độ phức tạp không gian (Space Complexity)
-* **Số đối thủ thực tế:** Real Madrid thường chạm trán và ghi bàn vào lưới khoảng 60 đến 80 câu lạc bộ (La Liga, Champions League, Copa del Rey, Club World Cup...).
-* **Kích thước ma trận:** $80 \text{ đối thủ} \times 4 \text{ quý} = 320 \text{ cells}$.
-* **Bộ nhớ RAM sử dụng:** Khoảng $15\text{ KB}$.
+* **Số đối thủ thực tế:** Real Madrid thường chạm trán và ghi bàn vào lưới khoảng $K \approx 60 - 80$ câu lạc bộ.
+* **Kích thước ma trận kết quả:** $80 \text{ đối thủ} \times (4 \text{ quý} \times 2 \text{ measures}) = 640 \text{ cells}$.
+* **Bộ nhớ RAM sử dụng:** Khoảng $25\text{ KB}$, hoàn toàn nằm trong bộ nhớ đệm L1/L2 Cache của CPU.
 
 ### Độ phức tạp thời gian (Time Complexity)
 * **Tận dụng Role-Playing Dimension:** Nhờ việc tách biệt hai khóa ngoại `Club_ID` và `Opponent_Club_ID` trên Fact Table, SSAS lọc lát cắt Real Madrid với chi phí $O(1)$ thông qua phân vùng dữ liệu của câu lạc bộ.
+* **Chi phí tính toán `PREVMEMBER`:** $O(1)$ cho mỗi cell nhờ con trỏ nội tại trong cấu trúc phân cấp thời gian được lập chỉ mục trước.
 * **Thời gian sắp xếp:** $O(K \log K)$ với $K \approx 80$, thực hiện trong vòng chưa đầy $0.5\text{ ms}$.
-* **Tổng thời gian phản hồi:** Khoảng $10\text{ ms}$.
+* **Tổng thời gian phản hồi:** Khoảng $10\text{ ms} - 15\text{ ms}$.

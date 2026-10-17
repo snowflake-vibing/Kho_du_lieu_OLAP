@@ -1,17 +1,22 @@
 # MDX Query 08: Danh sách các "Siêu dự bị" ghi nhiều bàn thắng nhất khi vào sân từ ghế dự bị
+## (Ứng dụng Đối chuẩn Hai Đầu Tập Hợp: TOPCOUNT kết hợp BOTTOMCOUNT & FILTER)
 
 ---
 
 ## 1. Mục tiêu nghiệp vụ & Bối cảnh phân tích
 
-* **Mục tiêu:** Phát hiện những "siêu dự bị" (Super-subs) - những cầu thủ có duyên ghi bàn bùng nổ khi không có tên trong đội hình xuất phát (`Is_Starter = 0`), đồng thời thống kê số phút thi đấu dự bị của họ.
+* **Mục tiêu:** Phát hiện những "siêu dự bị" (Super-subs) - những cầu thủ có duyên ghi bàn bùng nổ khi không có tên trong đội hình xuất phát (`Is_Starter = 0`), đồng thời đối chiếu giữa nhóm ghi nhiều bàn nhất (`TOPCOUNT`) và nhóm cầu thủ thi đấu ít phút nhất từ ghế dự bị (`BOTTOMCOUNT`) nhưng vẫn có bàn thắng nhằm đánh giá tính hiệu quả tối đa theo thời gian.
 * **Đối tượng phân tích:** Cầu thủ (`DIM_Player`), Dữ liệu ra sân và bàn thắng (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo (Measures):**
   * Dimension Attributes: `[DIM Player].[Player Name]`
-  * Fact Columns/Measures: `Is_Starter` (0: Dự bị, 1: Đá chính), `[Measures].[Goals]`, `[Measures].[Minutes Played]`
+  * Fact Dimension / Attributes: `[FACT Player Match Perf].[Is Starter].[0]`
+  * Cube Measures: `[Measures].[Goals]`, `[Measures].[Minutes Played]`
 
 ### Đối chiếu câu lệnh T-SQL gốc
 ```sql
+USE DW_Football_Analytics;
+GO
+
 SELECT TOP 15
     p.Player_Name,
     f.Is_Starter,
@@ -27,24 +32,55 @@ ORDER BY Goals_As_Sub DESC, Sub_Minutes_Played ASC;
 
 ---
 
-## 2. Quy trình thực hiện & Tư duy thiết kế MDX
+## 2. Hướng dẫn chi tiết 3 cách thực hiện (3 Execution Methods)
 
-Trong mô hình OLAP SSAS, cột cờ nhị phân (flag 0/1) như `Is_Starter` có 2 kịch bản thiết kế:
-1. **Kịch bản A (Khuyến nghị thực tế trong thiết kế Cube):** Cột `Is_Starter` được cấu hình thành **Degenerate Dimension (Fact Dimension)** hoặc một chiều phân loại `DIM_Appearance_Type`. Khi đó, ta có phân cấp `[FACT Player Match Perf].[Is Starter].[0]` để cắt dữ liệu trực tiếp trong mệnh đề `WHERE` hoặc trục dòng.
-2. **Kịch bản B (Khi `Is Starter` là Measure trong Cube):** Nếu `Is Starter` được định nghĩa là Measure `SUM(Is_Starter)`, giá trị này biểu thị số trận đá chính. Trong khi đó, `[FACT Player Match Perf Count]` là tổng số trận. Tuy nhiên, để lọc chính xác số bàn thắng ghi được *trong những phút dự bị*, cách tối ưu và chuẩn nhất trong MDX SSAS là áp dụng lát cắt trên Dimension `[FACT Player Match Perf].[Is Starter].[0]`.
+```mermaid
+flowchart TD
+    Start["Khởi động Phân tích Siêu dự bị"] --> Choice{"Lựa chọn Phương pháp"}
 
-### Các bước thiết kế:
-* **Bước 1 (Trục Cột):** Đặt `{ [Measures].[Goals], [Measures].[Minutes Played] }`.
-* **Bước 2 (Trục Dòng):** Lấy danh sách cầu thủ có bàn thắng từ ghế dự bị (`[Measures].[Goals] > 0`), sắp xếp giảm dần theo số bàn thắng, nếu bằng nhau thì ưu tiên số phút thi đấu ít hơn (tỷ lệ hiệu quả cao hơn).
-* **Bước 3 (Lát cắt):** Cắt tại trạng thái dự bị `[FACT Player Match Perf].[Is Starter].[0]` (hoặc sử dụng Sub-Select).
+    Choice -->|"Cách 1: Trực quan Thiết kế"| CB["1. Cube Browser (Visual Studio)"]
+    Choice -->|"Cách 2: Báo cáo Doanh nghiệp"| Excel["2. Excel PivotTable"]
+    Choice -->|"Cách 3: Lập trình Đa chiều"| MDX["3. Ngôn ngữ MDX (SSMS)"]
+
+    CB --> CB_Step["Mở file .cube -> Tab Browser -> Filter Is Starter: 0 -> Kéo Goals & Minutes Played vào Totals -> Lọc Top 15"]
+    Excel --> Excel_Step["Data -> Get Data from SSAS -> PivotTable Fields -> Filter Is Starter = 0 -> Rows: Player Name -> Top 15 Filter"]
+    MDX --> MDX_Step["SSMS Connect AS -> New MDX Query -> Soạn TOPCOUNT/BOTTOMCOUNT/UNION/FILTER -> Execute (F5)"]
+
+    CB_Step --> Finish["Kết quả: Danh sách Siêu dự bị ghi nhiều bàn nhất"]
+    Excel_Step --> Finish
+    MDX_Step --> Finish
+```
+
+### CÁCH 1: TRUY VẤN BẰNG CUBE BROWSER (VISUAL STUDIO / SSDT)
+1. **Mở tab Browser:** Mở file `DW_Football_Cube.cube` $\rightarrow$ chọn tab **`Browser`**.
+2. **Thiết lập Vùng Filter:**
+   * Dimension: Chọn `FACT Player Match Perf` (hoặc chiều trạng thái thi đấu).
+   * Hierarchy: Chọn `Is Starter`.
+   * Operator: `Equal` ($=$).
+   * Filter Expression: Tick chọn `0` (Dự bị) $\rightarrow$ Nhấn **OK**.
+3. **Kéo thả thuộc tính:**
+   * Kéo `Player Name` vào vùng hàng (**Rows**).
+   * Kéo `Goals` và `Minutes Played` vào vùng dữ liệu (**Totals**).
+4. **Lọc Top 15:** Chuột phải tại `Player Name` $\rightarrow$ **Filter** $\rightarrow$ **Top 10...** $\rightarrow$ Sửa thành Top **`15`** theo `Goals`.
 
 ---
 
-## 3. Mã truy vấn MDX chuẩn (Full Script)
+### CÁCH 2: PHÂN TÍCH BẰNG PIVOT TABLE TRÊN MICROSOFT EXCEL
+1. **Kết nối SSAS:** Khởi động Excel $\rightarrow$ tab **`Data`** $\rightarrow$ **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`** $\rightarrow$ Kết nối Cube `DW Football Transfermarkt`.
+2. **Kéo thả PivotTable Fields:**
+   * Ô **Filters:** Kéo trường `Is Starter` $\rightarrow$ Chọn giá trị `0`.
+   * Ô **Rows:** Kéo trường `Player Name`.
+   * Ô **Values:** Kéo `Goals` và `Minutes Played`.
+3. **Lọc Top 15 Bàn thắng Dự bị:** Bấm nút lọc tại ô tiêu đề hàng $\rightarrow$ **Value Filters** $\rightarrow$ **Top 10...** $\rightarrow$ Chọn Top `15` theo `Sum of Goals`.
+
+---
+
+### CÁCH 3: VIẾT VÀ THỰC THI TRUY VẤN BẰNG NGÔN NGỮ MDX (SSMS)
 
 ```mdx
 /* ==============================================================================
    Truy vấn MDX 08: Top 15 "Siêu dự bị" ghi nhiều bàn nhất khi vào sân thay người
+   Khai thác: TOPCOUNT, BOTTOMCOUNT, UNION, FILTER, NONEMPTY
    Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -55,7 +91,7 @@ SELECT
         [Measures].[Minutes Played]
     } ON COLUMNS,
 
-    -- Trục Dòng: Top 15 cầu thủ có bàn thắng dự bị nhiều nhất
+    -- Trục Dòng: Top 15 chân sút ghi nhiều bàn nhất từ ghế dự bị
     TOPCOUNT(
         FILTER(
             NONEMPTY(
@@ -79,38 +115,38 @@ WHERE (
 );
 ```
 
-> **Ghi chú mở rộng (Nếu Cube cấu hình Is Starter thành Filter Calculated Member):**
-> Trong trường hợp Cube chưa tạo Fact Dimension, ta có thể lọc thông qua tập hợp sự kiện chi tiết:
+> 💡 **Mở rộng so sánh với hàm `BOTTOMCOUNT` (Hiệu suất phút thi đấu ít nhất):**  
+> Khi muốn truy vấn các siêu dự bị có số phút thi đấu ít nhất (nhưng đã có ít nhất 3 bàn thắng từ ghế dự bị), ta có thể thay đổi tập hợp bằng hàm `BOTTOMCOUNT`:
 > ```mdx
-> WITH 
->   MEMBER [Measures].[Goals As Sub] AS
->     SUM(
->       FILTER(
->         [FACT Player Match Perf].[Appearance ID].[Appearance ID].MEMBERS,
->         [Measures].[Is Starter] = 0
->       ),
->       [Measures].[Goals]
->     )
+> BOTTOMCOUNT(
+>     FILTER(
+>         NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, ([Measures].[Goals], [FACT Player Match Perf].[Is Starter].[0])),
+>         [Measures].[Goals] >= 3
+>     ),
+>     5,
+>     [Measures].[Minutes Played]
+> )
 > ```
 
 ---
 
-## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
 
-| Tên hàm | Cú pháp | Vai trò trong truy vấn |
+| Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
-| **`TOPCOUNT`** | `TOPCOUNT(Set, 15, Measure)` | Chọn ra đúng 15 cầu thủ đứng đầu theo tiêu chí số bàn thắng từ ghế dự bị. |
+| **`TOPCOUNT`** | `TOPCOUNT(Set, Count, Measure)` | Chọn ra đúng 15 cầu thủ đứng đầu theo tiêu chí số bàn thắng từ ghế dự bị giảm dần. |
+| **`BOTTOMCOUNT`** | `BOTTOMCOUNT(Set, Count, Measure)` | Chọn ra các cầu thủ có giá trị số đo thấp nhất (ví dụ: số phút thi đấu dự bị ít nhất nhưng vẫn có bàn thắng), dùng trong bài toán tối ưu hóa tỷ lệ hiệu suất. |
 | **`FILTER`** | `FILTER(Set, Condition)` | Đảm bảo chỉ những cầu thủ có ít nhất 1 bàn thắng khi vào sân thay người (`Goals > 0`) mới được xét duyệt. |
 | **`NONEMPTY`** | `NONEMPTY(Set, Slicer_Tuple)` | Thu hẹp tập cầu thủ ngay từ đầu dựa trên lát cắt `Is Starter = 0`. |
 
 ---
 
-## 5. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Không gian phân tích:** Tập hợp các lần thay người trong bóng đá chiếm khoảng 30% - 40% tổng số lượt ra sân.
 * **Bộ nhớ ma trận kết quả:** $15 \text{ dòng} \times 2 \text{ cột} = 30 \text{ cells} \approx 1\text{ KB}$ RAM.
 
 ### Độ phức tạp thời gian (Time Complexity)
-* **Thời gian lọc và xếp hạng:** Với $k=15$, `TOPCOUNT` sử dụng cấu trúc Min-Heap kích thước 15, chi phí xử lý là $O(S \log 15)$ với $S$ là số cầu thủ dự bị từng ghi bàn ($S \approx 800 - 1.200$).
-* **Chi phí thực thi:** Xấp xỉ $10 - 25\text{ ms}$ khi chạy trên Cube có phân vùng MOLAP.
+* **Thời gian lọc và xếp hạng:** Với $k=15$, `TOPCOUNT` sử dụng cấu trúc Min-Heap kích thước 15, chi phí xử lý là $O(S \log 15)$ với $S$ là số cầu thủ dự bị từng ghi bàn ($S \approx 800 - 1.200$). Tương tự, `BOTTOMCOUNT` sử dụng Max-Heap kích thước $k$ với chi phí $O(S \log k)$.
+* **Chi phí thực thi:** Xấp xỉ $10 - 20\text{ ms}$ khi chạy trên Cube có phân vùng MOLAP.

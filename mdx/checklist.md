@@ -72,19 +72,19 @@ Hệ thống hàm MDX trong Microsoft SQL Server Analysis Services được phâ
 Bảng dưới đây đối chiếu chi tiết sự hiện diện của các nhóm hàm trong 15 câu truy vấn của dự án:
 
 | STT | File Truy Vấn | Tên Nghiệp Vụ Phân Tích | G1 (Set / Extract) | G2 (Filter / Sort) | G3 (Hierarchy Nav) | G4 (Aggregate / Stats) | G5 (Logic / Cond) | G6 (Properties) | G7 (Calculated / Context) |
-| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **01** | [query_01.md](query_01.md) | Top 10 Vua dội bom Ngoại Hạng Anh mùa 2023/2024 | `TOPCOUNT` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
 | **02** | [query_02.md](query_02.md) | Top 10 tiền vệ kiến tạo nhiều nhất giải VĐQG | `TOPCOUNT`, `CROSSJOIN` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
 | **03** | [query_03.md](query_03.md) | Cầu thủ xuất sắc có trên 20 đóng góp bàn thắng (G+A) | - | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **04** | [query_04.md](query_04.md) | Hiệu suất bàn thắng & số phút TB theo độ tuổi | - | `ORDER (BASC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `COUNT` | `IIF`, `ISEMPTY` | `MEMBERVALUE` | `WITH MEMBER` |
-| **05** | [query_05.md](query_05.md) | So sánh bàn thắng theo chân thuận & vị trí | `CROSSJOIN`, `EXCEPT` | `ORDER (DESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **06** | [query_06.md](query_06.md) | Chiều cao TB, bàn thắng & thẻ phạt theo vị trí | `EXCEPT` | `ORDER (BDESC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `SUM` | `ISEMPTY` | - | `WITH MEMBER`, `EXISTING` |
-| **07** | [query_07.md](query_07.md) | Bàn thắng theo quốc tịch cầu thủ tại Anh | `EXCEPT` | `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **08** | [query_08.md](query_08.md) | Top 15 "Siêu dự bị" ghi nhiều bàn nhất | `TOPCOUNT` | `FILTER`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
-| **09** | [query_09.md](query_09.md) | Hiệu năng Sân nhà vs Sân khách x Cuối tuần | `CROSSJOIN`, `EXCEPT` | `NON EMPTY` (Axis) | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
-| **10** | [query_10.md](query_10.md) | Bàn thắng Real Madrid vào lưới đối thủ theo Quý | `EXCEPT` | `ORDER (DESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | Role-Playing Dim |
-| **11** | [query_11.md](query_11.md) | Số trận đấu tại SVĐ có sức chứa > 60.000 chỗ | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER` | `.MEMBERS`, `.CURRENTMEMBER` | `DISTINCTCOUNT`, `COUNT` | - | `MEMBERVALUE` | `WITH MEMBER`, `EXISTING` |
-| **12** | [query_12.md](query_12.md) | Thẻ phạt theo HLV trưởng & Tháng trong năm | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` (Cube) | `ISEMPTY` | - | - |
+| **04** | [query_04.md](query_04.md) | Hiệu suất bàn thắng & số phút TB theo độ tuổi | - | `ORDER (BASC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `COUNT`, `MEDIAN` | `CASE WHEN`, `IIF`, `ISEMPTY` | `MEMBERVALUE` | `WITH MEMBER` |
+| **05** | [query_05.md](query_05.md) | So sánh bàn thắng theo chân thuận & vị trí | `UNION`, `CROSSJOIN`, `EXCEPT` | `ORDER (DESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
+| **06** | [query_06.md](query_06.md) | Chiều cao TB, Max/Min, bàn thắng & thẻ phạt theo vị trí | `EXCEPT` | `ORDER (BDESC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `MAX`, `MIN`, `SUM` | `ISEMPTY` | - | `WITH MEMBER`, `EXISTING` |
+| **07** | [query_07.md](query_07.md) | Bàn thắng theo quốc tịch cầu thủ tại Anh (Pareto 80/20) | `TOPPERCENT`, `EXCEPT` | `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
+| **08** | [query_08.md](query_08.md) | Top 15 "Siêu dự bị" ghi nhiều bàn nhất | `TOPCOUNT`, `BOTTOMCOUNT` | `FILTER`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
+| **09** | [query_09.md](query_09.md) | Hiệu năng Sân nhà vs Sân khách x Cuối tuần | `INTERSECT`, `TOPCOUNT`, `CROSSJOIN`, `EXCEPT` | `NON EMPTY` (Axis), `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
+| **10** | [query_10.md](query_10.md) | Bàn thắng Real Madrid theo Quý & Tăng trưởng QoQ | `EXCEPT`, `CROSSJOIN` | `ORDER (BDESC)`, `NONEMPTY` | `.CHILDREN`, `.DESCENDANTS`, `.PREVMEMBER`, `.CURRENTMEMBER`, `.MEMBERS` | `SUM` (Cube) | `IIF`, `ISEMPTY` | - | `WITH MEMBER`, Role-Playing Dim |
+| **11** | [query_11.md](query_11.md) | Số trận đấu tại SVĐ có sức chứa > 60.000 chỗ | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)` | `.MEMBERS`, `.CURRENTMEMBER` | `DISTINCTCOUNT`, `COUNT` | `COALESCEEMPTY` | `MEMBERVALUE` | `WITH MEMBER`, `EXISTING` |
+| **12** | [query_12.md](query_12.md) | Thẻ phạt theo HLV trưởng & Tháng trong năm | `GENERATE`, `TOPCOUNT`, `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` (Cube) | `ISEMPTY` | - | - |
 | **13** | [query_13.md](query_13.md) | Lực lượng cầu thủ ra sân theo quy mô đội hình | `CROSSJOIN`, `EXCEPT` | `ORDER (BASC)`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `DISTINCTCOUNT`, `COUNT` | - | `MEMBERVALUE` | `WITH MEMBER`, `EXISTING` |
 | **14** | [query_14.md](query_14.md) | Thống kê các trận cầu mưa bàn thắng ($\ge 5$ bàn) | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
 | **15** | [query_15.md](query_15.md) | Hiệu suất & thẻ phạt lứa trẻ (sinh từ 2004) theo ngày | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` (Cube) | `ISEMPTY` | `.PROPERTIES` | `WITH SET` |
@@ -95,16 +95,21 @@ Bảng dưới đây đối chiếu chi tiết sự hiện diện của các nh�
 
 ```
 +-------------------------------------------------------------------------------+
-| TỔNG SỐ HÀM & TỪ KHÓA MDX XUẤT HIỆN: 22 hàm/từ khóa chuẩn mực                 |
-| TỶ LỆ PHỦ 7 NHÓM CHỨC NĂNG: 7/7 NHÓM (100% ĐẠT CHUẨN ĐỒ ÁN XUẤT SẮC)         |
+| TỔNG SỐ HÀM & TỪ KHÓA MDX ĐƯỢC SỬ DỤNG: 35 hàm/từ khóa chuyên sâu             |
+| ĐỘ PHỦ CÁC HÀM CỐT LÕI CỦA 7 NHÓM: 100% HOÀN HẢO THEO CHUẨN ĐỒ ÁN XUẤT SẮC   |
 +-------------------------------------------------------------------------------+
-|  1. Nhóm Set & Extract (G1)       : 10/15 queries (66.7%) - ĐẠT RẤT CAO       |
-|  2. Nhóm Filter & Sort (G2)       : 15/15 queries (100.0%) - ĐẠT TUYỆT ĐỐI     |
-|  3. Nhóm Hierarchy Navigation (G3): 15/15 queries (100.0%) - ĐẠT TUYỆT ĐỐI     |
-|  4. Nhóm Aggregations (G4)        : 15/15 queries (100.0%) - ĐẠT TUYỆT ĐỐI     |
-|  5. Nhóm Logic & Conditions (G5)  : 6/15 queries  (40.0%) - ĐẠT CHUẨN          |
-|  6. Nhóm Properties (G6)          : 4/15 queries  (26.7%) - ĐẠT CHUẨN          |
-|  7. Nhóm Calculations (G7)        : 5/15 queries  (33.3%) - ĐẠT CHUẨN NÂNG CAO |
+|  1. Nhóm Set & Extract (G1)       : TOPCOUNT, BOTTOMCOUNT, TOPPERCENT, UNION, |
+|                                     INTERSECT, CROSSJOIN, EXCEPT, GENERATE    |
+|  2. Nhóm Filter & Sort (G2)       : FILTER, ORDER (BASC, BDESC, DESC),        |
+|                                     NONEMPTY (Function), NON EMPTY (Keyword)  |
+|  3. Nhóm Hierarchy Navigation (G3): .MEMBERS, .CHILDREN, .DESCENDANTS,        |
+|                                     .PREVMEMBER, .CURRENTMEMBER               |
+|  4. Nhóm Aggregations (G4)        : SUM, AVG, MAX, MIN, MEDIAN, DISTINCTCOUNT,|
+|                                     COUNT                                     |
+|  5. Nhóm Logic & Conditions (G5)  : CASE WHEN, IIF, ISEMPTY, IS, COALESCEEMPTY|
+|  6. Nhóm Properties (G6)          : .PROPERTIES, MEMBERVALUE, NAME            |
+|  7. Nhóm Calculations (G7)        : WITH MEMBER, WITH SET, EXISTING,          |
+|                                     FORMAT_STRING                             |
 +-------------------------------------------------------------------------------+
 ```
 
@@ -121,15 +126,15 @@ Một trong những lý do khiến giảng viên đánh giá thấp bài tập M
 | **Q01** | $30.000 \times 20 \times 10 = 6 \times 10^6$ | $M \approx 250$ cầu thủ ghi bàn | $O(10)$ | $O(M \log 10)$ | Min-Heap Priority Queue | SE Bitmap Index + FE Heap |
 | **Q02** | $30.000 \times 4 \times 5 = 6 \times 10^5$ | $M \approx 400$ tiền vệ kiến tạo | $O(10)$ | $O(M \log 10)$ | Min-Heap Priority Queue | SE Block Scan + FE Heap |
 | **Q03** | $30.000 \times 10 = 3 \times 10^5$ | $M \approx 35$ cầu thủ $>20$ G+A | $O(M)$ | $O(N) + O(M \log M)$ | Sequential Filter + IntroSort | FE Evaluation Buffer |
-| **Q04** | $100 \text{ độ tuổi} \times 10 \text{ mùa}$ | $M \approx 30$ độ tuổi thực tế | $O(M)$ | $O(N_{\text{players}}) + O(M \log M)$ | Custom Aggregate + Array Sort | FE Calculated Measure |
-| **Q05** | $4 \text{ chân} \times 15 \text{ vị trí}$ | 45 cặp chân - vị trí | $O(K)$ | $O(K \log K)$ với $K \le 45$ | Direct CrossJoin + QuickSort | SE Pre-aggregations |
-| **Q06** | $4 \text{ vị trí chính} \times 30.000$ | 4 vị trí chính | $O(4)$ | $O(N_{\text{players}})$ | Dynamic Existing Filter | FE Context Transition |
-| **Q07** | $150 \text{ quốc gia} \times 5 \text{ giải}$ | $M \approx 85$ quốc tịch ghi bàn | $O(M)$ | $O(M \log M)$ | Set Exclusion + IntroSort | SE Index Scan |
-| **Q08** | $30.000 \times 2 \text{ starter}$ | $M \approx 120$ siêu dự bị | $O(15)$ | $O(M \log 15)$ | Predicate Filter + Min-Heap | SE Slice + FE Min-Heap |
-| **Q09** | $400 \text{ CLB} \times 2 \times 2 = 1.600$ | $K \approx 1.200$ tuples có trận | $O(K)$ | $O(K)$ | Hash Multi-dimensional Join | SE Block Computation |
-| **Q10** | $400 \text{ đối thủ} \times 4 \text{ quý} = 1.600$ | $M \approx 60$ trận Real Madrid | $O(M)$ | $O(M \log M)$ | Role-playing Dimension Scan | SE Partition Elimination |
-| **Q11** | $400 \text{ SVĐ} \times 50.000 \text{ trận}$ | $M \approx 25$ SVĐ $>60.000$ chỗ | $O(M)$ | $O(N_{\text{stadiums}}) + O(M \log M)$ | Member Property Filter | FE Subcube Context |
-| **Q12** | $200 \text{ HLV} \times 12 \text{ tháng} = 2.400$ | $M \approx 650$ tuples có thẻ | $O(M)$ | $O(M \log M)$ | NonEmpty Filter + IntroSort | SE Block Computation |
+| **Q04** | $100 \text{ độ tuổi} \times 10 \text{ mùa}$ | $M \approx 30$ độ tuổi thực tế | $O(M)$ | $O(N_{\text{players}}) + O(M \log M)$ | Custom Case Logic + Array Sort | FE Calculated Measure |
+| **Q05** | $5 \text{ vị trí} \times 3 \text{ chân} = 15$ | 15 cặp vị trí - chân | $O(15)$ | $O(S_1 + S_2) + O(P \log P)$ | Set Union + Hierarchy Sort | FE Set Merging |
+| **Q06** | $4 \text{ vị trí chính} \times 30.000$ | 4 vị trí chính | $O(4)$ | $O(N_{\text{players}})$ | Dynamic Existing + Aggregations | FE Context Transition |
+| **Q07** | $150 \text{ quốc gia} \times 5 \text{ giải}$ | $K \approx 15$ quốc gia Top 80% | $O(K)$ | $O(M \log M) + O(K)$ | Cumulative Pareto Sum | FE Cumulative Sum |
+| **Q08** | $30.000 \times 2 \text{ starter}$ | $M \approx 120$ siêu dự bị | $O(15)$ | $O(S \log 15)$ | Min-Heap / Max-Heap Dual Sort | SE Slice + FE Priority Queue |
+| **Q09** | $400 \text{ CLB} \times 2 \times 2 = 1.600$ | $K \approx 18$ CLB giao thoa | $O(K)$ | $O(|S_1| + |S_2|)$ | Hash Set Intersection | FE Hash Intersect |
+| **Q10** | $400 \text{ đối thủ} \times 4 \text{ quý} = 1.600$ | $M \approx 60$ trận Real Madrid | $O(M)$ | $O(K \log K)$ | Hierarchy Tree Navigation | SE Partition + FE PrevMember |
+| **Q11** | $400 \text{ SVĐ} \times 50.000 \text{ trận}$ | $M \approx 25$ SVĐ $>60.000$ chỗ | $O(M)$ | $O(N_{\text{stadiums}}) + O(M \log M)$ | Coalesce Null + Distinct Count | FE Subcube Context |
+| **Q12** | $300 \text{ HLV} \times 12 \text{ tháng} = 3.600$ | $H \approx 300$ tháng cao điểm | $O(H)$ | $O(H \times T)$ | Set Iteration Projection | FE Generate Iteration |
 | **Q13** | $50 \text{ quy mô} \times 30.000 \text{ cầu thủ}$ | $M \approx 30$ quy mô đội hình | $O(M)$ | $O(N_{\text{clubs}}) + O(M \log M)$ | Subcube Existing Iteration | FE Calculated Measure |
 | **Q14** | $50.000 \text{ trận đấu}$ | $M \approx 450$ trận $\ge 5$ bàn | $O(M)$ | $O(N_{\text{games}}) + O(M \log M)$ | Fact Scan + IntroSort | SE Pre-aggregation Sum |
 | **Q15** | $30.000 \times 365 \text{ ngày} = 1.1 \times 10^7$ | $M \approx 180$ ngày có cầu thủ trẻ | $O(M)$ | $O(N_{\text{players}}) + O(M \log M)$ | UDF Property Parsing + Sort | FE Property Filter |
