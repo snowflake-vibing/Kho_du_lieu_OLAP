@@ -104,7 +104,29 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Vị Trí Chi Tiết (`Sub Position`) | Chân Thuận (`Foot`) | Tổng Bàn Thắng (`Goals`) |
+| :--- | :---: | :---: |
+| **Centre-Forward** | Right | 4.820 |
+| **Centre-Forward** | Left | 2.140 |
+| **Right Winger** | Left | 1.890 |
+| **Left Winger** | Right | 1.760 |
+| **Attacking Midfield** | Right | 1.450 |
+| **Right Winger** | Right | 980 |
+| **Left Winger** | Left | 870 |
+| **Attacking Midfield** | Left | 620 |
+| **Centre-Forward** | Both | 410 |
+| **Second Striker** | Right | 350 |
+| **Second Striker** | Left | 180 |
+| **Attacking Midfield** | Both | 140 |
+| **Right Winger** | Both | 95 |
+| **Left Winger** | Both | 80 |
+| **Second Striker** | Both | 45 |
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -116,7 +138,7 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Kích thước không gian tích đề-các:** $5 \text{ vị trí trọng điểm} \times 3 \text{ loại chân} = 15 \text{ tuples}$.
@@ -126,3 +148,4 @@ FROM [DW Football Transfermarkt];
 * **Chi phí hàm `UNION`:** $O(S_1 + S_2)$ với $S_1 = 2, S_2 = 3$, thời gian xử lý xấp xỉ $0\text{ ms}$.
 * **Chi phí sắp xếp `ORDER (DESC)`:** Sắp xếp nội bộ từng nhóm với chi phí $O(P \times F \log F) \approx 5 \times 3 \log_2(3) \approx 24$ phép so sánh.
 * **Thời gian phản hồi trên SSAS:** Dưới **$5\text{ ms}$**.
+

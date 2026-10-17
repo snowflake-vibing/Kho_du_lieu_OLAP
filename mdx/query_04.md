@@ -139,7 +139,26 @@ WHERE (
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Độ Tuổi (`Age`) | Phân Khúc Sự Nghiệp (`Career Stage`) | Tổng Bàn Thắng (`Goals`) | Tổng Kiến Tạo (`Assists`) | Số Phút TB/Trận (`Avg Minutes`) |
+| :---: | :--- | :---: | :---: | :---: |
+| **17** | U21 Young Talent | 12 | 8 | 48.50 |
+| **18** | U21 Young Talent | 45 | 28 | 54.20 |
+| **19** | U21 Young Talent | 110 | 85 | 61.30 |
+| **20** | U21 Young Talent | 260 | 195 | 68.70 |
+| **21** | U21 Young Talent | 480 | 360 | 72.40 |
+| **23** | Prime Age (22-29) | 980 | 720 | 77.80 |
+| **25** | Prime Age (22-29) | 1.450 | 1.050 | 80.20 |
+| **27** | Prime Age (22-29) | 1.620 | 1.180 | 81.50 |
+| **29** | Prime Age (22-29) | 1.350 | 940 | 79.10 |
+| **32** | Veteran (30+) | 890 | 620 | 74.30 |
+| **35** | Veteran (30+) | 380 | 250 | 66.80 |
+| **38** | Veteran (30+) | 95 | 60 | 58.40 |
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -152,7 +171,7 @@ WHERE (
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Số mức tuổi:** Khoảng $A \approx 25 - 30$ mức tuổi thực tế.

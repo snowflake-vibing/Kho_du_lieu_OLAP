@@ -133,7 +133,26 @@ WHERE (
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Câu Lạc Bộ Đối Thủ (`Opponent Club`) | Q1 Bàn Thắng | Q1 QoQ % | Q2 Bàn Thắng | Q2 QoQ % | Q3 Bàn Thắng | Q3 QoQ % | Q4 Bàn Thắng | Q4 QoQ % |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **FC Barcelona** | 4 | - | 4 | 0.00% | 2 | -50.00% | 5 | +150.00% |
+| **Atletico Madrid** | 3 | - | 2 | -33.33% | 1 | -50.00% | 5 | +400.00% |
+| **Girona FC** | 2 | - | 4 | +100.00% | 3 | -25.00% | 4 | +33.33% |
+| **Athletic Bilbao** | 2 | - | 1 | -50.00% | 2 | +100.00% | 3 | +50.00% |
+| **Sevilla FC** | 1 | - | 2 | +100.00% | 1 | -50.00% | 3 | +200.00% |
+| **Valencia CF** | 2 | - | 1 | -50.00% | 0 | -100.00% | 5 | N/A |
+| **Villarreal CF** | 2 | - | 3 | +50.00% | 1 | -66.67% | 4 | +300.00% |
+| **Real Betis** | 1 | - | 1 | 0.00% | 1 | 0.00% | 2 | +100.00% |
+| **Celta de Vigo** | 2 | - | 1 | -50.00% | 1 | 0.00% | 2 | +100.00% |
+| **CA Osasuna** | 2 | - | 2 | 0.00% | 0 | -100.00% | 4 | N/A |
+
+> *Ghi chú:* Giá trị `Q1 QoQ %` hiển thị dấu `-` (hoặc `NULL`) do Quý 1 là kỳ đầu năm, hàm `PREVMEMBER` không tìm thấy quý liền trước trong ngữ cảnh năm 2023, hàm `IIF` xử lý an toàn ngăn chặn lỗi chia cho 0.
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -146,7 +165,7 @@ WHERE (
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Số đối thủ thực tế:** Real Madrid thường chạm trán và ghi bàn vào lưới khoảng $K \approx 60 - 80$ câu lạc bộ.
@@ -158,3 +177,4 @@ WHERE (
 * **Chi phí tính toán `PREVMEMBER`:** $O(1)$ cho mỗi cell nhờ con trỏ nội tại trong cấu trúc phân cấp thời gian được lập chỉ mục trước.
 * **Thời gian sắp xếp:** $O(K \log K)$ với $K \approx 80$, thực hiện trong vòng chưa đầy $0.5\text{ ms}$.
 * **Tổng thời gian phản hồi:** Khoảng $10\text{ ms} - 15\text{ ms}$.
+

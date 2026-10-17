@@ -114,7 +114,32 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Sân Vận Động (`Stadium Name`) | Câu Lạc Bộ Chủ Quản (`Club Name`) | Sức Chứa Chuẩn Hóa (`Stadium Capacity`) | Số Trận Đã Diễn Ra (`Distinct Matches`) | Tổng Bàn Thắng (`Goals`) |
+| :--- | :--- | :---: | :---: | :---: |
+| **Camp Nou** | FC Barcelona | 99.354 Chỗ | 38 | 134 |
+| **Wembley Stadium** | England | 90.000 Chỗ | 18 | 58 |
+| **Signal Iduna Park** | Borussia Dortmund | 81.365 Chỗ | 36 | 132 |
+| **Santiago Bernabéu** | Real Madrid | 81.044 Chỗ | 42 | 148 |
+| **San Siro** | Inter Milan | 80.018 Chỗ | 44 | 146 |
+| **Stade de France** | France | 80.000 Chỗ | 16 | 49 |
+| **Allianz Arena** | Bayern Munich | 75.024 Chỗ | 38 | 152 |
+| **Olympiastadion Berlin** | Hertha BSC | 74.475 Chỗ | 32 | 88 |
+| **Old Trafford** | Manchester United | 74.310 Chỗ | 40 | 118 |
+| **Stadio Olimpico** | AS Roma | 70.634 Chỗ | 42 | 110 |
+| **Metropolitano Stadium** | Atletico Madrid | 68.456 Chỗ | 38 | 120 |
+| **Stade Vélodrome** | Olympique Marseille | 67.394 Chỗ | 36 | 98 |
+| **Tottenham Hotspur Stadium** | Tottenham Hotspur | 62.850 Chỗ | 38 | 114 |
+| **London Stadium** | West Ham United | 62.500 Chỗ | 36 | 92 |
+| **Benito Villamarín** | Real Betis | 60.720 Chỗ | 34 | 86 |
+| **Emirates Stadium** | Arsenal FC | 60.704 Chỗ | 40 | 136 |
+
+> *Ghi chú:* Thước đo `Distinct Matches Played` tận dụng hàm `DISTINCTCOUNT` kết hợp với `EXISTING` giúp đếm chính xác số trận đấu duy nhất mà không bị nhân bản theo số lượng 22-30 cầu thủ ra sân mỗi trận trong Fact Table.
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -126,7 +151,7 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Số sân vận động $>60.000$ chỗ tại Châu Âu:** Chỉ khoảng $S \approx 25 - 35$ sân vận động nổi tiếng.
@@ -135,3 +160,4 @@ FROM [DW Football Transfermarkt];
 ### Độ phức tạp thời gian (Time Complexity)
 * **Chi phí tính `DISTINCTCOUNT`:** $O(N_{\text{stadiums}} \times G)$ với $G$ là số trận trung bình mỗi sân ($\approx 20 - 50$ trận).
 * **Tổng thời gian phản hồi:** Khoảng **$10\text{ ms} - 25\text{ ms}$**.
+

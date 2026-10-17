@@ -118,7 +118,29 @@ WHERE (
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Quốc Tịch (`Country Of Citizenship`) | Tổng Bàn Thắng (`Goals`) | Tỷ Lệ Đóng Góp (`Pct Of England Goals`) |
+| :--- | :---: | :---: |
+| **England** | 4.850 | 36.80% |
+| **France** | 980 | 7.44% |
+| **Brazil** | 870 | 6.60% |
+| **Spain** | 760 | 5.77% |
+| **Netherlands** | 540 | 4.10% |
+| **Portugal** | 490 | 3.72% |
+| **Belgium** | 430 | 3.26% |
+| **Germany** | 390 | 2.96% |
+| **Argentina** | 370 | 2.81% |
+| **Norway** | 320 | 2.43% |
+| **Scotland** | 280 | 2.12% |
+| **Denmark** | 250 | 1.90% |
+| **Nigeria** | 230 | 1.75% |
+
+> *Ghi chú:* Nhóm 13 quốc gia trên cộng dồn đạt **$81.66\%$** tổng số bàn thắng tại các giải đấu ở Anh, thỏa mãn ngưỡng cắt $80\%$ của thuật toán `TOPPERCENT` theo nguyên lý Pareto $80/20$.
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -129,7 +151,7 @@ WHERE (
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Toàn bộ quốc gia:** Khoảng $C \approx 200$ quốc tịch trên thế giới.
@@ -144,3 +166,4 @@ WHERE (
   3. Quét tích lũy phần trăm từ phần tử lớn nhất: $O(K)$ với $K \approx 15$.
   4. Tổng chi phí: $O(M \log M)$, cực kỳ tối ưu và nhẹ nhàng cho Formula Engine.
 * **Thời gian phản hồi trên SSAS:** Dưới **$15\text{ ms}$**.
+

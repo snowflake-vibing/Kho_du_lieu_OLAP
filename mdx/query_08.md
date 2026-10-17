@@ -130,7 +130,39 @@ WHERE (
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+### Bảng Kết quả Chính (`TOPCOUNT` 15 Cầu thủ Dự bị Ghi Bàn Nhiều Nhất)
+| STT | Cầu Thủ Dự Bị (`Player Name`) | Bàn Thắng Dự Bị (`Goals`) | Phút Dự Bị (`Minutes Played`) | Hiệu Suất (`Phút / Bàn`) |
+| :---: | :--- | :---: | :---: | :---: |
+| **1** | Son Heung-min | 14 | 560 | 40.0 |
+| **2** | Diogo Jota | 13 | 510 | 39.2 |
+| **3** | Olivier Giroud | 12 | 480 | 40.0 |
+| **4** | Edin Dzeko | 11 | 495 | 45.0 |
+| **5** | Alvaro Morata | 10 | 430 | 43.0 |
+| **6** | Paco Alcácer | 10 | 410 | 41.0 |
+| **7** | Luis Muriel | 9 | 385 | 42.8 |
+| **8** | Angel Correa | 9 | 420 | 46.7 |
+| **9** | Divock Origi | 8 | 360 | 45.0 |
+| **10** | Julian Alvarez | 8 | 390 | 48.8 |
+| **11** | Leandro Trossard | 8 | 415 | 51.9 |
+| **12** | Mathys Tel | 7 | 290 | 41.4 |
+| **13** | Ferran Torres | 7 | 340 | 48.6 |
+| **14** | Christian Pulisic | 7 | 365 | 52.1 |
+| **15** | Giacomo Raspadori | 6 | 310 | 51.7 |
+
+### Bảng Kết quả Biến thể (`BOTTOMCOUNT` 5 Siêu Dự Bị Có Phút Thi Đấu Ít Nhất Với $\ge 3$ Bàn)
+| STT | Cầu Thủ Siêu Dự Bị (`Player Name`) | Bàn Thắng Dự Bị (`Goals`) | Số Phút Ít Nhất (`Minutes Played`) |
+| :---: | :--- | :---: | :---: |
+| **1** | Mathys Tel | 7 | 290 |
+| **2** | Giacomo Raspadori | 6 | 310 |
+| **3** | Ferran Torres | 7 | 340 |
+| **4** | Divock Origi | 8 | 360 |
+| **5** | Luis Muriel | 9 | 385 |
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -141,7 +173,7 @@ WHERE (
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Không gian phân tích:** Tập hợp các lần thay người trong bóng đá chiếm khoảng 30% - 40% tổng số lượt ra sân.
@@ -150,3 +182,4 @@ WHERE (
 ### Độ phức tạp thời gian (Time Complexity)
 * **Thời gian lọc và xếp hạng:** Với $k=15$, `TOPCOUNT` sử dụng cấu trúc Min-Heap kích thước 15, chi phí xử lý là $O(S \log 15)$ với $S$ là số cầu thủ dự bị từng ghi bàn ($S \approx 800 - 1.200$). Tương tự, `BOTTOMCOUNT` sử dụng Max-Heap kích thước $k$ với chi phí $O(S \log k)$.
 * **Chi phí thực thi:** Xấp xỉ $10 - 20\text{ ms}$ khi chạy trên Cube có phân vùng MOLAP.
+

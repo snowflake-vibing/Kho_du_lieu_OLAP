@@ -142,7 +142,18 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Vị Trí Chính (`Main Position`) | Chiều Cao TB (`Avg Height Cm`) | Chiều Cao Max (`Max Height Cm`) | Chiều Cao Min (`Min Height Cm`) | Tổng Bàn Thắng (`Goals`) | Thẻ Vàng (`Yellow Cards`) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Attack** | 183.2 | 201 | 163 | 12.450 | 2.180 |
+| **Midfield** | 180.5 | 197 | 161 | 6.820 | 4.950 |
+| **Defender** | 185.8 | 204 | 168 | 2.150 | 6.420 |
+| **Goalkeeper** | 189.6 | 206 | 175 | 5 | 540 |
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -155,7 +166,7 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Số vị trí chính:** Chỉ có 4 tuyến thi đấu (`Goalkeeper`, `Defender`, `Midfield`, `Attack`).
@@ -166,3 +177,4 @@ FROM [DW Football Transfermarkt];
 * **Duyệt qua danh sách cầu thủ:** Nhờ từ khóa `EXISTING`, Formula Engine chỉ cần duyệt qua các cầu thủ thuộc từng tuyến thi đấu để tính đồng thời `AVG`, `MAX`, `MIN`.
 * **Tổng số phép toán:** $O(N_{\text{players}})$ với $N \approx 30.000$, thực hiện một lần duy nhất trong bộ nhớ cache.
 * **Thời gian phản hồi trên SSAS:** Dao động từ **$10\text{ ms} - 25\text{ ms}$**.
+

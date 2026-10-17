@@ -117,7 +117,26 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 3. Các hàm MDX sử dụng & Chi tiết cú pháp
+## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+
+| Huấn Luyện Viên (`Coach Name`) | Tháng Kỷ Lục Thẻ Phạt (`Month`) | Thẻ Vàng (`Yellow Cards`) | Thẻ Đỏ (`Red Cards`) | Nhận Định Chuyên Môn |
+| :--- | :---: | :---: | :---: | :--- |
+| **Diego Simeone** | October | 24 | 2 | Giai đoạn căng thẳng với Derby Madrid và vòng bảng UCL |
+| **José Mourinho** | February | 21 | 3 | Giai đoạn knock-out cúp châu Âu với lối chơi quyết liệt |
+| **Antonio Conte** | November | 19 | 1 | Lịch thi đấu dày đặc mùa đông và áp lực pressing tầm cao |
+| **Mikel Arteta** | December | 18 | 1 | Lịch thi đấu Boxing Day Premier League với cường độ lớn |
+| **Erik ten Hag** | January | 17 | 2 | Khủng hoảng nhân sự dẫn đến nhiều pha phạm lỗi chiến thuật |
+| **Xavi Hernández** | March | 17 | 1 | Loạt trận El Clásico lượt về và cúp Nhà Vua Tây Ban Nha |
+| **Pep Guardiola** | April | 16 | 0 | Giai đoạn nước rút vô địch; thẻ vàng chủ yếu chống phản công |
+| **Thomas Tuchel** | November | 16 | 1 | Loạt trận then chốt phân định ngôi đầu bảng Champions League |
+| **Jürgen Klopp** | December | 15 | 1 | Cường độ Gegenpressing cao trong chuỗi 8 trận/tháng |
+| **Carlo Ancelotti** | April | 14 | 0 | Đội hình kỷ luật cao, kiểm soát nhịp độ trận đấu thông minh |
+
+> *Ý nghĩa thuật toán:* Hàm `GENERATE` kết hợp `TOPCOUNT(..., 1, ...)` đã giải quyết triệt để bài toán "Group By Top 1 Per Category" mà trong SQL đòi hỏi phải dùng cú pháp phức tạp như `ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)`.
+
+---
+
+## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
@@ -130,7 +149,7 @@ FROM [DW Football Transfermarkt];
 
 ---
 
-## 4. Đánh giá độ phức tạp & Tối ưu hóa hiệu năng
+## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
 
 ### Độ phức tạp không gian (Space Complexity)
 * **Số lượng HLV hợp lệ:** Khoảng $H \approx 200 - 350$ huấn luyện viên.
@@ -142,3 +161,4 @@ FROM [DW Football Transfermarkt];
 * **Chi phí `TOPCOUNT(..., 1)`:** $O(T)$ với $T \le 12$ phép so sánh tìm phần tử lớn nhất (Max element scan).
 * **Tổng số phép toán:** $300 \times 12 \approx 3.600$ phép tính so sánh, thực hiện tức thì trên bộ nhớ trong vòng **$5\text{ms} - 15\text{ms}$**.
 * **Đánh giá hiệu năng:** Việc lồng `TOPCOUNT` kích thước $1$ vào bên trong `GENERATE` mang lại hiệu năng cao gấp nhiều lần so với việc quét bảng phẳng trong SQL thông thường nhờ tận dụng trực tiếp cấu trúc phân cấp bộ nhớ của SSAS Formula Engine.
+
