@@ -41,3 +41,17 @@ Các truy vấn được chuyển đổi tương đương và nâng cao từ 15 
    * Mở từng file trong thư mục `mdx/` (từ `query_01.md` đến `query_15.md`), sao chép đoạn mã trong mục **Mã truy vấn MDX chuẩn**.
    * Dán vào cửa sổ Editor của SSMS và nhấn **Execute (F5)**.
    * Kết quả sẽ được hiển thị ngay lập tức dưới dạng lưới ma trận ô dữ liệu (OLAP Grid).
+
+---
+
+## 📑 BÁO CÁO KIỂM ĐỊNH HỌC THUẬT & ĐỐI CHIẾU HÀM MDX (QUALITY CHECKLIST)
+
+Nhằm phục vụ công tác nghiệm thu, chấm điểm đồ án và bảo vệ chuyên sâu trước Giảng viên / Hội đồng, toàn bộ 15 câu truy vấn đã được kiểm định khắt khe tại tài liệu:
+👉 **[checklist.md](checklist.md)**: **Bảng đối chiếu & Kiểm định chất lượng 15 câu truy vấn MDX**
+
+Nội dung thẩm định bao gồm:
+- **Ma trận đối chiếu độ phủ 7 nhóm hàm MDX** (Tập hợp, Lọc/Sắp xếp, Phân cấp, Thống kê, Logic, Thuộc tính, Tính toán) - Đạt tỷ lệ bao phủ 100%.
+- **Bảng phân tích định lượng độ phức tạp tính toán (Time & Space Complexity)** cho cả 15 câu.
+- **Bóc tách kiến trúc thực thi SSAS**: Cơ chế tối ưu giữa **Storage Engine (SE)** và **Formula Engine (FE)**, giải thuật Min-Heap $O(N \log k)$, Block Computation.
+- **Bộ 5 câu hỏi phản biện chuyên sâu** thường gặp khi bảo vệ đồ án cùng đáp án chuẩn mực.
+
