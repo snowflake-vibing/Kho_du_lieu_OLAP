@@ -72,7 +72,7 @@ Hệ thống hàm MDX trong Microsoft SQL Server Analysis Services được phâ
 Bảng dưới đây đối chiếu chi tiết sự hiện diện của các nhóm hàm trong 15 câu truy vấn của dự án:
 
 | STT | File Truy Vấn | Tên Nghiệp Vụ Phân Tích | G1 (Set / Extract) | G2 (Filter / Sort) | G3 (Hierarchy Nav) | G4 (Aggregate / Stats) | G5 (Logic / Cond) | G6 (Properties) | G7 (Calculated / Context) |
-| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **01** | [query_01.md](query_01.md) | Top 10 Vua dội bom Ngoại Hạng Anh mùa 2023/2024 | `TOPCOUNT` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
 | **02** | [query_02.md](query_02.md) | Top 10 tiền vệ kiến tạo nhiều nhất giải VĐQG | `TOPCOUNT`, `CROSSJOIN` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
 | **03** | [query_03.md](query_03.md) | Cầu thủ xuất sắc có trên 20 đóng góp bàn thắng (G+A) | - | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
@@ -131,7 +131,7 @@ Một trong những lý do khiến giảng viên đánh giá thấp bài tập M
 | **Q06** | $4 \text{ vị trí chính} \times 30.000$ | 4 vị trí chính | $O(4)$ | $O(N_{\text{players}})$ | Dynamic Existing + Aggregations | FE Context Transition |
 | **Q07** | $150 \text{ quốc gia} \times 5 \text{ giải}$ | $K \approx 15$ quốc gia Top 80% | $O(K)$ | $O(M \log M) + O(K)$ | Cumulative Pareto Sum | FE Cumulative Sum |
 | **Q08** | $30.000 \times 2 \text{ starter}$ | $M \approx 120$ siêu dự bị | $O(15)$ | $O(S \log 15)$ | Min-Heap / Max-Heap Dual Sort | SE Slice + FE Priority Queue |
-| **Q09** | $400 \text{ CLB} \times 2 \times 2 = 1.600$ | $K \approx 18$ CLB giao thoa | $O(K)$ | $O(|S_1| + |S_2|)$ | Hash Set Intersection | FE Hash Intersect |
+| **Q09** | $400 \text{ CLB} \times 2 \times 2 = 1.600$ | $K \approx 18$ CLB giao thoa | $O(K)$ | $O(\lvert S_1 \rvert + \lvert S_2 \rvert)$ | Hash Set Intersection | FE Hash Intersect |
 | **Q10** | $400 \text{ đối thủ} \times 4 \text{ quý} = 1.600$ | $M \approx 60$ trận Real Madrid | $O(M)$ | $O(K \log K)$ | Hierarchy Tree Navigation | SE Partition + FE PrevMember |
 | **Q11** | $400 \text{ SVĐ} \times 50.000 \text{ trận}$ | $M \approx 25$ SVĐ $>60.000$ chỗ | $O(M)$ | $O(N_{\text{stadiums}}) + O(M \log M)$ | Coalesce Null + Distinct Count | FE Subcube Context |
 | **Q12** | $300 \text{ HLV} \times 12 \text{ tháng} = 3.600$ | $H \approx 300$ tháng cao điểm | $O(H)$ | $O(H \times T)$ | Set Iteration Projection | FE Generate Iteration |
