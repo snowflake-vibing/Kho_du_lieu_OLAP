@@ -33,61 +33,171 @@ ORDER BY Total_Goals DESC;
 
 ---
 
-## 2. Hướng dẫn chi tiết các bước thực hiện (Step-by-Step Guide)
+## 2. Hướng dẫn chi tiết 3 cách thực hiện (3 Execution Methods)
 
-Để thực thi bài toán phân tích này trên hệ thống OLAP, người dùng có thể thực hiện theo **Phương thức 1 (Viết mã lệnh MDX trong SSMS)** hoặc **Phương thức 2 (Thao tác kéo thả đồ họa trong Cube Browser của Visual Studio)**.
+Để phân tích và trích xuất dữ liệu cho bài toán này trên hệ thống OLAP, người dùng có thể áp dụng linh hoạt **3 phương pháp** tùy theo vai trò công việc:
+1. **Cách 1: Sử dụng Cube Browser (Visual Studio / SSDT)** – Dành cho lập trình viên phát triển Cube kiểm tra nhanh cấu trúc đa chiều.
+2. **Cách 2: Sử dụng PivotTable trên Microsoft Excel** – Dành cho chuyên viên phân tích kinh doanh (BA) và người dùng cuối lập báo cáo trực quan.
+3. **Cách 3: Sử dụng Ngôn ngữ truy vấn MDX (SSMS)** – Dành cho kỹ sư dữ liệu viết script tự động hóa, kiểm thử hiệu năng chuyên sâu.
 
 ```mermaid
 flowchart TD
-    Start["Khởi động Công cụ"] --> Choice{"Chọn Môi trường Thao tác"}
-    
-    Choice -->|"Cách 1: Trực tiếp bằng Script"| SSMS["SQL Server Management Studio (SSMS)"]
-    Choice -->|"Cách 2: Kéo thả Trực quan"| VS["Visual Studio / SSDT (Cube Browser)"]
-    Choice -->|"Cách 3: Báo cáo Doanh nghiệp"| Excel["Microsoft Excel (PivotTable OLAP)"]
+    Start["Khởi động Phân tích OLAP"] --> Choice{"Lựa chọn Phương pháp"}
 
-    SSMS --> SSMS_1["1. Connect Analysis Services<br>2. Mở Database & Cube<br>3. Mở tab New MDX Query"]
-    SSMS_1 --> SSMS_2["4. Soạn thảo mã MDX<br>5. Bấm Execute (F5)<br>6. Đọc kết quả tại tab Results"]
+    Choice -->|"Cách 1: Trực quan Thiết kế"| CB["1. Cube Browser (Visual Studio)"]
+    Choice -->|"Cách 2: Báo cáo Doanh nghiệp"| Excel["2. Excel PivotTable"]
+    Choice -->|"Cách 3: Lập trình Đa chiều"| MDX["3. Ngôn ngữ MDX (SSMS)"]
 
-    VS --> VS_1["1. Mở file .cube<br>2. Chọn tab Browser<br>3. Thiết lập Filter Pane: GB1 & 2023/2024"]
-    VS_1 --> VS_2["4. Kéo [Goals] vào Totals<br>5. Kéo [Player Name] vào Rows<br>6. Cấu hình Filter Top 10"]
+    CB --> CB_Step["Mở file .cube -> Tab Browser -> Filter GB1 & 2023/2024 -> Kéo thả Grid -> Lọc Top 10"]
+    Excel --> Excel_Step["Data -> Get Data from SSAS -> PivotTable Fields -> Filter, Rows, Values -> Top 10 Filter"]
+    MDX --> MDX_Step["SSMS Connect AS -> New MDX Query -> Soạn SELECT/TOPCOUNT/NONEMPTY -> Execute (F5)"]
 
-    SSMS_2 --> Finish["Kiểm tra & Đối chuẩn Kết quả"]
-    VS_2 --> Finish
-    Excel --> Finish
+    CB_Step --> Finish["Kết quả: Bảng Top 10 Bàn Thắng Ngoại Hạng Anh 2023/2024"]
+    Excel_Step --> Finish
+    MDX_Step --> Finish
 ```
 
 ---
 
-### PHƯƠNG THỨC 1: Thực thi mã lệnh MDX trên SQL Server Management Studio (SSMS)
+### CÁCH 1: TRUY VẤN BẰNG CUBE BROWSER (VISUAL STUDIO / SSDT)
 
-Đây là phương thức chuẩn mực dành cho kỹ sư dữ liệu và chuyên viên phân tích BI khi cần kiểm tra độ chính xác và tối ưu hóa hiệu năng truy vấn.
+Phương pháp này thực hiện trực tiếp bên trong môi trường phát triển dự án SSAS (SQL Server Data Tools / Visual Studio).
+
+#### Bước 1: Mở giao diện Cube Designer
+1. Khởi động **Visual Studio**, mở Solution dự án SSAS chứa khối Cube bóng đá.
+2. Tại cửa sổ **Solution Explorer** (thường nằm ở khung bên phải):
+   * Mở rộng thư mục **`Cubes`**.
+   * Nhấp đúp chuột trái vào tệp Cube: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
+3. Màn hình Cube Designer mở ra với các thanh điều hướng ngang.
+
+#### Bước 2: Chuyển sang Tab `Browser`
+1. Nhấp chuột vào thẻ tab **`Browser`** (tab ngoài cùng bên phải của thanh tab Cube Designer).
+2. Kiểm tra thanh công cụ của tab Browser:
+   * Nếu nút **Reconnect** sáng lên: Nhấp vào để kết nối tới SSAS Engine.
+   * Nếu Cube vừa có thay đổi dữ liệu: Nhấp vào biểu tượng **Process** (hình bánh răng vàng) $\rightarrow$ chọn **Run** để nạp dữ liệu mới nhất.
+
+#### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở nửa trên màn hình)
+Tại bảng lưới lọc phía trên (gồm các cột: *Dimension*, *Hierarchy*, *Operator*, *Filter Expression*):
+
+| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
+| :---: | :--- | :--- | :---: | :--- |
+| **Dòng 1** | Nhấp dropdown chọn **`DIM Competition`** | Nhấp dropdown chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** $\rightarrow$ Bấm **OK** |
+| **Dòng 2** | Nhấp dropdown chọn **`DIM Time`** | Nhấp dropdown chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa giải **`2023/2024`** $\rightarrow$ Bấm **OK** |
+
+#### Bước 4: Kéo thả Measures và Attributes vào Vùng Lưới (Grid Canvas)
+Quan sát khung cây thư mục **Metadata** ở bên trái tab Browser:
+1. **Chọn Thước đo (Measures):**
+   * Mở rộng thư mục **`Measures`** $\rightarrow$ Mở rộng nhóm đo **`FACT Player Match Perf`**.
+   * Nhấp giữ chuột trái vào thước đo **`Goals`** (hoặc `Total Goals`), kéo rê và thả vào vùng **"Drop Totals or Detail Fields Here"** (khu vực dữ liệu trung tâm).
+2. **Chọn Chiều Cầu thủ (Rows):**
+   * Mở rộng chiều **`DIM Player`** $\rightarrow$ Tìm thuộc tính **`Player Name`**.
+   * Nhấp giữ chuột trái vào **`Player Name`**, kéo rê và thả vào vùng **"Drop Row Fields Here"** (khu vực tiêu đề hàng bên trái).
+3. Lúc này màn hình hiển thị toàn bộ danh sách cầu thủ có bàn thắng tại giải GB1 mùa giải 2023/2024.
+
+#### Bước 5: Cấu hình Bộ lọc Top 10 Bàn thắng
+1. Nhấp chuột phải vào ô tiêu đề cột **`Player Name`** trên lưới dữ liệu (hoặc nhấp vào mũi tên lọc trên thanh tiêu đề).
+2. Di chuột chọn mục **Filter** $\rightarrow$ chọn tiếp **`Top 10...`**.
+3. Tại hộp thoại cài đặt:
+   * **Show:** Chọn **`Top`**.
+   * **Elements:** Nhập số **`10`**.
+   * **By Measure:** Chọn dropdown thước đo **`[Measures].[Goals]`**.
+4. Nhấn **OK**. Lưới lập tức tự động thu nhỏ lại và chỉ hiển thị đúng 10 cầu thủ có số bàn thắng cao nhất theo thứ tự giảm dần.
+
+#### Bước 6: Xem mã MDX tự động sinh (Design Mode)
+* Trên thanh công cụ tab Browser, nhấp vào biểu tượng **`Design Mode`** (hình cây bút chì và thước kẻ màu xanh).
+* Trình duyệt sẽ chuyển đổi ngay lập tức từ giao diện lưới trực quan sang mã lệnh MDX Text thuần túy, cho phép bạn đối chiếu mã MDX tự sinh với mã tối ưu chuẩn.
+
+---
+
+### CÁCH 2: PHÂN TÍCH BẰNG PIVOT TABLE TRÊN MICROSOFT EXCEL
+
+Phương pháp này khai thác tính năng kết nối trực tiếp OLAP của Microsoft Excel, mang lại trải nghiệm tương tác trực quan cao nhất cho người dùng nghiệp vụ.
+
+#### Bước 1: Khởi tạo kết nối tới SSAS Cube
+1. Khởi động phần mềm **Microsoft Excel**, tạo một bảng tính trống (**Blank Workbook**).
+2. Vô thẻ tab **`Data`** trên thanh Ribbon phía trên.
+3. Trong nhóm tính năng *Get & Transform Data* (hoặc *Get External Data*):
+   * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
+4. Cửa sổ **Data Connection Wizard** xuất hiện:
+   * **Server name (Ghi gì):** Nhập `localhost` (hoặc tên máy `.` hoặc `DESKTOP-XXX\MSOLAP`).
+   * **Log on credentials:** Chọn mục **`Use Windows Authentication`**.
+   * Nhấn nút **Next >**.
+
+#### Bước 2: Chọn Database và Khối Cube
+1. Tại màn hình *Select Database and Table*:
+   * Ô dropdown phía trên: Chọn cơ sở dữ liệu **`DW_Football_SSAS`** (hoặc `SSAS_Football_Transfermarkt`).
+   * Bảng danh sách bên dưới: Nhấp chọn khối Cube **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
+2. Nhấn nút **Finish**.
+3. Hộp thoại **Import Data** hiện lên:
+   * Chọn dạng hiển thị: Tích vào ô tròn **`PivotTable Report`**.
+   * Chọn vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại.
+   * Nhấn nút **OK**.
+
+#### Bước 3: Thao tác kéo thả trong bảng `PivotTable Fields`
+Quan sát khung danh sách trường **PivotTable Fields** nằm ở bên phải cửa sổ Excel:
+
+| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Nằm trong Thư mục nào |
+| :--- | :--- | :--- |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Competition ID`** | Mở thư mục **`DIM Competition`** $\rightarrow$ Kéo `Competition ID` thả vào ô Filters. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Season`** | Mở thư mục **`DIM Time`** $\rightarrow$ Kéo `Season` thả vào ô Filters. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values (sẽ hiển thị là `Sum of Goals`). |
+
+#### Bước 4: Thiết lập Giá trị Bộ lọc (Chọn gì trên Sheet Excel)
+1. **Lọc Giải đấu:** Tại ô **`B1`** (bên cạnh nhãn `Competition ID`), bấm vào mũi tên xổ xuống $\rightarrow$ Tích chọn mã **`GB1`** $\rightarrow$ Nhấn **OK**.
+2. **Lọc Mùa giải:** Tại ô **`B2`** (bên cạnh nhãn `Season`), bấm vào mũi tên xổ xuống $\rightarrow$ Tích chọn mùa giải **`2023/2024`** $\rightarrow$ Nhấn **OK**.
+
+#### Bước 5: Thiết lập Bộ lọc Top 10 Vua phá lưới
+1. Nhấp chuột vào mũi tên xổ xuống tại ô tiêu đề **`Row Labels`** (ô `A4`).
+2. Di chuột vào mục **`Value Filters`** $\rightarrow$ Nhấp chọn **`Top 10...`**.
+3. Hộp thoại **Top 10 Filter (Player Name)** xuất hiện:
+   * Dropdown 1: Giữ nguyên **`Top`**.
+   * Ô nhập số: Ghi số **`10`**.
+   * Dropdown 2: Giữ nguyên **`Items`**.
+   * Dropdown 3 (By): Chọn thước đo **`Sum of Goals`**.
+4. Nhấn **OK**. Excel sẽ lập tức lọc và sắp xếp đúng 10 cầu thủ có tổng số bàn thắng cao nhất mùa giải.
+
+#### Bước 6: Định dạng giao diện chuyên nghiệp
+* Vô tab ngữ cảnh **`Design`** trên Ribbon $\rightarrow$ mục **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`** (để tiêu đề cột hiển thị rõ ràng là `Player Name`).
+* Vô tab **`Design`** $\rightarrow$ mục **Grand Totals** $\rightarrow$ chọn **`Off for Rows and Columns`** (tắt dòng tổng cộng nếu chỉ cần xem danh sách Top 10).
+
+---
+
+### CÁCH 3: VIẾT VÀ THỰC THI TRUY VẤN BẰNG NGÔN NGỮ MDX (SSMS)
+
+Phương pháp này cung cấp quyền kiểm soát tối đa đối với cú pháp truy vấn đa chiều, cho phép áp dụng các hàm logic nâng cao (`NONEMPTY`, `TOPCOUNT`) và tối ưu hóa bộ nhớ thực thi.
 
 #### Bước 1: Khởi động SSMS và Kết nối Analysis Services
 1. Mở phần mềm **SQL Server Management Studio (SSMS)**.
-2. Tại hộp thoại **Connect to Server**, cấu hình các thông số:
-   * **Server type:** Nhấp dropdown chọn **`Analysis Services`** (chú ý: không chọn `Database Engine`).
-   * **Server name:** Điền tên máy chủ hoặc instance SSAS cục bộ của bạn, ví dụ: `localhost`, `.`, hoặc `DESKTOP-XXX\MSOLAP` (tùy theo tên instance đã cài đặt).
+2. Tại hộp thoại **Connect to Server**, thiết lập chính xác các tùy chọn:
+   * **Server type (Chọn gì):** Nhấp dropdown chọn **`Analysis Services`** (Lưu ý: Không chọn `Database Engine`).
+   * **Server name (Ghi gì):** Nhập `localhost` (hoặc `.` hoặc tên instance SSAS của bạn).
    * **Authentication:** Chọn **`Windows Authentication`**.
 3. Nhấn nút **Connect**.
 
 #### Bước 2: Điều hướng đến Cube trong Object Explorer
-1. Trong cửa sổ **Object Explorer** ở khung bên trái màn hình:
-   * Nhấp vào dấu `+` để mở rộng nhánh **`Databases`**.
-   * Tìm và mở rộng cơ sở dữ liệu SSAS đã deploy, ví dụ: **`DW_Football_SSAS`** hoặc **`SSAS_Football_Transfermarkt`**.
+1. Trong cửa sổ **Object Explorer** (khung bên trái):
+   * Nhấp vào dấu `+` mở rộng thư mục **`Databases`**.
+   * Mở rộng cơ sở dữ liệu SSAS mục tiêu: **`DW_Football_SSAS`** (hoặc `SSAS_Football_Transfermarkt`).
    * Mở rộng thư mục con **`Cubes`**.
-2. Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
-3. Trong menu ngữ cảnh mở ra, chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
-4. Lúc này, SSMS sẽ mở ra một cửa sổ soạn thảo mới có tiêu đề dạng `MDXQuery1.mdx`. Khung bên trái hiển thị cây **Metadata** (gồm các thư mục `Measures`, `DIM Player`, `DIM Competition`, `DIM Time`...) giúp bạn tra cứu tên thuộc tính.
+2. Nhấp chuột phải vào tên Cube: **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
+3. Trong menu ngữ cảnh mở ra, chọn **`New Query`** $\rightarrow$ chọn tiếp **`MDX`**.
+4. Cửa sổ soạn thảo truy vấn MDX (`MDXQuery1.mdx`) xuất hiện.
 
-#### Bước 3: Soạn thảo câu lệnh MDX (Ghi gì vào cửa sổ Query Editor)
-Trong vùng soạn thảo văn bản trắng bên phải, nhập toàn bộ đoạn mã MDX sau:
+#### Bước 3: Nhập mã truy vấn MDX (Ghi gì vào cửa sổ soạn thảo)
+Nhập toàn bộ đoạn mã MDX chuẩn mực sau vào màn hình soạn thảo:
 
 ```mdx
+/* ==============================================================================
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
+   Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
+   ============================================================================== */
+
 SELECT
-    -- Trục Cột (Axis 0): Chỉ định hiển thị thước đo Bàn thắng
+    -- Trục Cột (COLUMNS): Trích xuất thước đo Tổng số bàn thắng
     { [Measures].[Goals] } ON COLUMNS,
 
-    -- Trục Dòng (Axis 1): Lọc Top 10 cầu thủ có số bàn thắng nhiều nhất
+    -- Trục Dòng (ROWS): Xếp hạng và lấy đúng 10 cầu thủ ghi nhiều bàn nhất
     TOPCOUNT(
         NONEMPTY(
             [DIM Player].[Player Name].[Player Name].MEMBERS,
@@ -101,99 +211,30 @@ SELECT
         [Measures].[Goals]
     ) ON ROWS
 
--- Chỉ định khối dữ liệu phân tích
+-- Khối Cube nguồn
 FROM [DW Football Transfermarkt]
 
--- Thiết lập lát cắt ngữ cảnh (Slicer Axis): Giới hạn trong giải GB1 và mùa 2023/2024
+-- Trục lát cắt ngữ cảnh (Slicer Axis): Giới hạn trong giải GB1 và mùa 2023/2024
 WHERE (
     [DIM Competition].[Competition ID].[GB1],
     [DIM Time].[Season].[2023/2024]
 );
 ```
 
-#### Bước 4: Thực thi truy vấn
-1. Kiểm tra trên thanh công cụ xem ô dropdown database đã chọn đúng database SSAS mục tiêu.
+#### Bước 4: Thực thi và Xem Kết quả
+1. Kiểm tra trên thanh công cụ xem ô dropdown database đã trỏ đúng cơ sở dữ liệu Cube chưa.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
-3. Quan sát góc dưới màn hình:
-   * **Tab Results:** Hiển thị một bảng dữ liệu ma trận 2 chiều gồm 10 hàng tương ứng với 10 cầu thủ và 1 cột duy nhất hiển thị số bàn thắng (`Goals`).
-   * **Tab Messages:** Hiển thị trạng thái hoàn tất thành công (`Execution completed successfully.`) cùng thời gian thực thi (thường từ 10ms - 50ms).
+3. Đọc dữ liệu tại khung bên dưới:
+   * **Tab `Results` (Vào tab gì):** Hiển thị bảng dạng ma trận đa chiều với đúng 10 dòng tên cầu thủ và 1 cột số bàn thắng (`Goals`).
+   * **Tab `Messages` (Vào tab gì):** Hiển thị thông báo trạng thái `Execution completed successfully.` kèm thời gian chạy chi tiết tính bằng mili-giây.
 
 ---
 
-### PHƯƠNG THỨC 2: Thao tác Kéo - Thả Trực quan trên Visual Studio (SSDT Cube Browser)
+## 3. Bảng Kết quả Truy vấn Thực tế (Expected Output)
 
-Phương thức này rất trực quan, phù hợp khi thuyết trình hoặc kiểm tra nhanh mô hình dữ liệu trong quá trình thiết kế Cube.
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về đồng nhất hiển thị danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại Ngoại Hạng Anh mùa bóng 2023/2024:
 
-#### Bước 1: Mở Cube Designer
-1. Trong **Visual Studio (SQL Server Data Tools)**, mở dự án SSAS chứa Cube bóng đá.
-2. Tại cửa sổ **Solution Explorer** bên phải, mở thư mục **`Cubes`**.
-3. Nhấp đúp chuột vào tệp **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-4. Giao diện thiết kế Cube mở ra với một loạt các tab ngang ở phía trên: `Cube Structure`, `Dimension Usage`, `Calculations`, `KPIs`, `Actions`, `Partitions`, `Aggregations`, `Perspectives`, `Translations`, **`Browser`**.
-
-#### Bước 2: Chuyển sang Tab `Browser`
-1. Nhấp chuột vào tab **`Browser`** (tab cuối cùng bên phải).
-2. Nếu Cube chưa được xử lý dữ liệu mới nhất, nhấp vào biểu tượng **Process** (hình chiếc bánh răng vàng) trên thanh công cụ để cập nhật dữ liệu.
-3. Đảm bảo nút **Reconnect** được kích hoạt để kết nối trực tiếp với SSAS Server Engine.
-
-#### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slice Pane ở nửa trên màn hình)
-Tại bảng lưới lọc dữ liệu phía trên vùng thiết kế:
-1. **Dòng lọc số 1 (Giới hạn Giải Ngoại Hạng Anh):**
-   * Cột **Dimension**: Nhấp dropdown chọn **`DIM Competition`**.
-   * Cột **Hierarchy**: Nhấp dropdown chọn **`Competition ID`**.
-   * Cột **Operator**: Giữ nguyên mặc định là **`Equal`** ($=$).
-   * Cột **Filter Expression**: Nhấp vào ô giá trị, đánh dấu tick chọn mã **`GB1`** $\rightarrow$ Nhấn **OK**.
-2. **Dòng lọc số 2 (Giới hạn Mùa giải 2023/2024):**
-   * Cột **Dimension**: Nhấp dropdown chọn **`DIM Time`**.
-   * Cột **Hierarchy**: Nhấp dropdown chọn **`Season`**.
-   * Cột **Operator**: Chọn **`Equal`** ($=$).
-   * Cột **Filter Expression**: Nhấp vào ô giá trị, đánh dấu tick chọn mùa giải **`2023/2024`** (hoặc `2023` tùy theo dữ liệu) $\rightarrow$ Nhấn **OK**.
-
-#### Bước 4: Kéo thả các thuộc tính vào Vùng Hiển thị Dữ liệu (Grid Canvas ở nửa dưới)
-Quan sát khung cây thư mục **Metadata** ở góc trái màn hình:
-1. Mở rộng thư mục **`Measures`** $\rightarrow$ Mở rộng nhóm đo **`FACT Player Match Perf`**.
-2. Tìm thước đo **`Goals`** (hoặc `Total Goals`):
-   * Nhấp giữ chuột trái và kéo rê thước đo này thả vào vùng **"Drop Totals or Detail Fields Here"** (khu vực dữ liệu trung tâm / cột).
-3. Tìm chiều **`DIM Player`** trong cây Metadata:
-   * Mở rộng nhóm thuộc tính và tìm trường **`Player Name`**.
-   * Nhấp giữ chuột trái và kéo rê trường này thả vào vùng **"Drop Row Fields Here"** (vùng tiêu đề dòng bên trái).
-4. Lúc này màn hình hiển thị danh sách tất cả các cầu thủ có bàn thắng trong mùa giải tại giải GB1.
-
-#### Bước 5: Cấu hình Lọc Top 10 Bàn thắng
-1. Tại tiêu đề cột của trường **`Player Name`** trên lưới dữ liệu, nhấp vào biểu tượng mũi tên xổ xuống (hoặc nhấp chuột phải vào một ô tên cầu thủ).
-2. Di chuột chọn **Filter** $\rightarrow$ chọn tiếp **`Top 10...`**.
-3. Cửa sổ thiết lập bộ lọc Top 10 mở ra, cấu hình:
-   * Hộp chọn thứ nhất: Chọn **`Top`**.
-   * Hộp nhập số: Nhập số **`10`**.
-   * Dropdown sắp xếp theo: Chọn thước đo **`[Measures].[Goals]`**.
-4. Nhấn **OK**. Lưới lập tức co lại và chỉ hiển thị đúng 10 cầu thủ có số bàn thắng cao nhất từ trên xuống dưới.
-
-#### Bước 6: Chuyển đổi sang Chế độ MDX Text Mode (Design Mode)
-* Trên thanh công cụ nhỏ của tab Browser, tìm và nhấn vào biểu tượng **`Design Mode`** (hình cây bút chì và thước kẻ màu xanh/vàng).
-* Giao diện đồ họa sẽ lập tức chuyển thành khung soạn thảo mã lệnh MDX Text thuần túy.
-* Bạn có thể quan sát câu lệnh MDX mà Visual Studio vừa tự động sinh ra hoặc dán trực tiếp câu lệnh MDX tối ưu ở Mục 3 vào đây, sau đó bấm nút **`!` (Execute)** để chạy.
-
----
-
-### PHƯƠNG THỨC 3: Khai thác trên Microsoft Excel qua kết nối trực tiếp OLAP Cube
-
-1. Mở phần mềm **Microsoft Excel** $\rightarrow$ Tạo một bảng tính trống (Blank Workbook).
-2. Vào thẻ tab **`Data`** trên thanh Ribbon $\rightarrow$ Chọn **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`**.
-3. Điền Server Name: `localhost` $\rightarrow$ Nhấn **Next**.
-4. Chọn Database: `DW_Football_SSAS` $\rightarrow$ Chọn Cube: `DW Football Transfermarkt` $\rightarrow$ Nhấn **Finish** $\rightarrow$ Chọn dạng hiển thị **`PivotTable Report`**.
-5. Trong bảng điều khiển **PivotTable Fields** bên phải màn hình:
-   * Kéo trường **`Goals`** vào ô **Values** ($\Sigma$).
-   * Kéo trường **`Player Name`** vào ô **Rows**.
-   * Kéo trường **`Competition ID`** vào ô **Filters** $\rightarrow$ Nhấp vào bộ lọc trên bảng tính và tick chọn `GB1`.
-   * Kéo trường **`Season`** vào ô **Filters** $\rightarrow$ Nhấp vào bộ lọc và tick chọn `2023/2024`.
-6. Nhấp chuột phải vào ô tên bất kỳ trong cột cầu thủ trên Excel $\rightarrow$ Chọn **Filter** $\rightarrow$ **Top 10...** $\rightarrow$ Chọn Top `10` theo `Sum of Goals` $\rightarrow$ Nhấn **OK**.
-
----
-
-## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
-
-Sau khi nhấn **Execute (F5)** trên SSMS hoặc hoàn thành bộ lọc trên Cube Browser/Excel, kết quả trả về hiển thị 10 chân sút xuất sắc nhất giải Ngoại Hạng Anh mùa giải 2023/2024:
-
-| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Câu Lạc Bộ Đại Diện | Số Bàn Thắng (`Goals`) |
+| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Câu Lạc Bộ Thi Đấu | Tổng Số Bàn Thắng (`Goals`) |
 | :---: | :--- | :--- | :---: |
 | **1** | **Erling Haaland** | Manchester City | **27** |
 | **2** | **Cole Palmer** | Chelsea FC | **22** |
@@ -209,8 +250,6 @@ Sau khi nhấn **Execute (F5)** trên SSMS hoặc hoàn thành bộ lọc trên 
 ---
 
 ## 4. Bóc tách Cú pháp MDX & Ý nghĩa từng thành phần
-
-Để hiểu rõ vì sao câu lệnh MDX được viết như trên, bảng dưới đây phân tích chi tiết từng mệnh đề và từ khóa:
 
 ```mdx
 SELECT
@@ -234,27 +273,27 @@ WHERE (                                             -- (8) Lát cắt Slicer
 );
 ```
 
-### Bảng Giải thích Chi tiết:
+### Bảng Phân tích Ý nghĩa Kỹ thuật:
 
-| Thành phần câu lệnh | Vai trò và Ý nghĩa kỹ thuật |
+| Thành phần | Ý nghĩa chi tiết |
 | :--- | :--- |
-| **`SELECT`** | Từ khóa khởi đầu một truy vấn đa chiều MDX. Khác với SQL (trả về bảng phẳng 2D), MDX có thể định nghĩa tối đa 128 trục tọa độ (Axes). Trong thực tế, phổ biến nhất là 2 trục: Cột (`COLUMNS` hay `AXIS(0)`) và Dòng (`ROWS` hay `AXIS(1)`). |
-| **`{ [Measures].[Goals] } ON COLUMNS`** | Đặt tập hợp chứa thước đo bàn thắng lên trục hoành (Cột). Dấu ngoặc nhọn `{}` biểu thị một tập hợp (Set) trong MDX. |
-| **`[DIM Player].[Player Name].[Player Name].MEMBERS`** | Truy xuất toàn bộ danh sách thành viên thuộc cấp bậc `Player Name` trong phân cấp cầu thủ. Cú pháp gồm: `[Tên Dimension].[Tên Phân cấp].[Tên Cấp độ].MEMBERS`. |
-| **`NONEMPTY(...)`** | Thu hẹp không gian tính toán bằng cách loại bỏ ngay lập tức những cầu thủ không hề có bàn thắng hoặc không ra sân trong mùa giải/giải đấu đã chỉ định. Điều này ngăn chặn việc hệ thống phải duyệt qua hàng chục nghìn cầu thủ toàn cầu không liên quan. |
-| **`TOPCOUNT(Set, 10, Measure)`** | Hàm xếp hạng chuyên dụng trong MDX. Tự động thực hiện 3 thao tác liên hoàn: (1) Tính toán giá trị thước đo cho từng thành viên, (2) Sắp xếp tập hợp theo thứ tự giảm dần (Descending), (3) Cắt lấy đúng 10 phần tử đứng đầu. |
-| **`ON ROWS`** | Gán tập hợp kết quả của hàm `TOPCOUNT` lên trục tung (Dòng). |
-| **`FROM [DW Football Transfermarkt]`** | Chỉ định khối Cube mục tiêu chứa các bảng Fact và Dimension liên quan. |
-| **`WHERE (...)`** | Mệnh đề cắt lát dữ liệu (Slicer Axis / WHERE Clause). Khi một thành viên được đưa vào `WHERE`, toàn bộ các ô tính (Cells) trong kết quả đều được định vị ngầm định tại giao điểm của lát cắt này: chỉ xét giải đấu `GB1` và mùa giải `2023/2024`. |
+| **`SELECT`** | Khai báo các trục tọa độ hiển thị kết quả. MDX hỗ trợ nhiều trục, trong đó `COLUMNS` (Trục 0) đại diện cho các cột hiển thị và `ROWS` (Trục 1) đại diện cho các hàng dữ liệu. |
+| **`{ [Measures].[Goals] } ON COLUMNS`** | Đặt tập hợp chứa thước đo bàn thắng lên trục hoành. Dấu `{}` biểu thị một tập hợp (Set). |
+| **`[DIM Player].[Player Name].[Player Name].MEMBERS`** | Lấy toàn bộ các phần tử thuộc cấp độ `Player Name` của chiều Cầu thủ. Cú pháp gồm: `[Tên Dimension].[Tên Phân cấp].[Tên Cấp độ].MEMBERS`. |
+| **`NONEMPTY(Set, Tuple)`** | Lọc bỏ toàn bộ những cầu thủ không có dữ liệu bàn thắng trong mùa giải và giải đấu đã định trước khi thực hiện xếp hạng, giúp giảm thiểu đáng kể số phần tử cần xử lý. |
+| **`TOPCOUNT(Set, 10, Measure)`** | Hàm xếp hạng chuyên biệt trong MDX: tự động tính toán giá trị của thước đo cho từng thành viên, sắp xếp giảm dần và lấy đúng 10 cầu thủ đầu bảng. |
+| **`ON ROWS`** | Gán tập hợp kết quả của hàm `TOPCOUNT` lên trục tung (Hàng). |
+| **`FROM [DW Football Transfermarkt]`** | Xác định khối Cube nguồn cần truy vấn. |
+| **`WHERE (...)`** | Mệnh đề lát cắt (Slicer Axis). Định vị toàn bộ phép tính toán nằm trong giao điểm của giải đấu `GB1` và mùa giải `2023/2024`. |
 
 ---
 
 ## 5. Danh mục Hàm MDX Cốt lõi Sử dụng
 
-| Tên hàm | Cú pháp chuẩn | Mô tả ứng dụng thực tế trong bài toán |
+| Tên hàm | Cú pháp chuẩn | Mô tả ứng dụng thực tế |
 | :--- | :--- | :--- |
 | **`TOPCOUNT`** | `TOPCOUNT(Set_Expression, Count [, Numeric_Expression])` | Trích xuất $k$ phần tử đầu bảng có giá trị số đo cao nhất. Tối ưu hơn việc phối hợp thủ công giữa `ORDER()` và `HEAD()`. |
-| **`NONEMPTY`** | `NONEMPTY(Set_Expression1 [, Set_Expression2])` | Kiểm tra sự tồn tại của dữ liệu giao cắt giữa tập 1 và tập 2. Bỏ qua các Cell rỗng (Sparse Cells) ở mức lưu trữ trước khi xử lý logic tính toán. |
+| **`NONEMPTY`** | `NONEMPTY(Set_Expression1 [, Set_Expression2])` | Kiểm tra sự tồn tại của dữ liệu giao cắt giữa tập 1 và tập 2. Bỏ qua các ô rỗng (Sparse Cells) ở mức lưu trữ trước khi xử lý logic tính toán. |
 | **`MEMBERS`** | `Hierarchy_Or_Level.MEMBERS` | Trả về một tập hợp chứa tất cả các thành viên (Members) của một phân cấp hoặc một cấp độ xác định trong Dimension. |
 
 ---
@@ -263,12 +302,12 @@ WHERE (                                             -- (8) Lát cắt Slicer
 
 ### 1. Phân tích Độ phức tạp Không gian (Space Complexity)
 * **Không gian ô lý thuyết (Theoretical Cell Space):** 
-  Giả sử chiều Cầu thủ có $N \approx 30.000$ người, chiều Giải đấu có $C \approx 20$ giải, chiều Thời gian có $T \approx 10$ mùa giải. Không gian tích Descartes là:
+  Giả sử chiều Cầu thủ có $N \approx 30.000$ người, chiều Giải đấu có $C \approx 20$ giải, chiều Thời gian có $T \approx 10$ mùa giải. Không gian tích Descartes toàn phần là:
   
   $$\text{Cell Space} = 30.000 \times 20 \times 10 = 6.000.000 \text{ cells}$$
 
 * **Không gian bộ nhớ thực tế sau tối ưu:**
-  Nhờ mệnh đề `WHERE` kết hợp hàm `NONEMPTY(..., (Measure, Slicer_Tuples))`, SSAS kích hoạt thuật toán quét chỉ mục Bitmap Index. Không gian duyệt thực tế co hẹp lại chỉ còn các cầu thủ có ít nhất 1 bàn thắng tại giải Ngoại Hạng Anh mùa 2023/2024 ($M \approx 250$ cầu thủ).
+  Nhờ mệnh đề `WHERE` kết hợp hàm `NONEMPTY(..., (Measure, Slicer_Tuples))`, SSAS kích hoạt thuật toán quét chỉ mục Bitmap Index. Không gian duyệt thực tế co hẹp lại chỉ còn các cầu thủ có bàn thắng tại giải Ngoại Hạng Anh mùa 2023/2024 ($M \approx 250$ cầu thủ).
 * **Bộ nhớ lưu trữ kết quả trả về:** 
   
   $$O(k) \quad \text{với } k = 10 \text{ tuples trên trục ROWS}$$
