@@ -68,42 +68,39 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
    * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
 3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
 
-#### Bước 2: Chuyển sang Tab `Browser`
+#### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt Chế độ Thiết kế (Design Mode)
 1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. Kiểm tra thanh công cụ tab Browser:
-   * Nếu nút **Reconnect** sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nhấp vào biểu tượng **Clear Results** hoặc **Process** nếu muốn làm tươi bộ nhớ đệm (Cache).
+2. **Kiểm tra trạng thái kết nối & giao diện:**
+   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
+   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
 
 #### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc (gồm các cột: *Dimension*, *Hierarchy*, *Operator*, *Filter Expression*):
+Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo lần lượt 3 dòng lọc để cố định giải đấu, mùa giải và áp dụng thuật toán Top 10:
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp dropdown chọn **`DIM Competition`** | Nhấp dropdown chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** $\rightarrow$ Bấm **OK** |
-| **Dòng 2** | Nhấp dropdown chọn **`DIM Time`** | Nhấp dropdown chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa giải **`2023/2024`** $\rightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** $\rightarrow$ Bấm **OK** (hiển thị `{ GB1 }`) |
+| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023`** (hoặc `2023/2024`) $\rightarrow$ Bấm **OK** |
+| **Dòng 3** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Player Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức bên dưới $\rightarrow$ Bấm **OK** |
 
-#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas)
+*Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 3:*
+```mdx
+TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals])
+```
+
+#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Thước đo (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo và thả vào vùng trung tâm: **"Drop Totals or Detail Fields Here"**.
-2. **Kéo Chiều Dữ liệu (Rows):**
+1. **Kéo Chiều Cầu thủ (Rows):**
    * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Player Name`**.
-   * Nhấp giữ chuột vào **`Player Name`**, kéo và thả vào khu vực tiêu đề dòng bên trái: **"Drop Row Fields Here"**.
+   * Nhấp giữ chuột vào **`Player Name`**, kéo và thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*. Lúc này trên lưới xuất hiện cột `Player Name`.
+2. **Kéo Thước đo Bàn thắng (Measures):**
+   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
+   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo và thả vào **ngay bên cạnh cột `Player Name`** trên lưới.
 
-#### Bước 5: Thiết lập Bộ lọc Top 10 Bàn thắng
-Người dùng có thể thực hiện theo một trong hai cách sau:
-* **Cách A (Giao diện nhanh):** Nhấp chuột phải vào tiêu đề cột `Player Name` $\rightarrow$ chọn **Filter** $\rightarrow$ chọn **`Top 10...`** $\rightarrow$ thiết lập *Show:* `Top`, *Elements:* `10`, *By Measure:* `[Measures].[Goals]` $\rightarrow$ Nhấn **OK**.
-* **Cách B (Dùng Expression Builder):** Tại khu vực Filter Pane phía trên, thêm dòng lọc cho `DIM Player` (Hierarchy `Player Name`), đặt Operator là **`Custom`** $\rightarrow$ nhấp nút ba chấm `...` mở cửa sổ **Expression Builder** $\rightarrow$ nhập biểu thức MDX:
-  ```mdx
-  TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals])
-  ```
-  Nhấn **OK**.
-
-#### Bước 6: Thực thi truy vấn và Xem kết quả
-1. Nhấp nút **"Click to execute the query"** (hoặc biểu tượng dấu chấm than đỏ `! Execute` / phím F5 trên thanh công cụ).
-2. Lưới hiển thị danh sách 10 cầu thủ hàng đầu cùng số bàn thắng tương ứng.
-3. Nhấp biểu tượng **Design Mode** (hình cây thước và bút chì) trên thanh công cụ nếu muốn xem đoạn mã MDX tự động sinh của hệ thống.
+#### Bước 5: Thực thi truy vấn và Xem kết quả
+1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than màu đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
+2. Lưới dữ liệu lập tức chạy và hiển thị chính xác bảng xếp hạng đúng **10 cầu thủ ghi bàn nhiều nhất** (Erling Haaland dẫn đầu với 27 bàn, Cole Palmer 22 bàn...).
+3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
 
 ---
 
