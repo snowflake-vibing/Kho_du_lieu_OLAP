@@ -68,21 +68,13 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
    * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
 3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
 
-#### Bước 2: Kiểm tra Calculations & Triển khai (Deploy) nếu có thước đo mới
-*(Tương tự kỹ thuật tạo Calculated Member trong SSAS):*
-1. Nếu muốn định nghĩa thêm chỉ số đo tính toán riêng (ví dụ: `[Measures].[Average_Goals_Per_Match]`):
-   * Chuyển sang tab **`Calculations`**.
-   * Nhấp chuột phải vào khung **Script Organizer** $\rightarrow$ chọn **`New Calculated Member`**.
-   * Nhập biểu thức toán học và thiết lập Parent Hierarchy là `Measures`.
-2. Nhấp chuột phải vào tên Project trong Solution Explorer $\rightarrow$ chọn **`Deploy`** để đồng bộ cấu trúc mới lên máy chủ SSAS.
-
-#### Bước 3: Chuyển sang Tab `Browser`
+#### Bước 2: Chuyển sang Tab `Browser`
 1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
 2. Kiểm tra thanh công cụ tab Browser:
    * Nếu nút **Reconnect** sáng lên: Nhấp vào để kết nối tới SSAS Database.
    * Nhấp vào biểu tượng **Clear Results** hoặc **Process** nếu muốn làm tươi bộ nhớ đệm (Cache).
 
-#### Bước 4: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
+#### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
 Tại bảng lưới thiết lập bộ lọc (gồm các cột: *Dimension*, *Hierarchy*, *Operator*, *Filter Expression*):
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
@@ -90,7 +82,7 @@ Tại bảng lưới thiết lập bộ lọc (gồm các cột: *Dimension*, *H
 | **Dòng 1** | Nhấp dropdown chọn **`DIM Competition`** | Nhấp dropdown chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** $\rightarrow$ Bấm **OK** |
 | **Dòng 2** | Nhấp dropdown chọn **`DIM Time`** | Nhấp dropdown chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa giải **`2023/2024`** $\rightarrow$ Bấm **OK** |
 
-#### Bước 5: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas)
+#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Thước đo (Measures):**
    * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
@@ -99,16 +91,16 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
    * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Player Name`**.
    * Nhấp giữ chuột vào **`Player Name`**, kéo và thả vào khu vực tiêu đề dòng bên trái: **"Drop Row Fields Here"**.
 
-#### Bước 6: Thiết lập Bộ lọc Top 10 Bàn thắng
+#### Bước 5: Thiết lập Bộ lọc Top 10 Bàn thắng
 Người dùng có thể thực hiện theo một trong hai cách sau:
 * **Cách A (Giao diện nhanh):** Nhấp chuột phải vào tiêu đề cột `Player Name` $\rightarrow$ chọn **Filter** $\rightarrow$ chọn **`Top 10...`** $\rightarrow$ thiết lập *Show:* `Top`, *Elements:* `10`, *By Measure:* `[Measures].[Goals]` $\rightarrow$ Nhấn **OK**.
-* **Cách B (Dùng Expression Builder - tương tự kỹ thuật nâng cao):** Tại khu vực Filter Pane phía trên, thêm dòng lọc cho `DIM Player` (Hierarchy `Player Name`), đặt Operator là **`Custom`** $\rightarrow$ nhấp nút ba chấm `...` mở cửa sổ **Expression Builder** $\rightarrow$ nhập biểu thức MDX:
+* **Cách B (Dùng Expression Builder):** Tại khu vực Filter Pane phía trên, thêm dòng lọc cho `DIM Player` (Hierarchy `Player Name`), đặt Operator là **`Custom`** $\rightarrow$ nhấp nút ba chấm `...` mở cửa sổ **Expression Builder** $\rightarrow$ nhập biểu thức MDX:
   ```mdx
   TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals])
   ```
   Nhấn **OK**.
 
-#### Bước 7: Thực thi truy vấn và Xem kết quả
+#### Bước 6: Thực thi truy vấn và Xem kết quả
 1. Nhấp nút **"Click to execute the query"** (hoặc biểu tượng dấu chấm than đỏ `! Execute` / phím F5 trên thanh công cụ).
 2. Lưới hiển thị danh sách 10 cầu thủ hàng đầu cùng số bàn thắng tương ứng.
 3. Nhấp biểu tượng **Design Mode** (hình cây thước và bút chì) trên thanh công cụ nếu muốn xem đoạn mã MDX tự động sinh của hệ thống.
