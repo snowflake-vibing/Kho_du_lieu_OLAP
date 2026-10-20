@@ -8,6 +8,13 @@ Theo yêu cầu môn học (tối thiểu 10 câu truy vấn), nhóm đã tinh c
 
 ---
 
+## 📚 GIÁO TRÌNH LÝ THUYẾT & NỀN TẢNG MDX (TUTORIAL)
+
+Để nắm vững toàn bộ kiến trúc không gian siêu khối, cú pháp toán học, phân biệt chuyên sâu giữa SQL vs MDX, cơ chế Formula Engine/Storage Engine và bộ câu hỏi phản biện lý thuyết, vui lòng xem tài liệu chi tiết tại:
+👉 **[mdx/tutorial/README.md](file:///d:/Kho_du_lieu_OLAP/mdx/tutorial/README.md)**: **Giáo trình Lý thuyết & Thực hành Truy vấn Đa chiều MDX từ A đến Z**
+
+---
+
 ## 🌟 BẢNG TỔNG HỢP 10 CÂU TRUY VẤN MDX CHÍNH THỨC NỘP BÁO CÁO
 
 | STT | File Tài Liệu | Mục tiêu nghiệp vụ MDX | Thao tác OLAP | Các hàm MDX cốt lõi |
