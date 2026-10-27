@@ -14,7 +14,7 @@
 
 ### Đối chiếu câu lệnh T-SQL gốc (Relational Database)
 ```sql
-USE DW_Football_Analytics;
+USE DW_Football_Transfermarkt;
 GO
 
 WITH QuarterStats AS (
@@ -23,9 +23,9 @@ WITH QuarterStats AS (
         t.Quarter,
         SUM(f.Goals) AS Total_Goals
     FROM dbo.FACT_Player_Match_Perf f
-    JOIN dbo.DIM_Club c ON f.Club_SK = c.Club_SK
-    JOIN dbo.DIM_Club op ON f.Opponent_Club_SK = op.Club_SK
-    JOIN dbo.DIM_Time t ON f.Time_SK = t.Time_SK
+    JOIN dbo.DIM_Club c ON f.Club_ID = c.Club_ID
+    JOIN dbo.DIM_Club op ON f.Opponent_Club_ID = op.Club_ID
+    JOIN dbo.DIM_Time t ON f.Time_ID = t.Time_ID
     WHERE c.Club_Name = 'Real Madrid' AND t.Year = 2023
     GROUP BY op.Club_Name, t.Quarter
 )
@@ -178,11 +178,15 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
    ============================================================================== */
 
 WITH 
-    -- 1. Bàn thắng của Quý liền trước (Quarter-over-Quarter Prior)
+    -- 1. Bàn thắng của Quý liền trước (chỉ xét trong cùng năm phân cấp 2023)
     MEMBER [Measures].[Prev Quarter Goals] AS
-        (
-            [Measures].[Goals],
-            [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER
+        IIF(
+            [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT,
+            (
+                [Measures].[Goals],
+                [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER
+            ),
+            NULL
         ),
         FORMAT_STRING = "#,##0"
 
@@ -192,8 +196,8 @@ WITH
             ISEMPTY([Measures].[Prev Quarter Goals]) OR [Measures].[Prev Quarter Goals] = 0,
             NULL,
             ROUND(
-                (([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals]) * 100,
-                2
+                ([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals],
+                4
             )
         ),
         FORMAT_STRING = "0.00%"
@@ -233,7 +237,7 @@ WHERE (
 ```
 
 **Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Ví dụ: khi đang ở `Quarter 2`, hàm sẽ tự động lấy giá trị của `Quarter 1`.
+* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Kết hợp điều kiện so sánh `.PARENT` giúp giới hạn tính toán chặt chẽ trong phạm vi năm phân tích 2023, đảm bảo Quý 1 đầu năm trả về `NULL` hoàn toàn tương thích với T-SQL và Excel PivotTable.
 * **`IIF(ISEMPTY(...) OR ... = 0, NULL, ...)`**: Hàm điều kiện ngăn ngừa chia cho 0 khi Quý trước không có bàn thắng hoặc khi ở Quý 1 đầu năm (chưa có kỳ trước đó).
 * **`DESCENDANTS([Hierarchy].[Year].[2023], [Quarter])`**: Trích xuất toàn bộ các nút con ở cấp độ `Quarter` trực thuộc năm 2023 mà không cần liệt kê thủ công từng Quý.
 * **`CrossJoin(...) ON COLUMNS`**: Kết hợp 4 Quý với 2 thước đo (Bàn thắng và Tăng trưởng QoQ) trên trục **CỘT** (Axis 0).
@@ -278,8 +282,13 @@ WHERE (
 ### 2.4. Nhận xét & Đối chiếu kết quả (Comparison & Validation)
 
 1. **Tính chính xác và Nhất quán của Dữ liệu:**
-   * Cả 3 cách tiếp cận (duyệt trực quan qua **Cube Browser trong SSDT**, lập bảng phân tích qua **PivotTable trong Excel**, và viết truy vấn trực tiếp bằng **ngôn ngữ MDX trong SSMS**) đều trả về cùng một kết quả duy nhất và chuẩn xác tuyệt đối: FC Barcelona là đối thủ bị Real Madrid chọc thủng lưới nhiều nhất (4 bàn ở Q1, 4 bàn ở Q2, 2 bàn ở Q3, 5 bàn ở Q4 - tăng trưởng QoQ Q4 bùng nổ $+150.00\%$). Các đối thủ lớn tiếp theo là Atletico Madrid và Girona FC cũng cho thấy sự tăng vọt bàn thua vào giai đoạn nước rút cuối năm (Q4).
-   * Điều này chứng minh hàm `PREVMEMBER` kết hợp cây phân cấp thời gian `Hierarchy Time` trong SSAS đã xử lý chuẩn xác logic điều hướng chuỗi thời gian (Time-series Navigation).
+   * Cả 3 cách tiếp cận (duyệt trực quan qua **Cube Browser trong SSDT**, lập bảng phân tích qua **PivotTable trong Excel**, và viết truy vấn trực tiếp bằng **ngôn ngữ MDX trong SSMS**) đều trả về cùng một kết quả duy nhất và đồng bộ tuyệt đối:
+     * **UD Almería** và **Valencia CF** là hai đối thủ bị Real Madrid chọc thủng lưới nhiều nhất trong năm 2023 với cùng **7 bàn thắng**. Trong đó, Real Madrid ghi 4 bàn vào lưới Almería ở Q2 và 3 bàn ở Q3 (tăng trưởng QoQ Q3: $-25.00\%$). Với Valencia CF, Real Madrid ghi 2 bàn ở Q1 và bùng nổ 5 bàn ở Q4.
+     * **Real Valladolid CF** nhận tới **6 bàn thua** chỉ trong Quý 2 (trận thắng giòn giã 6-0 của Real Madrid).
+     * **CA Osasuna** và **Villarreal CF** cùng nhận **6 bàn thua**, trong đó Real Madrid ghi 4 bàn vào lưới cả hai đội bóng này trong Quý 4.
+     * **Athletic Bilbao** (5 bàn) và **Girona FC** (5 bàn) chịu sức ép liên tục qua các Quý 2 và Quý 3 (Girona FC bị ghi 2 bàn ở Q2 và 3 bàn ở Q3, tăng trưởng $+50.00\%$).
+     * **FC Barcelona** chạm trán Real Madrid tại giải VĐQG La Liga 2023 với 0 bàn ở Q1 (thua 1-2) và 2 bàn ở Q4 (thắng 2-1 nhờ cú đúp của Jude Bellingham).
+   * Điều này chứng minh hàm `PREVMEMBER` kết hợp kiểm tra cùng năm phân cấp trong SSAS đã giải quyết trọn vẹn bài toán chuỗi thời gian theo quý (QoQ Time-series Analysis).
 
 2. **So sánh Ưu - Nhược điểm của từng phương thức:**
 

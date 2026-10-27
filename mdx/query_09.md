@@ -13,7 +13,7 @@
 
 ### Đối chiếu câu lệnh T-SQL gốc (Relational Database)
 ```sql
-USE DW_Football_Analytics;
+USE DW_Football_Transfermarkt;
 GO
 
 WITH WeekendTop AS (
@@ -22,11 +22,11 @@ WITH WeekendTop AS (
         SUM(f.Goals) AS Weekend_Goals,
         SUM(f.Yellow_Cards) AS Weekend_Yellow_Cards
     FROM dbo.FACT_Player_Match_Perf f
-    JOIN dbo.DIM_Club c ON f.Club_SK = c.Club_SK
-    JOIN dbo.DIM_Time t ON f.Time_SK = t.Time_SK
+    JOIN dbo.DIM_Club c ON f.Club_ID = c.Club_ID
+    JOIN dbo.DIM_Time t ON f.Time_ID = t.Time_ID
     WHERE t.Is_Weekend = 1
     GROUP BY c.Club_Name
-    ORDER BY Weekend_Goals DESC
+    ORDER BY Weekend_Goals DESC, c.Club_Name DESC
 ),
 WeekdayTop AS (
     SELECT TOP 30 
@@ -34,11 +34,11 @@ WeekdayTop AS (
         SUM(f.Goals) AS Weekday_Goals,
         SUM(f.Yellow_Cards) AS Weekday_Yellow_Cards
     FROM dbo.FACT_Player_Match_Perf f
-    JOIN dbo.DIM_Club c ON f.Club_SK = c.Club_SK
-    JOIN dbo.DIM_Time t ON f.Time_SK = t.Time_SK
+    JOIN dbo.DIM_Club c ON f.Club_ID = c.Club_ID
+    JOIN dbo.DIM_Time t ON f.Time_ID = t.Time_ID
     WHERE t.Is_Weekend = 0
     GROUP BY c.Club_Name
-    ORDER BY Weekday_Goals DESC
+    ORDER BY Weekday_Goals DESC, c.Club_Name DESC
 )
 SELECT 
     w.Club_Name,
@@ -232,8 +232,8 @@ FROM [DW Football Transfermarkt];
 1. **Hàm giao tập hợp `INTERSECT(«Set_1», «Set_2»[, ALL])`**:
    * **Cú pháp chuẩn:** `INTERSECT(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Tập hợp Top 30 CLB ghi bàn nhiều nhất trên Sân Nhà (kết quả từ hàm `TOPCOUNT` thứ nhất).
-     * `Set_2`: Tập hợp Top 30 CLB ghi bàn nhiều nhất trên Sân Khách (kết quả từ hàm `TOPCOUNT` thứ hai).
+     * `Set_1`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần (`Is_Weekend = 1`, kết quả từ hàm `TOPCOUNT` thứ nhất).
+     * `Set_2`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Ngày thường (`Is_Weekend = 0`, kết quả từ hàm `TOPCOUNT` thứ hai).
    * **Cơ chế hoạt động kỹ thuật:**
      * Thực hiện phép giao tập hợp trong đại số MDX ($Set_1 \cap Set_2$).
      * Formula Engine tính toán độc lập hai danh sách Top 30, sau đó hàm `INTERSECT` đối chiếu và chỉ giữ lại những câu lạc bộ xuất hiện đồng thời trong cả hai danh sách.
@@ -259,28 +259,40 @@ FROM [DW Football Transfermarkt];
 
 ### 2.4. Nhận xét & Đối chiếu kết quả
 
+1. **Tính chính xác và Nhất quán của Dữ liệu:**
+   * Cả 3 phương thức tiếp cận (Cube Browser trong SSDT, PivotTable trong Excel, và truy vấn MDX trong SSMS) đều phân tích chính xác tập hợp 9 CLB ưu tú xuất hiện đồng thời trong cả hai nhóm Top 30 bàn thắng Cuối tuần và Ngày thường.
+   * **Manchester City** thể hiện sự hủy diệt đồng đều ở mọi đấu trường với tổng cộng 245 bàn thắng (94 bàn cuối tuần, 151 bàn ngày thường; tổng cộng 129 thẻ vàng). Đứng tiếp theo là **FC Bayern Munich** (225 bàn: 115 cuối tuần, 110 ngày thường), **PSV Eindhoven** (219 bàn: 82 cuối tuần, 137 ngày thường), và **Real Madrid** (210 bàn: 76 cuối tuần, 134 ngày thường).
+   * Về chỉ số kỷ luật, **Real Madrid** và **Bayer 04 Leverkusen** nhận nhiều thẻ vàng nhất giữa tuần (128 và 120 thẻ vàng), phản ánh tính chất căng thẳng khốc liệt của các lượt trận cúp châu lục (UEFA Champions League, Europa League).
+
+2. **So sánh 3 phương thức thực hiện:**
+
 | Tiêu chí so sánh | 2.1. Visual Studio SSDT (Cube Browser) | 2.2. Excel PivotTable | 2.3. SSMS MDX Query |
 | :--- | :--- | :--- | :--- |
 | **Giao diện thao tác** | Kéo thả trực quan, hỗ trợ Expression Builder cho INTERSECT. | Kéo thả PivotTable thân thiện với chuyên viên phân tích. | Soạn thảo lệnh truy vấn kịch bản mã nguồn mở. |
-| **Tính đồng nhất** | Trả về đúng ma trận CLB $\times$ Cuối tuần / Ngày thường. | Trả về đúng ma trận CLB $\times$ Cuối tuần / Ngày thường. | Trả về đúng ma trận CLB $\times$ Cuối tuần / Ngày thường. |
+| **Tính đồng nhất** | Trả về đúng 9 CLB $\times$ Cuối tuần / Ngày thường chuẩn xác. | Trả về đúng 9 CLB $\times$ Cuối tuần / Ngày thường chuẩn xác. | Trả về đúng 9 CLB $\times$ Cuối tuần / Ngày thường chuẩn xác. |
 | **Độ phức tạp** | Trung bình (cần dán biểu thức INTERSECT vào Filter). | Đơn giản (kéo trường `Is Weekend` vào Columns). | Chuyên sâu (làm chủ cấu trúc SET và đại số tập hợp). |
 
 ---
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
+Sau khi thực thi bất kỳ phương pháp nào trong 3 cách trên, tập kết quả trả về hiển thị chuẩn xác ma trận 9 CLB ưu tú (Elite Clubs) vượt qua bộ lọc giao tập hợp `INTERSECT`:
+
 | Tên Câu Lạc Bộ (`Club Name`) | Cuối tuần - Bàn thắng | Cuối tuần - Thẻ vàng | Ngày thường - Bàn thắng | Ngày thường - Thẻ vàng |
 | :--- | :---: | :---: | :---: | :---: |
-| **FC Bayern Munich** | 150 | 83 | 75 | 46 |
-| **Manchester City** | 139 | 76 | 106 | 53 |
-| **Arsenal FC** | 134 | 93 | 65 | 52 |
-| **Bayer 04 Leverkusen** | 131 | 122 | 60 | 72 |
-| **Borussia Dortmund** | 128 | 101 | 49 | 64 |
-| **Paris Saint-Germain** | 128 | 93 | 70 | 59 |
-| **Real Madrid** | 128 | 108 | 82 | 67 |
-| **FC Barcelona** | 118 | 147 | 61 | 65 |
-| **SL Benfica** | 115 | 81 | 77 | 89 |
-| **Fenerbahce** | 113 | 111 | 75 | 76 |
+| **Manchester City** | 94 | 49 | 151 | 80 |
+| **Bayern Munich** | 115 | 62 | 110 | 67 |
+| **PSV Eindhoven** | 82 | 24 | 137 | 76 |
+| **Real Madrid** | 76 | 47 | 134 | 128 |
+| **Arsenal FC** | 75 | 42 | 124 | 103 |
+| **Paris Saint-Germain** | 59 | 40 | 139 | 112 |
+| **Bayer 04 Leverkusen** | 65 | 74 | 126 | 120 |
+| **Celtic FC** | 75 | 43 | 111 | 62 |
+| **Inter Milan** | 70 | 49 | 114 | 103 |
+
+> *Ghi chú:* 
+> * Số lượng 9 câu lạc bộ được xác định chuẩn xác thông qua phép toán `INTERSECT` giữa 2 tập hợp Top 30 CLB ghi bàn cuối tuần và Top 30 CLB ghi bàn ngày thường trong khối đa chiều SSAS.
+> * Các CLB chỉ mạnh ở giải quốc nội cuối tuần mà thi đấu ít bàn ở cúp giữa tuần (hoặc ngược lại) đã được loại bỏ một cách thuyết phục.
 
 ---
 

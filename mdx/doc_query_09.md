@@ -172,8 +172,8 @@ FROM [DW Football Transfermarkt];
 1. **Hàm giao tập hợp `INTERSECT(«Set_1», «Set_2»[, ALL])`**:
    * **Cú pháp chuẩn:** `INTERSECT(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Tập hợp Top 30 CLB ghi bàn nhiều nhất trên Sân Nhà (kết quả từ hàm `TOPCOUNT` thứ nhất).
-     * `Set_2`: Tập hợp Top 30 CLB ghi bàn nhiều nhất trên Sân Khách (kết quả từ hàm `TOPCOUNT` thứ hai).
+     * `Set_1`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần (`Is_Weekend = 1`, kết quả từ hàm `TOPCOUNT` thứ nhất).
+     * `Set_2`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Ngày thường (`Is_Weekend = 0`, kết quả từ hàm `TOPCOUNT` thứ hai).
    * **Cơ chế hoạt động kỹ thuật:**
      * Thực hiện phép giao tập hợp trong đại số MDX ($Set_1 \cap Set_2$).
      * Formula Engine tính toán độc lập hai danh sách Top 30, sau đó hàm `INTERSECT` đối chiếu và chỉ giữ lại những câu lạc bộ xuất hiện đồng thời trong cả hai danh sách.

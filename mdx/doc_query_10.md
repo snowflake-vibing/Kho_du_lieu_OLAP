@@ -110,11 +110,15 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
    ============================================================================== */
 
 WITH 
-    -- 1. Bàn thắng của Quý liền trước (Quarter-over-Quarter Prior)
+    -- 1. Bàn thắng của Quý liền trước (chỉ xét trong cùng năm phân cấp 2023)
     MEMBER [Measures].[Prev Quarter Goals] AS
-        (
-            [Measures].[Goals],
-            [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER
+        IIF(
+            [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT,
+            (
+                [Measures].[Goals],
+                [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER
+            ),
+            NULL
         ),
         FORMAT_STRING = "#,##0"
 
@@ -124,8 +128,8 @@ WITH
             ISEMPTY([Measures].[Prev Quarter Goals]) OR [Measures].[Prev Quarter Goals] = 0,
             NULL,
             ROUND(
-                (([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals]) * 100,
-                2
+                ([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals],
+                4
             )
         ),
         FORMAT_STRING = "0.00%"
@@ -165,7 +169,7 @@ WHERE (
 ```
 
 **Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Ví dụ: khi đang ở `Quarter 2`, hàm sẽ tự động lấy giá trị của `Quarter 1`.
+* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Kết hợp điều kiện so sánh `.PARENT` giúp giới hạn tính toán chặt chẽ trong phạm vi năm phân tích 2023, đảm bảo Quý 1 đầu năm trả về `NULL` hoàn toàn tương thích với T-SQL và Excel PivotTable.
 * **`IIF(ISEMPTY(...) OR ... = 0, NULL, ...)`**: Hàm điều kiện ngăn ngừa chia cho 0 khi Quý trước không có bàn thắng hoặc khi ở Quý 1 đầu năm (chưa có kỳ trước đó).
 * **`DESCENDANTS([Hierarchy].[Year].[2023], [Quarter])`**: Trích xuất toàn bộ các nút con ở cấp độ `Quarter` trực thuộc năm 2023 mà không cần liệt kê thủ công từng Quý.
 * **`CrossJoin(...) ON COLUMNS`**: Kết hợp 4 Quý với 2 thước đo (Bàn thắng và Tăng trưởng QoQ) trên trục **CỘT** (Axis 0).
