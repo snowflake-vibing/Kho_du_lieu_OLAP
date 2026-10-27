@@ -1,16 +1,27 @@
-# 3.10.10 Câu truy vấn 10: Thống kê bàn thắng của Real Madrid vào lưới các đối thủ theo từng Quý trong năm
+# 3.10.10 Câu truy vấn 10: Tăng trưởng bàn thắng theo Quý (QoQ) của Top 10 CLB hàng đầu Châu Âu năm 2023
 
-**Nội dung truy vấn:** Phân tích sự biến động số bàn thắng ghi được của Câu lạc bộ **Real Madrid** vào lưới các đối thủ cạnh tranh qua từng Quý trong năm 2023 (từ Quý 1 đến Quý 4). Đồng thời ứng dụng hàm phân cấp thời gian `PREVMEMBER` để tính tỷ lệ tăng trưởng bàn thắng so với Quý liền trước (**Quarter-over-Quarter - QoQ Growth**), hỗ trợ ban huấn luyện nhận diện đối thủ kỵ dơ và đánh giá điểm rơi phong độ của đội bóng.
+**Nội dung truy vấn:** Phân tích sự biến động số bàn thắng và tốc độ tăng trưởng Quý-trên-Quý (**Quarter-over-Quarter - QoQ Growth**) của **Top 10 Câu lạc bộ bóng đá hàng đầu Châu Âu** có tổng số bàn thắng cao nhất trong năm 2023. Truy vấn ứng dụng hàm phân cấp thời gian `PREVMEMBER` kết hợp hàm logic `IIF` để tính tỷ lệ tăng trưởng bàn thắng giữa các quý liên tiếp ($Q2 \text{ vs } Q1$, $Q3 \text{ vs } Q2$, $Q4 \text{ vs } Q3$).
+
+Đặc biệt, nhằm loại bỏ hoàn toàn các giá trị rỗng/null, tại Quý 1 ($Q1$) truy vấn chỉ lấy số bàn thắng (do là quý đầu tiên của năm phân tích nên chưa có quý liền kề trước đó làm mốc so sánh), và hiển thị song song cả Bàn thắng lẫn Tỷ lệ Tăng trưởng QoQ ở các Quý 2, 3, 4. Nhờ đó, kết quả đạt đúng 7 cột dữ liệu dày đặc, không có bất kỳ ô `null` nào.
+
+---
 
 ## 3.10.10.1 Sử dụng Cube Browser
 
 ### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures Tăng Trưởng QoQ
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
+1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSAS_Football_Transfermarkt`).
 2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
 3. Tạo 2 Calculated Members để tính bàn thắng quý trước và tỷ lệ tăng trưởng QoQ:
    * **Thước đo 1 (`Prev Quarter Goals`):**
      * Name: `Prev Quarter Goals` | Parent hierarchy: `Measures`
-     * Expression: `([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER)`
+     * Expression:
+       ```mdx
+       IIF(
+           [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT,
+           ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER),
+           NULL
+       )
+       ```
    * **Thước đo 2 (`QoQ Goals Growth`):**
      * Name: `QoQ Goals Growth` | Parent hierarchy: `Measures`
      * Expression:
@@ -18,7 +29,7 @@
        IIF(
            ISEMPTY([Measures].[Prev Quarter Goals]) OR [Measures].[Prev Quarter Goals] = 0,
            NULL,
-           ROUND((([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals]) * 100, 2)
+           ROUND((([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals]), 4)
        )
        ```
      * Format String: `0.00%`
@@ -26,29 +37,28 @@
 
 ### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
-2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa.
+2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa kéo thả.
 
 ### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọc để cố định đội bóng Real Madrid và năm 2023:
+Tại bảng lưới thiết lập bộ lọc phía trên, tạo dòng lọc cố định năm 2023:
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`Real Madrid`** → Bấm **OK** (hiển thị `{ Real Madrid }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** → Bấm **OK** (hiển thị `{ 2023 }`) |
+| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** → Bấm **OK** (hiển thị `{ 2023 }`) |
 
 ### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
-1. **Kéo Chiều Câu lạc bộ Đối thủ (Rows):**
-   * Mở rộng chiều **`Opponent Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows.
+1. **Kéo Chiều Câu lạc bộ (Rows):**
+   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows.
 2. **Kéo Phân cấp Quý (Columns):**
-   * Mở rộng thư mục **`DIM Time`** → mở rộng phân cấp **`Hierarchy`** → tìm cấp độ **`Quarter`**: Kéo thả lên vùng cột (Columns) để chia bảng theo các Quý (Q1, Q2, Q3, Q4).
+   * Mở rộng thư mục **`DIM Time`** → mở rộng phân cấp **`Hierarchy`** → tìm cấp độ **`Quarter`**: Kéo thả lên vùng cột (Columns) để chia bảng theo các Quý (1, 2, 3, 4).
 3. **Kéo Thước đo Bàn thắng & Tăng trưởng QoQ (Measures):**
    * Mở rộng thư mục **`Measures`**:
-     * Kéo **`Goals`** thả vào vùng dữ liệu trung tâm.
+     * Kéo **`Goals`** thả vào vùng dữ liệu.
      * Kéo **`QoQ Goals Growth`** thả vào ngay bên cạnh `Goals`.
 
 ### Bước 5: Thực thi truy vấn và Xem kết quả
 1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
-2. Lưới dữ liệu lập tức chạy và hiển thị ma trận phân bổ bàn thắng và tăng trưởng QoQ của Real Madrid vào lưới từng đối thủ qua các Quý năm 2023.
+2. Lưới dữ liệu lập tức hiển thị bảng ma trận phân bổ bàn thắng và tăng trưởng QoQ qua các Quý năm 2023.
 
 ---
 
@@ -60,7 +70,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọ
 3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 ### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+1. Chọn cơ sở dữ liệu: **`SSAS_Football_Transfermarkt`** → Chọn Cube: **`DW Football Transfermarkt`**.
 2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
@@ -68,20 +78,21 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Filters. |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** → Kéo `Year` thả vào ô Filters. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** → Kéo `Year` thả vào ô Filters (chọn năm `2023`). |
 | **Ô `Columns` (Cột ma trận)** | **`Quarter`** | Mở thư mục **`DIM Time`** → mở `Hierarchy` → Kéo `Quarter` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`Opponent Club`** → Kéo `Club Name` thả vào ô Rows. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Rows. |
 | **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`QoQ Goals Growth`** | Mở thư mục **`Measures`** → Kéo `QoQ Goals Growth` thả vào ô Values (hoặc kéo `Goals` lần 2 và chọn Show Values As `% Difference From`). |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`QoQ Goals Growth`** | Mở thư mục **`Measures`** → Kéo `QoQ Goals Growth` thả vào ô Values. |
 
-### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. Tại ô bên cạnh nhãn `Club Name`, nhấp mũi tên xổ xuống → tick chọn **`Real Madrid`** → Nhấn **OK**.
-2. Tại ô bên cạnh nhãn `Year`, nhấp mũi tên xổ xuống → tick chọn năm **`2023`** → Nhấn **OK**.
+### Bước 4: Thiết lập Bộ lọc Top 10 CLB
+1. Nhấp chuột vào mũi tên lọc tại tiêu đề hàng **Row Labels (Club Name)** trên PivotTable.
+2. Chọn **Value Filters** → chọn **Top 10...**.
+3. Thiết lập: **Top 10** theo trường **`Sum of Goals`** → Bấm **OK**.
+4. (Tùy chọn) Ẩn cột rỗng `Q1 QoQ Goals Growth` để bảng dữ liệu gọn gàng và thẩm mỹ nhất.
 
 ### Bước 5: Trình bày bảng kết quả
 * Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Sắp xếp danh sách đối thủ giảm dần theo tổng bàn thắng.
+* Sắp xếp danh sách giảm dần theo tổng bàn thắng.
 
 ---
 
@@ -91,11 +102,11 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 1. Khởi động phần mềm **SQL Server Management Studio (SSMS)**.
 2. Tại hộp thoại kết nối máy chủ:
    * **Server type:** Nhấp chọn **`Analysis Services`**.
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
+   * **Server name:** Nhập `localhost` (hoặc instance SSAS).
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`SSAS_Football_Transfermarkt`** → mở rộng thư mục **`Cubes`**.
    * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
@@ -104,8 +115,8 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 10: Tăng trưởng bàn thắng Real Madrid vào lưới đối thủ qua các Quý
-   Khai thác: PREVMEMBER, DESCENDANTS, CHILDREN, IIF, NONEMPTY, ORDER (BDESC)
+   Truy vấn MDX 10: Tăng trưởng bàn thắng theo Quý (QoQ) của Top 10 CLB Châu Âu
+   Khai thác: PREVMEMBER, IIF, TOPCOUNT, NONEMPTY, FORMAT_STRING
    Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -135,84 +146,63 @@ WITH
         FORMAT_STRING = "0.00%"
 
 SELECT
-    -- Trục Cột: Các Quý của năm 2023 kết hợp với Bàn thắng và Tăng trưởng QoQ
-    CrossJoin(
-        DESCENDANTS(
-            [DIM Time].[Hierarchy].[Year].[2023],
-            [DIM Time].[Hierarchy].[Quarter]
-        ),
-        {
-            [Measures].[Goals],
-            [Measures].[QoQ Goals Growth]
-        }
-    ) ON COLUMNS,
+    -- Trục Cột: Liệt kê rõ ràng 7 cột đo lường, loại bỏ cột Q1 QoQ rỗng
+    {
+        ([DIM Time].[Hierarchy].[Year].[2023].[1], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[2], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[2], [Measures].[QoQ Goals Growth]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[3], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[3], [Measures].[QoQ Goals Growth]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[4], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[4], [Measures].[QoQ Goals Growth])
+    } ON COLUMNS,
 
-    -- Trục Dòng: Các đối thủ từng bị Real Madrid chọc thủng lưới, xếp giảm dần
-    ORDER(
+    -- Trục Dòng: Top 10 CLB có tổng số bàn thắng cao nhất trong năm 2023
+    TOPCOUNT(
         NONEMPTY(
-            EXCEPT([Opponent Club].[Club Name].[Club Name].MEMBERS, { [Opponent Club].[Club Name].[All] }),
-            (
-                [Measures].[Goals],
-                [DIM Club].[Club Name].[Real Madrid]
-            )
+            EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+            ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
         ),
-        [Measures].[Goals],
-        BDESC
+        10,
+        ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
     ) ON ROWS
 
-FROM [DW Football Transfermarkt]
-
--- Lát cắt ngữ cảnh: Đội ghi bàn là Real Madrid
-WHERE (
-    [DIM Club].[Club Name].[Real Madrid]
-);
+FROM [DW Football Transfermarkt];
 ```
 
 **Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Kết hợp điều kiện so sánh `.PARENT` giúp giới hạn tính toán chặt chẽ trong phạm vi năm phân tích 2023, đảm bảo Quý 1 đầu năm trả về `NULL` hoàn toàn tương thích với T-SQL và Excel PivotTable.
-* **`IIF(ISEMPTY(...) OR ... = 0, NULL, ...)`**: Hàm điều kiện ngăn ngừa chia cho 0 khi Quý trước không có bàn thắng hoặc khi ở Quý 1 đầu năm (chưa có kỳ trước đó).
-* **`DESCENDANTS([Hierarchy].[Year].[2023], [Quarter])`**: Trích xuất toàn bộ các nút con ở cấp độ `Quarter` trực thuộc năm 2023 mà không cần liệt kê thủ công từng Quý.
-* **`CrossJoin(...) ON COLUMNS`**: Kết hợp 4 Quý với 2 thước đo (Bàn thắng và Tăng trưởng QoQ) trên trục **CỘT** (Axis 0).
-* **`ORDER(NONEMPTY(...), Goals, BDESC) ON ROWS`**: Sắp xếp danh sách các CLB đối thủ giảm dần theo tổng số bàn thua phải nhận từ Real Madrid trên trục **HÀNG** (Axis 1).
-* **`WHERE ([DIM Club].[Club Name].[Real Madrid])`**: Trục lát cắt dữ liệu (Slicer Axis), cố định đội bóng thực hiện ghi bàn là Real Madrid.
-
-### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
-
-1. **Hàm điều hướng chuỗi thời gian `.PREVMEMBER`**:
-   * **Cú pháp chuẩn:** `«Member».PREVMEMBER`
-   * **Tham số thực tế trong truy vấn:** `[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`.
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Dựa trên cây phân cấp thời gian tự nhiên (`Year -> Quarter -> Month -> Date`).
-     * Với mỗi Quý hiện hành đang được duyệt trên trục cột (ví dụ `Q2-2023`), hàm `.PREVMEMBER` điều hướng lùi lại đúng 1 bước trên cùng cấp độ phân cấp để trỏ về Quý liền kề trước đó (`Q1-2023`).
-     * Khi kết hợp trong Tuple `([Measures].[Goals], CURRENTMEMBER.PREVMEMBER)`, nó truy xuất số bàn thắng của Quý liền trước làm mốc so sánh.
-     * Tại Quý đầu tiên (`Q1-2023`), do không có quý nào đứng trước trong phạm vi phân cấp của năm, hàm trả về giá trị rỗng (`NULL`).
-   * **Kết quả trả về:** Thành viên thời gian liền kề trước đó trong cùng phân cấp.
-
-2. **Hàm duyệt cây phân cấp `DESCENDANTS(«Member»[, «Level»[, «Desc_Flag»]])`**:
-   * **Cú pháp chuẩn:** `DESCENDANTS(Member, Level)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Member`: Nút gốc `[DIM Time].[Hierarchy].[Year].[2023]`.
-     * `Level`: Cấp độ con `[DIM Time].[Hierarchy].[Quarter]`.
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Thuật toán duyệt cây đa chiều sẽ đi từ nút cha `Year 2023` xuống và tự động trích xuất toàn bộ các nút con ở cấp độ `Quarter` (`Q1`, `Q2`, `Q3`, `Q4`).
-     * Cơ chế này giúp truy vấn hoàn toàn tự động và linh hoạt, không cần phải gõ cứng tên từng Quý trong mã nguồn.
-   * **Kết quả trả về:** Tập hợp 4 Quý của năm 2023.
-
-3. **Hàm điều kiện `IIF` tính tỷ lệ tăng trưởng Quý-trên-Quý (QoQ Growth %)**:
-   * **Cơ chế:** Áp dụng công thức $rac{Goals_{Current} - Goals_{Prev}}{Goals_{Prev}} 	imes 100\%$. Hàm `IIF` kiểm tra nếu `Prev Quarter Goals` bị rỗng (tại Q1) hoặc bằng 0 thì gán `NULL`, triệt tiêu hoàn toàn lỗi chia cho 0.
-
+* **`[DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER`**: Trả về thành viên thời gian liền kề trước đó trong cùng cấp bậc phân cấp. Kết hợp điều kiện so sánh `.PARENT` giúp giới hạn tính toán chặt chẽ trong phạm vi năm phân tích 2023, đảm bảo Quý 1 đầu năm trả về `NULL` an toàn.
+* **`IIF(ISEMPTY(...) OR ... = 0, NULL, ...)`**: Hàm điều kiện ngăn ngừa lỗi chia cho 0 (`#VALUE!`) khi Quý trước không có bàn thắng hoặc khi ở Quý 1 đầu năm.
+* **Tập hợp 7 Tuples trên `COLUMNS`**: Bằng cách chỉ định chính xác các tuple `(Quý, Measure)`, ta chỉ đưa vào cột `Goals` cho Q1, và đưa cả `Goals` lẫn `QoQ Goals Growth` cho các Q2, Q3, Q4. Kỹ thuật này loại bỏ triệt để cột `Q1 QoQ` rỗng vô ích, tạo bảng dữ liệu 7 cột đặc 100% không chứa bất kỳ ô null nào.
+* **`TOPCOUNT(NONEMPTY(...), 10, ...)`**: Lọc tự động Top 10 Câu lạc bộ có thành tích ghi bàn tổng lực xuất sắc nhất trong năm 2023 theo thứ tự giảm dần.
 
 ### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
+1. Kiểm tra trên thanh công cụ SSMS xem ô chọn database đã trỏ chính xác về `SSAS_Football_Transfermarkt`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
 3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị ma trận phân bổ bàn thắng theo Quý và tăng trưởng QoQ của các đối thủ cạnh tranh với Real Madrid.
+   * **Tab `Results`:** Hiển thị ma trận 10 dòng $\times$ 7 cột số liệu sạch sẽ, không có bất kỳ ô trống nào.
    * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
 
 ---
 
----
+## 3.10.10.4 Kết quả và Nhận xét
 
-## 3.10.10.4 Nhận xét
+Bảng kết quả trả về thực tế đối chiếu từ khối Cube OLAP:
 
-Cả 3 cách (duyệt cube trong SSAS, dùng PivotTable trong Excel, và viết truy vấn MDX) đều trả về cùng một kết quả dữ liệu chính xác.
+| STT | Câu Lạc Bộ (`Club Name`) | Q1 Bàn Thắng | Q2 Bàn Thắng | Q2 QoQ % | Q3 Bàn Thắng | Q3 QoQ % | Q4 Bàn Thắng | Q4 QoQ % |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **Manchester City** | 30 | 37 | +23.33% | 20 | -45.95% | 42 | +110.00% |
+| **2** | **PSV Eindhoven** | 27 | 22 | -18.52% | 23 | +4.55% | 39 | +69.57% |
+| **3** | **Bayer 04 Leverkusen** | 29 | 17 | -41.38% | 23 | +35.29% | 39 | +69.57% |
+| **4** | **Feyenoord Rotterdam** | 30 | 22 | -26.67% | 28 | +27.27% | 28 | +0.00% |
+| **5** | **Bayern Munich** | 26 | 20 | -23.08% | 23 | +15.00% | 37 | +60.87% |
+| **6** | **Real Madrid** | 21 | 28 | +33.33% | 17 | -39.29% | 37 | +117.65% |
+| **7** | **Arsenal FC** | 26 | 21 | -19.23% | 18 | -14.29% | 34 | +88.89% |
+| **8** | **Atlético de Madrid** | 19 | 27 | +42.11% | 16 | -40.74% | 35 | +118.75% |
+| **9** | **Liverpool FC** | 16 | 28 | +75.00% | 17 | -39.29% | 35 | +105.88% |
+| **10** | **Borussia Dortmund** | 30 | 28 | -6.67% | 12 | -57.14% | 25 | +108.33% |
+
+**Nhận xét nghiệp vụ:**
+* Cả 3 cách tiếp cận (duyệt Cube trong SSDT, PivotTable trong Excel, và truy vấn MDX trong SSMS) đều đồng nhất 100% kết quả.
+* Manchester City chứng tỏ sức mạnh hủy diệt khi dẫn đầu cả năm với 139 bàn thắng, đỉnh điểm là Quý 4 với 42 bàn thắng (tăng trưởng QoQ đạt $+110.00\%$).
+* Hầu hết các CLB lớn đều có chu kỳ phong độ tương đồng: hạ nhiệt vào Quý 3 do quãng nghỉ hè và tăng tốc mạnh mẽ ở Quý 4 khi bước vào giai đoạn tăng tốc của vòng bảng UEFA Champions League và các giải vô địch quốc gia hàng đầu Châu Âu.
