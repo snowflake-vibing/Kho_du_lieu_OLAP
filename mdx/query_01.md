@@ -1,11 +1,11 @@
-# MDX Query 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
+# MDX Query 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024 (Season = '2023')
 ## (Ứng dụng Hàm Xếp hạng TOPCOUNT & Tối ưu hóa Ô thưa NONEMPTY)
 
 ---
 
 ## 1. Nội dung truy vấn & Bối cảnh nghiệp vụ
 
-* **Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - Mã giải đấu: `GB1`) trong mùa giải 2023/2024. Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
+* **Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - Mã giải đấu: `GB1`) trong mùa giải 2023/2024 (Season = '2023'). Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
 * **Đối tượng phân tích:** Cầu thủ (`DIM_Player`), Giải đấu (`DIM_Competition`), Thời gian (`DIM_Time`), Hiệu suất thi đấu (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo tham gia:**
   * Dimension Attributes: `[DIM Player].[Player Name]`, `[DIM Competition].[Competition ID]`, `[DIM Time].[Season]`
@@ -178,7 +178,7 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024 (Season = '2023')
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -193,7 +193,7 @@ SELECT
             (
                 [Measures].[Goals],
                 [DIM Competition].[Competition ID].[GB1],
-                [DIM Time].[Season].[2023/2024]
+                [DIM Time].[Season].[2023]
             )
         ),
         10,
@@ -206,7 +206,7 @@ FROM [DW Football Transfermarkt]
 -- Trục lát cắt ngữ cảnh (Slicer Axis): Giới hạn trong giải GB1 và mùa 2023/2024
 WHERE (
     [DIM Competition].[Competition ID].[GB1],
-    [DIM Time].[Season].[2023/2024]
+    [DIM Time].[Season].[2023]
 );
 ```
 
@@ -237,7 +237,7 @@ WHERE (
    * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
      * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS` (toàn bộ danh mục cầu thủ trong chiều Dimension).
-     * `Set_2`: Tuple tọa độ `([Measures].[Goals], [DIM Competition].[Competition ID].[GB1], [DIM Time].[Season].[2023/2024])`.
+     * `Set_2`: Tuple tọa độ `([Measures].[Goals], [DIM Competition].[Competition ID].[GB1], [DIM Time].[Season].[2023])`.
    * **Cơ chế hoạt động kỹ thuật:**
      * Hàm hoạt động trực tiếp ở tầng **Storage Engine** để kiểm tra tính thưa thớt (sparsity) của dữ liệu trước khi nạp vào Formula Engine.
      * Với mỗi cầu thủ trong `Set_1`, hệ thống kiểm tra ô dữ liệu giao thoa với `Set_2`. Nếu ô dữ liệu bàn thắng tại giải `GB1` mùa `2023/2024` bị rỗng (`NULL/Empty` - tức cầu thủ không thi đấu ở Premier League hoặc không ghi bàn nào), cầu thủ đó sẽ bị loại bỏ ngay lập tức.
@@ -286,13 +286,13 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 | **1** | **Erling Haaland** | Manchester City | **27** |
 | **2** | **Cole Palmer** | Chelsea FC | **22** |
 | **3** | **Alexander Isak** | Newcastle United | **21** |
-| **4** | **Ollie Watkins** | Aston Villa | **19** |
-| **5** | **Phil Foden** | Manchester City | **19** |
-| **6** | **Dominic Solanke** | AFC Bournemouth | **19** |
-| **7** | **Son Heung-min** | Tottenham Hotspur | **17** |
-| **8** | **Jarrod Bowen** | West Ham United | **16** |
-| **9** | **Jean-Philippe Mateta** | Crystal Palace | **16** |
-| **10** | **Bukayo Saka** | Arsenal FC | **16** |
+| **4** | **Dominic Solanke** | AFC Bournemouth | **19** |
+| **5** | **Ollie Watkins** | Aston Villa | **19** |
+| **6** | **Phil Foden** | Manchester City | **19** |
+| **7** | **Mohamed Salah** | Liverpool FC | **18** |
+| **8** | **Heung-min Son** | Tottenham Hotspur | **17** |
+| **9** | **Bukayo Saka** | Arsenal FC | **16** |
+| **10** | **Jarrod Bowen** | West Ham United | **16** |
 
 ---
 
@@ -330,6 +330,6 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 ### 3. Cơ chế hoạt động của Động cơ SSAS (Storage Engine vs Formula Engine)
 * **Storage Engine (SE - Động cơ Lưu trữ):**
-  Thực hiện trích xuất dữ liệu thô từ các phân vùng đĩa (Partitions), áp dụng bộ lọc `[DIM Competition].[Competition ID].[GB1]` và `[DIM Time].[Season].[2023/2024]`, đọc các khối dữ liệu nén (Data Chunks) theo cơ chế **Block Computation**.
+  Thực hiện trích xuất dữ liệu thô từ các phân vùng đĩa (Partitions), áp dụng bộ lọc `[DIM Competition].[Competition ID].[GB1]` và `[DIM Time].[Season].[2023]`, đọc các khối dữ liệu nén (Data Chunks) theo cơ chế **Block Computation**.
 * **Formula Engine (FE - Động cơ Công thức):**
   Nhận tập kết quả nén từ SE, khởi tạo cấu trúc Min-Heap kích thước 10, chạy hàm `TOPCOUNT` trên tập hợp cầu thủ đã lọc, sau đó đóng gói kết quả thành ma trận tế bào (Cellset) để trả về cho SSMS, Visual Studio hoặc Excel.

@@ -32,7 +32,7 @@ GENERATE(
             EXCEPT([DIM Club].[Coach Name].[Coach Name].MEMBERS, { [DIM Club].[Coach Name].[All] }),
             [Measures].[Yellow Cards]
         ),
-        [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown"
+        [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown" AND [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown Coach"
     ),
     TOPCOUNT(
         NONEMPTY(
@@ -140,7 +140,7 @@ SELECT
                     EXCEPT([DIM Club].[Coach Name].[Coach Name].MEMBERS, { [DIM Club].[Coach Name].[All] }),
                     [Measures].[Yellow Cards]
                 ),
-                [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown"
+                [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown" AND [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown Coach"
             ),
             TOPCOUNT(
                 NONEMPTY(

@@ -281,23 +281,23 @@ FROM [DW Football Transfermarkt];
 
 Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị ma trận bàn thắng theo vị trí chi tiết và chân thuận:
 
-| Vị Trí Chi Tiết (`Sub Position`) | Chân Thuận (`Foot`) | Tổng Bàn Thắng (`Goals`) |
-| :--- | :---: | :---: |
-| **Centre-Forward** | Right | 4.820 |
-| **Centre-Forward** | Left | 2.140 |
-| **Right Winger** | Left | 1.890 |
-| **Left Winger** | Right | 1.760 |
-| **Attacking Midfield** | Right | 1.450 |
-| **Right Winger** | Right | 980 |
-| **Left Winger** | Left | 870 |
-| **Attacking Midfield** | Left | 620 |
-| **Centre-Forward** | Both | 410 |
-| **Second Striker** | Right | 350 |
-| **Second Striker** | Left | 180 |
-| **Attacking Midfield** | Both | 140 |
-| **Right Winger** | Both | 95 |
-| **Left Winger** | Both | 80 |
-| **Second Striker** | Both | 45 |
+| Vị Trí Chi Tiết (`Sub Position`) | Chân Thuận (`Foot`) | Tổng Bàn Thắng (`Goals`) | Đánh Giá Chiến Thuật & Đặc Điểm |
+| :--- | :---: | :---: | :--- |
+| **Centre-Forward** | **right** | **5.457** | Trung phong chân phải truyền thống, chiếm khối lượng bàn thắng áp đảo |
+| **Left Winger** | **right** | **2.015** | Tiền đạo cánh trái nghịch chân (Inverted Winger) cắt vào trong dứt điểm |
+| **Attacking Midfield** | **right** | **1.308** | Nhạc trưởng làm bóng và sút xa từ tuyến hai bằng chân thuận |
+| **Right Winger** | **left** | **1.207** | Tiền đạo cánh phải nghịch chân (kèo trái) tạo đột biến |
+| **Centre-Forward** | **left** | **1.114** | Trung phong chân trái hiếm có, góc sút độc hiểm |
+| **Right Winger** | **right** | **783** | Tiền đạo cánh phải bám biên tạt bóng cổ điển |
+| **Attacking Midfield** | **left** | **667** | Tiền vệ công chân trái điều tiết nhịp độ và sút phạt |
+| **Centre-Forward** | **both** | **273** | Tiền đạo toàn năng hai chân, cực kỳ nguy hiểm trong vòng cấm |
+| **Second Striker** | **right** | **242** | Hộ công cơ động hỗ trợ trung phong |
+| **Left Winger** | **left** | **186** | Tiền đạo cánh trái thuần tạt bóng biên |
+| **Left Winger** | **both** | **79** | Chạy cánh trái dứt điểm linh hoạt hai chân |
+| **Right Winger** | **both** | **76** | Chạy cánh phải dứt điểm linh hoạt hai chân |
+| **Attacking Midfield** | **both** | **59** | Tiền vệ công xử lý bóng hai chân |
+| **Second Striker** | **left** | **40** | Hộ công chân trái |
+| **Second Striker** | **both** | **13** | Hộ công xử lý hai chân |
 
 ---
 

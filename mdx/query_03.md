@@ -24,7 +24,7 @@ SELECT
 FROM dbo.FACT_Player_Match_Perf f
 JOIN dbo.DIM_Player p ON f.Player_SK = p.Player_SK
 JOIN dbo.DIM_Time t ON f.Time_SK = t.Time_SK
-WHERE t.Season = '2023/2024' OR t.Year = 2023
+WHERE t.Season = '2023' OR t.Year = 2023
 GROUP BY p.Player_Name, t.Season
 HAVING SUM(f.Goal_Contributions) > 20
 ORDER BY Total_Goal_Contributions DESC;
@@ -83,7 +83,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọ
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 2:*
 ```mdx
 FILTER(
-    NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, ([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])),
+    NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, ([Measures].[Goal Contributions], [DIM Time].[Season].[2023])),
     [Measures].[Goal Contributions] > 20
 )
 ```
@@ -196,7 +196,7 @@ SELECT
                 [DIM Player].[Player Name].[Player Name].MEMBERS,
                 (
                     [Measures].[Goal Contributions],
-                    [DIM Time].[Season].[2023/2024]
+                    [DIM Time].[Season].[2023]
                 )
             ),
             [Measures].[Goal Contributions] > 20
@@ -210,7 +210,7 @@ FROM [DW Football Transfermarkt]
 
 -- Lát cắt ngữ cảnh (Slicer Axis): Mùa giải 2023/2024
 WHERE (
-    [DIM Time].[Season].[2023/2024]
+    [DIM Time].[Season].[2023]
 );
 ```
 
@@ -221,7 +221,7 @@ WHERE (
 * **`FILTER(..., [Measures].[Goal Contributions] > 20)`**: Hàm lọc logic tương đương với mệnh đề `HAVING SUM(Goal_Contributions) > 20` trong SQL.
 * **`NONEMPTY(...)`**: Tiền lọc dữ liệu thưa, loại bỏ trước những cầu thủ không thi đấu hoặc không có G+A nào trong mùa giải 2023/2024 trước khi đưa vào hàm `FILTER`.
 * **`FROM [DW Football Transfermarkt]`**: Chỉ định khối Cube nguồn cần truy xuất dữ liệu.
-* **`WHERE ([DIM Time].[Season].[2023/2024])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh trong mùa giải 2023/2024.
+* **`WHERE ([DIM Time].[Season].[2023])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh trong mùa giải 2023/2024.
 
 #### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
 
@@ -252,7 +252,7 @@ WHERE (
    * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
      * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS`.
-     * `Set_2`: Tuple `([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])`.
+     * `Set_2`: Tuple `([Measures].[Goal Contributions], [DIM Time].[Season].[2023])`.
    * **Cơ chế hoạt động kỹ thuật:**
      * Lọc sạch dữ liệu thưa ở tầng Storage Engine trước khi chuyển sang Formula Engine. Cầu thủ nào không có dữ liệu G+A trong mùa 2023/2024 sẽ bị loại trừ ngay từ đầu, giúp hàm `FILTER` chỉ cần đánh giá trên vài trăm cầu thủ thay vì quét qua toàn bộ cơ sở dữ liệu.
    * **Kết quả trả về:** Tập hợp các cầu thủ có dữ liệu thi đấu thực tế trong mùa giải 2023/2024.
@@ -294,16 +294,19 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 | Xếp hạng | Tên Cầu Thủ (`Player Name`) | Câu Lạc Bộ Đại Diện | Số Phút Thi Đấu (`Minutes Played`) | Đóng Góp Bàn Thắng (`Goal Contributions`) |
 | :---: | :--- | :--- | :---: | :---: |
-| **1** | **Harry Kane** | Bayern Munich | 3.120 | **44** (36G + 8A) |
-| **2** | **Kylian Mbappé** | Paris Saint-Germain | 2.890 | **38** (31G + 7A) |
-| **3** | **Cole Palmer** | Chelsea FC | 2.940 | **33** (22G + 11A) |
-| **4** | **Erling Haaland** | Manchester City | 2.560 | **32** (27G + 5A) |
-| **5** | **Ollie Watkins** | Aston Villa | 3.220 | **32** (19G + 13A) |
-| **6** | **Jude Bellingham** | Real Madrid | 2.980 | **31** (23G + 8A) |
-| **7** | **Lautaro Martínez** | Inter Milan | 2.850 | **29** (26G + 3A) |
-| **8** | **Phil Foden** | Manchester City | 3.140 | **27** (19G + 8A) |
-| **9** | **Alexander Isak** | Newcastle United | 2.490 | **23** (21G + 2A) |
-| **10** | **Bukayo Saka** | Arsenal FC | 3.030 | **25** (16G + 9A) |
+| **1** | **Harry Kane** | FC Bayern Munich | 3.818 | **56** |
+| **2** | **Luuk de Jong** | PSV Eindhoven | 3.406 | **47** |
+| **3** | **Viktor Gyökeres** | Sporting CP | 3.447 | **43** |
+| **4** | **Kylian Mbappé** | Paris Saint-Germain | 3.149 | **40** |
+| **5** | **Erling Haaland** | Manchester City | 3.337 | **38** |
+| **6** | **Mauro Icardi** | Galatasaray | 3.465 | **38** |
+| **7** | **Pierre-Emerick Aubameyang** | Olympique Marseille | 3.659 | **38** |
+| **8** | **Mohamed Salah** | Liverpool FC | 2.935 | **37** |
+| **9** | **Loïs Openda** | RB Leipzig | 3.274 | **35** |
+| **10** | **Phil Foden** | Manchester City | 3.555 | **35** |
+| **11** | **Jude Bellingham** | Real Madrid | 3.318 | **34** |
+| **12** | **Cole Palmer** | Chelsea FC | 2.628 | **33** |
+| **13** | **Bukayo Saka** | Arsenal FC | 3.661 | **33** |
 
 ---
 

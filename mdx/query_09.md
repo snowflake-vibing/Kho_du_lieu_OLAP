@@ -269,16 +269,18 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-| Tên Câu Lạc Bộ (`Club Name`) | Cuối tuần - Bàn thắng | Cuối tuần - Thẻ vàng | Ngày thường - Bàn thắng | Ngày thường - Thẻ vàng | Tổng Bàn Thắng |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Manchester City** | 68 | 42 | 28 | 10 | **96** |
-| **FC Bayern Munich** | 71 | 38 | 23 | 11 | **94** |
-| **Arsenal FC** | 65 | 45 | 26 | 16 | **91** |
-| **Real Madrid** | 60 | 48 | 27 | 20 | **87** |
-| **Liverpool FC** | 62 | 46 | 24 | 18 | **86** |
-| **Paris Saint-Germain** | 58 | 40 | 25 | 12 | **83** |
-| **Bayer 04 Leverkusen** | 63 | 39 | 19 | 9 | **82** |
-| **Inter Milan** | 59 | 43 | 21 | 15 | **80** |
+| Tên Câu Lạc Bộ (`Club Name`) | Cuối tuần - Bàn thắng | Cuối tuần - Thẻ vàng | Ngày thường - Bàn thắng | Ngày thường - Thẻ vàng |
+| :--- | :---: | :---: | :---: | :---: |
+| **FC Bayern Munich** | 150 | 83 | 75 | 46 |
+| **Manchester City** | 139 | 76 | 106 | 53 |
+| **Arsenal FC** | 134 | 93 | 65 | 52 |
+| **Bayer 04 Leverkusen** | 131 | 122 | 60 | 72 |
+| **Borussia Dortmund** | 128 | 101 | 49 | 64 |
+| **Paris Saint-Germain** | 128 | 93 | 70 | 59 |
+| **Real Madrid** | 128 | 108 | 82 | 67 |
+| **FC Barcelona** | 118 | 147 | 61 | 65 |
+| **SL Benfica** | 115 | 81 | 77 | 89 |
+| **Fenerbahce** | 113 | 111 | 75 | 76 |
 
 ---
 

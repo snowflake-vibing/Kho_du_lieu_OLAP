@@ -99,7 +99,7 @@ GENERATE(
             EXCEPT([DIM Club].[Coach Name].[Coach Name].MEMBERS, { [DIM Club].[Coach Name].[All] }),
             [Measures].[Yellow Cards]
         ),
-        [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown"
+        [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown" AND [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown Coach"
     ),
     TOPCOUNT(
         NONEMPTY(
@@ -207,7 +207,7 @@ SELECT
                     EXCEPT([DIM Club].[Coach Name].[Coach Name].MEMBERS, { [DIM Club].[Coach Name].[All] }),
                     [Measures].[Yellow Cards]
                 ),
-                [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown"
+                [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown" AND [DIM Club].[Coach Name].CURRENTMEMBER.NAME <> "Unknown Coach"
             ),
             TOPCOUNT(
                 NONEMPTY(
@@ -294,18 +294,16 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 | Huấn Luyện Viên (`Coach Name`) | Tháng Kỷ Lục Thẻ Phạt (`Month`) | Thẻ Vàng (`Yellow Cards`) | Thẻ Đỏ (`Red Cards`) | Nhận Định Chuyên Môn |
 | :--- | :---: | :---: | :---: | :--- |
-| **Diego Simeone** | October | 24 | 2 | Giai đoạn căng thẳng với Derby Madrid và vòng bảng UCL |
-| **José Mourinho** | February | 21 | 3 | Giai đoạn knock-out cúp châu Âu với lối chơi quyết liệt |
-| **Antonio Conte** | November | 19 | 1 | Lịch thi đấu dày đặc mùa đông và áp lực pressing tầm cao |
-| **Mikel Arteta** | December | 18 | 1 | Lịch thi đấu Boxing Day Premier League với cường độ lớn |
-| **Erik ten Hag** | January | 17 | 2 | Khủng hoảng nhân sự dẫn đến nhiều pha phạm lỗi chiến thuật |
-| **Xavi Hernández** | March | 17 | 1 | Loạt trận El Clásico lượt về và cúp Nhà Vua Tây Ban Nha |
-| **Pep Guardiola** | April | 16 | 0 | Giai đoạn nước rút vô địch; thẻ vàng chủ yếu chống phản công |
-| **Thomas Tuchel** | November | 16 | 1 | Loạt trận then chốt phân định ngôi đầu bảng Champions League |
-| **Jürgen Klopp** | December | 15 | 1 | Cường độ Gegenpressing cao trong chuỗi 8 trận/tháng |
-| **Carlo Ancelotti** | April | 14 | 0 | Đội hình kỷ luật cao, kiểm soát nhịp độ trận đấu thông minh |
-
-> *Ý nghĩa thuật toán:* Hàm `GENERATE` kết hợp `TOPCOUNT(..., 1, ...)` đã giải quyết triệt để bài toán "Group By Top 1 Per Category" mà trong SQL đòi hỏi phải dùng cú pháp phức tạp như `ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)`.
+| **Matías Almeyda** | Tháng 10 | **32** | **1** | Tháng đỉnh điểm căng thẳng tại giải VĐQG Hy Lạp |
+| **Diego Simeone** | Tháng 10 | **27** | **0** | Phong cách phòng ngự áp sát rát, thẻ vàng đạt đỉnh |
+| **João Pereira** | Tháng 10 | **27** | **0** | Đội bóng nhận nhiều thẻ trong các trận derby căng thẳng |
+| **Rúben Amorim** | Tháng 12 | **25** | **0** | Giai đoạn tourmalet mùa đông tại Bồ Đào Nha |
+| **Sergio Francisco** | Tháng 10 | **25** | **0** | Đội hình trẻ tranh chấp quyết liệt |
+| **Sven Vandenbroeck** | Tháng 10 | **25** | **1** | Đạt đỉnh thẻ phạt và có 1 thẻ đỏ trực tiếp |
+| **Russell Martin** | Tháng 10 | **24** | **0** | Lối chơi kiểm soát bóng chịu nhiều pha phản công |
+| **Sandro Wagner** | Tháng 10 | **24** | **0** | Tranh chấp va chạm rát ở khu vực giữa sân |
+| **Carlos Corberán** | Tháng 10 | **23** | **1** | Lối đá thể lực áp sát cao độ |
+| **José Bordalás** | Tháng 5 | **23** | **0** | Giai đoạn nước rút cuối mùa giải khốc liệt |
 
 ---
 

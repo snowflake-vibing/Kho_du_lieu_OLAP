@@ -158,15 +158,26 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
    ============================================================================== */
 
 WITH 
-    -- 1. Sức chứa sân vận động xử lý NULL bằng COALESCEEMPTY
+    -- 1. Tập hợp các sân vận động quy mô lớn (sức chứa >= 60.000 chỗ)
+    SET [ValidStadiums] AS
+        FILTER(
+            NONEMPTY(
+                CrossJoin(
+                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
+                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                    EXCEPT([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, { [DIM Club].[Stadium Seats].[0], [DIM Club].[Stadium Seats].[All] })
+                ),
+                [Measures].[FACT Player Match Perf Count]
+            ),
+            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000
+        )
+
+    -- 2. Sức chứa sân vận động định dạng chuẩn
     MEMBER [Measures].[Stadium Capacity Cleaned] AS
-        COALESCEEMPTY(
-            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBERVALUE,
-            0
-        ),
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
         FORMAT_STRING = "#,##0 Chỗ"
 
-    -- 2. Đếm số trận đấu duy nhất diễn ra tại sân vận động
+    -- 3. Đếm số trận đấu duy nhất diễn ra tại sân vận động
     MEMBER [Measures].[Distinct Matches Played] AS
         DISTINCTCOUNT(
             EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
@@ -183,17 +194,8 @@ SELECT
 
     -- Trục Dòng: Các sân vận động có sức chứa >= 60.000 chỗ, xếp giảm dần
     ORDER(
-        FILTER(
-            NONEMPTY(
-                CrossJoin(
-                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
-                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] })
-                ),
-                [Measures].[FACT Player Match Perf Count]
-            ),
-            [Measures].[Stadium Capacity Cleaned] >= 60000
-        ),
-        [Measures].[Stadium Capacity Cleaned],
+        [ValidStadiums],
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
         BDESC
     ) ON ROWS
 
@@ -265,24 +267,16 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 | Sân Vận Động (`Stadium Name`) | Câu Lạc Bộ Chủ Quản (`Club Name`) | Sức Chứa Chuẩn Hóa (`Stadium Capacity`) | Số Trận Đã Diễn Ra (`Distinct Matches`) | Tổng Bàn Thắng (`Goals`) |
 | :--- | :--- | :---: | :---: | :---: |
-| **Camp Nou** | FC Barcelona | 99.354 Chỗ | 38 | 134 |
-| **Wembley Stadium** | England | 90.000 Chỗ | 18 | 58 |
-| **Signal Iduna Park** | Borussia Dortmund | 81.365 Chỗ | 36 | 132 |
-| **Santiago Bernabéu** | Real Madrid | 81.044 Chỗ | 42 | 148 |
-| **San Siro** | Inter Milan | 80.018 Chỗ | 44 | 146 |
-| **Stade de France** | France | 80.000 Chỗ | 16 | 49 |
-| **Allianz Arena** | Bayern Munich | 75.024 Chỗ | 38 | 152 |
-| **Olympiastadion Berlin** | Hertha BSC | 74.475 Chỗ | 32 | 88 |
-| **Old Trafford** | Manchester United | 74.310 Chỗ | 40 | 118 |
-| **Stadio Olimpico** | AS Roma | 70.634 Chỗ | 42 | 110 |
-| **Metropolitano Stadium** | Atletico Madrid | 68.456 Chỗ | 38 | 120 |
-| **Stade Vélodrome** | Olympique Marseille | 67.394 Chỗ | 36 | 98 |
-| **Tottenham Hotspur Stadium** | Tottenham Hotspur | 62.850 Chỗ | 38 | 114 |
-| **London Stadium** | West Ham United | 62.500 Chỗ | 36 | 92 |
-| **Benito Villamarín** | Real Betis | 60.720 Chỗ | 34 | 86 |
-| **Emirates Stadium** | Arsenal FC | 60.704 Chỗ | 40 | 136 |
-
-> *Ghi chú:* Thước đo `Distinct Matches Played` tận dụng hàm `DISTINCTCOUNT` kết hợp với `EXISTING` giúp đếm chính xác số trận đấu duy nhất mà không bị nhân bản theo số lượng 22-30 cầu thủ ra sân mỗi trận trong Fact Table.
+| **Santiago Bernabéu** | Real Madrid | 83.186 Chỗ | 101 | 210 |
+| **SIGNAL IDUNA PARK** | Borussia Dortmund | 81.365 Chỗ | 89 | 177 |
+| **Atatürk Olimpiyat** | Fatih Karagümrük | 77.563 Chỗ | 72 | 118 |
+| **Giuseppe Meazza** | AC Milan | 75.923 Chỗ | 100 | 169 |
+| **Giuseppe Meazza** | Inter Milan | 75.923 Chỗ | 97 | 184 |
+| **Allianz Arena** | Bayern Munich | 75.000 Chỗ | 90 | 225 |
+| **Old Trafford** | Manchester United | 74.879 Chỗ | 94 | 145 |
+| **Olympiastadion Berlin** | Hertha BSC | 74.667 Chỗ | 34 | 40 |
+| **La Cartuja** | Real Betis Balompié | 71.374 Chỗ | 90 | 111 |
+| **Olimpico di Roma** | AS Roma | 70.634 Chỗ | 105 | 156 |
 
 ---
 

@@ -103,15 +103,26 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
    ============================================================================== */
 
 WITH 
-    -- 1. Sức chứa sân vận động xử lý NULL bằng COALESCEEMPTY
+    -- 1. Tập hợp các sân vận động quy mô lớn (sức chứa >= 60.000 chỗ)
+    SET [ValidStadiums] AS
+        FILTER(
+            NONEMPTY(
+                CrossJoin(
+                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
+                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                    EXCEPT([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, { [DIM Club].[Stadium Seats].[0], [DIM Club].[Stadium Seats].[All] })
+                ),
+                [Measures].[FACT Player Match Perf Count]
+            ),
+            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000
+        )
+
+    -- 2. Sức chứa sân vận động định dạng chuẩn
     MEMBER [Measures].[Stadium Capacity Cleaned] AS
-        COALESCEEMPTY(
-            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBERVALUE,
-            0
-        ),
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
         FORMAT_STRING = "#,##0 Chỗ"
 
-    -- 2. Đếm số trận đấu duy nhất diễn ra tại sân vận động
+    -- 3. Đếm số trận đấu duy nhất diễn ra tại sân vận động
     MEMBER [Measures].[Distinct Matches Played] AS
         DISTINCTCOUNT(
             EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
@@ -128,17 +139,8 @@ SELECT
 
     -- Trục Dòng: Các sân vận động có sức chứa >= 60.000 chỗ, xếp giảm dần
     ORDER(
-        FILTER(
-            NONEMPTY(
-                CrossJoin(
-                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
-                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] })
-                ),
-                [Measures].[FACT Player Match Perf Count]
-            ),
-            [Measures].[Stadium Capacity Cleaned] >= 60000
-        ),
-        [Measures].[Stadium Capacity Cleaned],
+        [ValidStadiums],
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
         BDESC
     ) ON ROWS
 
