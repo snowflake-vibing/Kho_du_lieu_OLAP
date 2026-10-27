@@ -8,7 +8,7 @@
 * **Nội dung truy vấn:** Phân tích sự biến động số bàn thắng ghi được của Câu lạc bộ **Real Madrid** vào lưới các đối thủ cạnh tranh qua từng Quý trong năm 2023 (từ Quý 1 đến Quý 4). Đồng thời ứng dụng hàm phân cấp thời gian `PREVMEMBER` để tính tỷ lệ tăng trưởng bàn thắng so với Quý liền trước (**Quarter-over-Quarter - QoQ Growth**), hỗ trợ ban huấn luyện nhận diện đối thủ kỵ dơ và đánh giá điểm rơi phong độ của đội bóng.
 * **Đối tượng phân tích:** Câu lạc bộ thi đấu (`DIM_Club`), Câu lạc bộ đối thủ (`Opponent_Club` - Role-playing Dimension), Phân cấp Thời gian (`DIM_Time`), Hiệu suất bàn thắng (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo tham gia:**
-  * Dimension Attributes: `[DIM Club].[Club Name]`, `[Opponent Club].[Club Name]`, `[DIM Time].[Hierarchy]` (Year $\rightarrow$ Quarter $\rightarrow$ Month $\rightarrow$ Date)
+  * Dimension Attributes: `[DIM Club].[Club Name]`, `[Opponent Club].[Club Name]`, `[DIM Time].[Hierarchy]` (Year → Quarter → Month → Date)
   * Cube Measures gốc: `[Measures].[Goals]`
   * Calculated Measures: `[Measures].[Prev Quarter Goals]`, `[Measures].[QoQ Goals Growth]`
 
@@ -74,8 +74,7 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
 
 #### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures Tăng Trưởng QoQ
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** $
-ightarrow$ chuyển đến tab **`Calculations`**.
+2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
 3. Tạo 2 Calculated Members để tính bàn thắng quý trước và tỷ lệ tăng trưởng QoQ:
    * **Thước đo 1 (`Prev Quarter Goals`):**
      * Name: `Prev Quarter Goals` | Parent hierarchy: `Measures`
@@ -91,8 +90,7 @@ ightarrow$ chuyển đến tab **`Calculations`**.
        )
        ```
      * Format String: `0.00%`
-4. Chọn menu **Build** $
-ightarrow$ **Deploy Solution** để cập nhật Cube.
+4. Chọn menu **Build** → **Deploy Solution** để cập nhật Cube.
 
 #### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
@@ -103,19 +101,14 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`Real Madrid`** $
-ightarrow$ Bấm **OK** (hiển thị `{ Real Madrid }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** $
-ightarrow$ Bấm **OK** (hiển thị `{ 2023 }`) |
+| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`Real Madrid`** → Bấm **OK** (hiển thị `{ Real Madrid }`) |
+| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** → Bấm **OK** (hiển thị `{ 2023 }`) |
 
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
 1. **Kéo Chiều Câu lạc bộ Đối thủ (Rows):**
-   * Mở rộng chiều **`Opponent Club`** $
-ightarrow$ tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows.
+   * Mở rộng chiều **`Opponent Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows.
 2. **Kéo Phân cấp Quý (Columns):**
-   * Mở rộng thư mục **`DIM Time`** $
-ightarrow$ mở rộng phân cấp **`Hierarchy`** $
-ightarrow$ tìm cấp độ **`Quarter`**: Kéo thả lên vùng cột (Columns) để chia bảng theo các Quý (Q1, Q2, Q3, Q4).
+   * Mở rộng thư mục **`DIM Time`** → mở rộng phân cấp **`Hierarchy`** → tìm cấp độ **`Quarter`**: Kéo thả lên vùng cột (Columns) để chia bảng theo các Quý (Q1, Q2, Q3, Q4).
 3. **Kéo Thước đo Bàn thắng & Tăng trưởng QoQ (Measures):**
    * Mở rộng thư mục **`Measures`**:
      * Kéo **`Goals`** thả vào vùng dữ liệu trung tâm.
@@ -131,51 +124,31 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** $
-ightarrow$ **`Get Data`** $
-ightarrow$ **`From Database`** $
-ightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
-ightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
-ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $
-ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
-ightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Club Name`** | Mở thư mục **`DIM Club`** $
-ightarrow$ Kéo `Club Name` thả vào ô Filters. |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** $
-ightarrow$ Kéo `Year` thả vào ô Filters. |
-| **Ô `Columns` (Cột ma trận)** | **`Quarter`** | Mở thư mục **`DIM Time`** $
-ightarrow$ mở `Hierarchy` $
-ightarrow$ Kéo `Quarter` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`Opponent Club`** $
-ightarrow$ Kéo `Club Name` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`QoQ Goals Growth`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `QoQ Goals Growth` thả vào ô Values (hoặc kéo `Goals` lần 2 và chọn Show Values As `% Difference From`). |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Filters. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** → Kéo `Year` thả vào ô Filters. |
+| **Ô `Columns` (Cột ma trận)** | **`Quarter`** | Mở thư mục **`DIM Time`** → mở `Hierarchy` → Kéo `Quarter` thả vào ô Columns. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`Opponent Club`** → Kéo `Club Name` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`QoQ Goals Growth`** | Mở thư mục **`Measures`** → Kéo `QoQ Goals Growth` thả vào ô Values (hoặc kéo `Goals` lần 2 và chọn Show Values As `% Difference From`). |
 
 #### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. Tại ô bên cạnh nhãn `Club Name`, nhấp mũi tên xổ xuống $
-ightarrow$ tick chọn **`Real Madrid`** $
-ightarrow$ Nhấn **OK**.
-2. Tại ô bên cạnh nhãn `Year`, nhấp mũi tên xổ xuống $
-ightarrow$ tick chọn năm **`2023`** $
-ightarrow$ Nhấn **OK**.
+1. Tại ô bên cạnh nhãn `Club Name`, nhấp mũi tên xổ xuống → tick chọn **`Real Madrid`** → Nhấn **OK**.
+2. Tại ô bên cạnh nhãn `Year`, nhấp mũi tên xổ xuống → tick chọn năm **`2023`** → Nhấn **OK**.
 
 #### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** $
-ightarrow$ **Report Layout** $
-ightarrow$ chọn **`Show in Tabular Form`**.
+* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
 * Sắp xếp danh sách đối thủ giảm dần theo tổng bàn thắng.
 
 ### 2.3. Sử dụng Ngôn ngữ truy vấn MDX (SSMS)
@@ -190,8 +163,8 @@ Phương pháp này mang lại khả năng tối ưu hóa tính toán cao nhất
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 #### Bước 2: Soạn thảo câu truy vấn MDX

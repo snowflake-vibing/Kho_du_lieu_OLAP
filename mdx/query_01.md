@@ -79,9 +79,9 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo lần lượ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** $\rightarrow$ Bấm **OK** (hiển thị `{ GB1 }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023`** (hoặc `2023/2024`) $\rightarrow$ Bấm **OK** |
-| **Dòng 3** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Player Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức bên dưới $\rightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** → Bấm **OK** (hiển thị `{ GB1 }`) |
+| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023`** (hoặc `2023/2024`) → Bấm **OK** |
+| **Dòng 3** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Player Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 3:*
 ```mdx
@@ -91,10 +91,10 @@ TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Chiều Cầu thủ (Rows):**
-   * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Player Name`**.
+   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Player Name`**.
    * Nhấp giữ chuột vào **`Player Name`**, kéo và thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*. Lúc này trên lưới xuất hiện cột `Player Name`.
 2. **Kéo Thước đo Bàn thắng (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
+   * Mở rộng thư mục **`Measures`** → mở rộng nhóm **`FACT Player Match Perf`**.
    * Nhấp giữ chuột vào thước đo **`Goals`**, kéo và thả vào **ngay bên cạnh cột `Player Name`** trên lưới.
 
 #### Bước 5: Thực thi truy vấn và Xem kết quả
@@ -112,7 +112,7 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
 2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
 3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
-   * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
+   * Nhấp chọn **`Get Data`** → chọn **`From Database`** → chọn **`From Analysis Services`**.
 4. Cửa sổ **Data Connection Wizard** xuất hiện:
    * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
    * **Log on credentials:** Chọn **`Use Windows Authentication`**.
@@ -125,25 +125,25 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 2. Nhấn nút **Finish**.
 3. Hộp thoại **Import Data** hiện lên:
    * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
-   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại $\rightarrow$ Nhấn **OK**.
+   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại → Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Competition ID`** | Mở thư mục **`DIM Competition`** $\rightarrow$ Kéo `Competition ID` thả vào ô Filters. |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Season`** | Mở thư mục **`DIM Time`** $\rightarrow$ Kéo `Season` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values (hiển thị `Sum of Goals`). |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Competition ID`** | Mở thư mục **`DIM Competition`** → Kéo `Competition ID` thả vào ô Filters. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Season`** | Mở thư mục **`DIM Time`** → Kéo `Season` thả vào ô Filters. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Player Name`** | Mở thư mục **`DIM Player`** → Kéo `Player Name` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values (hiển thị `Sum of Goals`). |
 
 #### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. **Lọc Giải đấu:** Tại ô **`B1`** (bên cạnh nhãn `Competition ID`), nhấp mũi tên xổ xuống $\rightarrow$ tick chọn mã giải **`GB1`** $\rightarrow$ Nhấn **OK**.
-2. **Lọc Mùa giải:** Tại ô **`B2`** (bên cạnh nhãn `Season`), nhấp mũi tên xổ xuống $\rightarrow$ tick chọn mùa bóng **`2023/2024`** $\rightarrow$ Nhấn **OK**.
+1. **Lọc Giải đấu:** Tại ô **`B1`** (bên cạnh nhãn `Competition ID`), nhấp mũi tên xổ xuống → tick chọn mã giải **`GB1`** → Nhấn **OK**.
+2. **Lọc Mùa giải:** Tại ô **`B2`** (bên cạnh nhãn `Season`), nhấp mũi tên xổ xuống → tick chọn mùa bóng **`2023/2024`** → Nhấn **OK**.
 
 #### Bước 5: Cấu hình Bộ lọc Top 10 Vua phá lưới
 1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-2. Di chuột vào mục **`Value Filters`** $\rightarrow$ chọn tiếp **`Top 10...`**.
+2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
 3. Trong hộp thoại **Top 10 Filter (Player Name)**:
    * Ô thứ nhất: Chọn **`Top`**.
    * Ô thứ hai: Nhập số **`10`**.
@@ -152,8 +152,8 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 4. Nhấn **OK**.
 
 #### Bước 6: Trình bày bảng kết quả
-* Vô thẻ ngữ cảnh **`Design`** trên Ribbon $\rightarrow$ chọn **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`** (để tiêu đề cột đổi thành `Player Name`).
-* Chọn **Grand Totals** $\rightarrow$ chọn **`Off for Rows and Columns`** để ẩn dòng tổng cộng, giữ lại đúng bảng xếp hạng 10 cầu thủ.
+* Vô thẻ ngữ cảnh **`Design`** trên Ribbon → chọn **Report Layout** → chọn **`Show in Tabular Form`** (để tiêu đề cột đổi thành `Player Name`).
+* Chọn **Grand Totals** → chọn **`Off for Rows and Columns`** để ẩn dòng tổng cộng, giữ lại đúng bảng xếp hạng 10 cầu thủ.
 
 ---
 
@@ -169,8 +169,8 @@ Phương pháp này mang lại khả năng tối ưu hóa tính toán cao nhất
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 #### Bước 2: Soạn thảo câu truy vấn MDX

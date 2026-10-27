@@ -22,7 +22,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta áp dụng hàm l�
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Game`** | Nhấp chọn **`Coach Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `GENERATE` bên dưới $\rightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Game`** | Nhấp chọn **`Coach Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `GENERATE` bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào Expression Builder ở Dòng 1:*
 ```mdx
@@ -51,10 +51,10 @@ GENERATE(
 ### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Chiều Huấn luyện viên & Tháng (Rows):**
-   * Mở rộng chiều **`DIM Game`** $\rightarrow$ tìm thuộc tính **`Coach Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
-   * Mở rộng chiều **`DIM Time`** $\rightarrow$ tìm thuộc tính **`Month`**: Kéo thả vào ngay bên cạnh cột `Coach Name`.
+   * Mở rộng chiều **`DIM Game`** → tìm thuộc tính **`Coach Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
+   * Mở rộng chiều **`DIM Time`** → tìm thuộc tính **`Month`**: Kéo thả vào ngay bên cạnh cột `Coach Name`.
 2. **Kéo Thước đo Thẻ phạt (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở nhóm **`FACT Player Match Perf`**.
+   * Mở rộng thư mục **`Measures`** → mở nhóm **`FACT Player Match Perf`**.
    * Nhấp giữ chuột vào thước đo **`Yellow Cards`**, kéo thả vào ngay bên cạnh cột `Month`.
    * Tiếp tục kéo thước đo **`Red Cards`** vào ngay bên cạnh cột `Yellow Cards`.
 
@@ -71,32 +71,32 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 
 ### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** $\rightarrow$ **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $\rightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 ### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $\rightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $\rightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $\rightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Coach Name`** | Mở thư mục **`DIM Club`** $\rightarrow$ Kéo `Coach Name` thả vào ô Rows. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Month`** | Mở thư mục **`DIM Time`** $\rightarrow$ Kéo `Month` thả vào ô Rows (nằm dưới `Coach Name`). |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Yellow Cards` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Red Cards`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Red Cards` thả vào ô Values. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Coach Name`** | Mở thư mục **`DIM Club`** → Kéo `Coach Name` thả vào ô Rows. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Month`** | Mở thư mục **`DIM Time`** → Kéo `Month` thả vào ô Rows (nằm dưới `Coach Name`). |
+| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** → Kéo `Yellow Cards` thả vào ô Values. |
+| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Red Cards`** | Mở thư mục **`Measures`** → Kéo `Red Cards` thả vào ô Values. |
 
 ### Bước 4: Cấu hình Bộ lọc Top 1 Tháng kỷ lục cho từng HLV (Đồng bộ thuật toán GENERATE)
 1. Trong bảng PivotTable, nhấp chuột vào mũi tên lọc bên cạnh một ô giá trị **`Month`** (cột tháng).
-2. Di chuột vào mục **`Value Filters`** $\rightarrow$ chọn tiếp **`Top 10...`**.
+2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
 3. Trong hộp thoại Top 10 Filter:
-   * Thiết lập: **`Top`** $\rightarrow$ nhập **`1`** $\rightarrow$ **`Items`** theo **`Sum of Yellow Cards`** $\rightarrow$ Nhấn **OK**.
+   * Thiết lập: **`Top`** → nhập **`1`** → **`Items`** theo **`Sum of Yellow Cards`** → Nhấn **OK**.
    * *Ý nghĩa:* Bộ lọc này yêu cầu PivotTable chỉ giữ lại đúng **1 tháng cao nhất** cho mỗi huấn luyện viên, loại bỏ hoàn toàn các tháng còn lại, tái lập chính xác 100% thuật toán `GENERATE + TOPCOUNT(..., 1)` của ngôn ngữ MDX!
 
 ### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** $\rightarrow$ **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`**.
+* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
 * Bảng hiển thị mỗi HLV đúng 1 dòng tháng kỷ lục, đồng bộ hoàn hảo với Cube Browser và MDX.
 
 ---
@@ -111,8 +111,8 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 ### Bước 2: Soạn thảo câu truy vấn MDX

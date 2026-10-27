@@ -8,8 +8,7 @@
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
 2. Trong cửa sổ **Solution Explorer**, nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
 3. Chuyển sang tab **`Calculations`** ở cạnh trên để tạo 2 thước đo tính toán phân loại độ tuổi và phút thi đấu trung bình:
-   * **Thước đo 1 (`Avg Minutes Played`):** Nhấp chuột phải vào Script Organizer $
-ightarrow$ chọn **New Calculated Member**:
+   * **Thước đo 1 (`Avg Minutes Played`):** Nhấp chuột phải vào Script Organizer → chọn **New Calculated Member**:
      * Name: `Avg Minutes Played`
      * Parent hierarchy: `Measures`
      * Expression: `IIF([Measures].[FACT Player Match Perf Count] = 0, NULL, [Measures].[Minutes Played] / [Measures].[FACT Player Match Perf Count])`
@@ -25,8 +24,7 @@ ightarrow$ chọn **New Calculated Member**:
            ELSE "Veteran 30+ - Lão tướng"
        END
        ```
-4. Chọn menu **Build** $
-ightarrow$ **Deploy Solution** để cập nhật 2 thước đo mới vào cấu trúc Cube.
+4. Chọn menu **Build** → **Deploy Solution** để cập nhật 2 thước đo mới vào cấu trúc Cube.
 
 ### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nạp cấu trúc mới deploy).
@@ -37,13 +35,11 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** $
-ightarrow$ Bấm **OK** (hiển thị `{ 2023 }`) |
+| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** → Bấm **OK** (hiển thị `{ 2023 }`) |
 
 ### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 1. **Kéo Chiều Tuổi cầu thủ (Rows):**
-   * Mở rộng chiều **`DIM Player`** $
-ightarrow$ tìm thuộc tính **`Age`**: Kéo thả vào vùng Rows.
+   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Age`**: Kéo thả vào vùng Rows.
 2. **Kéo 4 Thước đo đã đồng bộ (Measures):**
    * Mở rộng thư mục **`Measures`**:
      * Kéo **`Career Stage Group`** thả vào cạnh cột `Age`.
@@ -61,50 +57,31 @@ ightarrow$ tìm thuộc tính **`Age`**: Kéo thả vào vùng Rows.
 
 ### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** $
-ightarrow$ **`Get Data`** $
-ightarrow$ **`From Database`** $
-ightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
-ightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 ### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
-ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $
-ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
-ightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** $
-ightarrow$ Kéo `Year` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Age`** | Mở thư mục **`DIM Player`** $
-ightarrow$ Kéo `Age` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Career Stage Group`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Career Stage Group` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Assists`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Assists` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Minutes Played`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Avg Minutes Played` thả vào ô Values. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** → Kéo `Year` thả vào ô Filters. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Age`** | Mở thư mục **`DIM Player`** → Kéo `Age` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Career Stage Group`** | Mở thư mục **`Measures`** → Kéo `Career Stage Group` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Assists`** | Mở thư mục **`Measures`** → Kéo `Assists` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Minutes Played`** | Mở thư mục **`Measures`** → Kéo `Avg Minutes Played` thả vào ô Values. |
 
 ### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-* Tại ô **`B1`** (bên cạnh nhãn `Year`), nhấp mũi tên xổ xuống $
-ightarrow$ tick chọn năm **`2023`** $
-ightarrow$ Nhấn **OK**.
+* Tại ô **`B1`** (bên cạnh nhãn `Year`), nhấp mũi tên xổ xuống → tick chọn năm **`2023`** → Nhấn **OK**.
 
 ### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** $
-ightarrow$ **Report Layout** $
-ightarrow$ chọn **`Show in Tabular Form`**.
-* Sắp xếp tuổi tăng dần: Nhấp chuột phải vào cột `Age` $
-ightarrow$ chọn **Sort** $
-ightarrow$ **Sort Smallest to Largest**.
+* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
+* Sắp xếp tuổi tăng dần: Nhấp chuột phải vào cột `Age` → chọn **Sort** → **Sort Smallest to Largest**.
 
 ---
 
@@ -118,8 +95,8 @@ ightarrow$ **Sort Smallest to Largest**.
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 ### Bước 2: Soạn thảo câu truy vấn MDX

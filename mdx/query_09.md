@@ -82,7 +82,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `INTERSECT` bên dưới $\rightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `INTERSECT` bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 1:*
 ```mdx
@@ -109,11 +109,11 @@ INTERSECT(
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Chiều Câu lạc bộ (Rows):**
-   * Mở rộng chiều **`DIM Club`** $\rightarrow$ tìm thuộc tính **`Club Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
+   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
 2. **Kéo Phân loại Cuối tuần / Ngày thường (Columns):**
-   * Mở rộng chiều **`DIM Time`** $\rightarrow$ tìm thuộc tính **`Is Weekend`**: Kéo thả lên vùng cột (Columns) để chia bảng làm 2 cột: Cuối tuần (1) và Ngày thường (0).
+   * Mở rộng chiều **`DIM Time`** → tìm thuộc tính **`Is Weekend`**: Kéo thả lên vùng cột (Columns) để chia bảng làm 2 cột: Cuối tuần (1) và Ngày thường (0).
 3. **Kéo Thước đo Bàn thắng & Thẻ vàng (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở nhóm **`FACT Player Match Perf`**.
+   * Mở rộng thư mục **`Measures`** → mở nhóm **`FACT Player Match Perf`**.
    * Nhấp giữ chuột vào thước đo **`Goals`**, kéo thả vào vùng dữ liệu trung tâm.
    * Tiếp tục nhấp giữ thước đo **`Yellow Cards`**, kéo thả vào ngay bên cạnh cột `Goals`.
 
@@ -129,31 +129,31 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** trên thanh Ribbon $\rightarrow$ **`Get Data`** $\rightarrow$ **`From Database`** $\rightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $\rightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** trên thanh Ribbon → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $\rightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $\rightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $\rightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Columns` (Cột ma trận)** | **`Is Weekend`** | Mở thư mục **`DIM Time`** $\rightarrow$ Kéo `Is Weekend` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** $\rightarrow$ Kéo `Club Name` thả vào ô Rows. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Yellow Cards` thả vào ô Values. |
+| **Ô `Columns` (Cột ma trận)** | **`Is Weekend`** | Mở thư mục **`DIM Time`** → Kéo `Is Weekend` thả vào ô Columns. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Rows. |
+| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** → Kéo `Yellow Cards` thả vào ô Values. |
 
 #### Bước 4: Thiết lập Bộ lọc Top 30 CLB xuất sắc
 1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-2. Di chuột vào mục **`Value Filters`** $\rightarrow$ chọn tiếp **`Top 10...`**.
-3. Trong hộp thoại Top 10 Filter: Đổi số `10` thành **`30`** Items theo **`Sum of Goals`** $\rightarrow$ Nhấn **OK**.
+2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
+3. Trong hộp thoại Top 10 Filter: Đổi số `10` thành **`30`** Items theo **`Sum of Goals`** → Nhấn **OK**.
 
 #### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** $\rightarrow$ **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`**.
-* Tắt tổng phụ: **Subtotals** $\rightarrow$ **`Do Not Show Subtotals`**.
+* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
+* Tắt tổng phụ: **Subtotals** → **`Do Not Show Subtotals`**.
 
 ---
 
@@ -162,9 +162,9 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 Phương pháp này mang lại khả năng tối ưu hóa tính toán cao nhất và kiểm soát toàn diện logic giao tập hợp.
 
 #### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động **SQL Server Management Studio (SSMS)** $\rightarrow$ kết nối Analysis Services.
-2. Mở rộng `Databases` $\rightarrow$ `DW_Football_SSAS` $\rightarrow$ `Cubes`.
-3. Chuột phải vào Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ **`MDX`**.
+1. Khởi động **SQL Server Management Studio (SSMS)** → kết nối Analysis Services.
+2. Mở rộng `Databases` → `DW_Football_SSAS` → `Cubes`.
+3. Chuột phải vào Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → **`MDX`**.
 
 #### Bước 2: Soạn thảo câu truy vấn MDX
 Nhập câu lệnh MDX hoàn chỉnh sau:
@@ -238,17 +238,17 @@ FROM [DW Football Transfermarkt];
      * Thực hiện phép giao tập hợp trong đại số MDX ($Set_1 \cap Set_2$).
      * Formula Engine tính toán độc lập hai danh sách Top 30, sau đó hàm `INTERSECT` đối chiếu và chỉ giữ lại những câu lạc bộ xuất hiện đồng thời trong cả hai danh sách.
      * Thứ tự các phần tử trong tập kết quả trả về được bảo toàn theo đúng thứ tự xuất hiện của `Set_1`.
-     * Những đội bóng chỉ mạnh sân nhà nhưng yếu sân khách (hoặc ngược lại) sẽ bị loại bỏ, chỉ giữ lại các CLB duy trì được bản lĩnh và phong độ ổn định toàn diện (16 CLB).
-   * **Kết quả trả về:** Tập hợp gồm 16 câu lạc bộ ưu tú nhất Châu Âu.
+     * Những đội bóng chỉ ghi nhiều bàn cuối tuần nhưng ít bàn ngày thường (hoặc ngược lại) sẽ bị loại bỏ, chỉ giữ lại các CLB duy trì được hiệu suất tấn công ổn định toàn diện trong cả hai khung thời gian.
+   * **Kết quả trả về:** Tập hợp gồm các câu lạc bộ ưu tú duy trì phong độ cao cả cuối tuần và ngày thường.
 
 2. **Hàm `TOPCOUNT` kết hợp Tuple tiêu chí cục bộ**:
-   * **Cú pháp chuẩn:** `TOPCOUNT(Set, 30, (Goals, [Is Home Game].[1]))`
+   * **Cú pháp chuẩn:** `TOPCOUNT(Set, 30, ([Measures].[Goals], [DIM Time].[Is Weekend].[1]))`
    * **Cơ chế hoạt động kỹ thuật:**
-     * Tiêu chí sắp xếp của hàm `TOPCOUNT` là một Tuple giao cắt đa chiều `([Measures].[Goals], [FACT Player Match Perf].[Is Home Game].[1])`.
-     * Kỹ thuật này cho phép lọc và xếp hạng dữ liệu theo điều kiện sân bãi riêng biệt mà không làm ảnh hưởng đến ngữ cảnh toàn cục của toàn bộ câu truy vấn.
+     * Tiêu chí sắp xếp của hàm `TOPCOUNT` là một Tuple giao cắt đa chiều `([Measures].[Goals], [DIM Time].[Is Weekend].[1])`.
+     * Kỹ thuật này cho phép lọc và xếp hạng dữ liệu theo điều kiện thi đấu cuối tuần riêng biệt mà không làm ảnh hưởng đến ngữ cảnh toàn cục của toàn bộ câu truy vấn.
 
 3. **Hàm `CrossJoin` trên trục COLUMNS**:
-   * **Cơ chế:** Ghép thước đo bàn thắng với hai trạng thái thi đấu `{ [Is Home Game].[1], [Is Home Game].[0] }`, sinh ra hai cột hiển thị trực quan: Bàn thắng Sân Nhà và Bàn thắng Sân Khách.
+   * **Cơ chế:** Ghép các thước đo `{ [Measures].[Goals], [Measures].[Yellow Cards] }` với hai trạng thái thời gian `{ [DIM Time].[Is Weekend].[1], [DIM Time].[Is Weekend].[0] }`, sinh ra 4 cột hiển thị trực quan: Cuối tuần (Bàn thắng, Thẻ vàng) và Ngày thường (Bàn thắng, Thẻ vàng).
 
 
 #### Bước 3: Thực thi truy vấn và Đọc kết quả

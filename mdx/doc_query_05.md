@@ -22,8 +22,8 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo các dòng l
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Sub Position`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `UNION` bên dưới $\rightarrow$ Bấm **OK** |
-| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Foot`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `EXCEPT` bên dưới $\rightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Sub Position`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `UNION` bên dưới → Bấm **OK** |
+| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Foot`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `EXCEPT` bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào Expression Builder ở Dòng 1 (Hợp tập hợp các vị trí tấn công & tiền vệ):*
 ```mdx
@@ -41,10 +41,10 @@ EXCEPT([DIM Player].[Foot].[Foot].MEMBERS, { [DIM Player].[Foot].[All] })
 ### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Chiều Vị trí & Chân thuận (Rows/Columns):**
-   * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Sub Position`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
+   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Sub Position`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
    * Tìm tiếp thuộc tính **`Foot`** trong `DIM Player`: Kéo thả vào ngay bên cạnh cột `Sub Position` (hoặc kéo lên vùng Columns để tạo ma trận chéo 2 chiều).
 2. **Kéo Thước đo Bàn thắng (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
+   * Mở rộng thư mục **`Measures`** → mở rộng nhóm **`FACT Player Match Perf`**.
    * Nhấp giữ chuột vào thước đo **`Goals`**, kéo và thả vào ngay bên cạnh cột `Foot` trên lưới.
 
 ### Bước 5: Thực thi truy vấn và Xem kết quả
@@ -62,7 +62,7 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
 2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
 3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
-   * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
+   * Nhấp chọn **`Get Data`** → chọn **`From Database`** → chọn **`From Analysis Services`**.
 4. Cửa sổ **Data Connection Wizard** xuất hiện:
    * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
    * **Log on credentials:** Chọn **`Use Windows Authentication`**.
@@ -75,16 +75,16 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 2. Nhấn nút **Finish**.
 3. Hộp thoại **Import Data** hiện lên:
    * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
-   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại $\rightarrow$ Nhấn **OK**.
+   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Columns` (Cột ma trận)** | **`Foot`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Foot` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Sub Position`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Sub Position` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values (hiển thị `Sum of Goals`). |
+| **Ô `Columns` (Cột ma trận)** | **`Foot`** | Mở thư mục **`DIM Player`** → Kéo `Foot` thả vào ô Columns. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Sub Position`** | Mở thư mục **`DIM Player`** → Kéo `Sub Position` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values (hiển thị `Sum of Goals`). |
 
 ### Bước 4: Lọc các Vị trí Trọng điểm
 * Tại mũi tên lọc ở ô tiêu đề `Row Labels` (cột `Sub Position`), bỏ chọn `(Select All)`, chỉ tick chọn 5 vị trí:
@@ -97,7 +97,7 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 
 ### Bước 5: Tạo Heatmap Trực quan (Color Scales)
 1. Dùng chuột bôi đen toàn bộ vùng số liệu bàn thắng bên trong bảng ma trận.
-2. Vô thẻ tab **`Home`** trên thanh Ribbon $\rightarrow$ chọn **`Conditional Formatting`** $\rightarrow$ chọn **`Color Scales`** $\rightarrow$ chọn dải màu xanh lá - vàng - đỏ (Green - Yellow - Red Color Scale).
+2. Vô thẻ tab **`Home`** trên thanh Ribbon → chọn **`Conditional Formatting`** → chọn **`Color Scales`** → chọn dải màu xanh lá - vàng - đỏ (Green - Yellow - Red Color Scale).
 3. Bảng ma trận sẽ hiển thị các gam màu trực quan: ô màu xanh lá đậm là nơi có số lượng bàn thắng cao nhất (như Tiền đạo cắm chân Phải, Tiền đạo cánh Phải thuận chân Trái).
 
 ---
@@ -114,8 +114,8 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 ### Bước 2: Soạn thảo câu truy vấn MDX

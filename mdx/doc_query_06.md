@@ -6,8 +6,7 @@
 
 ### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures Thể Hình
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** $
-ightarrow$ chuyển đến tab **`Calculations`**.
+2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
 3. Tạo lần lượt 3 Calculated Members để tính toán chiều cao trung bình, lớn nhất và nhỏ nhất từ thuộc tính `Height In Cm`:
    * **Thước đo 1 (`Min Height Cm`):**
      * Name: `Min Height Cm` | Parent hierarchy: `Measures`
@@ -19,8 +18,7 @@ ightarrow$ chuyển đến tab **`Calculations`**.
    * **Thước đo 3 (`Max Height Cm`):**
      * Name: `Max Height Cm` | Parent hierarchy: `Measures`
      * Expression: `MAX(EXISTING [DIM Player].[Player Name].[Player Name].MEMBERS, [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)`
-4. Chọn menu **Build** $
-ightarrow$ **Deploy Solution** để đồng bộ 3 thước đo vào khối Cube.
+4. Chọn menu **Build** → **Deploy Solution** để đồng bộ 3 thước đo vào khối Cube.
 
 ### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận các thước đo mới).
@@ -28,8 +26,7 @@ ightarrow$ **Deploy Solution** để đồng bộ 3 thước đo vào khối Cub
 
 ### Bước 3: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
 1. **Kéo Tuyến thi đấu (Rows):**
-   * Mở rộng chiều **`DIM Player`** $
-ightarrow$ tìm thuộc tính **`Main Position`**: Kéo thả vào vùng Rows.
+   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Main Position`**: Kéo thả vào vùng Rows.
 2. **Kéo 5 Thước đo Thể hình & Hiệu năng (Measures):**
    * Mở rộng thư mục **`Measures`**:
      * Kéo **`Min Height Cm`** thả vào cạnh `Main Position`.
@@ -48,42 +45,27 @@ ightarrow$ tìm thuộc tính **`Main Position`**: Kéo thả vào vùng Rows.
 
 ### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** $
-ightarrow$ **`Get Data`** $
-ightarrow$ **`From Database`** $
-ightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
-ightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 ### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
-ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $
-ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
-ightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Main Position`** | Mở thư mục **`DIM Player`** $
-ightarrow$ Kéo `Main Position` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Min Height Cm`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Min Height Cm` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Height Cm`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Avg Height Cm` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Max Height Cm`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Max Height Cm` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Yellow Cards` thả vào ô Values. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Main Position`** | Mở thư mục **`DIM Player`** → Kéo `Main Position` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Min Height Cm`** | Mở thư mục **`Measures`** → Kéo `Min Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Height Cm`** | Mở thư mục **`Measures`** → Kéo `Avg Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Max Height Cm`** | Mở thư mục **`Measures`** → Kéo `Max Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** → Kéo `Yellow Cards` thả vào ô Values. |
 
 ### Bước 4: Trình bày bảng kết quả
-* Vào tab **`Design`** $
-ightarrow$ **Report Layout`** $
-ightarrow$ chọn **`Show in Tabular Form`**.
+* Vào tab **`Design`** → **Report Layout`** → chọn **`Show in Tabular Form`**.
 * Bảng hiển thị đồng bộ 5 cột chỉ số thể hình và thi đấu khớp 100% với Cube Browser và MDX.
 
 ---
@@ -98,8 +80,8 @@ ightarrow$ chọn **`Show in Tabular Form`**.
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 ### Bước 2: Soạn thảo câu truy vấn MDX

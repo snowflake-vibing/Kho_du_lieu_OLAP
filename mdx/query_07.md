@@ -76,8 +76,7 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
 
 #### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Member Tỷ Lệ Pareto
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** $
-ightarrow$ chuyển đến tab **`Calculations`**.
+2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
 3. Tạo 2 Calculated Members để tính tổng bàn thắng của giải đấu tại Anh và tỷ lệ phần trăm đóng góp:
    * **Thước đo 1 (`England Total Goals`):**
      * Name: `England Total Goals` | Parent hierarchy: `Measures`
@@ -86,8 +85,7 @@ ightarrow$ chuyển đến tab **`Calculations`**.
      * Name: `Pct Of England Goals` | Parent hierarchy: `Measures`
      * Expression: `IIF([Measures].[England Total Goals] = 0, NULL, [Measures].[Goals] / [Measures].[England Total Goals])`
      * Format String: `0.00%`
-4. Chọn menu **Build** $
-ightarrow$ **Deploy Solution** để đồng bộ vào Cube.
+4. Chọn menu **Build** → **Deploy Solution** để đồng bộ vào Cube.
 
 #### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
@@ -98,11 +96,8 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Country Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`England`** $
-ightarrow$ Bấm **OK** (hiển thị `{ England }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Country Of Citizenship`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $
-ightarrow$ nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `TOPPERCENT` bên dưới $
-ightarrow$ Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Country Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`England`** → Bấm **OK** (hiển thị `{ England }`) |
+| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Country Of Citizenship`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `TOPPERCENT` bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 2:*
 ```mdx
@@ -118,8 +113,7 @@ TOPPERCENT(
 
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
 1. **Kéo Chiều Quốc tịch (Rows):**
-   * Mở rộng chiều **`DIM Player`** $
-ightarrow$ tìm thuộc tính **`Country Of Citizenship`**: Kéo thả vào vùng Rows.
+   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Country Of Citizenship`**: Kéo thả vào vùng Rows.
 2. **Kéo Thước đo Bàn thắng & Tỷ lệ % (Measures):**
    * Mở rộng thư mục **`Measures`**:
      * Kéo **`Goals`** thả vào cạnh cột `Country Of Citizenship`.
@@ -135,51 +129,32 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** $
-ightarrow$ **`Get Data`** $
-ightarrow$ **`From Database`** $
-ightarrow$ **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
-ightarrow$ Nhấn **Next >**.
+2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
-ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** $
-ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
-ightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Country Name`** | Mở thư mục **`DIM Competition`** $
-ightarrow$ Kéo `Country Name` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Country Of Citizenship`** | Mở thư mục **`DIM Player`** $
-ightarrow$ Kéo `Country Of Citizenship` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Pct Of England Goals`** | Mở thư mục **`Measures`** $
-ightarrow$ Kéo `Pct Of England Goals` thả vào ô Values. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Country Name`** | Mở thư mục **`DIM Competition`** → Kéo `Country Name` thả vào ô Filters. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Country Of Citizenship`** | Mở thư mục **`DIM Player`** → Kéo `Country Of Citizenship` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Pct Of England Goals`** | Mở thư mục **`Measures`** → Kéo `Pct Of England Goals` thả vào ô Values. |
 
 #### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. Tại ô **`B1`** (bên cạnh nhãn `Country Name`), nhấp mũi tên xổ xuống $
-ightarrow$ tick chọn **`England`** $
-ightarrow$ Nhấn **OK**.
+1. Tại ô **`B1`** (bên cạnh nhãn `Country Name`), nhấp mũi tên xổ xuống → tick chọn **`England`** → Nhấn **OK**.
 2. **Cấu hình Bộ lọc Pareto 80%:**
    * Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-   * Di chuột vào mục **`Value Filters`** $
-ightarrow$ chọn tiếp **`Top 10...`**.
-   * Trong hộp thoại Top 10 Filter: Đổi sang **`Top`** $
-ightarrow$ Nhập **`80`** $
-ightarrow$ Chọn **`Percent`** theo **`Sum of Goals`** $
-ightarrow$ Nhấn **OK**.
+   * Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
+   * Trong hộp thoại Top 10 Filter: Đổi sang **`Top`** → Nhập **`80`** → Chọn **`Percent`** theo **`Sum of Goals`** → Nhấn **OK**.
 
 #### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** $
-ightarrow$ **Report Layout** $
-ightarrow$ chọn **`Show in Tabular Form`**.
+* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
 * Sắp xếp giảm dần theo số bàn thắng.
 
 ### 2.3. Sử dụng Ngôn ngữ truy vấn MDX (SSMS)
@@ -194,8 +169,8 @@ Phương pháp này mang lại khả năng tối ưu hóa tính toán cao nhất
    * **Authentication:** Chọn **`Windows Authentication`**.
    * Nhấn nút **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** $\rightarrow$ mở rộng database **`DW_Football_SSAS`** $\rightarrow$ mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** $\rightarrow$ chọn **`New Query`** $\rightarrow$ chọn **`MDX`**.
+   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
 #### Bước 2: Soạn thảo câu truy vấn MDX
