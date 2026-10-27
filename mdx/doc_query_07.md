@@ -5,8 +5,8 @@
 ## 3.10.7.1 Sử dụng Cube Browser
 
 ### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Member Tỷ Lệ Pareto
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
+1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSAS_Football_Transfermarkt`).
+2. Mở tệp khối đa chiều **`DW Football Transfermarkt.cube`** → chuyển đến tab **`Calculations`**.
 3. Tạo 2 Calculated Members để tính tổng bàn thắng của giải đấu tại Anh và tỷ lệ phần trăm đóng góp:
    * **Thước đo 1 (`England Total Goals`):**
      * Name: `England Total Goals` | Parent hierarchy: `Measures`
@@ -51,7 +51,9 @@ TOPPERCENT(
 
 ### Bước 5: Thực thi truy vấn và Xem kết quả
 1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
-2. Lưới dữ liệu lập tức chạy và hiển thị đúng 2 cột `Goals` và `Pct Of England Goals` theo danh sách các quốc gia chiếm 80% bàn thắng.
+2. Lưới dữ liệu lập tức chạy và hiển thị đúng 2 cột `Goals` và `Pct Of England Goals` theo danh sách 18 quốc gia chiếm 80% bàn thắng.
+
+---
 
 ---
 
@@ -63,8 +65,9 @@ TOPPERCENT(
 3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
 
 ### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`SSAS_Football_Transfermarkt`** (hoặc `DW_Football_SSAS`).
+2. Chọn Cube: **`DW Football Transfermarkt`** → Nhấn **Finish**.
+3. Chọn vị trí đặt bảng: **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
 
 ### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
@@ -85,7 +88,9 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 
 ### Bước 5: Trình bày bảng kết quả
 * Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Sắp xếp giảm dần theo số bàn thắng.
+* Nhấp chuột phải vào một ô trong cột `Goals` → chọn **Sort** → **`Sort Largest to Smallest`**.
+
+---
 
 ---
 
@@ -96,10 +101,9 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 2. Tại hộp thoại kết nối máy chủ:
    * **Server type:** Nhấp chọn **`Analysis Services`**.
    * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Authentication:** Chọn **`Windows Authentication`**.
-   * Nhấn nút **Connect**.
+   * **Authentication:** Chọn **`Windows Authentication`** → Nhấn **Connect**.
 3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
+   * Mở rộng thư mục **`Databases`** → mở database **`SSAS_Football_Transfermarkt`** (hoặc `DW_Football_SSAS`) → mở thư mục **`Cubes`**.
    * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
 4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
 
@@ -114,7 +118,7 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
    ============================================================================== */
 
 WITH 
-    -- 1. Tổng số bàn thắng của toàn bộ giải đấu tại Anh
+    -- 1. Tổng số bàn thắng của toàn bộ giải đấu tại Anh (cố định cấp [All] làm mẫu số)
     MEMBER [Measures].[England Total Goals] AS
         (
             [Measures].[Goals],
@@ -127,7 +131,7 @@ WITH
         IIF(
             ISEMPTY([Measures].[England Total Goals]) OR [Measures].[England Total Goals] = 0,
             NULL,
-            ROUND(([Measures].[Goals] / [Measures].[England Total Goals]) * 100, 2)
+            [Measures].[Goals] / [Measures].[England Total Goals]
         ),
         FORMAT_STRING = "0.00%"
 
@@ -167,9 +171,9 @@ WHERE (
 ```
 
 **Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`WITH MEMBER [Measures].[England Total Goals]`**: Tính tổng số bàn thắng toàn thể tại Nước Anh bằng cách kết hợp tọa độ giao cắt `(Goals, [All] Country, [England])`.
-* **`WITH MEMBER [Measures].[Pct Of England Goals]`**: Tính tỷ trọng đóng góp của từng quốc gia so với tổng bàn thắng toàn giải, định dạng phần trăm `0.00%`.
-* **`TOPPERCENT(Set, 80, [Measures].[Goals])`**: Thuật toán Pareto tự động tính toán tổng tích lũy từ quốc gia có nhiều bàn thắng nhất đi xuống và dừng lại khi chạm ngưỡng $80\%$.
+* **`WITH MEMBER [Measures].[England Total Goals]`**: Tính tổng số bàn thắng toàn thể tại Nước Anh (2.236 bàn) bằng cách kết hợp tọa độ giao cắt `(Goals, [All] Country, [England])`.
+* **`WITH MEMBER [Measures].[Pct Of England Goals]`**: Tính tỷ trọng đóng góp của từng quốc gia so với tổng bàn thắng toàn giải, kết hợp chuỗi định dạng phần trăm `FORMAT_STRING = "0.00%"`.
+* **`TOPPERCENT(Set, 80, [Measures].[Goals])`**: Thuật toán Pareto tự động tính toán tổng tích lũy từ quốc gia có nhiều bàn thắng nhất đi xuống và dừng lại khi chạm ngưỡng $\ge 80\%$.
 * **`NONEMPTY(EXCEPT(...), Tuple)`**: Loại bỏ nút tổng hợp `[All]` và lọc sạch các quốc gia không có bàn thắng nào tại Anh trước khi tính tổng tích lũy phần trăm, đảm bảo mẫu số chính xác tuyệt đối.
 * **`ORDER(..., BDESC) ON ROWS`**: Sắp xếp danh sách các quốc gia thuộc Top 80% theo thứ tự giảm dần số bàn thắng trên trục **HÀNG** (Axis 1).
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
@@ -184,28 +188,27 @@ WHERE (
      * `Percentage`: `80` (ngưỡng tỷ lệ phần trăm tích lũy cần đạt tới).
      * `Numeric_Expression`: `[Measures].[Goals]` (thước đo số bàn thắng dùng để tính tỷ trọng).
    * **Cơ chế hoạt động kỹ thuật:**
-     * **Bước 1:** Tính tổng số bàn thắng của toàn bộ tập hợp quốc gia tham gia các giải đấu tại Anh ($Total$).
+     * **Bước 1:** Tính tổng số bàn thắng của toàn bộ tập hợp quốc gia tham gia các giải đấu tại Anh ($Total = 2.236$ bàn).
      * **Bước 2:** Sắp xếp toàn bộ các quốc gia theo thứ tự số bàn thắng giảm dần.
-     * **Bước 3:** Tiến hành cộng dồn tích lũy (Cumulative Sum) số bàn thắng từ quốc gia đứng đầu (Anh, Pháp, Na Uy...) trở xuống.
-     * **Bước 4:** Tại mỗi quốc gia nạp vào, tính tỷ lệ phần trăm tích lũy: $CumPct = rac{\sum_{i=1}^k Goals_i}{Total} 	imes 100\%$.
-     * **Bước 5:** Tiếp tục nạp thêm quốc gia cho đến khi tỷ lệ tích lũy đạt hoặc vừa vượt qua ngưỡng `80%`, sau đó dừng lại và trả về đúng danh sách $k$ quốc gia đó.
-   * **Ý nghĩa nghiệp vụ:** Tự động hóa hoàn toàn thuật toán nguyên lý Pareto kinh điển (80/20) mà không cần viết vòng lặp thủ công như trong SQL.
-   * **Kết quả trả về:** Tập hợp 13 quốc gia dẫn đầu chiếm $81.66\%$ tổng số bàn thắng của bóng đá Anh.
+     * **Bước 3:** Tiến hành cộng dồn tích lũy (Cumulative Sum) số bàn thắng từ quốc gia đứng đầu (England 714 bàn, Brazil 194 bàn, Norway 91 bàn...) trở xuống.
+     * **Bước 4:** Tại mỗi quốc gia nạp vào, tính tỷ lệ phần trăm tích lũy: $CumPct = \frac{\sum_{i=1}^k Goals_i}{Total} \times 100\%$.
+     * **Bước 5:** Tiếp tục nạp thêm quốc gia cho đến khi tỷ lệ tích lũy đạt hoặc vừa vượt qua ngưỡng `80%` ($80.32\%$ tại quốc gia thứ 18 là Ghana), sau đó dừng lại và trả về đúng danh sách 18 quốc gia đó.
+   * **Ý nghĩa nghiệp vụ:** Tự động hóa hoàn toàn thuật toán nguyên lý Pareto kinh điển (80/20) mà không cần viết vòng lặp thủ công phức tạp như trong SQL.
+   * **Kết quả trả về:** Tập hợp đúng **18 quốc gia** dẫn đầu chiếm **$80.32\%$** tổng số bàn thắng của bóng đá Anh.
 
 2. **Tọa độ Tuple cố định mẫu số `[Measures].[England Total Goals]`**:
    * **Cú pháp chuẩn:** `( [Measures].[Goals], [DIM Player].[Country Of Citizenship].[All], [DIM Competition].[Country Name].[England] )`
    * **Cơ chế hoạt động kỹ thuật:**
-     * Kỹ thuật gán tọa độ cấp cao nhất `[Country Of Citizenship].[All]` giúp bỏ qua sự phân rã theo từng dòng của trục ROWS, luôn giữ cố định tổng số bàn thắng toàn thể của giải đấu tại Anh làm mẫu số cho phép tính tỷ trọng phần trăm `[Pct Of England Goals]`.
+     * Kỹ thuật gán tọa độ cấp cao nhất `[Country Of Citizenship].[All]` giúp bỏ qua sự phân rã theo từng dòng của trục ROWS, luôn giữ cố định tổng số bàn thắng toàn thể của giải đấu tại Anh (2.236 bàn) làm mẫu số cho phép tính tỷ trọng phần trăm `[Pct Of England Goals]`.
 
 3. **Hàm `ORDER(TOPPERCENT(...), [Measures].[Goals], BDESC)`**:
    * **Cơ chế:** Sắp xếp danh sách các quốc gia thuộc nhóm Top 80% theo thứ tự giảm dần số bàn thắng trên quy mô toàn cục (`BDESC`), đảm bảo hiển thị trực quan từ quốc gia ghi nhiều bàn nhất trở xuống.
 
-
 ### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
+1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `SSAS_Football_Transfermarkt` (hoặc `DW_Football_SSAS`).
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
 3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị danh sách 13 quốc gia dẫn đầu chiếm $81.66\%$ tổng bàn thắng.
+   * **Tab `Results`:** Hiển thị danh sách 18 quốc gia dẫn đầu chiếm $80.32\%$ tổng bàn thắng.
    * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
 
 ---
