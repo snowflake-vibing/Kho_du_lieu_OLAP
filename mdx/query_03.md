@@ -223,6 +223,46 @@ WHERE (
 * **`FROM [DW Football Transfermarkt]`**: Chỉ định khối Cube nguồn cần truy xuất dữ liệu.
 * **`WHERE ([DIM Time].[Season].[2023/2024])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh trong mùa giải 2023/2024.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm `ORDER(«Set», «Criteria»[, BASC | BDESC | ASC | DESC])`**:
+   * **Cú pháp chuẩn:** `ORDER(Set, Criteria, BDESC)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp các cầu thủ đã thỏa mãn điều kiện lọc từ hàm `FILTER(...)`.
+     * `Criteria`: `[Measures].[Goal Contributions]` (tiêu chí định lượng dùng để sắp xếp).
+     * Cờ sắp xếp: `BDESC` (Break Hierarchy Descending).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hàm tính toán giá trị `Goal Contributions` cho từng cầu thủ trong tập hợp kết quả của hàm `FILTER`.
+     * Cờ `BDESC` chỉ định thuật toán bẻ gãy hoàn toàn cấu trúc phân cấp (Hierarchy-breaking) để thực hiện sắp xếp giảm dần trên quy mô toàn cục (Global Sort). Nhờ đó, danh sách cầu thủ được xếp hạng chuẩn xác từ người đóng góp nhiều nhất (Harry Kane - 44) xuống thấp dần mà không bị chia cắt theo các phân nhóm phân cấp nội bộ.
+   * **Kết quả trả về:** Tập hợp các cầu thủ đã được sắp xếp giảm dần theo tổng đóng góp bàn thắng.
+
+2. **Hàm `FILTER(«Set», «Logical_Expression»)`**:
+   * **Cú pháp chuẩn:** `FILTER(Set, Logical_Expression)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp cầu thủ sau khi đã loại bỏ ô thưa bằng `NONEMPTY(...)`.
+     * `Logical_Expression`: `[Measures].[Goal Contributions] > 20`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Formula Engine duyệt tuần tự qua từng phần tử (cầu thủ) trong tập hợp đầu vào.
+     * Tại mỗi cầu thủ, biểu thức điều kiện `[Measures].[Goal Contributions] > 20` được tính toán trong ngữ cảnh mùa giải `2023/2024` (từ mệnh đề lát cắt Slicer `WHERE`).
+     * Chỉ những cầu thủ có giá trị logic là `TRUE` (tổng số bàn thắng + kiến tạo vượt mốc 20) mới được giữ lại trong tập kết quả; các phần tử có tổng $\le 20$ hoặc rỗng bị loại bỏ hoàn toàn.
+     * **Ý nghĩa đối chiếu:** Hàm này tương đương trực tiếp với mệnh đề `HAVING SUM(Goal_Contributions) > 20` trong truy vấn SQL truyền thống.
+   * **Kết quả trả về:** Tập hợp con gồm các cầu thủ đạt mốc trên 20 đóng góp bàn thắng.
+
+3. **Hàm `NONEMPTY(«Set_1»[, «Set_2»])`**:
+   * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS`.
+     * `Set_2`: Tuple `([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Lọc sạch dữ liệu thưa ở tầng Storage Engine trước khi chuyển sang Formula Engine. Cầu thủ nào không có dữ liệu G+A trong mùa 2023/2024 sẽ bị loại trừ ngay từ đầu, giúp hàm `FILTER` chỉ cần đánh giá trên vài trăm cầu thủ thay vì quét qua toàn bộ cơ sở dữ liệu.
+   * **Kết quả trả về:** Tập hợp các cầu thủ có dữ liệu thi đấu thực tế trong mùa giải 2023/2024.
+
+4. **Thuộc tính `.MEMBERS`**:
+   * **Cú pháp chuẩn:** `«Hierarchy/Level».MEMBERS`
+   * **Tham số thực tế trong truy vấn:** `[DIM Player].[Player Name].[Player Name]`.
+   * **Cơ chế hoạt động kỹ thuật:** Trích xuất toàn bộ danh sách các thành viên ở cấp độ `Player Name` để làm đầu vào cho chuỗi hàm xử lý tập hợp `NONEMPTY -> FILTER -> ORDER`.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

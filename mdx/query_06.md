@@ -60,46 +60,43 @@ flowchart TD
 
 Phương pháp này được thực hiện trực tiếp trong môi trường phát triển khối đa chiều (SQL Server Data Tools / Visual Studio).
 
-#### Bước 1: Mở giao diện Cube Designer
+#### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures Thể Hình
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Trong cửa sổ **Solution Explorer** (khung bên phải):
-   * Mở rộng thư mục **`Cubes`**.
-   * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
+2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** $
+ightarrow$ chuyển đến tab **`Calculations`**.
+3. Tạo lần lượt 3 Calculated Members để tính toán chiều cao trung bình, lớn nhất và nhỏ nhất từ thuộc tính `Height In Cm`:
+   * **Thước đo 1 (`Min Height Cm`):**
+     * Name: `Min Height Cm` | Parent hierarchy: `Measures`
+     * Expression: `MIN(EXISTING [DIM Player].[Player Name].[Player Name].MEMBERS, [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)`
+   * **Thước đo 2 (`Avg Height Cm`):**
+     * Name: `Avg Height Cm` | Parent hierarchy: `Measures`
+     * Expression: `AVG(EXISTING [DIM Player].[Player Name].[Player Name].MEMBERS, [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)`
+     * Format String: `#,##0.0`
+   * **Thước đo 3 (`Max Height Cm`):**
+     * Name: `Max Height Cm` | Parent hierarchy: `Measures`
+     * Expression: `MAX(EXISTING [DIM Player].[Player Name].[Player Name].MEMBERS, [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)`
+4. Chọn menu **Build** $
+ightarrow$ **Deploy Solution** để đồng bộ 3 thước đo vào khối Cube.
 
 #### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. **Kiểm tra trạng thái kết nối & giao diện:**
-   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
+1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận các thước đo mới).
+2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa.
 
-#### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta loại bỏ giá trị tổng hợp `(All)` để chỉ phân tích 4 tuyến thi đấu chính:
+#### Bước 3: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
+1. **Kéo Tuyến thi đấu (Rows):**
+   * Mở rộng chiều **`DIM Player`** $
+ightarrow$ tìm thuộc tính **`Main Position`**: Kéo thả vào vùng Rows.
+2. **Kéo 5 Thước đo Thể hình & Hiệu năng (Measures):**
+   * Mở rộng thư mục **`Measures`**:
+     * Kéo **`Min Height Cm`** thả vào cạnh `Main Position`.
+     * Kéo **`Avg Height Cm`** thả vào tiếp theo.
+     * Kéo **`Max Height Cm`** thả vào tiếp theo.
+     * Kéo **`Goals`** thả vào tiếp theo.
+     * Kéo **`Yellow Cards`** thả vào cột cuối cùng.
 
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Main Position`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô $\rightarrow$ nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `EXCEPT` bên dưới $\rightarrow$ Bấm **OK** |
-
-*Biểu thức nhập vào Expression Builder ở Dòng 1:*
-```mdx
-EXCEPT([DIM Player].[Main Position].[Main Position].MEMBERS, { [DIM Player].[Main Position].[All] })
-```
-
-#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
-Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Tuyến thi đấu (Rows):**
-   * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Main Position`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*. Lúc này trên lưới xuất hiện 4 tuyến thi đấu.
-2. **Kéo các Thước đo Hiệu suất (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo thả vào ngay bên cạnh cột `Main Position`.
-   * Tiếp tục kéo thước đo **`Yellow Cards`** vào ngay bên cạnh cột `Goals`.
-
-#### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị bảng phân bổ bàn thắng và thẻ phạt theo từng tuyến thi đấu chính.
-3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
-
----
+#### Bước 4: Thực thi truy vấn và Xem kết quả
+1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
+2. Lưới dữ liệu lập tức chạy và hiển thị đúng 5 cột chỉ số thể hình và hiệu năng theo từng tuyến thi đấu chính.
 
 ### 2.2. Sử dụng PivotTable trên Microsoft Excel
 
@@ -107,38 +104,43 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
-3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
-   * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
-4. Cửa sổ **Data Connection Wizard** xuất hiện:
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Log on credentials:** Chọn **`Use Windows Authentication`**.
-   * Nhấn nút **Next >**.
+2. Chọn thẻ tab **`Data`** $
+ightarrow$ **`Get Data`** $
+ightarrow$ **`From Database`** $
+ightarrow$ **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
+ightarrow$ Nhấn **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
-1. Tại màn hình *Select Database and Table*:
-   * Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** (hoặc tên database SSAS tương ứng).
-   * Chọn Cube: **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
-2. Nhấn nút **Finish**.
-3. Hộp thoại **Import Data** hiện lên:
-   * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
-   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại $\rightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
+ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** $
+ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
+ightarrow$ Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Main Position`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Main Position` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Yellow Cards` thả vào ô Values. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Main Position`** | Mở thư mục **`DIM Player`** $
+ightarrow$ Kéo `Main Position` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Min Height Cm`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Min Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Height Cm`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Avg Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Max Height Cm`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Max Height Cm` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Yellow Cards` thả vào ô Values. |
 
-#### Bước 4: Sắp xếp và Định dạng hiển thị
-1. Chuột phải vào cột `Goals` $\rightarrow$ chọn **Sort** $\rightarrow$ chọn **`Sort Largest to Smallest`** để đưa tuyến tấn công ghi nhiều bàn nhất lên đầu.
-2. Vô thẻ ngữ cảnh **`Design`** $\rightarrow$ chọn **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`**.
-3. Chọn **Grand Totals** $\rightarrow$ chọn **`Off for Rows and Columns`** để bảng dữ liệu tập trung hoàn toàn vào 4 tuyến thi đấu.
-
----
+#### Bước 4: Trình bày bảng kết quả
+* Vào tab **`Design`** $
+ightarrow$ **Report Layout`** $
+ightarrow$ chọn **`Show in Tabular Form`**.
+* Bảng hiển thị đồng bộ 5 cột chỉ số thể hình và thi đấu khớp 100% với Cube Browser và MDX.
 
 ### 2.3. Sử dụng Ngôn ngữ truy vấn MDX (SSMS)
 
@@ -235,6 +237,34 @@ FROM [DW Football Transfermarkt];
 * **`SELECT { ... } ON COLUMNS`**: Đặt 3 chỉ số thể hình tính toán cùng 2 thước đo bàn thắng và thẻ phạt lên trục **CỘT** (Axis 0).
 * **`ORDER(EXCEPT(...), [Measures].[Goals], BDESC) ON ROWS`**: Loại trừ nút tổng hợp `[All]` bằng hàm `EXCEPT`, sau đó sắp xếp 4 tuyến thi đấu giảm dần theo tổng số bàn thắng ghi được (`BDESC`) trên trục **HÀNG** (Axis 1).
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
+
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Các hàm thống kê tập hợp `AVG()`, `MAX()`, `MIN()`**:
+   * **Cú pháp chuẩn:**
+     * `AVG(Set, Numeric_Expression)`: Tính giá trị trung bình cộng.
+     * `MAX(Set, Numeric_Expression)`: Tìm giá trị lớn nhất.
+     * `MIN(Set, Numeric_Expression)`: Tìm giá trị nhỏ nhất (có điều kiện `> 0` để tránh giá trị rỗng).
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp cầu thủ được lọc theo ngữ cảnh `EXISTING [Player Name].MEMBERS`.
+     * `Numeric_Expression`: Giá trị số học của chiều cao `[DIM Player].[Height In Cm].CURRENTMEMBER.MEMBERVALUE`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Formula Engine duyệt qua tập hợp các cầu thủ thuộc từng tuyến thi đấu, trích xuất chỉ số chiều cao thực tế và áp dụng các công thức giải tích thống kê để đưa ra bức tranh thể hình chi tiết cho từng vị trí.
+
+2. **Từ khóa chuyển đổi ngữ cảnh `EXISTING «Set»`**:
+   * **Cú pháp chuẩn:** `EXISTING Set`
+   * **Tham số thực tế trong truy vấn:** `EXISTING [DIM Player].[Player Name].[Player Name].MEMBERS`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Đây là kỹ thuật cốt lõi giải quyết bài toán **Context Transition** trong không gian đa chiều SSAS.
+     * Nếu không có từ khóa `EXISTING`, biểu thức `[Player Name].MEMBERS` sẽ quét qua toàn bộ cầu thủ trong hệ thống, dẫn đến kết quả chiều cao trung bình trên mọi dòng là như nhau (bằng trung bình toàn bộ giải đấu).
+     * Khi thêm `EXISTING`, SSAS ép tập hợp `Player Name` phải được lọc theo ngữ cảnh dòng hiện hành trên trục ROWS (`Main Position` đang xét như `Goalkeeper`, `Defender`, `Midfield`, `Attack`). Nhờ đó, mỗi dòng sẽ phản ánh chính xác chỉ số thể hình của riêng tuyến thi đấu đó.
+
+3. **Hàm làm tròn `ROUND(«Numeric_Expression», «Decimals»)`**:
+   * **Cơ chế:** Làm tròn kết quả chiều cao trung bình đến 1 chữ số thập phân (`1`), kết hợp chuỗi định dạng `FORMAT_STRING = "#,##0.0"`.
+
+4. **Hàm `ORDER(EXCEPT(...), [Measures].[Goals], BDESC)`**:
+   * **Cơ chế:** Dùng `EXCEPT` loại bỏ nút tổng hợp `[All]` của `Main Position`, sau đó dùng `ORDER` với cờ `BDESC` để sắp xếp 4 tuyến thi đấu giảm dần theo tổng số bàn thắng ghi được trên toàn cục.
+
 
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.

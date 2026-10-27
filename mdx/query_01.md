@@ -218,6 +218,40 @@ WHERE (
 * **`FROM [DW Football Transfermarkt]`**: Chỉ định nguồn dữ liệu được truy xuất từ khối Cube đa chiều `[DW Football Transfermarkt]`.
 * **`WHERE (...)`**: Trục lát cắt ngữ cảnh (Slicer Axis), cố định phạm vi tính toán tại giải đấu Ngoại Hạng Anh (`GB1`) và mùa giải `2023/2024`.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm `TOPCOUNT(«Set», «Count»[, «Numeric_Expression»])`**:
+   * **Cú pháp chuẩn:** `TOPCOUNT(Set, Count, Numeric_Expression)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp các cầu thủ đã được tiền lọc sạch dữ liệu thưa bằng `NONEMPTY(...)`.
+     * `Count`: `10` (số lượng phần tử cần trích xuất).
+     * `Numeric_Expression`: `[Measures].[Goals]` (tiêu chí định lượng để sắp xếp và xếp hạng).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hàm tự động đánh giá biểu thức số đo `[Measures].[Goals]` cho từng cầu thủ trong tập hợp đầu vào tại ngữ cảnh của lát cắt Slicer `(GB1, 2023/2024)`.
+     * Tự động thực hiện sắp xếp tập hợp theo thứ tự giảm dần tuyệt đối (tương đương cơ chế `BDESC` - Break Hierarchy Descending, phá vỡ thứ bậc phân cấp nếu có để xếp hạng toàn cục).
+     * Cắt lấy đúng `10` phần tử đứng đầu danh sách có số bàn thắng lớn nhất và trả về một tập hợp (Set) gồm 10 cầu thủ.
+     * Nếu có nhiều cầu thủ đồng hạng ở vị trí thứ 10, SSAS sẽ ngắt theo thứ tự lưu trữ nội bộ của Dimension.
+   * **Kết quả trả về:** Một tập hợp (Set) gồm đúng 10 Tuple đại diện cho 10 cầu thủ ghi nhiều bàn thắng nhất.
+
+2. **Hàm `NONEMPTY(«Set_1»[, «Set_2»])`**:
+   * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS` (toàn bộ danh mục cầu thủ trong chiều Dimension).
+     * `Set_2`: Tuple tọa độ `([Measures].[Goals], [DIM Competition].[Competition ID].[GB1], [DIM Time].[Season].[2023/2024])`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hàm hoạt động trực tiếp ở tầng **Storage Engine** để kiểm tra tính thưa thớt (sparsity) của dữ liệu trước khi nạp vào Formula Engine.
+     * Với mỗi cầu thủ trong `Set_1`, hệ thống kiểm tra ô dữ liệu giao thoa với `Set_2`. Nếu ô dữ liệu bàn thắng tại giải `GB1` mùa `2023/2024` bị rỗng (`NULL/Empty` - tức cầu thủ không thi đấu ở Premier League hoặc không ghi bàn nào), cầu thủ đó sẽ bị loại bỏ ngay lập tức.
+     * **Ý nghĩa tối ưu hóa:** Kho dữ liệu có hàng chục nghìn cầu thủ, nếu không có `NONEMPTY`, hàm `TOPCOUNT` sẽ phải duyệt và tính toán số đo cho toàn bộ cầu thủ trong bộ nhớ. Việc dùng `NONEMPTY` giúp thu hẹp tập dữ liệu từ hơn 20.000 cầu thủ xuống chỉ còn vài chục cầu thủ thực tế có bàn thắng, giảm thiểu chi phí quét RAM và tối ưu hóa thời gian thực thi.
+   * **Kết quả trả về:** Một tập con (Subset) chỉ gồm các cầu thủ thực sự có phát sinh dữ liệu bàn thắng.
+
+3. **Thuộc tính `.MEMBERS`**:
+   * **Cú pháp chuẩn:** `«Hierarchy/Level».MEMBERS`
+   * **Tham số thực tế trong truy vấn:** Cấp độ `[DIM Player].[Player Name].[Player Name]`.
+   * **Cơ chế hoạt động kỹ thuật:** Truy vấn toàn bộ danh mục các thành viên (all members) thuộc cấp độ tên cầu thủ trong thuộc tính `Player Name`, trả về một tập hợp phẳng (flat set) làm dữ liệu đầu vào cho các phép toán tập hợp tiếp theo.
+   * **Kết quả trả về:** Một tập hợp (Set) chứa toàn bộ danh sách tên cầu thủ trong chiều Dim Player.
+
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

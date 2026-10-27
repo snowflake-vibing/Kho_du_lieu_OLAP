@@ -54,6 +54,8 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 
 ---
 
+---
+
 ## 3.10.5.2 Sử dụng Pivot Excel
 
 ### Bước 1: Khởi tạo kết nối tới SSAS Cube
@@ -97,6 +99,8 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 1. Dùng chuột bôi đen toàn bộ vùng số liệu bàn thắng bên trong bảng ma trận.
 2. Vô thẻ tab **`Home`** trên thanh Ribbon $\rightarrow$ chọn **`Conditional Formatting`** $\rightarrow$ chọn **`Color Scales`** $\rightarrow$ chọn dải màu xanh lá - vàng - đỏ (Green - Yellow - Red Color Scale).
 3. Bảng ma trận sẽ hiển thị các gam màu trực quan: ô màu xanh lá đậm là nơi có số lượng bàn thắng cao nhất (như Tiền đạo cắm chân Phải, Tiền đạo cánh Phải thuận chân Trái).
+
+---
 
 ---
 
@@ -158,12 +162,51 @@ FROM [DW Football Transfermarkt];
 * **`NONEMPTY(...)`**: Loại bỏ trước các tổ hợp không có bàn thắng phát sinh ở mức lưu trữ trước khi chuyển sang Formula Engine.
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy vấn dữ liệu.
 
+### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm hợp tập hợp `UNION(«Set_1», «Set_2»[, ALL])`**:
+   * **Cú pháp chuẩn:** `UNION(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: Nhóm vị trí tiền đạo trung tâm `{ [Sub Position].[Centre-Forward], [Sub Position].[Second Striker] }`.
+     * `Set_2`: Nhóm vị trí tấn công biên và tiền vệ công `{ [Sub Position].[Left Winger], [Sub Position].[Right Winger], [Sub Position].[Attacking Midfield] }`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Thực hiện phép hợp tập hợp trong đại số MDX ($Set_1 \cup Set_2$). Gộp toàn bộ các thành viên thuộc 2 tập hợp rời rạc thành một tập hợp duy nhất gồm 5 vị trí tấn công chủ chốt.
+     * Mặc định, hàm `UNION` tự động loại bỏ các phần tử trùng lặp nếu có giữa 2 tập.
+   * **Kết quả trả về:** Tập hợp gồm 5 vị trí thi đấu mũi nhọn.
+
+2. **Hàm tích Đề-các `CrossJoin(«Set_1», «Set_2»)` (hoặc toán tử `*`)**:
+   * **Cú pháp chuẩn:** `CrossJoin(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: Tập hợp 5 vị trí thi đấu tấn công (kết quả từ hàm `UNION`).
+     * `Set_2`: Tập hợp các loại chân thuận chi tiết (kết quả từ hàm `EXCEPT`: `Left`, `Right`, `Both`).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Thực hiện phép nhân chéo tích Đề-các (Cartesian Product) giữa 2 tập hợp đa chiều.
+     * Mỗi vị trí thi đấu trong `Set_1` được kết hợp tuần tự với từng loại chân thuận trong `Set_2`, sinh ra tập hợp gồm các Tuple 2 chiều dạng `(Sub Position, Foot)` với tổng số $5 	imes 3 = 15$ tổ hợp chiến thuật.
+   * **Kết quả trả về:** Tập hợp các Tuple đa chiều đại diện cho từng cặp vị trí - chân thuận.
+
+3. **Hàm trừ tập hợp `EXCEPT(«Set_1», «Set_2»)`**:
+   * **Cú pháp chuẩn:** `EXCEPT(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: `[DIM Player].[Foot].[Foot].MEMBERS` (tất cả thành viên trong phân cấp chân thuận).
+     * `Set_2`: `{ [DIM Player].[Foot].[All] }` (phần tử tổng hợp cấp cao nhất `[All]`).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Thực hiện phép trừ tập hợp ($Set_1 \setminus Set_2$). Loại bỏ nút tổng hợp toàn cục `[All]` để chỉ giữ lại các giá trị mức lá cụ thể (`Left`, `Right`, `Both`), ngăn chặn hiện tượng số liệu tổng bị cộng dồn trùng lặp với số liệu chi tiết.
+   * **Kết quả trả về:** Tập hợp chứa các loại chân thuận thực tế.
+
+4. **Hàm sắp xếp bảo toàn thứ bậc `ORDER(..., DESC)`**:
+   * **Cú pháp chuẩn:** `ORDER(Set, Criteria, DESC)`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Chú ý sử dụng cờ `DESC` (Hierarchy-preserving Descending) thay vì `BDESC`. Thuật toán sẽ tôn trọng phân cấp của Tuple: nó gom nhóm theo từng vị trí thi đấu (`Sub Position`) và thực hiện sắp xếp giảm dần theo số bàn thắng của các loại chân thuận (`Foot`) ngay bên trong từng vị trí đó, giúp cấu trúc báo cáo mạch lạc và dễ đối chiếu chiến thuật.
+
+
 ### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
 3. Đọc dữ liệu tại khung bên dưới:
    * **Tab `Results`:** Hiển thị danh sách ma trận các cặp vị trí và chân thuận xếp theo thứ tự bàn thắng giảm dần.
    * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
+
+---
 
 ---
 

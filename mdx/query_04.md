@@ -63,43 +63,56 @@ flowchart TD
 
 Phương pháp này được thực hiện trực tiếp trong môi trường phát triển khối đa chiều (SQL Server Data Tools / Visual Studio).
 
-#### Bước 1: Mở giao diện Cube Designer
+#### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Members
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Trong cửa sổ **Solution Explorer** (khung bên phải):
-   * Mở rộng thư mục **`Cubes`**.
-   * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
+2. Trong cửa sổ **Solution Explorer**, nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
+3. Chuyển sang tab **`Calculations`** ở cạnh trên để tạo 2 thước đo tính toán phân loại độ tuổi và phút thi đấu trung bình:
+   * **Thước đo 1 (`Avg Minutes Played`):** Nhấp chuột phải vào Script Organizer $
+ightarrow$ chọn **New Calculated Member**:
+     * Name: `Avg Minutes Played`
+     * Parent hierarchy: `Measures`
+     * Expression: `IIF([Measures].[FACT Player Match Perf Count] = 0, NULL, [Measures].[Minutes Played] / [Measures].[FACT Player Match Perf Count])`
+     * Format String: `#,##0.0`
+   * **Thước đo 2 (`Career Stage Group`):** Tạo Calculated Member thứ hai:
+     * Name: `Career Stage Group`
+     * Parent hierarchy: `Measures`
+     * Expression:
+       ```mdx
+       CASE 
+           WHEN [DIM Player].[Age].CURRENTMEMBER.MEMBER_VALUE < 21 THEN "U21 - Tài năng trẻ"
+           WHEN [DIM Player].[Age].CURRENTMEMBER.MEMBER_VALUE <= 29 THEN "Prime 22-29 - Đỉnh cao"
+           ELSE "Veteran 30+ - Lão tướng"
+       END
+       ```
+4. Chọn menu **Build** $
+ightarrow$ **Deploy Solution** để cập nhật 2 thước đo mới vào cấu trúc Cube.
 
 #### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. **Kiểm tra trạng thái kết nối & giao diện:**
-   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
+1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nạp cấu trúc mới deploy).
+2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa.
 
 #### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọc để cố định năm dương lịch 2023:
+Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọc cho năm 2023:
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** $\rightarrow$ Bấm **OK** (hiển thị `{ 2023 }`) |
+| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** $
+ightarrow$ Bấm **OK** (hiển thị `{ 2023 }`) |
 
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
-Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Độ tuổi (Rows):**
-   * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Age`**.
-   * Nhấp giữ chuột vào **`Age`**, kéo và thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
-2. **Kéo các Thước đo Hiệu suất (Measures):**
-   * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo thả vào ngay bên cạnh cột `Age`.
-   * Tiếp tục kéo thước đo **`Assists`** vào ngay bên cạnh cột `Goals`.
-   * Tiếp tục kéo thước đo **`Minutes Played`** vào ngay bên cạnh cột `Assists`.
+1. **Kéo Chiều Tuổi cầu thủ (Rows):**
+   * Mở rộng chiều **`DIM Player`** $
+ightarrow$ tìm thuộc tính **`Age`**: Kéo thả vào vùng Rows.
+2. **Kéo 4 Thước đo đã đồng bộ (Measures):**
+   * Mở rộng thư mục **`Measures`**:
+     * Kéo **`Career Stage Group`** thả vào cạnh cột `Age`.
+     * Kéo **`Goals`** thả vào tiếp theo.
+     * Kéo **`Assists`** thả vào tiếp theo.
+     * Kéo **`Avg Minutes Played`** thả vào cột cuối cùng.
 
 #### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị bảng phân bổ tổng số bàn thắng, kiến tạo và số phút thi đấu theo từng độ tuổi từ 16 đến 42 tuổi.
-3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
-
----
+1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
+2. Lưới dữ liệu lập tức chạy và hiển thị đúng 4 cột phân tích hiệu suất theo từng độ tuổi giống hệt câu truy vấn MDX.
 
 ### 2.2. Sử dụng PivotTable trên Microsoft Excel
 
@@ -107,50 +120,50 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
 1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
-3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
-   * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
-4. Cửa sổ **Data Connection Wizard** xuất hiện:
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Log on credentials:** Chọn **`Use Windows Authentication`**.
-   * Nhấn nút **Next >**.
+2. Chọn thẻ tab **`Data`** $
+ightarrow$ **`Get Data`** $
+ightarrow$ **`From Database`** $
+ightarrow$ **`From Analysis Services`**.
+3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** $
+ightarrow$ Nhấn **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
-1. Tại màn hình *Select Database and Table*:
-   * Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** (hoặc tên database SSAS tương ứng).
-   * Chọn Cube: **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
-2. Nhấn nút **Finish**.
-3. Hộp thoại **Import Data** hiện lên:
-   * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
-   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại $\rightarrow$ Nhấn **OK**.
+1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** $
+ightarrow$ Chọn Cube: **`DW Football Transfermarkt`**.
+2. Nhấn **Finish** $
+ightarrow$ Chọn **`PivotTable Report`** tại ô **`=$A$3`** $
+ightarrow$ Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
 | Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** $\rightarrow$ Kéo `Year` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Age`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Age` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Assists`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Assists` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Minutes Played`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Minutes Played` thả vào ô Values. |
+| **Ô `Filters` (Bộ lọc báo cáo)** | **`Year`** | Mở thư mục **`DIM Time`** $
+ightarrow$ Kéo `Year` thả vào ô Filters. |
+| **Ô `Rows` (Dòng dữ liệu)** | **`Age`** | Mở thư mục **`DIM Player`** $
+ightarrow$ Kéo `Age` thả vào ô Rows. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Career Stage Group`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Career Stage Group` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Assists`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Assists` thả vào ô Values. |
+| **Ô `Values` ($\Sigma$ Thước đo)** | **`Avg Minutes Played`** | Mở thư mục **`Measures`** $
+ightarrow$ Kéo `Avg Minutes Played` thả vào ô Values. |
 
 #### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-* Tại ô **`B1`** (bên cạnh nhãn `Year`), nhấp mũi tên xổ xuống $\rightarrow$ tick chọn năm **`2023`** $\rightarrow$ Nhấn **OK**.
+* Tại ô **`B1`** (bên cạnh nhãn `Year`), nhấp mũi tên xổ xuống $
+ightarrow$ tick chọn năm **`2023`** $
+ightarrow$ Nhấn **OK**.
 
-#### Bước 5: Tạo Calculated Field tính Số phút trung bình trong Excel
-1. Chọn một ô bất kỳ bên trong bảng PivotTable.
-2. Vô thẻ ngữ cảnh **`PivotTable Analyze`** trên thanh Ribbon $\rightarrow$ nhóm *Calculations* $\rightarrow$ chọn **`Fields, Items & Sets`** $\rightarrow$ chọn **`Calculated Field...`**.
-3. Thiết lập thông số:
-   * **Name:** Ghi `Avg Minutes Per Match`
-   * **Formula:** Nhập `='Minutes Played' / 'FACT Player Match Perf Count'`
-4. Nhấn **OK**. Cột số phút trung bình sẽ được tự động tính và hiển thị lên bảng.
-
-#### Bước 6: Sắp xếp và Định dạng hiển thị
-* Chuột phải vào cột `Age` $\rightarrow$ chọn **Sort** $\rightarrow$ chọn **`Sort Smallest to Largest`** để xem biểu đồ phát triển từ trẻ đến kỳ cựu.
-* Vô thẻ **`Design`** $\rightarrow$ chọn **Report Layout** $\rightarrow$ **`Show in Tabular Form`**.
-
----
+#### Bước 5: Trình bày bảng kết quả
+* Vào tab **`Design`** $
+ightarrow$ **Report Layout** $
+ightarrow$ chọn **`Show in Tabular Form`**.
+* Sắp xếp tuổi tăng dần: Nhấp chuột phải vào cột `Age` $
+ightarrow$ chọn **Sort** $
+ightarrow$ **Sort Smallest to Largest**.
 
 ### 2.3. Sử dụng Ngôn ngữ truy vấn MDX (SSMS)
 
@@ -232,6 +245,45 @@ WHERE (
 * **`FROM [DW Football Transfermarkt]`**: Nguồn khối Cube đa chiều phân tích.
 * **`WHERE ([DIM Time].[Year].[2023])`**: Trục lát cắt dữ liệu (Slicer Axis), giới hạn phạm vi tính toán trong năm dương lịch 2023.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Mệnh đề định nghĩa thành viên tính toán `WITH MEMBER`**:
+   * **Cú pháp chuẩn:** `WITH MEMBER «Member_Name» AS «Expression»[, FORMAT_STRING = '...']`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Cho phép tạo ra các thước đo ảo (Calculated Measures) chỉ tồn tại tạm thời trong phiên thực thi của câu truy vấn MDX mà không cần can thiệp thay đổi cấu trúc Cube trên SSAS.
+     * Các thành viên này được Formula Engine tính toán động theo từng tọa độ ô dữ liệu (cell) tại thời điểm hiển thị.
+
+2. **Hàm điều kiện `IIF(«Logical_Expression», «True_Part», «False_Part»)` kết hợp `IsEmpty()`**:
+   * **Cú pháp chuẩn:** `IIF(Condition, Value_If_True, Value_If_False)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Condition`: `IsEmpty([Measures].[FACT Player Match Perf Count]) OR [Measures].[FACT Player Match Perf Count] = 0` (kiểm tra mẫu số số lần ra sân).
+     * `Value_If_True`: `NULL` (nếu mẫu số rỗng hoặc bằng 0).
+     * `Value_If_False`: Phép chia tính trung bình `ROUND([Measures].[Minutes Played] / [Measures].[FACT Player Match Perf Count], 2)`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Đây là giải thuật tính toán phòng vệ (Defensive Calculation) chuẩn mực trong OLAP. Nếu cầu thủ ở độ tuổi đó chưa ra sân trận nào, mẫu số bằng 0 sẽ lập tức trả về `NULL`, triệt tiêu hoàn toàn nguy cơ phát sinh lỗi chia cho 0 (`#DIV/0!`) gây gián đoạn câu truy vấn.
+
+3. **Cấu trúc rẽ nhánh `CASE WHEN ... THEN ... ELSE ... END`**:
+   * **Cú pháp chuẩn:** `CASE WHEN Cond1 THEN Res1 WHEN Cond2 THEN Res2 ELSE ResElse END`
+   * **Tham số thực tế trong truy vấn:**
+     * `WHEN Age <= 21 THEN "U21 Young Talent"`
+     * `WHEN Age <= 29 THEN "Prime Age (22-29)"`
+     * `ELSE "Veteran (30+)"`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Đánh giá giá trị số tuổi của thành viên hiện hành trên trục dòng (`CURRENTMEMBER.MEMBERVALUE`).
+     * Thực hiện phân loại động độ tuổi vào 3 nhóm chuyên môn thể thao: Cầu thủ trẻ tiềm năng (U21), Độ tuổi đỉnh cao sự nghiệp (22-29), và Cầu thủ dạn dày kinh nghiệm (30+), giúp báo cáo có tính phân tầng nghiệp vụ sâu sắc.
+
+4. **Thuộc tính `.CURRENTMEMBER` và `.MEMBERVALUE`**:
+   * **Cú pháp chuẩn:** `«Dimension/Hierarchy».CURRENTMEMBER.MEMBERVALUE`
+   * **Tham số thực tế trong truy vấn:** `[DIM Player].[Age].CURRENTMEMBER.MEMBERVALUE`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * `.CURRENTMEMBER`: Con trỏ ngữ cảnh trỏ đến thành viên của chiều `Age` đang được xử lý tại dòng hiện hành.
+     * `.MEMBERVALUE`: Trích xuất giá trị số học nguyên thủy (numeric scalar) của thuộc tính tuổi (ví dụ: `21`, `28`, `35`) thay vì dạng chuỗi ký tự hiển thị (`.NAME`), cho phép thực hiện các phép so sánh toán học `<=`, `>` và sắp xếp một cách chính xác.
+
+5. **Hàm `ORDER(FILTER(...), BASC)`**:
+   * **Cú pháp chuẩn:** `ORDER(Set, Criteria, BASC)`
+   * **Tham số thực tế:** Lọc các độ tuổi hợp lệ có dữ liệu (`NOT ISEMPTY AND Age > 0`) và sắp xếp tăng dần toàn cục (`BASC` - Break Hierarchy Ascending) từ 16 tuổi đến 42 tuổi.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
@@ -282,7 +334,7 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 | Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
 | :--- | :--- | :--- |
-| **`WITH MEMBER`** | `WITH MEMBER [Cube].[Name] AS 'Exp' [, FORMAT_STRING = '...']` | Định nghĩa thước đo ảo hoặc chỉ số phân loại tạm thời trong phạm vi câu truy vấn mà không làm thay đổi cấu trúc Cube vật lý. |
+| **`WITH MEMBER`** | `WITH MEMBER [DW Football Transfermarkt] AS 'Exp' [, FORMAT_STRING = '...']` | Định nghĩa thước đo ảo hoặc chỉ số phân loại tạm thời trong phạm vi câu truy vấn mà không làm thay đổi cấu trúc Cube vật lý. |
 | **`CASE WHEN`** | `CASE WHEN Cond THEN Val ... ELSE Default END` | Cấu trúc rẽ nhánh điều kiện logic trong MDX, phân chia độ tuổi thành 3 phân khúc sự nghiệp rõ rệt. |
 | **`IIF`** | `IIF(Logical_Exp, True_Part, False_Part)` | Xử lý an toàn mẫu số của phép tính trung bình, trả về `NULL` khi số lần ra sân bằng 0 hoặc rỗng để chống lỗi chia cho 0. |
 | **`MEMBERVALUE`** | `Member.MEMBERVALUE` | Trích xuất giá trị số học nguyên bản của thuộc tính `Age` thay vì giá trị chuỗi văn bản (`NAME`), phục vụ phép so sánh số học trong `CASE` và `ORDER`. |
