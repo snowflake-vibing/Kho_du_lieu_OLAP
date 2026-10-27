@@ -279,25 +279,30 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị ma trận bàn thắng theo vị trí chi tiết và chân thuận:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 18 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Vị Trí Chi Tiết (`Sub Position`) | Chân Thuận (`Foot`) | Tổng Bàn Thắng (`Goals`) | Đánh Giá Chiến Thuật & Đặc Điểm |
-| :--- | :---: | :---: | :--- |
-| **Centre-Forward** | **right** | **5.457** | Trung phong chân phải truyền thống, chiếm khối lượng bàn thắng áp đảo |
-| **Left Winger** | **right** | **2.015** | Tiền đạo cánh trái nghịch chân (Inverted Winger) cắt vào trong dứt điểm |
-| **Attacking Midfield** | **right** | **1.308** | Nhạc trưởng làm bóng và sút xa từ tuyến hai bằng chân thuận |
-| **Right Winger** | **left** | **1.207** | Tiền đạo cánh phải nghịch chân (kèo trái) tạo đột biến |
-| **Centre-Forward** | **left** | **1.114** | Trung phong chân trái hiếm có, góc sút độc hiểm |
-| **Right Winger** | **right** | **783** | Tiền đạo cánh phải bám biên tạt bóng cổ điển |
-| **Attacking Midfield** | **left** | **667** | Tiền vệ công chân trái điều tiết nhịp độ và sút phạt |
-| **Centre-Forward** | **both** | **273** | Tiền đạo toàn năng hai chân, cực kỳ nguy hiểm trong vòng cấm |
-| **Second Striker** | **right** | **242** | Hộ công cơ động hỗ trợ trung phong |
-| **Left Winger** | **left** | **186** | Tiền đạo cánh trái thuần tạt bóng biên |
-| **Left Winger** | **both** | **79** | Chạy cánh trái dứt điểm linh hoạt hai chân |
-| **Right Winger** | **both** | **76** | Chạy cánh phải dứt điểm linh hoạt hai chân |
-| **Attacking Midfield** | **both** | **59** | Tiền vệ công xử lý bóng hai chân |
-| **Second Striker** | **left** | **40** | Hộ công chân trái |
-| **Second Striker** | **both** | **13** | Hộ công xử lý hai chân |
+| STT | Vị Trí Chi Tiết (`Sub Position`) | Chân Thuận (`Foot`) | Tổng Bàn Thắng (`Goals`) |
+| :---: | :--- | :---: | :---: |
+| **1** | **Attacking Midfield** | `right` | **1,308** |
+| **2** | **Attacking Midfield** | `left` | **667** |
+| **3** | **Attacking Midfield** | `both` | **59** |
+| **4** | **Attacking Midfield** | `Unknown` | **1** |
+| **5** | **Centre-Forward** | `right` | **5,457** |
+| **6** | **Centre-Forward** | `left` | **1,114** |
+| **7** | **Centre-Forward** | `both` | **273** |
+| **8** | **Centre-Forward** | `Unknown` | **34** |
+| **9** | **Left Winger** | `right` | **2,015** |
+| **10** | **Left Winger** | `left` | **186** |
+| **11** | **Left Winger** | `both` | **79** |
+| **12** | **Left Winger** | `Unknown` | **2** |
+| **13** | **Right Winger** | `left` | **1,207** |
+| **14** | **Right Winger** | `right` | **783** |
+| **15** | **Right Winger** | `both` | **76** |
+| **16** | **Right Winger** | `Unknown` | **0** |
+| **17** | **Second Striker** | `right` | **242** |
+| **18** | **Second Striker** | `left` | **93** |
+
+
 
 ---
 

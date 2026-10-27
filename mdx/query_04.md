@@ -288,10 +288,12 @@ WHERE (
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị bảng phân bổ hiệu suất theo từng độ tuổi năm 2023:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 29 dòng dữ liệu thực tế từ khối Cube OLAP:
 
 | Độ Tuổi (`Age`) | Phân Khúc Sự Nghiệp (`Career Stage`) | Tổng Bàn Thắng (`Goals`) | Tổng Kiến Tạo (`Assists`) | Số Phút TB/Trận (`Avg Minutes`) |
 | :---: | :--- | :---: | :---: | :---: |
+| **17** | U21 Young Talent | - | - | - |
+| **18** | U21 Young Talent | 0 | 0 | 6.00 |
 | **19** | U21 Young Talent | 1 | 3 | 40.31 |
 | **20** | U21 Young Talent | 24 | 16 | 47.78 |
 | **21** | U21 Young Talent | 46 | 54 | 42.69 |
@@ -302,7 +304,7 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 | **26** | Prime Age (22-29) | 865 | 694 | 62.56 |
 | **27** | Prime Age (22-29) | 838 | 641 | 63.33 |
 | **28** | Prime Age (22-29) | 948 | 718 | 66.09 |
-| **29** | Prime Age (22-29) | 1.008 | 776 | 67.72 |
+| **29** | Prime Age (22-29) | 1008 | 776 | 67.72 |
 | **30** | Veteran (30+) | 816 | 582 | 65.17 |
 | **31** | Veteran (30+) | 632 | 471 | 65.28 |
 | **32** | Veteran (30+) | 720 | 561 | 69.87 |
@@ -312,6 +314,15 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 | **36** | Veteran (30+) | 222 | 198 | 68.58 |
 | **37** | Veteran (30+) | 199 | 139 | 66.51 |
 | **38** | Veteran (30+) | 165 | 126 | 70.28 |
+| **39** | Veteran (30+) | 130 | 80 | 68.85 |
+| **40** | Veteran (30+) | 72 | 41 | 65.41 |
+| **41** | Veteran (30+) | 15 | 13 | 71.21 |
+| **42** | Veteran (30+) | 3 | 2 | 73.11 |
+| **43** | Veteran (30+) | 6 | 5 | 80.28 |
+| **44** | Veteran (30+) | 0 | 0 | 90.00 |
+| **45** | Veteran (30+) | 1 | 1 | 56.80 |
+
+
 
 ---
 

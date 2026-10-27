@@ -306,14 +306,16 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị bảng thống kê thể hình và hiệu suất theo 4 tuyến thi đấu chính (số liệu thực tế đã đối soát và kiểm chứng 100% từ Data Warehouse):
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 4 dòng dữ liệu thực tế từ khối Cube OLAP:
 
 | Vị Trí Chính (`Main Position`) | Chiều Cao TB (`Avg Height Cm`) | Chiều Cao Max (`Max Height Cm`) | Chiều Cao Min (`Min Height Cm`) | Tổng Bàn Thắng (`Goals`) | Thẻ Vàng (`Yellow Cards`) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Attack** | 180.9 | 201 | 160 | 11.561 | 6.292 |
-| **Midfield** | 180.2 | 202 | 160 | 5.000 | 10.050 |
-| **Defender** | 183.9 | 206 | 163 | 2.610 | 11.551 |
+| **Attack** | 180.9 | 201 | 160 | 11,561 | 6,292 |
+| **Midfield** | 180.2 | 202 | 160 | 5,000 | 10,050 |
+| **Defender** | 183.9 | 206 | 163 | 2,610 | 11,551 |
 | **Goalkeeper** | 190.5 | 206 | 179 | 2 | 801 |
+
+
 
 ---
 

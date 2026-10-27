@@ -290,23 +290,113 @@ WHERE (
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị danh sách các ngôi sao đạt trên 20 đóng góp bàn thắng mùa 2023/2024:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 101 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Câu Lạc Bộ Đại Diện | Số Phút Thi Đấu (`Minutes Played`) | Đóng Góp Bàn Thắng (`Goal Contributions`) |
-| :---: | :--- | :--- | :---: | :---: |
-| **1** | **Harry Kane** | FC Bayern Munich | 3.818 | **56** |
-| **2** | **Luuk de Jong** | PSV Eindhoven | 3.406 | **47** |
-| **3** | **Viktor Gyökeres** | Sporting CP | 3.447 | **43** |
-| **4** | **Kylian Mbappé** | Paris Saint-Germain | 3.149 | **40** |
-| **5** | **Erling Haaland** | Manchester City | 3.337 | **38** |
-| **6** | **Mauro Icardi** | Galatasaray | 3.465 | **38** |
-| **7** | **Pierre-Emerick Aubameyang** | Olympique Marseille | 3.659 | **38** |
-| **8** | **Mohamed Salah** | Liverpool FC | 2.935 | **37** |
-| **9** | **Loïs Openda** | RB Leipzig | 3.274 | **35** |
-| **10** | **Phil Foden** | Manchester City | 3.555 | **35** |
-| **11** | **Jude Bellingham** | Real Madrid | 3.318 | **34** |
-| **12** | **Cole Palmer** | Chelsea FC | 2.628 | **33** |
-| **13** | **Bukayo Saka** | Arsenal FC | 3.661 | **33** |
+| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Số Phút Thi Đấu (`Minutes Played`) | Đóng Góp Bàn Thắng (`Goal Contributions`) |
+| :---: | :--- | :---: | :---: |
+| **1** | **Harry Kane** | 3,908 | **56** |
+| **2** | **Luuk de Jong** | 3,406 | **47** |
+| **3** | **Viktor Gyökeres** | 3,537 | **45** |
+| **4** | **Kylian Mbappé** | 3,239 | **42** |
+| **5** | **Mauro Icardi** | 3,555 | **39** |
+| **6** | **Erling Haaland** | 3,337 | **38** |
+| **7** | **Pierre-Emerick Aubameyang** | 3,659 | **38** |
+| **8** | **Mohamed Salah** | 2,935 | **37** |
+| **9** | **Loïs Openda** | 3,274 | **35** |
+| **10** | **Phil Foden** | 3,555 | **35** |
+| **11** | **Jude Bellingham** | 3,318 | **34** |
+| **12** | **Bukayo Saka** | 3,661 | **33** |
+| **13** | **Cole Palmer** | 2,628 | **33** |
+| **14** | **Santiago Gimenez** | 2,838 | **33** |
+| **15** | **Vangelis Pavlidis** | 3,000 | **33** |
+| **16** | **Alexander Sørloth** | 2,903 | **32** |
+| **17** | **Artem Dovbyk** | 2,605 | **32** |
+| **18** | **Lautaro Martínez** | 3,198 | **32** |
+| **19** | **Ollie Watkins** | 3,226 | **32** |
+| **20** | **Vinicius Junior** | 2,777 | **32** |
+| **21** | **Alejandro Grimaldo** | 3,625 | **31** |
+| **22** | **Florian Wirtz** | 3,089 | **31** |
+| **23** | **Robert Lewandowski** | 3,495 | **31** |
+| **24** | **Brian Brobbey** | 2,876 | **30** |
+| **25** | **Rafa Silva** | 3,552 | **30** |
+| **26** | **Serhou Guirassy** | 2,214 | **30** |
+| **27** | **Antoine Griezmann** | 3,477 | **29** |
+| **28** | **Dries Mertens** | 2,838 | **29** |
+| **29** | **Pedro Gonçalves** | 3,068 | **29** |
+| **30** | **Victor Boniface** | 1,934 | **29** |
+| **31** | **Ángel Di María** | 3,213 | **28** |
+| **32** | **Deniz Undav** | 2,097 | **28** |
+| **33** | **Marcus Thuram** | 3,165 | **28** |
+| **34** | **Simon Banza** | 2,550 | **28** |
+| **35** | **Edin Dzeko** | 2,738 | **27** |
+| **36** | **Heung-min Son** | 2,948 | **27** |
+| **37** | **Jarrod Bowen** | 3,572 | **27** |
+| **38** | **Julián Alvarez** | 2,937 | **27** |
+| **39** | **Matt O'Riley** | 3,302 | **27** |
+| **40** | **Rafael Leão** | 3,438 | **27** |
+| **41** | **Lawrence Shankland** | 2,869 | **26** |
+| **42** | **Olivier Giroud** | 3,324 | **26** |
+| **43** | **Ademola Lookman** | 2,621 | **25** |
+| **44** | **Álvaro Morata** | 2,577 | **25** |
+| **45** | **Cameron Puertas** | 2,944 | **25** |
+| **46** | **Christian Pulisic** | 3,504 | **25** |
+| **47** | **Darwin Núñez** | 2,504 | **25** |
+| **48** | **Ermedin Demirovic** | 2,884 | **25** |
+| **49** | **Gianluca Scamacca** | 2,156 | **25** |
+| **50** | **James Tavernier** | 3,681 | **25** |
+| **51** | **Niclas Füllkrug** | 3,449 | **25** |
+| **52** | **Paulo Dybala** | 2,581 | **25** |
+| **53** | **Xavi Simons** | 3,275 | **25** |
+| **54** | **Alexander Isak** | 2,579 | **24** |
+| **55** | **Cristo** | 2,793 | **24** |
+| **56** | **Dušan Tadić** | 3,159 | **24** |
+| **57** | **Galeno** | 2,896 | **24** |
+| **58** | **Julian Brandt** | 3,022 | **24** |
+| **59** | **Mame Thiam** | 3,164 | **24** |
+| **60** | **Romelu Lukaku** | 3,728 | **24** |
+| **61** | **Anders Dreyer** | 2,249 | **23** |
+| **62** | **Johan Bakayoko** | 3,156 | **23** |
+| **63** | **Jonathan David** | 2,642 | **23** |
+| **64** | **Kévin Denkey** | 2,497 | **23** |
+| **65** | **Leroy Sané** | 3,067 | **23** |
+| **66** | **Malik Tillman** | 2,094 | **23** |
+| **67** | **Rafa Mujica** | 2,536 | **23** |
+| **68** | **Rodrygo** | 3,414 | **23** |
+| **69** | **Thijs Dallinga** | 3,173 | **23** |
+| **70** | **Vitinha** | 4,517 | **23** |
+| **71** | **Álex Baena** | 2,967 | **22** |
+| **72** | **Alexandre Lacazette** | 2,305 | **22** |
+| **73** | **Bruno Fernandes** | 3,660 | **22** |
+| **74** | **Calvin Stengs** | 2,714 | **22** |
+| **75** | **Charles De Ketelaere** | 2,653 | **22** |
+| **76** | **Dominic Solanke** | 3,333 | **22** |
+| **77** | **Evanilson** | 2,562 | **22** |
+| **78** | **Marvin Ducksch** | 2,713 | **22** |
+| **79** | **Mohamed Amoura** | 1,880 | **22** |
+| **80** | **Nuno Santos** | 3,429 | **22** |
+| **81** | **Raphinha** | 1,844 | **22** |
+| **82** | **Sebastian Szymanski** | 2,899 | **22** |
+| **83** | **Vincenzo Grifo** | 2,972 | **22** |
+| **84** | **Andrej Kramaric** | 2,207 | **21** |
+| **85** | **Anthony Gordon** | 3,346 | **21** |
+| **86** | **Haris Hajradinovic** | 3,310 | **21** |
+| **87** | **İrfan Can Kahveci** | 2,024 | **21** |
+| **88** | **Jean-Philippe Mateta** | 2,285 | **21** |
+| **89** | **Jeremie Frimpong** | 2,909 | **21** |
+| **90** | **Joey Veerman** | 2,970 | **21** |
+| **91** | **Kai Havertz** | 3,472 | **21** |
+| **92** | **Kerem Aktürkoğlu** | 3,069 | **21** |
+| **93** | **Martin Ødegaard** | 3,855 | **21** |
+| **94** | **Mohammed Kudus** | 3,440 | **21** |
+| **95** | **Niklas Beste** | 2,629 | **21** |
+| **96** | **Paulinho** | 1,887 | **21** |
+| **97** | **Rey Manaj** | 2,505 | **21** |
+| **98** | **Rodri** | 3,636 | **21** |
+| **99** | **Tobias Lauritsen** | 2,493 | **21** |
+| **100** | **Victor Osimhen** | 2,449 | **21** |
+| **101** | **Youssef En-Nesyri** | 3,090 | **21** |
+
+
 
 ---
 

@@ -290,20 +290,187 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị tháng kỷ lục thẻ phạt của từng chiến lược gia hàng đầu:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 175 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Huấn Luyện Viên (`Coach Name`) | Tháng Kỷ Lục Thẻ Phạt (`Month`) | Thẻ Vàng (`Yellow Cards`) | Thẻ Đỏ (`Red Cards`) | Nhận Định Chuyên Môn |
-| :--- | :---: | :---: | :---: | :--- |
-| **Matías Almeyda** | Tháng 10 | **32** | **1** | Tháng đỉnh điểm căng thẳng tại giải VĐQG Hy Lạp |
-| **Diego Simeone** | Tháng 10 | **27** | **0** | Phong cách phòng ngự áp sát rát, thẻ vàng đạt đỉnh |
-| **João Pereira** | Tháng 10 | **27** | **0** | Đội bóng nhận nhiều thẻ trong các trận derby căng thẳng |
-| **Rúben Amorim** | Tháng 12 | **25** | **0** | Giai đoạn tourmalet mùa đông tại Bồ Đào Nha |
-| **Sergio Francisco** | Tháng 10 | **25** | **0** | Đội hình trẻ tranh chấp quyết liệt |
-| **Sven Vandenbroeck** | Tháng 10 | **25** | **1** | Đạt đỉnh thẻ phạt và có 1 thẻ đỏ trực tiếp |
-| **Russell Martin** | Tháng 10 | **24** | **0** | Lối chơi kiểm soát bóng chịu nhiều pha phản công |
-| **Sandro Wagner** | Tháng 10 | **24** | **0** | Tranh chấp va chạm rát ở khu vực giữa sân |
-| **Carlos Corberán** | Tháng 10 | **23** | **1** | Lối đá thể lực áp sát cao độ |
-| **José Bordalás** | Tháng 5 | **23** | **0** | Giai đoạn nước rút cuối mùa giải khốc liệt |
+| STT | Huấn Luyện Viên (`Coach Name`) | Tháng Kỷ Lục Thẻ Phạt (`Month`) | Thẻ Vàng (`Yellow Cards`) | Thẻ Đỏ (`Red Cards`) |
+| :---: | :--- | :---: | :---: | :---: |
+| **1** | **Matías Almeyda** | Tháng 10 | **32** | 1 |
+| **2** | **Diego Simeone** | Tháng 10 | **27** | 0 |
+| **3** | **João Pereira** | Tháng 10 | **27** | 0 |
+| **4** | **Rúben Amorim** | Tháng 12 | **25** | 0 |
+| **5** | **Sergio Francisco** | Tháng 10 | **25** | 0 |
+| **6** | **Sven Vandenbroeck** | Tháng 10 | **25** | 1 |
+| **7** | **Russell Martin** | Tháng 10 | **24** | 0 |
+| **8** | **Sandro Wagner** | Tháng 10 | **24** | 0 |
+| **9** | **Carlos Corberán** | Tháng 10 | **23** | 1 |
+| **10** | **José Bordalás** | Tháng 5 | **23** | 0 |
+| **11** | **Steffen Baumgart** | Tháng 10 | **23** | 1 |
+| **12** | **Unai Emery** | Tháng 12 | **23** | 1 |
+| **13** | **Eder Sarabia** | Tháng 10 | **22** | 1 |
+| **14** | **Manuel Pellegrini** | Tháng 10 | **22** | 2 |
+| **15** | **Nicky Hayen** | Tháng 10 | **22** | 1 |
+| **16** | **Çağdaş Atan** | Tháng 4 | **21** | 0 |
+| **17** | **Erik ten Hag** | Tháng 5 | **21** | 2 |
+| **18** | **Manolo González** | Tháng 4 | **21** | 2 |
+| **19** | **Pierre Sage** | Tháng 2 | **21** | 0 |
+| **20** | **Sébastien Pocognoli** | Tháng 10 | **21** | 1 |
+| **21** | **Carles Martínez** | Tháng 2 | **20** | 0 |
+| **22** | **Cristiano Bacci** | Tháng 2 | **20** | 1 |
+| **23** | **Fabian Hürzeler** | Tháng 12 | **20** | 0 |
+| **24** | **Marcelino** | Tháng 9 | **20** | 2 |
+| **25** | **Shota Arveladze** | Tháng 1 | **20** | 0 |
+| **26** | **Bruno Lage** | Tháng 10 | **19** | 0 |
+| **27** | **Hansi Flick** | Tháng 10 | **19** | 0 |
+| **28** | **Jagoba Arrasate** | Tháng 10 | **19** | 2 |
+| **29** | **Massimiliano Allegri** | Tháng 10 | **19** | 1 |
+| **30** | **Özhan Pulat** | Tháng 1 | **19** | 0 |
+| **31** | **Recep Uçar** | Tháng 10 | **19** | 0 |
+| **32** | **Robin van Persie** | Tháng 10 | **19** | 0 |
+| **33** | **Rui Borges** | Tháng 10 | **19** | 1 |
+| **34** | **Vasco Matos** | Tháng 4 | **19** | 0 |
+| **35** | **Vítor Pereira** | Tháng 4 | **19** | 0 |
+| **36** | **Antonio Conte** | Tháng 12 | **18** | 1 |
+| **37** | **César Peixoto** | Tháng 2 | **18** | 0 |
+| **38** | **Craig Levein** | Tháng 10 | **18** | 0 |
+| **39** | **Cristian Chivu** | Tháng 10 | **18** | 0 |
+| **40** | **Derek McInnes** | Tháng 12 | **18** | 0 |
+| **41** | **Dino Toppmöller** | Tháng 10 | **18** | 0 |
+| **42** | **Enzo Maresca** | Tháng 10 | **18** | 0 |
+| **43** | **Luís Pinto** | Tháng 8 | **18** | 1 |
+| **44** | **Nuno Espírito Santo** | Tháng 4 | **18** | 0 |
+| **45** | **Sotiris Sylaidopoulos** | Tháng 2 | **18** | 0 |
+| **46** | **Thomas Frank** | Tháng 9 | **18** | 0 |
+| **47** | **Carlos Vicens** | Tháng 9 | **17** | 1 |
+| **48** | **David Moyes** | Tháng 12 | **17** | 0 |
+| **49** | **Ian Cathro** | Tháng 9 | **17** | 0 |
+| **50** | **İsmet Taşdemir** | Tháng 1 | **17** | 0 |
+| **51** | **Jens Berthel Askou** | Tháng 10 | **17** | 1 |
+| **52** | **Míchel** | Tháng 10 | **17** | 0 |
+| **53** | **Mikel Arteta** | Tháng 10 | **17** | 0 |
+| **54** | **Niko Kovac** | Tháng 10 | **17** | 0 |
+| **55** | **Paulo Pezzolano** | Tháng 4 | **17** | 0 |
+| **56** | **Stefano Pioli** | Tháng 10 | **17** | 0 |
+| **57** | **Xabi Alonso** | Tháng 5 | **17** | 1 |
+| **58** | **Alessandro Nesta** | Tháng 9 | **16** | 0 |
+| **59** | **Alessio Lisci** | Tháng 10 | **16** | 3 |
+| **60** | **David Hubert** | Tháng 10 | **16** | 0 |
+| **61** | **Ernesto Valverde** | Tháng 4 | **16** | 0 |
+| **62** | **Fabio Grosso** | Tháng 1 | **16** | 0 |
+| **63** | **Francesco Farioli** | Tháng 2 | **16** | 1 |
+| **64** | **Giovanni Persico** | Tháng 1 | **16** | 0 |
+| **65** | **Hugo Oliveira** | Tháng 2 | **16** | 1 |
+| **66** | **Igor Tudor** | Tháng 4 | **16** | 0 |
+| **67** | **Iñigo Pérez** | Tháng 9 | **16** | 1 |
+| **68** | **Ivan Jurić** | Tháng 2 | **16** | 0 |
+| **69** | **John Heitinga** | Tháng 10 | **16** | 0 |
+| **70** | **José Mourinho** | Tháng 9 | **16** | 0 |
+| **71** | **Keith Andrews** | Tháng 10 | **16** | 0 |
+| **72** | **Marcel Lička** | Tháng 12 | **16** | 0 |
+| **73** | **Markus Gisdol** | Tháng 1 | **16** | 0 |
+| **74** | **Oliver Glasner** | Tháng 10 | **16** | 0 |
+| **75** | **Onur Cinel** | Tháng 10 | **16** | 0 |
+| **76** | **Roberto D'Aversa** | Tháng 10 | **16** | 0 |
+| **77** | **Scott Parker** | Tháng 12 | **16** | 0 |
+| **78** | **Stuart Kettlewell** | Tháng 8 | **16** | 0 |
+| **79** | **Adi Hütter** | Tháng 10 | **15** | 1 |
+| **80** | **Andoni Iraola** | Tháng 12 | **15** | 0 |
+| **81** | **Bo Henriksen** | Tháng 2 | **15** | 1 |
+| **82** | **Brendan Rodgers** | Tháng 12 | **15** | 0 |
+| **83** | **Claudio Giráldez** | Tháng 10 | **15** | 2 |
+| **84** | **Emre Belözoğlu** | Tháng 1 | **15** | 2 |
+| **85** | **Eusebio Di Francesco** | Tháng 10 | **15** | 1 |
+| **86** | **Gerardo Seoane** | Tháng 12 | **15** | 0 |
+| **87** | **Habib Beye** | Tháng 10 | **15** | 0 |
+| **88** | **Horst Steffen** | Tháng 4 | **15** | 0 |
+| **89** | **Kosta Runjaić** | Tháng 4 | **15** | 0 |
+| **90** | **Luis Enrique** | Tháng 10 | **15** | 1 |
+| **91** | **Marco Baroni** | Tháng 10 | **15** | 0 |
+| **92** | **Paolo Zanetti** | Tháng 5 | **15** | 0 |
+| **93** | **Patrick Vieira** | Tháng 9 | **15** | 0 |
+| **94** | **Paulo Fonseca** | Tháng 4 | **15** | 0 |
+| **95** | **Pep Guardiola** | Tháng 4 | **15** | 0 |
+| **96** | **Rick Kruys** | Tháng 4 | **15** | 0 |
+| **97** | **Roberto De Zerbi** | Tháng 4 | **15** | 0 |
+| **98** | **Stef Wils** | Tháng 11 | **15** | 1 |
+| **99** | **Steven Pressley** | Tháng 2 | **15** | 0 |
+| **100** | **Besnik Hasi** | Tháng 1 | **14** | 1 |
+| **101** | **Daniel Farke** | Tháng 4 | **14** | 0 |
+| **102** | **Don Cowie** | Tháng 2 | **14** | 0 |
+| **103** | **Eddie Howe** | Tháng 11 | **14** | 0 |
+| **104** | **Fatih Tekke** | Tháng 10 | **14** | 2 |
+| **105** | **Graham Potter** | Tháng 4 | **14** | 0 |
+| **106** | **Hikmet Karaman** | Tháng 1 | **14** | 0 |
+| **107** | **Issame Charaï** | Tháng 1 | **14** | 1 |
+| **108** | **José Faria** | Tháng 9 | **14** | 0 |
+| **109** | **José Mota** | Tháng 9 | **14** | 2 |
+| **110** | **Julian Schuster** | Tháng 10 | **14** | 0 |
+| **111** | **Luis Carrión** | Tháng 9 | **14** | 0 |
+| **112** | **Luka Elsner** | Tháng 8 | **14** | 2 |
+| **113** | **Lukas Kwasniok** | Tháng 10 | **14** | 0 |
+| **114** | **Marco Silva** | Tháng 1 | **14** | 0 |
+| **115** | **Okan Buruk** | Tháng 1 | **14** | 0 |
+| **116** | **Olivier Pantaloni** | Tháng 12 | **14** | 0 |
+| **117** | **Peter Zeidler** | Tháng 1 | **14** | 0 |
+| **118** | **Sebastian Hoeneß** | Tháng 4 | **14** | 0 |
+| **119** | **Thorsten Fink** | Tháng 9 | **14** | 0 |
+| **120** | **Vincent Kompany** | Tháng 4 | **14** | 0 |
+| **121** | **Arne Slot** | Tháng 4 | **13** | 0 |
+| **122** | **Bülent Uygun** | Tháng 9 | **13** | 0 |
+| **123** | **David Gray** | Tháng 4 | **13** | 1 |
+| **124** | **David Martindale** | Tháng 9 | **13** | 0 |
+| **125** | **Freyr Alexandersson** | Tháng 10 | **13** | 1 |
+| **126** | **Ivan Leko** | Tháng 10 | **13** | 1 |
+| **127** | **Jim Goodwin** | Tháng 10 | **13** | 1 |
+| **128** | **Liam Rosenior** | Tháng 2 | **13** | 1 |
+| **129** | **Luís Castro** | Tháng 3 | **13** | 0 |
+| **130** | **Mircea Rednic** | Tháng 8 | **13** | 0 |
+| **131** | **Ole Werner** | Tháng 4 | **13** | 0 |
+| **132** | **Stephen Robinson** | Tháng 12 | **13** | 0 |
+| **133** | **Alexandre Dujeux** | Tháng 8 | **12** | 1 |
+| **134** | **Christian Ilzer** | Tháng 2 | **12** | 0 |
+| **135** | **Eduardo Coudet** | Tháng 5 | **12** | 0 |
+| **136** | **Éric Roy** | Tháng 3 | **12** | 1 |
+| **137** | **Frederik Vanderbiest** | Tháng 1 | **12** | 0 |
+| **138** | **Joseph Oosting** | Tháng 10 | **12** | 0 |
+| **139** | **Michel Der Zakarian** | Tháng 10 | **12** | 1 |
+| **140** | **Paul Simonis** | Tháng 4 | **12** | 0 |
+| **141** | **Steve Cooper** | Tháng 4 | **12** | 0 |
+| **142** | **Thomas Reis** | Tháng 1 | **12** | 0 |
+| **143** | **Thomas Thomasberg** | Tháng 10 | **12** | 0 |
+| **144** | **Vasco Seabra** | Tháng 2 | **12** | 0 |
+| **145** | **Wouter Vrancken** | Tháng 10 | **12** | 2 |
+| **146** | **António da Costa** | Tháng 1 | **11** | 0 |
+| **147** | **Bruno Genesio** | Tháng 8 | **11** | 0 |
+| **148** | **Christophe Pélissier** | Tháng 8 | **11** | 1 |
+| **149** | **Dick Lukkien** | Tháng 1 | **11** | 0 |
+| **150** | **Dick Schreuder** | Tháng 10 | **11** | 0 |
+| **151** | **Didier Digard** | Tháng 4 | **11** | 0 |
+| **152** | **Fabio Pisacane** | Tháng 1 | **11** | 0 |
+| **153** | **Hedwiges Maduro** | Tháng 9 | **11** | 0 |
+| **154** | **Henk Fraser** | Tháng 10 | **11** | 0 |
+| **155** | **İlhan Palut** | Tháng 5 | **11** | 0 |
+| **156** | **Mike Klein** | Tháng 9 | **11** | 0 |
+| **157** | **Ron Jans** | Tháng 10 | **11** | 0 |
+| **158** | **Ruben den Uil** | Tháng 10 | **11** | 0 |
+| **159** | **Bas Sibum** | Tháng 3 | **10** | 0 |
+| **160** | **Franck Haise** | Tháng 8 | **10** | 1 |
+| **161** | **Jimmy Thelin** | Tháng 10 | **10** | 0 |
+| **162** | **Maurice Steijn** | Tháng 2 | **10** | 0 |
+| **163** | **Mirjam Clifford** | Tháng 4 | **10** | 0 |
+| **164** | **Peter Bosz** | Tháng 3 | **10** | 0 |
+| **165** | **Maarten Martens** | Tháng 2 | **9** | 0 |
+| **166** | **Oleksandr Shovkovskyi** | Tháng 10 | **9** | 0 |
+| **167** | **Robin Veldman** | Tháng 5 | **8** | 0 |
+| **168** | **Stéphane Le Mignan** | Tháng 2 | **7** | 0 |
+| **169** | **Jacob Neestrup** | Tháng 9 | **5** | 0 |
+| **170** | **Brian Priske** | Tháng 11 | **2** | 0 |
+| **171** | **Giorgio Contini** | Tháng 12 | **1** | 0 |
+| **172** | **Thomas Häberli** | Tháng 9 | **1** | 0 |
+| **173** | **Vladan Milojevic** | Tháng 10 | **1** | 0 |
+| **174** | **Jindrich Trpisovsky** | Tháng 3 | **0** | 0 |
+| **175** | **Marek Papszun** | Tháng 9 | **0** | 0 |
+
+
 
 ---
 

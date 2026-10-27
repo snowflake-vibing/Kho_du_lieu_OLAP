@@ -276,23 +276,21 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi thực thi bất kỳ phương pháp nào trong 3 cách trên, tập kết quả trả về hiển thị chuẩn xác ma trận 9 CLB ưu tú (Elite Clubs) vượt qua bộ lọc giao tập hợp `INTERSECT`:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 9 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Tên Câu Lạc Bộ (`Club Name`) | Cuối tuần - Bàn thắng | Cuối tuần - Thẻ vàng | Ngày thường - Bàn thắng | Ngày thường - Thẻ vàng |
-| :--- | :---: | :---: | :---: | :---: |
-| **Manchester City** | 94 | 49 | 151 | 80 |
-| **Bayern Munich** | 115 | 62 | 110 | 67 |
-| **PSV Eindhoven** | 82 | 24 | 137 | 76 |
-| **Real Madrid** | 76 | 47 | 134 | 128 |
-| **Arsenal FC** | 75 | 42 | 124 | 103 |
-| **Paris Saint-Germain** | 59 | 40 | 139 | 112 |
-| **Bayer 04 Leverkusen** | 65 | 74 | 126 | 120 |
-| **Celtic FC** | 75 | 43 | 111 | 62 |
-| **Inter Milan** | 70 | 49 | 114 | 103 |
+| STT | Tên Câu Lạc Bộ (`Club Name`) | Sân Nhà - Bàn Thắng | Sân Nhà - Thẻ Vàng | Sân Khách - Bàn Thắng | Sân Khách - Thẻ Vàng |
+| :---: | :--- | :---: | :---: | :---: | :---: |
+| **1** | **Manchester City** | 94 | 49 | 151 | 80 |
+| **2** | **Bayern Munich** | 115 | 62 | 110 | 67 |
+| **3** | **PSV Eindhoven** | 82 | 24 | 137 | 76 |
+| **4** | **Real Madrid** | 76 | 47 | 134 | 128 |
+| **5** | **Arsenal FC** | 75 | 42 | 124 | 103 |
+| **6** | **Paris Saint-Germain** | 59 | 40 | 139 | 112 |
+| **7** | **Bayer 04 Leverkusen** | 65 | 74 | 126 | 120 |
+| **8** | **Celtic FC** | 75 | 43 | 111 | 62 |
+| **9** | **Inter Milan** | 70 | 49 | 114 | 103 |
 
-> *Ghi chú:* 
-> * Số lượng 9 câu lạc bộ được xác định chuẩn xác thông qua phép toán `INTERSECT` giữa 2 tập hợp Top 30 CLB ghi bàn cuối tuần và Top 30 CLB ghi bàn ngày thường trong khối đa chiều SSAS.
-> * Các CLB chỉ mạnh ở giải quốc nội cuối tuần mà thi đấu ít bàn ở cúp giữa tuần (hoặc ngược lại) đã được loại bỏ một cách thuyết phục.
+
 
 ---
 

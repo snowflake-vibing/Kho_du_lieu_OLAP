@@ -279,20 +279,22 @@ WHERE (
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị danh sách 10 chân sút xuất sắc nhất mùa giải Ngoại Hạng Anh 2023/2024:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 10 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Câu Lạc Bộ Thi Đấu | Tổng Số Bàn Thắng (`Goals`) |
-| :---: | :--- | :--- | :---: |
-| **1** | **Erling Haaland** | Manchester City | **27** |
-| **2** | **Cole Palmer** | Chelsea FC | **22** |
-| **3** | **Alexander Isak** | Newcastle United | **21** |
-| **4** | **Dominic Solanke** | AFC Bournemouth | **19** |
-| **5** | **Ollie Watkins** | Aston Villa | **19** |
-| **6** | **Phil Foden** | Manchester City | **19** |
-| **7** | **Mohamed Salah** | Liverpool FC | **18** |
-| **8** | **Heung-min Son** | Tottenham Hotspur | **17** |
-| **9** | **Bukayo Saka** | Arsenal FC | **16** |
-| **10** | **Jarrod Bowen** | West Ham United | **16** |
+| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Tổng Số Bàn Thắng (`Goals`) |
+| :---: | :--- | :---: |
+| **1** | **Erling Haaland** | **27** |
+| **2** | **Cole Palmer** | **22** |
+| **3** | **Alexander Isak** | **21** |
+| **4** | **Dominic Solanke** | **19** |
+| **5** | **Ollie Watkins** | **19** |
+| **6** | **Phil Foden** | **19** |
+| **7** | **Mohamed Salah** | **18** |
+| **8** | **Heung-min Son** | **17** |
+| **9** | **Bukayo Saka** | **16** |
+| **10** | **Jarrod Bowen** | **16** |
+
+
 
 ---
 

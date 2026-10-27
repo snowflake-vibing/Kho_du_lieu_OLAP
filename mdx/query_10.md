@@ -302,22 +302,45 @@ WHERE (
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị ma trận bàn thắng và tăng trưởng QoQ của Real Madrid:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 33 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Câu Lạc Bộ Đối Thủ (`Opponent Club`) | Q1 Bàn Thắng | Q1 QoQ % | Q2 Bàn Thắng | Q2 QoQ % | Q3 Bàn Thắng | Q3 QoQ % | Q4 Bàn Thắng | Q4 QoQ % |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **UD Almería** | - | - | 4 | - | 3 | -25.00% | - | -100.00% |
-| **CA Osasuna** | 2 | +100.00% | - | -100.00% | - | - | 4 | - |
-| **Cádiz CF** | - | -100.00% | 2 | - | - | -100.00% | 3 | - |
-| **Girona FC** | - | -100.00% | 2 | - | 3 | +50.00% | - | -100.00% |
-| **Villarreal CF** | 1 | - | 1 | 0.00% | - | -100.00% | 4 | - |
-| **Celta de Vigo** | - | - | 2 | - | 1 | -50.00% | - | -100.00% |
-| **Valencia CF** | 2 | - | 0 | -100.00% | - | - | 5 | - |
-| **Real Valladolid CF** | - | -100.00% | 6 | - | - | -100.00% | - | - |
-| **Athletic Bilbao** | 2 | - | 1 | -50.00% | 2 | +100.00% | - | -100.00% |
-| **FC Barcelona** | 0 | -100.00% | - | - | - | - | 2 | - |
+| STT | Câu Lạc Bộ Đối Thủ (`Opponent Club`) | Q1 Bàn Thắng | Q1 QoQ % | Q2 Bàn Thắng | Q2 QoQ % | Q3 Bàn Thắng | Q3 QoQ % | Q4 Bàn Thắng | Q4 QoQ % |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **UD Almería** | - | - | 4 | - | 3 | -25.00% | - | -100.00% |
+| **2** | **CA Osasuna** | 2 | - | - | -100.00% | - | - | 4 | - |
+| **3** | **Cádiz CF** | - | - | 2 | - | - | -100.00% | 3 | - |
+| **4** | **Girona FC** | - | - | 2 | - | 3 | +50.00% | - | -100.00% |
+| **5** | **Villarreal CF** | 1 | - | 1 | +0.00% | - | -100.00% | 4 | - |
+| **6** | **Celta de Vigo** | - | - | 2 | - | 1 | -50.00% | - | -100.00% |
+| **7** | **Valencia CF** | 2 | - | 0 | -100.00% | - | - | 5 | - |
+| **8** | **Celtic FC** | - | - | - | - | - | - | - | - |
+| **9** | **FC Barcelona** | 0 | - | - | - | - | - | 2 | - |
+| **10** | **Real Valladolid CF** | - | - | 6 | - | - | -100.00% | - | - |
+| **11** | **Athletic Bilbao** | 2 | - | 1 | -50.00% | 2 | +100.00% | - | -100.00% |
+| **12** | **Elche CF** | 4 | - | - | -100.00% | - | - | - | - |
+| **13** | **Sevilla FC** | - | - | 2 | - | - | -100.00% | 1 | - |
+| **14** | **Deportivo Alavés** | - | - | - | - | - | - | 1 | - |
+| **15** | **Getafe CF** | - | - | 1 | - | 2 | +100.00% | - | -100.00% |
+| **16** | **Granada CF** | - | - | - | - | - | - | 2 | - |
+| **17** | **Liverpool FC** | 6 | - | - | -100.00% | - | - | - | - |
+| **18** | **RB Leipzig** | - | - | - | - | - | - | - | - |
+| **19** | **RCD Espanyol Barcelona** | 3 | - | - | -100.00% | - | - | - | - |
+| **20** | **RCD Mallorca** | 0 | - | - | - | - | - | - | - |
+| **21** | **SSC Napoli** | - | - | - | - | - | - | 6 | - |
+| **22** | **Atlético de Madrid** | 1 | - | - | -100.00% | 1 | - | - | -100.00% |
+| **23** | **Rayo Vallecano** | - | - | 2 | - | - | -100.00% | 0 | - |
+| **24** | **SC Braga** | - | - | - | - | - | - | 5 | - |
+| **25** | **1.FC Union Berlin** | - | - | - | - | 1 | - | 3 | +200.00% |
+| **26** | **Bayern Munich** | - | - | - | - | - | - | - | - |
+| **27** | **Chelsea FC** | - | - | 4 | - | - | -100.00% | - | - |
+| **28** | **Manchester City** | - | - | 1 | - | - | -100.00% | - | - |
+| **29** | **UD Las Palmas** | - | - | - | - | 2 | - | - | -100.00% |
+| **30** | **FC Shakhtar Donetsk** | - | - | - | - | - | - | - | - |
+| **31** | **Real Betis Balompié** | 0 | - | - | - | - | - | 1 | - |
+| **32** | **Real Sociedad** | 0 | - | 0 | - | 2 | - | - | -100.00% |
+| **33** | **Borussia Dortmund** | - | - | - | - | - | - | - | - |
 
-> *Ghi chú:* Giá trị `Q1 QoQ %` hiển thị dấu `-` (hoặc `NULL`) do Quý 1 là kỳ đầu năm, hàm `PREVMEMBER` không tìm thấy quý liền trước trong ngữ cảnh năm 2023, hàm `IIF` xử lý an toàn ngăn chặn lỗi chia cho 0.
+
 
 ---
 

@@ -263,20 +263,35 @@ FROM [DW Football Transfermarkt];
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị 16 siêu sân vận động của bóng đá Châu Âu:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 23 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| Sân Vận Động (`Stadium Name`) | Câu Lạc Bộ Chủ Quản (`Club Name`) | Sức Chứa Chuẩn Hóa (`Stadium Capacity`) | Số Trận Đã Diễn Ra (`Distinct Matches`) | Tổng Bàn Thắng (`Goals`) |
-| :--- | :--- | :---: | :---: | :---: |
-| **Santiago Bernabéu** | Real Madrid | 83.186 Chỗ | 101 | 210 |
-| **SIGNAL IDUNA PARK** | Borussia Dortmund | 81.365 Chỗ | 89 | 177 |
-| **Atatürk Olimpiyat** | Fatih Karagümrük | 77.563 Chỗ | 72 | 118 |
-| **Giuseppe Meazza** | AC Milan | 75.923 Chỗ | 100 | 169 |
-| **Giuseppe Meazza** | Inter Milan | 75.923 Chỗ | 97 | 184 |
-| **Allianz Arena** | Bayern Munich | 75.000 Chỗ | 90 | 225 |
-| **Old Trafford** | Manchester United | 74.879 Chỗ | 94 | 145 |
-| **Olympiastadion Berlin** | Hertha BSC | 74.667 Chỗ | 34 | 40 |
-| **La Cartuja** | Real Betis Balompié | 71.374 Chỗ | 90 | 111 |
-| **Olimpico di Roma** | AS Roma | 70.634 Chỗ | 105 | 156 |
+| STT | Sân Vận Động (`Stadium Name`) | Câu Lạc Bộ Chủ Quản (`Club Name`) | Sức Chứa Chuẩn Hóa (`Stadium Capacity`) | Số Trận Đã Diễn Ra (`Distinct Matches`) | Tổng Bàn Thắng (`Goals`) |
+| :---: | :--- | :--- | :---: | :---: | :---: |
+| **1** | **Santiago Bernabéu** | Real Madrid | 83,186 Chỗ | 101 | 210 |
+| **2** | **SIGNAL IDUNA PARK** | Borussia Dortmund | 81,365 Chỗ | 89 | 177 |
+| **3** | **Atatürk Olimpiyat** | Fatih Karagümrük | 77,563 Chỗ | 72 | 118 |
+| **4** | **Giuseppe Meazza** | AC Milan | 75,923 Chỗ | 100 | 169 |
+| **5** | **Giuseppe Meazza** | Inter Milan | 75,923 Chỗ | 97 | 184 |
+| **6** | **Allianz Arena** | Bayern Munich | 75,000 Chỗ | 90 | 225 |
+| **7** | **Old Trafford** | Manchester United | 74,879 Chỗ | 94 | 145 |
+| **8** | **Olympiastadion Berlin** | Hertha BSC | 74,667 Chỗ | 34 | 40 |
+| **9** | **La Cartuja** | Real Betis Balompié | 71,374 Chỗ | 90 | 111 |
+| **10** | **Olimpico di Roma** | Associazione Sportiva Roma | 70,634 Chỗ | 105 | 156 |
+| **11** | **Olimpico di Roma** | Società Sportiva Lazio S.p.A. | 70,634 Chỗ | 90 | 122 |
+| **12** | **Riyadh Air Metropolitano** | Atlético de Madrid | 70,460 Chỗ | 92 | 160 |
+| **13** | **Estádio da Luz** | SL Benfica | 68,100 Chỗ | 90 | 192 |
+| **14** | **Orange Vélodrome** | Olympique Marseille | 67,394 Chỗ | 92 | 145 |
+| **15** | **Tottenham Hotspur Stadium** | Tottenham Hotspur | 62,850 Chỗ | 84 | 145 |
+| **16** | **Spotify Camp Nou** | FC Barcelona | 62,657 Chỗ | 94 | 179 |
+| **17** | **London Stadium** | West Ham United | 62,500 Chỗ | 86 | 115 |
+| **18** | **Veltins-Arena** | FC Schalke 04 | 62,271 Chỗ | 34 | 32 |
+| **19** | **Anfield** | Liverpool FC | 61,276 Chỗ | 94 | 198 |
+| **20** | **Etihad Stadium** | Manchester City | 61,000 Chỗ | 99 | 245 |
+| **21** | **Emirates Stadium** | Arsenal FC | 60,704 Chỗ | 94 | 199 |
+| **22** | **MHPArena Stuttgart** | VfB Stuttgart | 60,449 Chỗ | 68 | 123 |
+| **23** | **Celtic Park** | Celtic FC | 60,411 Chỗ | 78 | 186 |
+
+
 
 ---
 

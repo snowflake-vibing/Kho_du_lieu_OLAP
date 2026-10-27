@@ -307,30 +307,30 @@ WHERE (
 
 ## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị nhóm 18 quốc gia chiếm 80% bàn thắng tại Nước Anh (số liệu thực tế đã kiểm chứng và đối soát 100% từ Data Warehouse):
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 18 dòng dữ liệu thực tế từ khối Cube OLAP:
 
 | STT | Quốc Tịch (`Country Of Citizenship`) | Tổng Bàn Thắng (`Goals`) | Tỷ Lệ Đóng Góp (`Pct Of England Goals`) |
 | :---: | :--- | :---: | :---: |
-| 1 | **England** | 714 | 31.93% |
-| 2 | **Brazil** | 194 | 8.68% |
-| 3 | **Norway** | 91 | 4.07% |
-| 4 | **France** | 89 | 3.98% |
-| 5 | **Portugal** | 86 | 3.85% |
-| 6 | **Argentina** | 79 | 3.53% |
-| 7 | **Germany** | 54 | 2.42% |
-| 8 | **Belgium** | 53 | 2.37% |
-| 9 | **Netherlands** | 52 | 2.33% |
-| 10 | **Denmark** | 51 | 2.28% |
-| 11 | **Spain** | 51 | 2.28% |
-| 12 | **Sweden** | 48 | 2.15% |
-| 13 | **Jamaica** | 44 | 1.97% |
-| 14 | **Korea, South** | 42 | 1.88% |
-| 15 | **Scotland** | 39 | 1.74% |
-| 16 | **Egypt** | 37 | 1.65% |
-| 17 | **Nigeria** | 37 | 1.65% |
-| 18 | **Ghana** | 35 | 1.57% |
+| **1** | **England** | **714** | 31.93% |
+| **2** | **Brazil** | **194** | 8.68% |
+| **3** | **Norway** | **91** | 4.07% |
+| **4** | **France** | **89** | 3.98% |
+| **5** | **Portugal** | **86** | 3.85% |
+| **6** | **Argentina** | **79** | 3.53% |
+| **7** | **Germany** | **54** | 2.42% |
+| **8** | **Belgium** | **53** | 2.37% |
+| **9** | **Netherlands** | **52** | 2.33% |
+| **10** | **Denmark** | **51** | 2.28% |
+| **11** | **Spain** | **51** | 2.28% |
+| **12** | **Sweden** | **48** | 2.15% |
+| **13** | **Jamaica** | **44** | 1.97% |
+| **14** | **Korea, South** | **42** | 1.88% |
+| **15** | **Scotland** | **39** | 1.74% |
+| **16** | **Egypt** | **37** | 1.65% |
+| **17** | **Nigeria** | **37** | 1.65% |
+| **18** | **Ghana** | **35** | 1.57% |
 
-> *Ghi chú:* Nhóm 18 quốc gia trên cộng dồn đạt **$80.32\%$** tổng số bàn thắng (1.796 bàn / 2.236 bàn) tại các giải đấu ở Anh, thỏa mãn ngưỡng cắt $80\%$ của thuật toán `TOPPERCENT` theo nguyên lý Pareto $80/20$.
+
 
 ---
 
