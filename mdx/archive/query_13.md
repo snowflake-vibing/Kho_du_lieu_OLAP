@@ -197,6 +197,28 @@ FROM [DW Football Transfermarkt];
 * **`NONEMPTY(...)`**: Loại trừ trước các câu lạc bộ không có bản ghi ra sân nào phát sinh trong hệ thống.
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm đếm duy nhất `DISTINCTCOUNT(«Set»)` kết hợp từ khóa `EXISTING`**:
+   * **Cú pháp chuẩn:** `DISTINCTCOUNT(EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS)`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Bảng sự kiện `FACT_Player_Match_Perf` ghi nhận từng lần ra sân của cầu thủ qua từng trận đấu (một cầu thủ có thể ra sân 30-40 trận/mùa).
+     * Hàm `DISTINCTCOUNT` duyệt qua tập hợp các mã định danh `Player ID` và chỉ đếm các giá trị phân biệt duy nhất, triệt tiêu hoàn toàn sự nhân bản theo số trận.
+     * Từ khóa `EXISTING` kích hoạt cơ chế chuyển đổi ngữ cảnh (**Context Transition**): ép tập hợp `Player ID` chỉ bao gồm các cầu thủ thi đấu cho đúng câu lạc bộ đang xét trên dòng hiện hành, đem lại con số số lượng cầu thủ thực chiến (`Active Players`) chính xác tuyệt đối.
+   * **Kết quả trả về:** Số lượng cầu thủ thực tế đã ra sân thi đấu cho từng CLB.
+
+2. **Hàm tích Đề-các `CrossJoin(«Set_1», «Set_2»)` giữa 2 thuộc tính cùng Dimension**:
+   * **Cú pháp chuẩn:** `CrossJoin(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: Danh sách tên câu lạc bộ `[DIM Club].[Club Name]`.
+     * `Set_2`: Quy mô danh nghĩa đội hình `[DIM Club].[Squad Size]`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Ghép cặp Tên CLB và Quy mô quân số đăng ký thành một Tuple 2 chiều trên trục dòng, cho phép đối chiếu song song giữa quân số danh nghĩa đăng ký với quân số thực chiến.
+
+3. **Thuộc tính `.CURRENTMEMBER` và `.MEMBERVALUE`**:
+   * **Cơ chế hoạt động kỹ thuật:** Trích xuất giá trị số học nguyên thủy (numeric integer) của thuộc tính `Squad Size` để thực hiện sắp xếp số học chuẩn xác bằng `ORDER(..., BDESC)` từ CLB có quy mô lớn nhất (32 cầu thủ) xuống nhỏ dần, tránh lỗi sắp xếp theo thứ tự bảng chữ cái.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

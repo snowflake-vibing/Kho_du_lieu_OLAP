@@ -89,7 +89,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta áp dụng hàm l�
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Game`** | Nhấp chọn **`Coach Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `GENERATE` bên dưới → Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Coach Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `GENERATE` bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào Expression Builder ở Dòng 1:*
 ```mdx
@@ -118,7 +118,7 @@ GENERATE(
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 1. **Kéo Chiều Huấn luyện viên & Tháng (Rows):**
-   * Mở rộng chiều **`DIM Game`** → tìm thuộc tính **`Coach Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
+   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Coach Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
    * Mở rộng chiều **`DIM Time`** → tìm thuộc tính **`Month`**: Kéo thả vào ngay bên cạnh cột `Coach Name`.
 2. **Kéo Thước đo Thẻ phạt (Measures):**
    * Mở rộng thư mục **`Measures`** → mở nhóm **`FACT Player Match Perf`**.

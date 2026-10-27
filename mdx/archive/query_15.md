@@ -226,6 +226,33 @@ FROM [DW Football Transfermarkt];
 * **`ORDER(..., [Full Date].MEMBERVALUE, BASC) ON ROWS`**: Sắp xếp nhật ký thi đấu theo thứ tự thời gian tăng dần (`BASC`) trên trục **HÀNG** (Axis 1).
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Mệnh đề định nghĩa tập hợp đặt tên `WITH SET «Set_Name» AS «Expression»`**:
+   * **Cú pháp chuẩn:** `WITH SET [Set_Name] AS Set_Expression`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Cho phép định nghĩa một tập hợp con có tên gọi riêng (`[Young Players]`) chỉ tồn tại trong phiên truy vấn.
+     * Đóng gói logic lọc phức tạp của lứa cầu thủ trẻ (ngày sinh $\ge 2004$ hoặc tuổi $\le 20$), giúp tái sử dụng tập hợp này một cách gọn gàng trong các mệnh đề `CrossJoin` tiếp theo mà không cần phải lặp lại biểu thức `FILTER`.
+
+2. **Hàm trích xuất thuộc tính thành viên `.PROPERTIES(«Property_Name»)`**:
+   * **Cú pháp chuẩn:** `«Member».PROPERTIES("Property_Name")`
+   * **Tham số thực tế trong truy vấn:** `[DIM Player].[Player Name].CURRENTMEMBER.PROPERTIES("Date Of Birth")`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Trích xuất trực tiếp giá trị của thuộc tính phụ (Member Property) `Date Of Birth` gắn liền với thành viên `Player Name` mà không cần thiết phải kéo thuộc tính đó ra hiển thị trên trục tọa độ.
+     * Cho phép Formula Engine thực hiện so sánh chuỗi ngày tháng chuẩn ISO (`>= "2004-01-01"`) để nhận diện chính xác các tài năng sinh từ năm 2004 trở về sau.
+
+3. **Hàm `NONEMPTY(«Set», «Measure_Set»)` với tập hợp nhiều thước đo**:
+   * **Cú pháp chuẩn:** `NONEMPTY(Set, { Measure1, Measure2, Measure3 })`
+   * **Tham số thực tế:** `NONEMPTY(CrossJoin(...), { Goals, Yellow Cards, Red Cards })`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Kiểm tra sự tồn tại dữ liệu trên cả 3 thước đo: Bàn thắng, Thẻ vàng, Thẻ đỏ.
+     * Nếu trong một ngày cụ thể mà cầu thủ trẻ không ra sân hoặc không phát sinh bất kỳ sự kiện bàn thắng hay thẻ phạt nào, dòng đó sẽ bị loại bỏ ngay từ tầng Storage Engine.
+     * Giúp giảm quy mô ma trận từ hàng triệu ô thưa xuống chỉ còn vài chục dòng sự kiện thi đấu thực tế.
+
+4. **Hàm `ORDER(..., [Full Date].MEMBERVALUE, BASC)`**:
+   * **Cơ chế:** Sắp xếp nhật ký thi đấu theo dòng thời gian tăng dần (`BASC` - Break Hierarchy Ascending) từ các mốc ngày sớm nhất đến mới nhất, tạo thành một cuốn nhật ký tiến trình phong độ hoàn chỉnh của các tài năng trẻ.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

@@ -236,6 +236,37 @@ WHERE (
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
 * **`WHERE ([FACT Player Match Perf].[Is Starter].[0])`**: Trục lát cắt dữ liệu (Slicer Axis), cố định ngữ cảnh phân tích cho các lần ra sân dự bị.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm `TOPCOUNT(«Set», «Count»[, «Numeric_Expression»])`**:
+   * **Cú pháp chuẩn:** `TOPCOUNT(Set, Count, Numeric_Expression)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp cầu thủ dự bị đã được lọc điều kiện bàn thắng (`Goals > 0`).
+     * `Count`: `15` (số lượng cầu thủ cần lấy).
+     * `Numeric_Expression`: `[Measures].[Goals]` (tiêu chí số bàn thắng ghi được khi vào sân từ ghế dự bị).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Đánh giá số bàn thắng ghi được của từng cầu thủ trong ngữ cảnh lát cắt `Is Starter = 0` (vào sân thay người).
+     * Tự động sắp xếp giảm dần toàn cục (`BDESC`) và trích xuất đúng 15 chân sút dự bị có thành tích phá lưới ấn tượng nhất.
+   * **Kết quả trả về:** Tập hợp 15 cầu thủ "Siêu dự bị" ghi nhiều bàn nhất.
+
+2. **Hàm đối ngẫu `BOTTOMCOUNT(«Set», «Count»[, «Numeric_Expression»])` (trong biến thể nâng cao)**:
+   * **Cú pháp chuẩn:** `BOTTOMCOUNT(Set, Count, Numeric_Expression)`
+   * **Tham số thực tế trong biến thể:**
+     * `Set`: Các cầu thủ dự bị ghi được từ 3 bàn thắng trở lên (`Goals >= 3`).
+     * `Count`: `5` (lấy ra 5 cầu thủ).
+     * `Numeric_Expression`: `[Measures].[Minutes Played]` (tiêu chí số phút thi đấu).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hoạt động ngược lại với `TOPCOUNT`: tự động sắp xếp tập hợp theo thứ tự tăng dần (`BASC`) của thời lượng thi đấu và lấy ra 5 cầu thủ có số phút ra sân ít nhất.
+     * **Ý nghĩa nghiệp vụ:** Tìm kiếm các "Siêu dự bị" đạt hiệu suất tối thượng: thi đấu ít phút nhất nhưng vẫn kịp ghi từ 3 bàn trở lên cho đội bóng.
+
+3. **Hàm `FILTER(«Set», «Logical_Expression»)`**:
+   * **Cú pháp chuẩn:** `FILTER(Set, Logical_Expression)`
+   * **Cơ chế hoạt động kỹ thuật:** Formula Engine duyệt qua tập hợp các cầu thủ dự bị và loại bỏ triệt để những cầu thủ vào sân nhưng không ghi được bàn thắng nào (`[Measures].[Goals] > 0`), giúp danh sách kết quả tinh gọn và chuẩn xác.
+
+4. **Hàm `NONEMPTY(«Set_1»[, «Set_2»])`**:
+   * **Cơ chế hoạt động kỹ thuật:** Tiền lọc ô thưa với Tuple `([Measures].[Goals], [FACT Player Match Perf].[Is Starter].[0])`, chỉ nạp vào bộ nhớ các cầu thủ thực sự có dữ liệu ra sân từ ghế dự bị.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

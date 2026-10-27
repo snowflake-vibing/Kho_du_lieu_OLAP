@@ -219,6 +219,42 @@ WHERE (
 * **`FROM [DW Football Transfermarkt]`**: Chỉ định khối Cube nguồn cần trích xuất dữ liệu.
 * **`WHERE ([DIM Competition].[Competition Type].[domestic_league])`**: Trục lát cắt dữ liệu (Slicer Axis), giới hạn ngữ cảnh phân tích trong các giải Vô địch Quốc gia.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm `TOPCOUNT(«Set», «Count»[, «Numeric_Expression»])`**:
+   * **Cú pháp chuẩn:** `TOPCOUNT(Set, Count, Numeric_Expression)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp các Tuple `(Player Name, Midfield)` đã được tiền lọc sạch dữ liệu thưa bằng `NONEMPTY(...)`.
+     * `Count`: `10` (lấy ra đúng 10 tiền vệ dẫn đầu).
+     * `Numeric_Expression`: `[Measures].[Assists]` (tiêu chí định lượng số pha kiến tạo).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hàm tự động đánh giá số pha kiến tạo `Assists` của từng tiền vệ trong ngữ cảnh lát cắt các giải Vô địch Quốc gia (`domestic_league`).
+     * Thực hiện sắp xếp giảm dần toàn cục (`BDESC`) theo giá trị kiến tạo và cắt lấy đúng 10 tiền vệ có thành tích xuất sắc nhất.
+   * **Kết quả trả về:** Tập hợp gồm đúng 10 tiền vệ kiến tạo nhiều nhất.
+
+2. **Hàm tích Đề-các `CrossJoin(«Set_1», «Set_2»)` (hoặc toán tử `*`)**:
+   * **Cú pháp chuẩn:** `CrossJoin(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS` (toàn bộ danh mục cầu thủ).
+     * `Set_2`: `{ [DIM Player].[Main Position].[Midfield] }` (thành viên vị trí tiền vệ).
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Phép nhân tích Đề-các giữa tập hợp tên cầu thủ với vai trò tiền vệ `Midfield`. Cơ chế này tạo ra một tập hợp các Tuple phẳng dạng `(Player, Midfield)`, đóng vai trò như một bộ lọc trực tiếp ở cấp độ tập hợp, đảm bảo chỉ có các cầu thủ thi đấu ở vị trí tiền vệ mới được đưa vào xét duyệt.
+   * **Kết quả trả về:** Tập hợp các Tuple `(Player Name, Midfield)`.
+
+3. **Hàm `NONEMPTY(«Set_1»[, «Set_2»])`**:
+   * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set_1`: Tập hợp các Tuple sinh ra từ `CrossJoin`.
+     * `Set_2`: Tuple tọa độ `([Measures].[Assists], [DIM Competition].[Competition Type].[domestic_league])`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Hoạt động ở tầng Storage Engine, loại trừ trước những tiền vệ không có bất kỳ kiến tạo nào ở giải VĐQG trước khi đưa vào hàm `TOPCOUNT`, giảm thiểu tài nguyên tính toán của Formula Engine.
+   * **Kết quả trả về:** Tập con các tiền vệ thực tế có kiến tạo tại các giải VĐQG.
+
+4. **Thuộc tính `.MEMBERS`**:
+   * **Cú pháp chuẩn:** `«Hierarchy/Level».MEMBERS`
+   * **Cơ chế hoạt động kỹ thuật:** Trích xuất toàn bộ danh sách các thành viên ở cấp độ `Player Name` để làm đầu vào cho hàm `CrossJoin`.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).

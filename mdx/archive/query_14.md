@@ -204,6 +204,31 @@ FROM [DW Football Transfermarkt];
 * **`NONEMPTY(...)`**: Tiền lọc dữ liệu thưa, loại bỏ trước các trận đấu chưa diễn ra hoặc không có bàn thắng nào.
 * **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
 
+#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+
+1. **Hàm `FILTER(«Set», «Logical_Expression»)`**:
+   * **Cú pháp chuẩn:** `FILTER(Set, Logical_Expression)`
+   * **Tham số thực tế trong truy vấn:**
+     * `Set`: Tập hợp các Tuple `(Game ID, Round)` sau khi tiền lọc ô thưa.
+     * `Logical_Expression`: `[Measures].[Goals] >= 5`.
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Formula Engine duyệt qua từng trận đấu trong tập hợp và đánh giá tổng số bàn thắng được ghi bởi cả hai đội bóng.
+     * Chỉ những trận đấu có từ 5 bàn thắng trở lên mới thỏa mãn điều kiện logic `TRUE` và được giữ lại.
+     * **Ý nghĩa đối chiếu:** Tương đương trực tiếp với mệnh đề `HAVING SUM(Goals) >= 5` trong ngôn ngữ SQL truyền thống.
+   * **Kết quả trả về:** Tập hợp các trận đấu bùng nổ bàn thắng ($\ge 5$ bàn).
+
+2. **Hàm `ORDER(«Set», «Criteria», BDESC)`**:
+   * **Cú pháp chuẩn:** `ORDER(Set, Criteria, BDESC)`
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Đánh giá số bàn thắng của từng trận đấu và sắp xếp giảm dần trên quy mô toàn cục (`BDESC`).
+     * Đưa các trận cầu có số bàn thắng kỷ lục (như trận 10 bàn tại Vòng 9) lên đầu bảng xếp hạng ma trận.
+
+3. **Hàm `CrossJoin(Game ID, Round)` kết hợp `EXCEPT(...)`**:
+   * **Cơ chế hoạt động kỹ thuật:**
+     * Dùng hàm `EXCEPT` loại bỏ nút tổng hợp `[All]` trên cả 2 chiều `Game ID` và `Round` để tránh xuất hiện dòng tổng cộng thừa.
+     * Dùng `CrossJoin` ghép mã trận đấu với vòng đấu thành một Tuple hoàn chỉnh đại diện cho một trận đấu cụ thể.
+
+
 #### Bước 3: Thực thi truy vấn và Đọc kết quả
 1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
 2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
