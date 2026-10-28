@@ -1,35 +1,38 @@
-# 3.10.7 Câu truy vấn 7: Thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu thuộc Nước Anh
+# 3.10 Thực hiện các câu truy vấn sử dụng SSAS, Pivot table, ngôn ngữ MDX
 
-**Nội dung truy vấn:** Xác định nhóm các quốc gia có cầu thủ đóng góp vào **80% tổng số bàn thắng** được ghi tại tất cả các giải đấu bóng đá diễn ra trên lãnh thổ Nước Anh (`Country_Name = 'England'`). Ứng dụng nguyên lý Pareto $80/20$ giúp liên đoàn bóng đá và các câu lạc bộ đánh giá thị trường xuất khẩu cầu thủ chủ lực, phục vụ chiến lược cấp giấy phép lao động (Work Permit) và chính sách ngoại binh.
+## 3.10.7 Câu truy vấn 7
 
-## 3.10.7.1 Sử dụng Cube Browser
+**Nội dung truy vấn:** Xác định nhóm các quốc gia có cầu thủ đóng góp vào 80% tổng số bàn thắng được ghi tại tất cả các giải đấu bóng đá diễn ra trên lãnh thổ Nước Anh Country Name là England. Ứng dụng nguyên lý Pareto 80/20 giúp liên đoàn bóng đá và các câu lạc bộ đánh giá thị trường xuất khẩu cầu thủ chủ lực, phục vụ chiến lược cấp giấy phép lao động và chính sách ngoại binh.
 
-### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Member Tỷ Lệ Pareto
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSAS_Football_Transfermarkt`).
-2. Mở tệp khối đa chiều **`DW Football Transfermarkt.cube`** → chuyển đến tab **`Calculations`**.
-3. Tạo 2 Calculated Members để tính tổng bàn thắng của giải đấu tại Anh và tỷ lệ phần trăm đóng góp:
-   * **Thước đo 1 (`England Total Goals`):**
-     * Name: `England Total Goals` | Parent hierarchy: `Measures`
-     * Expression: `([DIM Player].[Country Of Citizenship].[All], [Measures].[Goals], [DIM Competition].[Country Name].[England])`
-   * **Thước đo 2 (`Pct Of England Goals`):**
-     * Name: `Pct Of England Goals` | Parent hierarchy: `Measures`
-     * Expression: `IIF([Measures].[England Total Goals] = 0, NULL, [Measures].[Goals] / [Measures].[England Total Goals])`
-     * Format String: `0.00%`
-4. Chọn menu **Build** → **Deploy Solution** để đồng bộ vào Cube.
+### 3.10.7.1 Sử dụng Cube Browser
 
-### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
-2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa.
+**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo 2 thước đo tính toán tổng bàn thắng tại Anh và tỷ lệ phần trăm Pareto:
+* ● Thước đo thứ nhất: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `England Total Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
+```mdx
+([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All], [DIM Competition].[Country Name].[England])
+```
+* ● Thước đo thứ hai: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Pct Of England Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
+```mdx
+IIF([Measures].[England Total Goals] = 0, NULL, [Measures].[Goals] / [Measures].[England Total Goals])
+```
+Đặt Format String là `0.00%`.
 
-### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọc để cố định Nước Anh và áp dụng thuật toán `TOPPERCENT 80%`:
+**Bước 2:** Trên thanh menu công cụ của Visual Studio, chọn menu Build rồi nhấp chọn Deploy Solution để đồng bộ cấu trúc mới vào máy chủ SSAS.
 
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Country Name`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn **`England`** → Bấm **OK** (hiển thị `{ England }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Country Of Citizenship`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `TOPPERCENT` bên dưới → Bấm **OK** |
+**Bước 3:** Chuyển sang tab **Browser** trên thanh tab của trình thiết kế Cube Designer. Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào nút Reconnect để nhận cấu trúc mới, sau đó nhấp chọn biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan.
 
-*Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 2:*
+**Bước 4:** Thiết lập bộ lọc quốc gia giải đấu tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Competition.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Country Name.
+* ● Tại cột Operator, giữ nguyên giá trị là Equal.
+* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn England rồi nhấp nút OK để xác nhận.
+
+**Bước 5:** Thiết lập điều kiện lọc Top 80% Pareto quốc tịch cầu thủ tại dòng thứ hai trong vùng bộ lọc Filter Pane:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Player.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Country Of Citizenship.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Custom.
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhấp tiếp vào nút dấu ba chấm mở rộng để mở cửa sổ Expression Builder.
+* ● Trong cửa sổ Expression Builder, dán biểu thức TOPPERCENT để lọc các quốc gia chiếm 80% bàn thắng:
 ```mdx
 TOPPERCENT(
     NONEMPTY(
@@ -40,85 +43,55 @@ TOPPERCENT(
     [Measures].[Goals]
 )
 ```
+Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lưu điều kiện lọc.
 
-### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
-1. **Kéo Chiều Quốc tịch (Rows):**
-   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Country Of Citizenship`**: Kéo thả vào vùng Rows.
-2. **Kéo Thước đo Bàn thắng & Tỷ lệ % (Measures):**
-   * Mở rộng thư mục **`Measures`**:
-     * Kéo **`Goals`** thả vào cạnh cột `Country Of Citizenship`.
-     * Kéo **`Pct Of England Goals`** thả vào cột tiếp theo.
+**Bước 6:** Kéo thả các trường dữ liệu vào lưới Data Grid:
+* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Player, nhấp giữ chuột trái vào thuộc tính Country Of Citizenship, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
+* ● Tiếp tục trong khung Metadata, mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái và kéo các thước đo thả vào khu vực dữ liệu bên cạnh cột Country Of Citizenship theo thứ tự gồm Goals và Pct Of England Goals.
 
-### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
-2. Lưới dữ liệu lập tức chạy và hiển thị đúng 2 cột `Goals` và `Pct Of England Goals` theo danh sách 18 quốc gia chiếm 80% bàn thắng.
+**Bước 7:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả danh sách 18 quốc gia đóng góp 80% tổng số bàn thắng tại Nước Anh.
 
 ---
 
----
+### 3.10.7.2 Sử dụng Pivot Excel
 
-## 3.10.7.2 Sử dụng Pivot Excel
+**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
+* ● Mở rộng thư mục DIM Competition, nhấp giữ chuột trái vào trường Country Name, kéo chuột xuống phía dưới và thả vào ô Filters.
+* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Country Of Citizenship, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái vào các thước đo kéo thả vào ô Values gồm Goals và Pct Of England Goals.
 
-### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
+**Bước 2:** Thiết lập giá trị cho bộ lọc quốc gia giải đấu: Tại ô B1 nằm cạnh nhãn Country Name trên trang tính, nhấp chuột vào nút mũi tên xổ xuống, tích chọn England rồi nhấp nút OK.
 
-### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`SSAS_Football_Transfermarkt`** (hoặc `DW_Football_SSAS`).
-2. Chọn Cube: **`DW Football Transfermarkt`** → Nhấn **Finish**.
-3. Chọn vị trí đặt bảng: **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
+**Bước 3:** Cấu hình bộ lọc Pareto 80%:
+* ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 nhãn Row Labels của cột Country Of Citizenship.
+* ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
+* ● Trong hộp thoại Top 10 Filter xuất hiện, đổi ô thứ nhất sang Top, nhập số 80 vào ô thứ hai, tại ô thứ ba chọn Percent theo thước đo Sum of Goals rồi nhấp nút OK để áp dụng.
 
-### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
-Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
+**Bước 4:** Sắp xếp giảm dần theo số bàn thắng: Nhấp chuột phải vào một ô số bất kỳ trong cột Goals, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
 
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
-| :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Country Name`** | Mở thư mục **`DIM Competition`** → Kéo `Country Name` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Country Of Citizenship`** | Mở thư mục **`DIM Player`** → Kéo `Country Of Citizenship` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Pct Of England Goals`** | Mở thư mục **`Measures`** → Kéo `Pct Of England Goals` thả vào ô Values. |
-
-### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. Tại ô **`B1`** (bên cạnh nhãn `Country Name`), nhấp mũi tên xổ xuống → tick chọn **`England`** → Nhấn **OK**.
-2. **Cấu hình Bộ lọc Pareto 80%:**
-   * Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-   * Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
-   * Trong hộp thoại Top 10 Filter: Đổi sang **`Top`** → Nhập **`80`** → Chọn **`Percent`** theo **`Sum of Goals`** → Nhấn **OK**.
-
-### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Nhấp chuột phải vào một ô trong cột `Goals` → chọn **Sort** → **`Sort Largest to Smallest`**.
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách 18 quốc gia dẫn đầu chiếm 80% tổng số bàn thắng tại giải đấu ở Anh.
 
 ---
 
----
+### 3.10.7.3 Sử dụng ngôn ngữ MDX
 
-## 3.10.7.3 Sử dụng ngôn ngữ MDX
+**Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động phần mềm **SQL Server Management Studio (SSMS)**.
-2. Tại hộp thoại kết nối máy chủ:
-   * **Server type:** Nhấp chọn **`Analysis Services`**.
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Authentication:** Chọn **`Windows Authentication`** → Nhấn **Connect**.
-3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở database **`SSAS_Football_Transfermarkt`** (hoặc `DW_Football_SSAS`) → mở thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
-4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
-
-### Bước 2: Soạn thảo câu truy vấn MDX
-Nhập câu lệnh MDX hoàn chỉnh sau:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu ở Anh. Truy vấn chỉ định rõ các mệnh đề:
+* ● Mệnh đề `WITH MEMBER` định nghĩa `[Measures].[England Total Goals]` cố định cấp All làm mẫu số và `[Measures].[Pct Of England Goals]` tính tỷ lệ phần trăm đóng góp.
+* ● Lựa chọn 2 thước đo hiển thị trên trục cột COLUMNS.
+* ● Sử dụng hàm `TOPPERCENT` lấy các quốc gia đạt ngưỡng 80% số bàn thắng trên trục hàng ROWS, kết hợp hàm `ORDER` với cờ `BDESC` để sắp xếp giảm dần.
+* ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
+* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn trong giải đấu ở Nước Anh `[DIM Competition].[Country Name].[England]`.
 
 ```mdx
 /* ==============================================================================
    Truy vấn MDX 07: Thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu ở Anh
-   Khai thác: TOPPERCENT, NONEMPTY, EXCEPT, ORDER (BDESC)
-   Cube: [DW Football Transfermarkt]
+   Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
 WITH 
-    -- 1. Tổng số bàn thắng của toàn bộ giải đấu tại Anh (cố định cấp [All] làm mẫu số)
+    -- 1. Tổng số bàn thắng của toàn bộ giải đấu tại Anh cố định cấp All làm mẫu số
     MEMBER [Measures].[England Total Goals] AS
         (
             [Measures].[Goals],
@@ -136,13 +109,13 @@ WITH
         FORMAT_STRING = "0.00%"
 
 SELECT
-    -- Trục Cột: Tổng số bàn thắng và Tỷ lệ phần trăm đóng góp
+    -- Trục Cột COLUMNS: Tổng số bàn thắng và Tỷ lệ phần trăm đóng góp
     {
         [Measures].[Goals],
         [Measures].[Pct Of England Goals]
     } ON COLUMNS,
 
-    -- Trục Dòng: Các quốc gia chiếm 80% tổng số bàn thắng, xếp giảm dần
+    -- Trục Dòng ROWS: Các quốc gia chiếm 80% tổng số bàn thắng, xếp giảm dần
     ORDER(
         TOPPERCENT(
             NONEMPTY(
@@ -162,59 +135,42 @@ SELECT
         BDESC
     ) ON ROWS
 
+-- Khối Cube nguồn
 FROM [DW Football Transfermarkt]
 
--- Lát cắt ngữ cảnh: Các giải đấu diễn ra tại Nước Anh
+-- Trục lát cắt Slicer Axis: Các giải đấu diễn ra tại Nước Anh
 WHERE (
     [DIM Competition].[Country Name].[England]
 );
 ```
 
-**Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`WITH MEMBER [Measures].[England Total Goals]`**: Tính tổng số bàn thắng toàn thể tại Nước Anh (2.236 bàn) bằng cách kết hợp tọa độ giao cắt `(Goals, [All] Country, [England])`.
-* **`WITH MEMBER [Measures].[Pct Of England Goals]`**: Tính tỷ trọng đóng góp của từng quốc gia so với tổng bàn thắng toàn giải, kết hợp chuỗi định dạng phần trăm `FORMAT_STRING = "0.00%"`.
-* **`TOPPERCENT(Set, 80, [Measures].[Goals])`**: Thuật toán Pareto tự động tính toán tổng tích lũy từ quốc gia có nhiều bàn thắng nhất đi xuống và dừng lại khi chạm ngưỡng $\ge 80\%$.
-* **`NONEMPTY(EXCEPT(...), Tuple)`**: Loại bỏ nút tổng hợp `[All]` và lọc sạch các quốc gia không có bàn thắng nào tại Anh trước khi tính tổng tích lũy phần trăm, đảm bảo mẫu số chính xác tuyệt đối.
-* **`ORDER(..., BDESC) ON ROWS`**: Sắp xếp danh sách các quốc gia thuộc Top 80% theo thứ tự giảm dần số bàn thắng trên trục **HÀNG** (Axis 1).
-* **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
-* **`WHERE ([DIM Competition].[Country Name].[England])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh phân tích tại Nước Anh.
+**Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
-
-1. **Hàm xếp hạng tích lũy Pareto `TOPPERCENT(«Set», «Percentage», «Numeric_Expression»)`**:
-   * **Cú pháp chuẩn:** `TOPPERCENT(Set, Percentage, Numeric_Expression)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set`: Tập hợp các quốc tịch cầu thủ sau khi đã loại bỏ nút `[All]` và lọc sạch ô thưa.
-     * `Percentage`: `80` (ngưỡng tỷ lệ phần trăm tích lũy cần đạt tới).
-     * `Numeric_Expression`: `[Measures].[Goals]` (thước đo số bàn thắng dùng để tính tỷ trọng).
-   * **Cơ chế hoạt động kỹ thuật:**
-     * **Bước 1:** Tính tổng số bàn thắng của toàn bộ tập hợp quốc gia tham gia các giải đấu tại Anh ($Total = 2.236$ bàn).
-     * **Bước 2:** Sắp xếp toàn bộ các quốc gia theo thứ tự số bàn thắng giảm dần.
-     * **Bước 3:** Tiến hành cộng dồn tích lũy (Cumulative Sum) số bàn thắng từ quốc gia đứng đầu (England 714 bàn, Brazil 194 bàn, Norway 91 bàn...) trở xuống.
-     * **Bước 4:** Tại mỗi quốc gia nạp vào, tính tỷ lệ phần trăm tích lũy: $CumPct = \frac{\sum_{i=1}^k Goals_i}{Total} \times 100\%$.
-     * **Bước 5:** Tiếp tục nạp thêm quốc gia cho đến khi tỷ lệ tích lũy đạt hoặc vừa vượt qua ngưỡng `80%` ($80.32\%$ tại quốc gia thứ 18 là Ghana), sau đó dừng lại và trả về đúng danh sách 18 quốc gia đó.
-   * **Ý nghĩa nghiệp vụ:** Tự động hóa hoàn toàn thuật toán nguyên lý Pareto kinh điển (80/20) mà không cần viết vòng lặp thủ công phức tạp như trong SQL.
-   * **Kết quả trả về:** Tập hợp đúng **18 quốc gia** dẫn đầu chiếm **$80.32\%$** tổng số bàn thắng của bóng đá Anh.
-
-2. **Tọa độ Tuple cố định mẫu số `[Measures].[England Total Goals]`**:
-   * **Cú pháp chuẩn:** `( [Measures].[Goals], [DIM Player].[Country Of Citizenship].[All], [DIM Competition].[Country Name].[England] )`
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Kỹ thuật gán tọa độ cấp cao nhất `[Country Of Citizenship].[All]` giúp bỏ qua sự phân rã theo từng dòng của trục ROWS, luôn giữ cố định tổng số bàn thắng toàn thể của giải đấu tại Anh (2.236 bàn) làm mẫu số cho phép tính tỷ trọng phần trăm `[Pct Of England Goals]`.
-
-3. **Hàm `ORDER(TOPPERCENT(...), [Measures].[Goals], BDESC)`**:
-   * **Cơ chế:** Sắp xếp danh sách các quốc gia thuộc nhóm Top 80% theo thứ tự giảm dần số bàn thắng trên quy mô toàn cục (`BDESC`), đảm bảo hiển thị trực quan từ quốc gia ghi nhiều bàn nhất trở xuống.
-
-### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `SSAS_Football_Transfermarkt` (hoặc `DW_Football_SSAS`).
-2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
-3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị danh sách 18 quốc gia dẫn đầu chiếm $80.32\%$ tổng bàn thắng.
-   * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về danh sách 18 quốc gia dẫn đầu chiếm 80.32% tổng số bàn thắng.
 
 ---
 
----
+### 3.10.7.4 Nhận xét
 
-## 3.10.7.4 Nhận xét
+Cả 3 cách gồm duyệt cube trong SSAS, dùng PivotTable trong Excel và viết truy vấn MDX đều trả về cùng một kết quả dữ liệu chính xác tuyệt đối.
 
-Cả 3 cách (duyệt cube trong SSAS, dùng PivotTable trong Excel, và viết truy vấn MDX) đều trả về cùng một kết quả dữ liệu chính xác.
+| STT | Quốc Tịch `Country Of Citizenship` | Tổng Bàn Thắng `Goals` | Tỷ Lệ Đóng Góp `Pct Of England Goals` |
+| :---: | :--- | :---: | :---: |
+| **1** | **England** | **714** | 31.93% |
+| **2** | **Brazil** | **194** | 8.68% |
+| **3** | **Norway** | **91** | 4.07% |
+| **4** | **France** | **89** | 3.98% |
+| **5** | **Portugal** | **86** | 3.85% |
+| **6** | **Argentina** | **79** | 3.53% |
+| **7** | **Germany** | **54** | 2.42% |
+| **8** | **Belgium** | **53** | 2.37% |
+| **9** | **Netherlands** | **52** | 2.33% |
+| **10** | **Denmark** | **51** | 2.28% |
+| **11** | **Spain** | **51** | 2.28% |
+| **12** | **Sweden** | **48** | 2.15% |
+| **13** | **Jamaica** | **44** | 1.97% |
+| **14** | **Korea, South** | **42** | 1.88% |
+| **15** | **Scotland** | **39** | 1.74% |
+| **16** | **Egypt** | **37** | 1.65% |
+| **17** | **Nigeria** | **37** | 1.65% |
+| **18** | **Ghana** | **35** | 1.57% |

@@ -1,30 +1,21 @@
-# 3.10.12 Câu truy vấn 12: Thẻ phạt của các đội bóng phân theo Huấn luyện viên trưởng & Tháng trong năm
+# 3.10 Thực hiện các câu truy vấn sử dụng SSAS, Pivot table, ngôn ngữ MDX
 
-**Nội dung truy vấn:** Xác định **tháng có số lượng thẻ phạt kỷ lục cao nhất** (tháng cao điểm căng thẳng) của từng Huấn luyện viên trưởng danh tiếng trong năm thi đấu, đi kèm tổng số thẻ vàng (`Yellow Cards`) và thẻ đỏ (`Red Cards`). Ứng dụng hàm lặp tập hợp `GENERATE` kết hợp `TOPCOUNT(..., 1)` giải quyết triệt để bài toán *"Group By Top 1 Per Category"* trong đại số đa chiều, hỗ trợ ban kỷ luật và truyền thông nhận diện thời điểm căng thẳng tâm lý lớn nhất của các HLV.
+## 3.10.12 Câu truy vấn 12
 
-## 3.10.12.1 Sử dụng Cube Browser
+**Nội dung truy vấn:** Xác định tháng có số lượng thẻ phạt kỷ lục cao nhất của từng Huấn luyện viên trưởng danh tiếng trong năm thi đấu, đi kèm tổng số thẻ vàng Yellow Cards và thẻ đỏ Red Cards. Ứng dụng hàm lặp tập hợp GENERATE kết hợp TOPCOUNT lấy đúng 1 tháng cao nhất giải quyết triệt để bài toán Group By Top 1 Per Category trong đại số đa chiều, hỗ trợ ban kỷ luật và truyền thông nhận diện thời điểm căng thẳng tâm lý lớn nhất của các huấn luyện viên.
 
-### Bước 1: Mở giao diện Cube Designer
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Trong cửa sổ **Solution Explorer** (khung bên phải):
-   * Mở rộng thư mục **`Cubes`**.
-   * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
+### 3.10.12.1 Sử dụng Cube Browser
 
-### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. **Kiểm tra trạng thái kết nối & giao diện:**
-   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
+**Bước 1:** Mở tab **Browser** trong trình thiết kế cube `DW Football Transfermarkt.cube`. Màn hình đang ở trạng thái trống, sẵn sàng để kéo thả các dimension, measure hoặc thiết lập bộ lọc.
 
-### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta áp dụng hàm lặp tập hợp `GENERATE`:
+**Bước 2:** Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan. Màn hình lúc này chia làm 3 khu vực gồm khung Metadata ở bên trái, vùng thiết lập bộ lọc Filter Pane ở phía trên bên phải và lưới dữ liệu Data Grid ở phía dưới bên phải.
 
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Coach Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** mở *Expression Builder*, dán biểu thức `GENERATE` bên dưới → Bấm **OK** |
-
-*Biểu thức nhập vào Expression Builder ở Dòng 1:*
+**Bước 3:** Thiết lập bộ lọc lặp tập hợp GENERATE tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Club.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Coach Name.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Custom.
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhấp tiếp vào nút dấu ba chấm mở rộng để mở cửa sổ Expression Builder.
+* ● Trong cửa sổ Expression Builder, dán biểu thức GENERATE kết hợp TOPCOUNT lấy duy nhất 1 tháng có nhiều thẻ vàng nhất cho mỗi huấn luyện viên:
 ```mdx
 GENERATE(
     FILTER(
@@ -47,92 +38,58 @@ GENERATE(
     )
 )
 ```
+Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lưu điều kiện lọc.
 
-### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
-Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Huấn luyện viên & Tháng (Rows):**
-   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Coach Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
-   * Mở rộng chiều **`DIM Time`** → tìm thuộc tính **`Month`**: Kéo thả vào ngay bên cạnh cột `Coach Name`.
-2. **Kéo Thước đo Thẻ phạt (Measures):**
-   * Mở rộng thư mục **`Measures`** → mở nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Yellow Cards`**, kéo thả vào ngay bên cạnh cột `Month`.
-   * Tiếp tục kéo thước đo **`Red Cards`** vào ngay bên cạnh cột `Yellow Cards`.
+**Bước 4:** Kéo thả các trường dữ liệu vào lưới Data Grid:
+* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Coach Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
+* ● Mở rộng thư mục chiều DIM Time, tìm thuộc tính Month, nhấp giữ chuột trái kéo sang thả vào vị trí ngay bên cạnh cột Coach Name.
+* ● Mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, lần lượt nhấp giữ chuột trái và kéo các thước đo Yellow Cards và Red Cards thả vào khu vực dữ liệu.
 
-### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị mỗi huấn luyện viên đúng duy nhất 1 tháng có số thẻ vàng cao điểm nhất.
-3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
+**Bước 5:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả mỗi huấn luyện viên đúng duy nhất một tháng có số thẻ phạt cao điểm nhất.
 
 ---
 
----
+### 3.10.12.2 Sử dụng Pivot Excel
 
-## 3.10.12.2 Sử dụng Pivot Excel
+**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
+* ● Mở rộng thư mục DIM Club, nhấp giữ chuột trái vào trường Coach Name, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Month, kéo chuột xuống phía dưới và thả tiếp vào ô Rows ngay phía dưới trường Coach Name.
+* ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái vào các thước đo kéo thả vào ô Values gồm Yellow Cards và Red Cards.
 
-### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
+**Bước 2:** Cấu hình bộ lọc Top 1 tháng kỷ lục cho từng huấn luyện viên:
+* ● Trên bảng PivotTable, nhấp chuột vào nút mũi tên lọc bên cạnh một ô giá trị thuộc cột Month.
+* ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
+* ● Trong hộp thoại Top 10 Filter xuất hiện, thiết lập Top 1 Items theo trường Sum of Yellow Cards rồi nhấp nút OK để áp dụng.
 
-### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
+**Bước 3:** Sắp xếp giảm dần theo số thẻ vàng kỷ lục: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Yellow Cards, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
 
-### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
-Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
-
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
-| :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Coach Name`** | Mở thư mục **`DIM Club`** → Kéo `Coach Name` thả vào ô Rows. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Month`** | Mở thư mục **`DIM Time`** → Kéo `Month` thả vào ô Rows (nằm dưới `Coach Name`). |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** → Kéo `Yellow Cards` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Red Cards`** | Mở thư mục **`Measures`** → Kéo `Red Cards` thả vào ô Values. |
-
-### Bước 4: Cấu hình Bộ lọc Top 1 Tháng kỷ lục cho từng HLV (Đồng bộ thuật toán GENERATE)
-1. Trong bảng PivotTable, nhấp chuột vào mũi tên lọc bên cạnh một ô giá trị **`Month`** (cột tháng).
-2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
-3. Trong hộp thoại Top 10 Filter:
-   * Thiết lập: **`Top`** → nhập **`1`** → **`Items`** theo **`Sum of Yellow Cards`** → Nhấn **OK**.
-   * *Ý nghĩa:* Bộ lọc này yêu cầu PivotTable chỉ giữ lại đúng **1 tháng cao nhất** cho mỗi huấn luyện viên, loại bỏ hoàn toàn các tháng còn lại, tái lập chính xác 100% thuật toán `GENERATE + TOPCOUNT(..., 1)` của ngôn ngữ MDX!
-
-### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Bảng hiển thị mỗi HLV đúng 1 dòng tháng kỷ lục, đồng bộ hoàn hảo với Cube Browser và MDX.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các huấn luyện viên cùng tháng cao điểm phải nhận nhiều thẻ phạt nhất.
 
 ---
 
-## 3.10.12.3 Sử dụng ngôn ngữ MDX
+### 3.10.12.3 Sử dụng ngôn ngữ MDX
 
-### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động phần mềm **SQL Server Management Studio (SSMS)**.
-2. Tại hộp thoại kết nối máy chủ:
-   * **Server type:** Nhấp chọn **`Analysis Services`**.
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Authentication:** Chọn **`Windows Authentication`**.
-   * Nhấn nút **Connect**.
-3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
-4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
+**Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-### Bước 2: Soạn thảo câu truy vấn MDX
-Nhập câu lệnh MDX hoàn chỉnh sau:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích tìm tháng kỷ lục thẻ phạt của từng huấn luyện viên trưởng. Truy vấn chỉ định rõ các mệnh đề:
+* ● Lựa chọn hai thước đo `[Measures].[Yellow Cards]` và `[Measures].[Red Cards]` hiển thị trên trục cột COLUMNS.
+* ● Sử dụng hàm `GENERATE` kết hợp `TOPCOUNT` với tham số đếm bằng 1 để duyệt tuần tự qua từng huấn luyện viên và trích xuất đúng một tháng có nhiều thẻ vàng nhất trên trục hàng ROWS, kết hợp hàm `ORDER` với cờ `BDESC` để sắp xếp giảm dần toàn cục.
+* ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 12: Thẻ phạt phân theo Huấn luyện viên trưởng & Tháng trong năm
-   Khai thác: GENERATE, TOPCOUNT, CURRENTMEMBER, NONEMPTY, FILTER, ORDER (BDESC)
-   Cube: [DW Football Transfermarkt]
+   Truy vấn MDX 12: Thẻ phạt phân theo Huấn luyện viên trưởng và Tháng trong năm
+   Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
 SELECT
-    -- Trục Cột: Thước đo Thẻ vàng và Thẻ đỏ
+    -- Trục Cột COLUMNS: Thước đo Thẻ vàng và Thẻ đỏ
     {
         [Measures].[Yellow Cards],
         [Measures].[Red Cards]
     } ON COLUMNS,
 
-    -- Trục Dòng: Duyệt qua từng HLV, tìm đúng 1 tháng có nhiều thẻ vàng nhất
+    -- Trục Dòng ROWS: Duyệt qua từng HLV, tìm đúng 1 tháng có nhiều thẻ vàng nhất
     ORDER(
         GENERATE(
             FILTER(
@@ -161,52 +118,25 @@ SELECT
 FROM [DW Football Transfermarkt];
 ```
 
-**Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`GENERATE(Set1, Set2_Expression)`**: Vòng lặp tập hợp (Set Iteration). Với mỗi HLV thuộc `Set1`, hệ thống thực thi biểu thức `Set2` để tìm ra tháng cao điểm của HLV đó rồi ghép nối kết quả lại thành một tập hợp duy nhất.
-* **`TOPCOUNT(CrossJoin({ Coach.CURRENTMEMBER }, Month.MEMBERS), 1, Yellow Cards)`**: Trích xuất chính xác 1 tháng có số thẻ vàng lớn nhất cho HLV hiện hành đang được duyệt bởi hàm `GENERATE`.
-* **`CURRENTMEMBER`**: Biến con trỏ tham chiếu đến đối tượng HLV đang được xét trong vòng lặp.
-* **`FILTER(NONEMPTY(...), ... <> 'Unknown')`**: Lọc sạch các giá trị khuyết thiếu thông tin HLV trước khi đưa vào vòng lặp.
-* **`ORDER(..., [Measures].[Yellow Cards], BDESC) ON ROWS`**: Sắp xếp danh sách kết quả sau khi duyệt `GENERATE` theo thứ tự giảm dần số thẻ vàng trên toàn cục trên trục **HÀNG** (Axis 1).
-* **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
+**Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
-
-1. **Hàm lặp tập hợp cấp cao `GENERATE(«Set_1», «Set_2_Expression»[, ALL])`**:
-   * **Cú pháp chuẩn:** `GENERATE(Set_1, Set_2_Expression)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Tập hợp danh sách các HLV trưởng (sau khi lọc bỏ nút `[All]`, lọc ô thưa và loại bỏ giá trị `"Unknown"`).
-     * `Set_2_Expression`: Biểu thức lồng nhau `TOPCOUNT(CrossJoin({ Coach.CURRENTMEMBER }, Month.MEMBERS), 1, Yellow Cards)`.
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Đây là giải thuật duyệt vòng lặp (For-Each Loop) mạnh mẽ nhất trong ngôn ngữ MDX.
-     * Formula Engine duyệt tuần tự qua từng Huấn luyện viên trưởng trong `Set_1`.
-     * Tại mỗi bước lặp, nó thiết lập biến con trỏ `CURRENTMEMBER` trỏ vào vị HLV đó.
-     * Sau đó, nó thực thi biểu thức `Set2_Expression` cho riêng vị HLV đó: lấy tích chéo HLV đó với 12 tháng, dùng `TOPCOUNT(..., 1)` để trích xuất ra duy nhất 1 tháng mà đội bóng của HLV đó phải nhận nhiều thẻ vàng nhất trong lịch sử.
-     * Kết quả của mỗi vòng lặp là một Tuple dạng `(Coach Name, Month)`. Hàm `GENERATE` tự động gom và nối tất cả các kết quả này thành một tập hợp phẳng duy nhất để trả về trên trục ROWS.
-   * **Kết quả trả về:** Tập hợp các Tuple gồm từng HLV trưởng kèm theo tháng đỉnh điểm nhận thẻ phạt của họ.
-
-2. **Hàm `TOPCOUNT(..., 1, Yellow Cards)` (Vai trò tìm ArgMax)**:
-   * **Cú pháp chuẩn:** `TOPCOUNT(Set, 1, Numeric_Expression)`
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Với tham số `Count = 1`, hàm hoạt động như một thuật toán tìm kiếm cực trị (ArgMax), lọc và trả về đúng 1 tháng có số thẻ vàng cao nhất của HLV tương ứng trong vòng lặp.
-
-3. **Thuộc tính `.CURRENTMEMBER`**:
-   * **Cơ chế hoạt động kỹ thuật:** Đóng vai trò là biến con trỏ ngữ cảnh động trong vòng lặp `GENERATE`, cho phép biểu thức con bên trong `TOPCOUNT` nhận diện chính xác đối tượng HLV đang được tính toán trong lượt lặp đó.
-
-4. **Hàm `ORDER(GENERATE(...), [Measures].[Yellow Cards], BDESC)`**:
-   * **Cơ chế:** Sắp xếp toàn bộ kết quả sau khi duyệt `GENERATE` theo thứ tự giảm dần số thẻ vàng kỷ lục trên quy mô toàn cục (`BDESC`), đưa các HLV có tháng nhận nhiều thẻ phạt nhất lên đầu bảng.
-
-
-### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
-2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
-3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị danh sách các HLV cùng tháng kỷ lục thẻ phạt và số thẻ vàng, thẻ đỏ tương ứng.
-   * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về danh sách các huấn luyện viên trưởng cùng tháng đỉnh điểm căng thẳng và số lượng thẻ phạt chi tiết.
 
 ---
 
----
+### 3.10.12.4 Nhận xét
 
-## 3.10.12.4 Nhận xét
+Cả 3 cách gồm duyệt cube trong SSAS, dùng PivotTable trong Excel và viết truy vấn MDX đều trả về cùng một kết quả dữ liệu chính xác tuyệt đối.
 
-Cả 3 cách (duyệt cube trong SSAS, dùng PivotTable trong Excel, và viết truy vấn MDX) đều trả về cùng một kết quả dữ liệu chính xác.
+| STT | Huấn Luyện Viên `Coach Name` | Tháng Kỷ Lục Thẻ Phạt `Month` | Thẻ Vàng `Yellow Cards` | Thẻ Đỏ `Red Cards` |
+| :---: | :--- | :---: | :---: | :---: |
+| **1** | **Matías Almeyda** | Tháng 10 | **32** | 1 |
+| **2** | **Diego Simeone** | Tháng 10 | **27** | 0 |
+| **3** | **João Pereira** | Tháng 10 | **27** | 0 |
+| **4** | **Rúben Amorim** | Tháng 12 | **25** | 0 |
+| **5** | **Sergio Francisco** | Tháng 10 | **25** | 0 |
+| **6** | **Sven Vandenbroeck** | Tháng 10 | **25** | 1 |
+| **7** | **Russell Martin** | Tháng 10 | **24** | 0 |
+| **8** | **José Mourinho** | Tháng 1 | **24** | 0 |
+| **9** | **Stefano Pioli** | Tháng 10 | **23** | 0 |
+| **10** | **Erik ten Hag** | Tháng 10 | **22** | 0 |

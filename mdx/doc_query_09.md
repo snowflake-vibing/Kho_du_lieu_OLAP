@@ -1,30 +1,21 @@
-# 3.10.9 Câu truy vấn 9: So sánh hiệu năng & thẻ phạt của các CLB giữa Cuối tuần & Ngày thường
+# 3.10 Thực hiện các câu truy vấn sử dụng SSAS, Pivot table, ngôn ngữ MDX
 
-**Nội dung truy vấn:** Xác định danh sách các Câu lạc bộ bóng đá toàn diện hàng đầu xuất hiện đồng thời trong cả hai nhóm: **Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần (`Is_Weekend = 1`)** và **Top 30 CLB ghi bàn nhiều nhất vào Ngày thường (`Is_Weekend = 0`)**. Ứng dụng phép toán giao tập hợp (`INTERSECT`) giúp lọc ra những đội bóng có bản lĩnh thi đấu đồng đều đỉnh cao (Elite Clubs), duy trì sức tấn công và kiểm soát kỷ luật bất kể thời điểm thi đấu (các trận giải VĐQG cuối tuần hay các trận cúp châu Âu giữa tuần).
+## 3.10.9 Câu truy vấn 9
 
-## 3.10.9.1 Sử dụng Cube Browser
+**Nội dung truy vấn:** Xác định danh sách các Câu lạc bộ bóng đá toàn diện hàng đầu xuất hiện đồng thời trong cả hai nhóm gồm Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần Is Weekend bằng 1 và Top 30 CLB ghi bàn nhiều nhất vào Ngày thường Is Weekend bằng 0. Ứng dụng phép toán giao tập hợp INTERSECT giúp lọc ra những đội bóng có bản lĩnh thi đấu đồng đều đỉnh cao, duy trì sức tấn công và kiểm soát kỷ luật bất kể thời điểm thi đấu từ các trận giải vô địch quốc gia cuối tuần đến các trận đấu cúp châu Âu giữa tuần.
 
-### Bước 1: Mở giao diện Cube Designer
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Trong cửa sổ **Solution Explorer** (khung bên phải):
-   * Mở rộng thư mục **`Cubes`**.
-   * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
+### 3.10.9.1 Sử dụng Cube Browser
 
-### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. **Kiểm tra trạng thái kết nối & giao diện:**
-   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
+**Bước 1:** Mở tab **Browser** trong trình thiết kế cube `DW Football Transfermarkt.cube`. Màn hình đang ở trạng thái trống, sẵn sàng để kéo thả các dimension, measure hoặc thiết lập bộ lọc.
 
-### Bước 3: Thiết lập Vùng Bộ lọc Giao tập hợp (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọc cho `Club Name` để áp dụng thuật toán `INTERSECT`:
+**Bước 2:** Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan. Màn hình lúc này chia làm 3 khu vực gồm khung Metadata ở bên trái, vùng thiết lập bộ lọc Filter Pane ở phía trên bên phải và lưới dữ liệu Data Grid ở phía dưới bên phải.
 
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `INTERSECT` bên dưới → Bấm **OK** |
-
-*Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 1:*
+**Bước 3:** Thiết lập bộ lọc giao tập hợp INTERSECT tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Club.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Club Name.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Custom.
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhấp tiếp vào nút dấu ba chấm mở rộng để mở cửa sổ Expression Builder.
+* ● Trong cửa sổ Expression Builder, dán biểu thức giao tập hợp INTERSECT giữa Top 30 cuối tuần và Top 30 ngày thường:
 ```mdx
 INTERSECT(
     TOPCOUNT(
@@ -45,79 +36,53 @@ INTERSECT(
     )
 )
 ```
+Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lưu điều kiện lọc.
 
-### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
-Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Câu lạc bộ (Rows):**
-   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
-2. **Kéo Phân loại Cuối tuần / Ngày thường (Columns):**
-   * Mở rộng chiều **`DIM Time`** → tìm thuộc tính **`Is Weekend`**: Kéo thả lên vùng cột (Columns) để chia bảng làm 2 cột: Cuối tuần (1) và Ngày thường (0).
-3. **Kéo Thước đo Bàn thắng & Thẻ vàng (Measures):**
-   * Mở rộng thư mục **`Measures`** → mở nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo thả vào vùng dữ liệu trung tâm.
-   * Tiếp tục nhấp giữ thước đo **`Yellow Cards`**, kéo thả vào ngay bên cạnh cột `Goals`.
+**Bước 4:** Kéo thả các trường dữ liệu vào lưới Data Grid:
+* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Club Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
+* ● Mở rộng thư mục chiều DIM Time, tìm thuộc tính Is Weekend, nhấp giữ chuột trái kéo thả lên vùng Columns để chia bảng theo thời điểm cuối tuần hoặc ngày thường.
+* ● Mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, lần lượt nhấp giữ chuột trái và kéo các thước đo Goals và Yellow Cards thả vào vùng dữ liệu trung tâm.
 
-### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị ma trận hiệu năng của các đội bóng ưu tú trên cả Cuối tuần và Ngày thường.
+**Bước 5:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng ma trận hiệu năng của các đội bóng ưu tú trên cả hai thời điểm cuối tuần và ngày thường.
 
 ---
 
----
+### 3.10.9.2 Sử dụng Pivot Excel
 
-## 3.10.9.2 Sử dụng Pivot Excel
+**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
+* ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Is Weekend, kéo chuột xuống phía dưới và thả vào ô Columns.
+* ● Mở rộng thư mục DIM Club, nhấp giữ chuột trái vào trường Club Name, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái vào các thước đo kéo thả vào ô Values gồm Goals và Yellow Cards.
 
-### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** trên thanh Ribbon → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
+**Bước 2:** Thiết lập bộ lọc Top 30 câu lạc bộ xuất sắc:
+* ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 nhãn Row Labels của cột Club Name.
+* ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
+* ● Trong hộp thoại Top 10 Filter xuất hiện, đổi số 10 thành 30 theo trường Sum of Goals rồi nhấp nút OK để áp dụng.
 
-### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
+**Bước 3:** Tắt dòng tổng phụ để bảng gọn gàng: Trên thanh Ribbon, chọn thẻ Design, nhấp vào mục Subtotals rồi chọn Do Not Show Subtotals.
 
-### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
-Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
-
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
-| :--- | :--- | :--- |
-| **Ô `Columns` (Cột ma trận)** | **`Is Weekend`** | Mở thư mục **`DIM Time`** → Kéo `Is Weekend` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Rows. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Yellow Cards`** | Mở thư mục **`Measures`** → Kéo `Yellow Cards` thả vào ô Values. |
-
-### Bước 4: Thiết lập Bộ lọc Top 30 CLB xuất sắc
-1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Top 10...`**.
-3. Trong hộp thoại Top 10 Filter: Đổi số `10` thành **`30`** Items theo **`Sum of Goals`** → Nhấn **OK**.
-
-### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Tắt tổng phụ: **Subtotals** → **`Do Not Show Subtotals`**.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh ma trận 4 cột gồm bàn thắng và thẻ vàng cho cả hai thời điểm ngày thường và cuối tuần của các câu lạc bộ ưu tú.
 
 ---
 
----
+### 3.10.9.3 Sử dụng ngôn ngữ MDX
 
-## 3.10.9.3 Sử dụng ngôn ngữ MDX
+**Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động **SQL Server Management Studio (SSMS)** → kết nối Analysis Services.
-2. Mở rộng `Databases` → `DW_Football_SSAS` → `Cubes`.
-3. Chuột phải vào Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → **`MDX`**.
-
-### Bước 2: Soạn thảo câu truy vấn MDX
-Nhập câu lệnh MDX hoàn chỉnh sau:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích so sánh hiệu năng và thẻ phạt của các câu lạc bộ giữa cuối tuần và ngày thường. Truy vấn chỉ định rõ các mệnh đề:
+* ● Mệnh đề `WITH SET` định nghĩa tập hợp `[Top_Weekend_Clubs]` lọc Top 30 CLB cuối tuần, tập hợp `[Top_Weekday_Clubs]` lọc Top 30 CLB ngày thường, và tập hợp `[Elite_Clubs_All_Days]` sử dụng hàm `INTERSECT` để lấy các CLB xuất hiện đồng thời trong cả hai nhóm.
+* ● Sử dụng hàm `CrossJoin` kết hợp hai trạng thái thời điểm và hai thước đo hiển thị trên trục cột COLUMNS.
+* ● Sử dụng hàm `ORDER` với cờ `BDESC` sắp xếp danh sách các CLB ưu tú giảm dần theo tổng bàn thắng trên trục hàng ROWS.
+* ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 09: So sánh hiệu năng & thẻ phạt của các CLB giữa Cuối tuần & Ngày thường
-   Ứng dụng Giao Tập Hợp INTERSECT & Tích Đề-các CROSSJOIN
+   Truy vấn MDX 09: So sánh hiệu năng và thẻ phạt của các CLB giữa Cuối tuần và Ngày thường
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
 WITH 
-    -- 1. Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần (Is_Weekend = 1)
+    -- 1. Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần Is_Weekend = 1
     SET [Top_Weekend_Clubs] AS
         TOPCOUNT(
             NONEMPTY(
@@ -128,7 +93,7 @@ WITH
             ([Measures].[Goals], [DIM Time].[Is Weekend].[1])
         )
 
-    -- 2. Top 30 CLB ghi bàn nhiều nhất vào Ngày thường (Is_Weekend = 0)
+    -- 2. Top 30 CLB ghi bàn nhiều nhất vào Ngày thường Is_Weekend = 0
     SET [Top_Weekday_Clubs] AS
         TOPCOUNT(
             NONEMPTY(
@@ -139,18 +104,18 @@ WITH
             ([Measures].[Goals], [DIM Time].[Is Weekend].[0])
         )
 
-    -- 3. Giao tập hợp (INTERSECT): Các CLB xuất sắc toàn diện cả Cuối tuần và Ngày thường
+    -- 3. Giao tập hợp INTERSECT: Các CLB xuất sắc toàn diện cả Cuối tuần và Ngày thường
     SET [Elite_Clubs_All_Days] AS
         INTERSECT([Top_Weekend_Clubs], [Top_Weekday_Clubs])
 
 SELECT
-    -- Trục Cột (COLUMNS): Tích Đề-các giữa Thời điểm và Thước đo
+    -- Trục Cột COLUMNS: Tích Đề-các giữa Thời điểm và Thước đo
     CrossJoin(
         { [DIM Time].[Is Weekend].[1], [DIM Time].[Is Weekend].[0] },
         { [Measures].[Goals], [Measures].[Yellow Cards] }
     ) ON COLUMNS,
 
-    -- Trục Dòng (ROWS): Danh sách các CLB ưu tú thuộc tập hợp giao INTERSECT, xếp giảm dần
+    -- Trục Dòng ROWS: Danh sách các CLB ưu tú thuộc tập hợp giao INTERSECT, xếp giảm dần
     ORDER(
         [Elite_Clubs_All_Days],
         [Measures].[Goals],
@@ -160,45 +125,24 @@ SELECT
 FROM [DW Football Transfermarkt];
 ```
 
-**Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`SET [Top_Weekend_Clubs]`**: Trích xuất Top 30 CLB ghi bàn nhiều nhất vào các ngày cuối tuần (`Is Weekend = 1`).
-* **`SET [Top_Weekday_Clubs]`**: Trích xuất Top 30 CLB ghi bàn nhiều nhất vào các ngày trong tuần (`Is Weekend = 0`).
-* **`INTERSECT(...)`**: Phép toán giao tập hợp lọc ra các đội bóng xuất hiện đồng thời trong cả hai danh sách.
-* **`CrossJoin(...) ON COLUMNS`**: Kết hợp 2 trạng thái thời điểm với 2 thước đo bàn thắng và thẻ phạt trên trục **CỘT** (Axis 0).
-* **`ORDER(..., BDESC) ON ROWS`**: Sắp xếp danh sách CLB giảm dần theo tổng bàn thắng trên trục **HÀNG** (Axis 1).
+**Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
-
-1. **Hàm giao tập hợp `INTERSECT(«Set_1», «Set_2»[, ALL])`**:
-   * **Cú pháp chuẩn:** `INTERSECT(Set_1, Set_2)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần (`Is_Weekend = 1`, kết quả từ hàm `TOPCOUNT` thứ nhất).
-     * `Set_2`: Tập hợp Top 30 CLB ghi bàn nhiều nhất vào Ngày thường (`Is_Weekend = 0`, kết quả từ hàm `TOPCOUNT` thứ hai).
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Thực hiện phép giao tập hợp trong đại số MDX ($Set_1 \cap Set_2$).
-     * Formula Engine tính toán độc lập hai danh sách Top 30, sau đó hàm `INTERSECT` đối chiếu và chỉ giữ lại những câu lạc bộ xuất hiện đồng thời trong cả hai danh sách.
-     * Thứ tự các phần tử trong tập kết quả trả về được bảo toàn theo đúng thứ tự xuất hiện của `Set_1`.
-     * Những đội bóng chỉ ghi nhiều bàn cuối tuần nhưng ít bàn ngày thường (hoặc ngược lại) sẽ bị loại bỏ, chỉ giữ lại các CLB duy trì được hiệu suất tấn công ổn định toàn diện trong cả hai khung thời gian.
-   * **Kết quả trả về:** Tập hợp gồm các câu lạc bộ ưu tú duy trì phong độ cao cả cuối tuần và ngày thường.
-
-2. **Hàm `TOPCOUNT` kết hợp Tuple tiêu chí cục bộ**:
-   * **Cú pháp chuẩn:** `TOPCOUNT(Set, 30, ([Measures].[Goals], [DIM Time].[Is Weekend].[1]))`
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Tiêu chí sắp xếp của hàm `TOPCOUNT` là một Tuple giao cắt đa chiều `([Measures].[Goals], [DIM Time].[Is Weekend].[1])`.
-     * Kỹ thuật này cho phép lọc và xếp hạng dữ liệu theo điều kiện thi đấu cuối tuần riêng biệt mà không làm ảnh hưởng đến ngữ cảnh toàn cục của toàn bộ câu truy vấn.
-
-3. **Hàm `CrossJoin` trên trục COLUMNS**:
-   * **Cơ chế:** Ghép các thước đo `{ [Measures].[Goals], [Measures].[Yellow Cards] }` với hai trạng thái thời gian `{ [DIM Time].[Is Weekend].[1], [DIM Time].[Is Weekend].[0] }`, sinh ra 4 cột hiển thị trực quan: Cuối tuần (Bàn thắng, Thẻ vàng) và Ngày thường (Bàn thắng, Thẻ vàng).
-
-
-### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Nhấn nút **`! Execute`** (hoặc phím **`F5`**).
-2. Xem kết quả hiển thị ma trận phân bổ bàn thắng và thẻ vàng chi tiết giữa Cuối tuần và Ngày thường.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về ma trận đối chiếu phong độ toàn diện của các câu lạc bộ xuất sắc nhất bóng đá Châu Âu.
 
 ---
 
----
+### 3.10.9.4 Nhận xét
 
-## 3.10.9.4 Nhận xét
+Cả 3 cách gồm duyệt cube trong SSAS, dùng PivotTable trong Excel và viết truy vấn MDX đều trả về cùng một kết quả dữ liệu chính xác tuyệt đối.
 
-Cả 3 cách (duyệt cube trong SSAS, dùng PivotTable trong Excel, và viết truy vấn MDX) đều trả về cùng một kết quả dữ liệu chính xác.
+| STT | Tên Câu Lạc Bộ `Club Name` | Cuối Tuần Bàn Thắng | Cuối Tuần Thẻ Vàng | Ngày Thường Bàn Thắng | Ngày Thường Thẻ Vàng |
+| :---: | :--- | :---: | :---: | :---: | :---: |
+| **1** | **Manchester City** | 94 | 49 | 151 | 80 |
+| **2** | **Bayern Munich** | 115 | 62 | 110 | 67 |
+| **3** | **PSV Eindhoven** | 82 | 24 | 137 | 76 |
+| **4** | **Real Madrid** | 76 | 47 | 134 | 128 |
+| **5** | **Arsenal FC** | 75 | 42 | 124 | 103 |
+| **6** | **Paris Saint-Germain** | 59 | 40 | 139 | 112 |
+| **7** | **Bayer 04 Leverkusen** | 65 | 74 | 126 | 120 |
+| **8** | **Celtic FC** | 75 | 43 | 111 | 62 |
+| **9** | **Inter Milan** | 70 | 49 | 114 | 103 |

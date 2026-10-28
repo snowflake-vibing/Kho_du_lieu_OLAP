@@ -1,147 +1,93 @@
-# 3.10.5 Câu truy vấn 5: So sánh tổng bàn thắng giữa chân Trái, chân Phải & 2 Chân theo vị trí chi tiết
+# 3.10 Thực hiện các câu truy vấn sử dụng SSAS, Pivot table, ngôn ngữ MDX
 
-**Nội dung truy vấn:** Khảo sát xem đặc điểm chân thuận (`Foot`: Left, Right, Both) tương quan như thế nào với số lượng bàn thắng ghi được ở từng vai trò vị trí cụ thể trên sân cỏ (`Sub_Position` như Centre-Forward, Left Winger, Right Winger, Attacking Midfield, Second Striker). Sử dụng phép toán hợp tập hợp (`UNION`) để gom nhóm các vị trí tiền đạo và tiền vệ tấn công chủ lực, phục vụ công tác phân tích chiến thuật và bố trí cầu thủ chạy cánh nghịch chân (Inverted Wingers).
+## 3.10.5 Câu truy vấn 5
 
-## 3.10.5.1 Sử dụng Cube Browser
+**Nội dung truy vấn:** Khảo sát xem đặc điểm chân thuận Foot gồm chân trái, chân phải và hai chân tương quan như thế nào với số lượng bàn thắng ghi được ở từng vai trò vị trí cụ thể trên sân cỏ Sub Position như tiền đạo cắm Centre-Forward, tiền đạo cánh trái Left Winger, tiền đạo cánh phải Right Winger, tiền vệ tấn công Attacking Midfield và hộ công Second Striker. Sử dụng phép toán hợp tập hợp UNION để gom nhóm các vị trí tiền đạo và tiền vệ tấn công chủ lực, phục vụ công tác phân tích chiến thuật và bố trí cầu thủ chạy cánh nghịch chân.
 
-### Bước 1: Mở giao diện Cube Designer
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Trong cửa sổ **Solution Explorer** (khung bên phải):
-   * Mở rộng thư mục **`Cubes`**.
-   * Nhấp đúp chuột vào tệp khối đa chiều: **`DW_Football_Cube.cube`** (hoặc `DW Football Transfermarkt.cube`).
-3. Màn hình Cube Designer xuất hiện với các tab chức năng ở cạnh trên (*Cube Structure*, *Dimension Usage*, *Calculations*, *Partitions*, *Browser*...).
+### 3.10.5.1 Sử dụng Cube Browser
 
-### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (tab ngoài cùng bên phải của trình thiết kế Cube).
-2. **Kiểm tra trạng thái kết nối & giao diện:**
-   * Nếu nút **Reconnect** (biểu tượng 2 phích cắm ở góc trên bên trái) sáng lên: Nhấp vào để kết nối tới SSAS Database.
-   * Nếu màn hình đang ở chế độ soạn thảo văn bản thuần (Text Mode): Nhấp vào biểu tượng **`Design Mode`** (hình chiếc Lưới màu xanh có cây thước kẻ/bút chì màu vàng, nằm cạnh nút Stop xám) để chuyển sang giao diện thiết kế đồ họa trực quan (Graphical Query Designer). Khi đó, màn hình sẽ chia làm 2 phần: **Bảng lọc (Filter Pane)** ở trên và **Lưới dữ liệu (Data Grid)** ở dưới.
+**Bước 1:** Mở tab **Browser** trong trình thiết kế cube `DW Football Transfermarkt.cube`. Màn hình đang ở trạng thái trống, sẵn sàng để kéo thả các dimension, measure hoặc thiết lập bộ lọc.
 
-### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo các dòng lọc để chọn nhóm vị trí tấn công và loại trừ giá trị rỗng/nút All của chân thuận:
+**Bước 2:** Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan. Màn hình lúc này chia làm 3 khu vực gồm khung Metadata ở bên trái, vùng thiết lập bộ lọc Filter Pane ở phía trên bên phải và lưới dữ liệu Data Grid ở phía dưới bên phải.
 
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Sub Position`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `UNION` bên dưới → Bấm **OK** |
-| **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Foot`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức `EXCEPT` bên dưới → Bấm **OK** |
-
-*Biểu thức nhập vào Expression Builder ở Dòng 1 (Hợp tập hợp các vị trí tấn công & tiền vệ):*
+**Bước 3:** Thiết lập bộ lọc nhóm vị trí tấn công tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Player.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Sub Position.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Custom.
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhấp tiếp vào nút dấu ba chấm mở rộng để mở cửa sổ Expression Builder.
+* ● Trong cửa sổ Expression Builder, dán biểu thức hợp tập hợp UNION để gom 5 vị trí tấn công và tiền vệ:
 ```mdx
 UNION(
     { [DIM Player].[Sub Position].[Centre-Forward], [DIM Player].[Sub Position].[Second Striker] },
     { [DIM Player].[Sub Position].[Left Winger], [DIM Player].[Sub Position].[Right Winger], [DIM Player].[Sub Position].[Attacking Midfield] }
 )
 ```
+Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lưu điều kiện lọc.
 
-*Biểu thức nhập vào Expression Builder ở Dòng 2 (Loại trừ phần tử All của chân thuận):*
+**Bước 4:** Thiết lập bộ lọc loại bỏ nút All của chân thuận tại dòng thứ hai trong vùng bộ lọc Filter Pane:
+* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Player.
+* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Foot.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Custom.
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhấp tiếp vào nút dấu ba chấm mở rộng để mở cửa sổ Expression Builder.
+* ● Trong cửa sổ Expression Builder, dán biểu thức EXCEPT để loại bỏ nút tổng hợp All:
 ```mdx
 EXCEPT([DIM Player].[Foot].[Foot].MEMBERS, { [DIM Player].[Foot].[All] })
 ```
+Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lưu điều kiện lọc.
 
-### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
-Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Vị trí & Chân thuận (Rows/Columns):**
-   * Mở rộng chiều **`DIM Player`** → tìm thuộc tính **`Sub Position`**: Kéo thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*.
-   * Tìm tiếp thuộc tính **`Foot`** trong `DIM Player`: Kéo thả vào ngay bên cạnh cột `Sub Position` (hoặc kéo lên vùng Columns để tạo ma trận chéo 2 chiều).
-2. **Kéo Thước đo Bàn thắng (Measures):**
-   * Mở rộng thư mục **`Measures`** → mở rộng nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Goals`**, kéo và thả vào ngay bên cạnh cột `Foot` trên lưới.
+**Bước 5:** Kéo thả các trường dữ liệu vào lưới Data Grid:
+* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Player, nhấp giữ chuột trái vào thuộc tính Sub Position, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
+* ● Tiếp tục trong khung Metadata, nhấp giữ chuột trái vào thuộc tính Foot trong chiều DIM Player, kéo sang thả vào vị trí ngay bên cạnh cột Sub Position.
+* ● Tiếp tục trong khung Metadata, mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, nhấp giữ chuột trái vào thước đo Goals, kéo sang và thả vào vị trí ngay bên cạnh cột Foot.
 
-### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị ma trận phân bổ bàn thắng theo từng vị trí chi tiết và chân thuận.
-3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
+**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị ma trận phân bổ bàn thắng theo từng vị trí chi tiết và loại chân thuận.
 
 ---
 
----
+### 3.10.5.2 Sử dụng Pivot Excel
 
-## 3.10.5.2 Sử dụng Pivot Excel
+**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
+* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Foot, kéo chuột xuống phía dưới và thả vào ô Columns.
+* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Sub Position, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Goals, kéo chuột xuống phía dưới và thả vào ô Values với giá trị hiển thị là Sum of Goals.
 
-### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
-3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
-   * Nhấp chọn **`Get Data`** → chọn **`From Database`** → chọn **`From Analysis Services`**.
-4. Cửa sổ **Data Connection Wizard** xuất hiện:
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Log on credentials:** Chọn **`Use Windows Authentication`**.
-   * Nhấn nút **Next >**.
+**Bước 2:** Thiết lập lọc các vị trí trọng điểm: Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 nhãn Row Labels của cột Sub Position, bỏ chọn ô Select All, chỉ tích chọn 5 vị trí gồm Centre-Forward, Second Striker, Left Winger, Right Winger và Attacking Midfield rồi nhấp nút OK.
 
-### Bước 2: Chọn Database và Khối đa chiều
-1. Tại màn hình *Select Database and Table*:
-   * Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** (hoặc tên database SSAS tương ứng).
-   * Chọn Cube: **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
-2. Nhấn nút **Finish**.
-3. Hộp thoại **Import Data** hiện lên:
-   * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
-   * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại → Nhấn **OK**.
+**Bước 3:** Tạo dải màu trực quan phân tích chiến thuật: Dùng chuột bôi đen toàn bộ vùng số liệu bàn thắng bên trong bảng ma trận. Trên thanh Ribbon, chọn thẻ Home, nhấp chọn Conditional Formatting, di chuột chọn Color Scales rồi chọn dải màu xanh lá sang vàng và đỏ để làm nổi bật các ô có số lượng bàn thắng vượt trội.
 
-### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
-Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
-
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
-| :--- | :--- | :--- |
-| **Ô `Columns` (Cột ma trận)** | **`Foot`** | Mở thư mục **`DIM Player`** → Kéo `Foot` thả vào ô Columns. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Sub Position`** | Mở thư mục **`DIM Player`** → Kéo `Sub Position` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values (hiển thị `Sum of Goals`). |
-
-### Bước 4: Lọc các Vị trí Trọng điểm
-* Tại mũi tên lọc ở ô tiêu đề `Row Labels` (cột `Sub Position`), bỏ chọn `(Select All)`, chỉ tick chọn 5 vị trí:
-  * `Centre-Forward`
-  * `Second Striker`
-  * `Left Winger`
-  * `Right Winger`
-  * `Attacking Midfield`
-* Nhấn **OK**.
-
-### Bước 5: Tạo Heatmap Trực quan (Color Scales)
-1. Dùng chuột bôi đen toàn bộ vùng số liệu bàn thắng bên trong bảng ma trận.
-2. Vô thẻ tab **`Home`** trên thanh Ribbon → chọn **`Conditional Formatting`** → chọn **`Color Scales`** → chọn dải màu xanh lá - vàng - đỏ (Green - Yellow - Red Color Scale).
-3. Bảng ma trận sẽ hiển thị các gam màu trực quan: ô màu xanh lá đậm là nơi có số lượng bàn thắng cao nhất (như Tiền đạo cắm chân Phải, Tiền đạo cánh Phải thuận chân Trái).
+**Bước 4:** Trang tính Excel hiển thị bảng ma trận hoàn chỉnh phản ánh sự tương quan rõ nét giữa chân thuận và vị trí thi đấu, nổi bật là tiền đạo cắm chân phải và tiền đạo cánh phải thuận chân trái.
 
 ---
 
----
+### 3.10.5.3 Sử dụng ngôn ngữ MDX
 
-## 3.10.5.3 Sử dụng ngôn ngữ MDX
+**Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động phần mềm **SQL Server Management Studio (SSMS)**.
-2. Tại hộp thoại kết nối máy chủ:
-   * **Server type:** Nhấp chọn **`Analysis Services`**.
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Authentication:** Chọn **`Windows Authentication`**.
-   * Nhấn nút **Connect**.
-3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
-4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
-
-### Bước 2: Soạn thảo câu truy vấn MDX
-Nhập câu lệnh MDX hoàn chỉnh sau:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích so sánh tổng số bàn thắng giữa các loại chân thuận theo từng vị trí chi tiết. Truy vấn chỉ định rõ các mệnh đề:
+* ● Lựa chọn thước đo `[Measures].[Goals]` hiển thị trên trục cột COLUMNS.
+* ● Sử dụng hàm `UNION` hợp nhất hai nhóm vị trí tấn công và tiền vệ, kết hợp hàm `EXCEPT` loại trừ nút All của chân thuận, sau đó dùng hàm `CrossJoin` và `NONEMPTY` tạo tích Đề-các trên trục hàng ROWS, kết hợp hàm `ORDER` với từ khóa `DESC` để sắp xếp giảm dần số bàn thắng theo từng nhóm vị trí.
+* ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
 
 ```mdx
 /* ==============================================================================
    Truy vấn MDX 05: Bàn thắng theo vị trí chi tiết và chân thuận
-   Khai thác: UNION, CROSSJOIN, EXCEPT, NONEMPTY, ORDER (DESC)
-   Cube: [DW Football Transfermarkt]
+   Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
 SELECT
-    -- Trục Cột: Thước đo Bàn thắng
+    -- Trục Cột COLUMNS: Thước đo Bàn thắng
     { [Measures].[Goals] } ON COLUMNS,
 
-    -- Trục Dòng: Các cặp (Sub Position, Foot) sắp xếp phân cấp theo từng vị trí
+    -- Trục Dòng ROWS: Các cặp Sub Position và Foot sắp xếp phân cấp theo từng vị trí
     ORDER(
         NONEMPTY(
             CrossJoin(
-                -- Hợp tập hợp (UNION): Kết hợp các vị trí tấn công và tiền vệ
+                -- Hợp tập hợp UNION: Kết hợp các vị trí tấn công và tiền vệ
                 UNION(
                     { [DIM Player].[Sub Position].[Centre-Forward], [DIM Player].[Sub Position].[Second Striker] },
                     { [DIM Player].[Sub Position].[Left Winger], [DIM Player].[Sub Position].[Right Winger], [DIM Player].[Sub Position].[Attacking Midfield] }
                 ),
-                -- Tập hợp các loại chân thuận (loại bỏ nút All)
+                -- Tập hợp các loại chân thuận loại bỏ nút All
                 EXCEPT([DIM Player].[Foot].[Foot].MEMBERS, { [DIM Player].[Foot].[All] })
             ),
             [Measures].[Goals]
@@ -153,63 +99,33 @@ SELECT
 FROM [DW Football Transfermarkt];
 ```
 
-**Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`SELECT { [Measures].[Goals] } ON COLUMNS`**: Chọn thước đo tổng số bàn thắng đặt trên trục **CỘT** (Axis 0).
-* **`ORDER(..., [Measures].[Goals], DESC) ON ROWS`**: Sắp xếp kết quả theo thứ tự giảm dần số bàn thắng, sử dụng từ khóa `DESC` (duy trì phân cấp - Hierarchy-preserving) giúp gom các dòng của cùng một nhóm vị trí lại với nhau.
-* **`UNION(...)`**: Hợp nhất hai tập hợp con của các vai trò tấn công (Tiền đạo cắm, Hộ công) và vai trò sáng tạo (Tiền đạo cánh, Tiền vệ tấn công) thành một tập hợp duy nhất.
-* **`CrossJoin(...)`**: Tạo tích Đề-các giữa tập hợp các vị trí thi đấu đã hợp nhất với các loại chân thuận (`Foot`).
-* **`EXCEPT([DIM Player].[Foot].[Foot].MEMBERS, { [DIM Player].[Foot].[All] })`**: Loại trừ phần tử tổng hợp `[All]` để chỉ giữ lại các giá trị lá cụ thể (`Left`, `Right`, `Both`).
-* **`NONEMPTY(...)`**: Loại bỏ trước các tổ hợp không có bàn thắng phát sinh ở mức lưu trữ trước khi chuyển sang Formula Engine.
-* **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy vấn dữ liệu.
+**Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
-
-1. **Hàm hợp tập hợp `UNION(«Set_1», «Set_2»[, ALL])`**:
-   * **Cú pháp chuẩn:** `UNION(Set_1, Set_2)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Nhóm vị trí tiền đạo trung tâm `{ [Sub Position].[Centre-Forward], [Sub Position].[Second Striker] }`.
-     * `Set_2`: Nhóm vị trí tấn công biên và tiền vệ công `{ [Sub Position].[Left Winger], [Sub Position].[Right Winger], [Sub Position].[Attacking Midfield] }`.
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Thực hiện phép hợp tập hợp trong đại số MDX ($Set_1 \cup Set_2$). Gộp toàn bộ các thành viên thuộc 2 tập hợp rời rạc thành một tập hợp duy nhất gồm 5 vị trí tấn công chủ chốt.
-     * Mặc định, hàm `UNION` tự động loại bỏ các phần tử trùng lặp nếu có giữa 2 tập.
-   * **Kết quả trả về:** Tập hợp gồm 5 vị trí thi đấu mũi nhọn.
-
-2. **Hàm tích Đề-các `CrossJoin(«Set_1», «Set_2»)` (hoặc toán tử `*`)**:
-   * **Cú pháp chuẩn:** `CrossJoin(Set_1, Set_2)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: Tập hợp 5 vị trí thi đấu tấn công (kết quả từ hàm `UNION`).
-     * `Set_2`: Tập hợp các loại chân thuận chi tiết (kết quả từ hàm `EXCEPT`: `Left`, `Right`, `Both`).
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Thực hiện phép nhân chéo tích Đề-các (Cartesian Product) giữa 2 tập hợp đa chiều.
-     * Mỗi vị trí thi đấu trong `Set_1` được kết hợp tuần tự với từng loại chân thuận trong `Set_2`, sinh ra tập hợp gồm các Tuple 2 chiều dạng `(Sub Position, Foot)` với tổng số $5 	imes 3 = 15$ tổ hợp chiến thuật.
-   * **Kết quả trả về:** Tập hợp các Tuple đa chiều đại diện cho từng cặp vị trí - chân thuận.
-
-3. **Hàm trừ tập hợp `EXCEPT(«Set_1», «Set_2»)`**:
-   * **Cú pháp chuẩn:** `EXCEPT(Set_1, Set_2)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Set_1`: `[DIM Player].[Foot].[Foot].MEMBERS` (tất cả thành viên trong phân cấp chân thuận).
-     * `Set_2`: `{ [DIM Player].[Foot].[All] }` (phần tử tổng hợp cấp cao nhất `[All]`).
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Thực hiện phép trừ tập hợp ($Set_1 \setminus Set_2$). Loại bỏ nút tổng hợp toàn cục `[All]` để chỉ giữ lại các giá trị mức lá cụ thể (`Left`, `Right`, `Both`), ngăn chặn hiện tượng số liệu tổng bị cộng dồn trùng lặp với số liệu chi tiết.
-   * **Kết quả trả về:** Tập hợp chứa các loại chân thuận thực tế.
-
-4. **Hàm sắp xếp bảo toàn thứ bậc `ORDER(..., DESC)`**:
-   * **Cú pháp chuẩn:** `ORDER(Set, Criteria, DESC)`
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Chú ý sử dụng cờ `DESC` (Hierarchy-preserving Descending) thay vì `BDESC`. Thuật toán sẽ tôn trọng phân cấp của Tuple: nó gom nhóm theo từng vị trí thi đấu (`Sub Position`) và thực hiện sắp xếp giảm dần theo số bàn thắng của các loại chân thuận (`Foot`) ngay bên trong từng vị trí đó, giúp cấu trúc báo cáo mạch lạc và dễ đối chiếu chiến thuật.
-
-
-### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
-2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
-3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị danh sách ma trận các cặp vị trí và chân thuận xếp theo thứ tự bàn thắng giảm dần.
-   * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về danh sách ma trận các cặp vị trí và chân thuận kèm số bàn thắng tương ứng được sắp xếp khoa học.
 
 ---
 
----
+### 3.10.5.4 Nhận xét
 
-## 3.10.5.4 Nhận xét
+Cả 3 cách gồm duyệt cube trong SSAS, dùng PivotTable trong Excel và viết truy vấn MDX đều trả về cùng một kết quả dữ liệu chính xác tuyệt đối.
 
-Cả 3 cách (duyệt cube trong SSAS, dùng PivotTable trong Excel, và viết truy vấn MDX) đều trả về cùng một kết quả dữ liệu chính xác.
+| STT | Vị Trí Chi Tiết `Sub Position` | Chân Thuận `Foot` | Tổng Bàn Thắng `Goals` |
+| :---: | :--- | :---: | :---: |
+| **1** | **Attacking Midfield** | right | **1308** |
+| **2** | **Attacking Midfield** | left | **667** |
+| **3** | **Attacking Midfield** | both | **59** |
+| **4** | **Attacking Midfield** | Unknown | **1** |
+| **5** | **Centre-Forward** | right | **5457** |
+| **6** | **Centre-Forward** | left | **1114** |
+| **7** | **Centre-Forward** | both | **273** |
+| **8** | **Centre-Forward** | Unknown | **34** |
+| **9** | **Left Winger** | right | **2015** |
+| **10** | **Left Winger** | left | **186** |
+| **11** | **Left Winger** | both | **79** |
+| **12** | **Left Winger** | Unknown | **2** |
+| **13** | **Right Winger** | left | **1207** |
+| **14** | **Right Winger** | right | **783** |
+| **15** | **Right Winger** | both | **76** |
+| **16** | **Right Winger** | Unknown | **0** |
+| **17** | **Second Striker** | right | **242** |
+| **18** | **Second Striker** | left | **93** |
