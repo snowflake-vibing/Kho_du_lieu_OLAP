@@ -6,9 +6,9 @@
 
 ### 3.10.1.1 Sử dụng Cube Browser
 
-**Bước 1:** Khởi động phần mềm Visual Studio, trong cửa sổ Solution Explorer ở khung bên phải màn hình, nhấp đúp chuột vào tệp khối đa chiều DW Football Transfermarkt.cube. Trình thiết kế Cube Designer xuất hiện. Trên thanh tab chức năng nằm ở mép trên, nhấp chuột vào tab Browser nằm ở ngoài cùng bên phải.
+**Bước 1:** Mở tab **Browser** trong trình thiết kế cube `DW Football Transfermarkt.cube`. Màn hình đang ở trạng thái trống, sẵn sàng để kéo thả các dimension, measure hoặc thiết lập bộ lọc.
 
-**Bước 2:** Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào biểu tượng Design Mode có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan. Màn hình lúc này chia làm 3 khu vực gồm khung Metadata ở bên trái, vùng thiết lập bộ lọc Filter Pane ở phía trên bên phải và lưới dữ liệu Data Grid ở phía dưới bên phải.
+**Bước 2:** Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan. Màn hình lúc này chia làm 3 khu vực gồm khung Metadata ở bên trái, vùng thiết lập bộ lọc Filter Pane ở phía trên bên phải và lưới dữ liệu Data Grid ở phía dưới bên phải.
 
 **Bước 3:** Thiết lập bộ lọc giải đấu tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Competition.
@@ -44,38 +44,30 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 ### 3.10.1.2 Sử dụng Pivot Excel
 
-**Bước 1:** Khởi động phần mềm Microsoft Excel, nhấp chọn Blank Workbook để tạo một trang tính mới. Trên thanh Ribbon ở phía trên, nhấp chuột vào thẻ Data. Trong nhóm công cụ Get & Transform Data, nhấp chuột vào nút Get Data, di chuột chọn From Database rồi nhấp chuột chọn From Analysis Services.
+**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
+* ● Mở rộng thư mục DIM Competition, nhấp giữ chuột trái vào trường Competition ID, kéo chuột xuống phía dưới và thả vào ô Filters.
+* ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Season, kéo chuột xuống phía dưới và thả tiếp vào ô Filters ngay phía dưới trường Competition ID.
+* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Player Name, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Goals, kéo chuột xuống phía dưới và thả vào ô Values với giá trị hiển thị là Sum of Goals.
 
-**Bước 2:** Cửa sổ Data Connection Wizard xuất hiện. Tại ô Server name, nhập địa chỉ localhost hoặc tên máy chủ dịch vụ SSAS. Tại mục Log on credentials, nhấp chọn ô tròn Use Windows Authentication. Nhấp chuột vào nút Next ở góc dưới bên phải.
-
-**Bước 3:** Tại bước chọn Database và Cube, nhấp chuột chọn cơ sở dữ liệu DW Football SSAS trong danh sách phía trên, sau đó nhấp chuột chọn khối Cube DW Football Transfermarkt ở danh sách phía dưới rồi nhấp nút Finish. Hộp thoại Import Data hiện ra, nhấp chọn ô tròn PivotTable Report, kiểm tra vị trí đặt bảng tại ô A3 rồi nhấp nút OK.
-
-**Bước 4:** Thao tác kéo thả các trường trong khung danh sách PivotTable Fields ở cạnh phải màn hình:
-* ● Nhấp chuột mở rộng thư mục DIM Competition, nhấp giữ chuột trái vào trường Competition ID, kéo chuột xuống phía dưới và thả vào ô Filters.
-* ● Nhấp chuột mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Season, kéo chuột xuống phía dưới và thả tiếp vào ô Filters ngay phía dưới trường Competition ID.
-* ● Nhấp chuột mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Player Name, kéo chuột xuống phía dưới và thả vào ô Rows.
-* ● Nhấp chuột mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Goals, kéo chuột xuống phía dưới và thả vào ô Values. Giá trị hiển thị tại ô này là Sum of Goals.
-
-**Bước 5:** Thiết lập giá trị cho các bộ lọc trên trang tính Excel:
+**Bước 2:** Thiết lập giá trị cho các bộ lọc trên trang tính Excel:
 * ● Tại ô B1 nằm cạnh nhãn Competition ID, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mã giải đấu GB1 rồi nhấp nút OK.
 * ● Tại ô B2 nằm cạnh nhãn Season, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mùa bóng 2023/2024 rồi nhấp nút OK.
 
-**Bước 6:** Thiết lập bộ lọc Top 10 cầu thủ ghi bàn:
+**Bước 3:** Thiết lập bộ lọc Top 10 cầu thủ ghi bàn:
 * ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 có nhãn Row Labels.
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
 * ● Hộp thoại Top 10 Filter xuất hiện, giữ nguyên ô thứ nhất là Top, nhập số 10 vào ô thứ hai, giữ nguyên ô thứ ba là Items, tại ô thứ tư By nhấp mở danh sách thả xuống và chọn thước đo Sum of Goals. Nhấp nút OK để áp dụng bộ lọc.
 
-**Bước 7:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa 2023/2024 được sắp xếp theo thứ tự số bàn thắng Sum of Goals giảm dần.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa 2023/2024 được sắp xếp theo thứ tự số bàn thắng Sum of Goals giảm dần.
 
 ---
 
 ### 3.10.1.3 Sử dụng ngôn ngữ MDX
 
-**Bước 1:** Khởi động phần mềm SQL Server Management Studio. Tại hộp thoại Connect to Server, mục Server type nhấp chọn Analysis Services, mục Server name nhập localhost hoặc tên instance SSAS, mục Authentication chọn Windows Authentication rồi nhấp nút Connect.
+**Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-**Bước 2:** Trong cửa sổ Object Explorer ở bên trái màn hình, nhấp chuột mở rộng thư mục Databases, mở rộng tiếp cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes. Nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX. Cửa sổ soạn thảo truy vấn MDX xuất hiện ở khung làm việc chính bên phải.
-
-**Bước 3:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định top 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024. Truy vấn chỉ định rõ các mệnh đề:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định top 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024. Truy vấn chỉ định rõ các mệnh đề:
 * ● Lựa chọn measure `[Measures].[Goals]` hiển thị trên trục cột COLUMNS.
 * ● Sử dụng hàm `TOPCOUNT` để lựa chọn 10 bản ghi hàng đầu hiển thị trên trục hàng ROWS, kết hợp hàm `NONEMPTY` lọc trước các cầu thủ có phát sinh bàn thắng trong chiều `[DIM Player].[Player Name]` theo `[Measures].[Goals]`.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
@@ -115,9 +107,9 @@ WHERE (
 );
 ```
 
-**Bước 4:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
+**Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-**Bước 5:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về ma trận dữ liệu hiển thị đúng 10 dòng tên cầu thủ và 1 cột số bàn thắng Goals tương ứng, khớp hoàn toàn với các tiêu chí lọc, trong đó Erling Haaland dẫn đầu với 27 bàn thắng, Cole Palmer với 22 bàn thắng và Alexander Isak với 21 bàn thắng.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về ma trận dữ liệu hiển thị đúng 10 dòng tên cầu thủ và 1 cột số bàn thắng Goals tương ứng, khớp hoàn toàn với các tiêu chí lọc, trong đó Erling Haaland dẫn đầu với 27 bàn thắng, Cole Palmer với 22 bàn thắng và Alexander Isak với 21 bàn thắng.
 
 ---
 
