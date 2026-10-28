@@ -1,11 +1,11 @@
-# MDX Query 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024 (Season = '2023')
+# MDX Query 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
 ## (Ứng dụng Hàm Xếp hạng TOPCOUNT & Tối ưu hóa Ô thưa NONEMPTY)
 
 ---
 
 ## 1. Nội dung truy vấn & Bối cảnh nghiệp vụ
 
-* **Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - Mã giải đấu: `GB1`) trong mùa giải 2023/2024 (Season = '2023'). Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
+* **Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - Mã giải đấu: `GB1`) trong mùa giải 2023/2024. Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
 * **Đối tượng phân tích:** Cầu thủ (`DIM_Player`), Giải đấu (`DIM_Competition`), Thời gian (`DIM_Time`), Hiệu suất thi đấu (`FACT_Player_Match_Perf`).
 * **Các thuộc tính & Thước đo tham gia:**
   * Dimension Attributes: `[DIM Player].[Player Name]`, `[DIM Competition].[Competition ID]`, `[DIM Time].[Season]`
@@ -80,7 +80,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo lần lượ
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
 | **Dòng 1** | Nhấp chọn **`DIM Competition`** | Nhấp chọn **`Competition ID`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mã **`GB1`** → Bấm **OK** (hiển thị `{ GB1 }`) |
-| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023`** (hoặc `2023/2024`) → Bấm **OK** |
+| **Dòng 2** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023/2024`** → Bấm **OK** |
 | **Dòng 3** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Player Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 3:*
@@ -178,7 +178,7 @@ Nhập câu lệnh MDX hoàn chỉnh sau:
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024 (Season = '2023')
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -193,7 +193,7 @@ SELECT
             (
                 [Measures].[Goals],
                 [DIM Competition].[Competition ID].[GB1],
-                [DIM Time].[Season].[2023]
+                [DIM Time].[Season].[2023/2024]
             )
         ),
         10,
@@ -206,7 +206,7 @@ FROM [DW Football Transfermarkt]
 -- Trục lát cắt ngữ cảnh (Slicer Axis): Giới hạn trong giải GB1 và mùa 2023/2024
 WHERE (
     [DIM Competition].[Competition ID].[GB1],
-    [DIM Time].[Season].[2023]
+    [DIM Time].[Season].[2023/2024]
 );
 ```
 
@@ -237,7 +237,7 @@ WHERE (
    * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
      * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS` (toàn bộ danh mục cầu thủ trong chiều Dimension).
-     * `Set_2`: Tuple tọa độ `([Measures].[Goals], [DIM Competition].[Competition ID].[GB1], [DIM Time].[Season].[2023])`.
+     * `Set_2`: Tuple tọa độ `([Measures].[Goals], [DIM Competition].[Competition ID].[GB1], [DIM Time].[Season].[2023/2024])`.
    * **Cơ chế hoạt động kỹ thuật:**
      * Hàm hoạt động trực tiếp ở tầng **Storage Engine** để kiểm tra tính thưa thớt (sparsity) của dữ liệu trước khi nạp vào Formula Engine.
      * Với mỗi cầu thủ trong `Set_1`, hệ thống kiểm tra ô dữ liệu giao thoa với `Set_2`. Nếu ô dữ liệu bàn thắng tại giải `GB1` mùa `2023/2024` bị rỗng (`NULL/Empty` - tức cầu thủ không thi đấu ở Premier League hoặc không ghi bàn nào), cầu thủ đó sẽ bị loại bỏ ngay lập tức.
@@ -332,6 +332,6 @@ Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết q
 
 ### 3. Cơ chế hoạt động của Động cơ SSAS (Storage Engine vs Formula Engine)
 * **Storage Engine (SE - Động cơ Lưu trữ):**
-  Thực hiện trích xuất dữ liệu thô từ các phân vùng đĩa (Partitions), áp dụng bộ lọc `[DIM Competition].[Competition ID].[GB1]` và `[DIM Time].[Season].[2023]`, đọc các khối dữ liệu nén (Data Chunks) theo cơ chế **Block Computation**.
+  Thực hiện trích xuất dữ liệu thô từ các phân vùng đĩa (Partitions), áp dụng bộ lọc `[DIM Competition].[Competition ID].[GB1]` và `[DIM Time].[Season].[2023/2024]`, đọc các khối dữ liệu nén (Data Chunks) theo cơ chế **Block Computation**.
 * **Formula Engine (FE - Động cơ Công thức):**
   Nhận tập kết quả nén từ SE, khởi tạo cấu trúc Min-Heap kích thước 10, chạy hàm `TOPCOUNT` trên tập hợp cầu thủ đã lọc, sau đó đóng gói kết quả thành ma trận tế bào (Cellset) để trả về cho SSMS, Visual Studio hoặc Excel.

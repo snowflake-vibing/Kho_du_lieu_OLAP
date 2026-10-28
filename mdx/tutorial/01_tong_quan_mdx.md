@@ -110,7 +110,7 @@ SELECT
     NON EMPTY 
     CROSSJOIN(
         [Top_English_Clubs],
-        {[DIM Time].[Season].[2022], [DIM Time].[Season].[2023]}
+        {[DIM Time].[Season].[2022/2023], [DIM Time].[Season].[2023/2024]}
     ) ON ROWS
 
 FROM [DW Football Transfermarkt]

@@ -22,13 +22,13 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023`** (hoặc `2023/2024`) → Bấm **OK** |
+| **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Season`** | Giữ nguyên **`Equal`** ($=$) | Bấm vào ô, tick chọn mùa **`2023/2024`** → Bấm **OK** |
 | **Dòng 2** | Nhấp chọn **`DIM Player`** | Nhấp chọn **`Player Name`** | Bấm dropdown chọn **`Custom`** (hoặc `MDX`) | Bấm vào ô → nhấp nút ba chấm **`...`** để mở cửa sổ *Expression Builder*, dán biểu thức bên dưới → Bấm **OK** |
 
 *Biểu thức nhập vào cửa sổ Expression Builder ở Dòng 2:*
 ```mdx
 FILTER(
-    NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, ([Measures].[Goal Contributions], [DIM Time].[Season].[2023])),
+    NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, ([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])),
     [Measures].[Goal Contributions] > 20
 )
 ```
@@ -84,7 +84,7 @@ Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn 
 | **Ô `Values` ($\Sigma$ Thước đo)** | **`Goal Contributions`** | Mở thư mục **`Measures`** → Kéo `Goal Contributions` thả vào ô Values. |
 
 ### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-* Tại ô **`B1`** (bên cạnh nhãn `Season`), nhấp mũi tên xổ xuống → tick chọn mùa bóng **`2023/2024`** (hoặc `2023`) → Nhấn **OK**.
+* Tại ô **`B1`** (bên cạnh nhãn `Season`), nhấp mũi tên xổ xuống → tick chọn mùa bóng **`2023/2024`** → Nhấn **OK**.
 
 ### Bước 5: Cấu hình Bộ lọc Cầu thủ có G+A > 20 & Sắp xếp
 1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
@@ -141,7 +141,7 @@ SELECT
                 [DIM Player].[Player Name].[Player Name].MEMBERS,
                 (
                     [Measures].[Goal Contributions],
-                    [DIM Time].[Season].[2023]
+                    [DIM Time].[Season].[2023/2024]
                 )
             ),
             [Measures].[Goal Contributions] > 20
@@ -155,7 +155,7 @@ FROM [DW Football Transfermarkt]
 
 -- Lát cắt ngữ cảnh (Slicer Axis): Mùa giải 2023/2024
 WHERE (
-    [DIM Time].[Season].[2023]
+    [DIM Time].[Season].[2023/2024]
 );
 ```
 
@@ -166,7 +166,7 @@ WHERE (
 * **`FILTER(..., [Measures].[Goal Contributions] > 20)`**: Hàm lọc logic tương đương với mệnh đề `HAVING SUM(Goal_Contributions) > 20` trong SQL.
 * **`NONEMPTY(...)`**: Tiền lọc dữ liệu thưa, loại bỏ trước những cầu thủ không thi đấu hoặc không có G+A nào trong mùa giải 2023/2024 trước khi đưa vào hàm `FILTER`.
 * **`FROM [DW Football Transfermarkt]`**: Chỉ định khối Cube nguồn cần truy xuất dữ liệu.
-* **`WHERE ([DIM Time].[Season].[2023])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh trong mùa giải 2023/2024.
+* **`WHERE ([DIM Time].[Season].[2023/2024])`**: Trục lát cắt dữ liệu (Slicer Axis), định vị ngữ cảnh trong mùa giải 2023/2024.
 
 ### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
 
@@ -197,7 +197,7 @@ WHERE (
    * **Cú pháp chuẩn:** `NONEMPTY(Set_1, Set_2)`
    * **Tham số thực tế trong truy vấn:**
      * `Set_1`: `[DIM Player].[Player Name].[Player Name].MEMBERS`.
-     * `Set_2`: Tuple `([Measures].[Goal Contributions], [DIM Time].[Season].[2023])`.
+     * `Set_2`: Tuple `([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])`.
    * **Cơ chế hoạt động kỹ thuật:**
      * Lọc sạch dữ liệu thưa ở tầng Storage Engine trước khi chuyển sang Formula Engine. Cầu thủ nào không có dữ liệu G+A trong mùa 2023/2024 sẽ bị loại trừ ngay từ đầu, giúp hàm `FILTER` chỉ cần đánh giá trên vài trăm cầu thủ thay vì quét qua toàn bộ cơ sở dữ liệu.
    * **Kết quả trả về:** Tập hợp các cầu thủ có dữ liệu thi đấu thực tế trong mùa giải 2023/2024.

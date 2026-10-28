@@ -2,7 +2,7 @@
 
 ## 3.10.1 Câu truy vấn 1
 
-**Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - GB1) trong mùa giải 2023/2024 (Season = '2023'). Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
+**Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh (Premier League - GB1) trong mùa giải 2023/2024. Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
 
 ### 3.10.1.1 Sử dụng Cube Browser
 
@@ -12,7 +12,7 @@
 
 **Bước 3:** Thiết lập bộ lọc cho `DIM Competition` (Hierarchy `Competition ID`). Đặt Operator là **Equal** và chọn Filter Expression là **{ GB1 }**.
 
-**Bước 4:** Thiết lập bộ lọc cho `DIM Time` (Hierarchy `Season`). Đặt Operator là **Equal** và chọn Filter Expression là **{ 2023 }** (hoặc `2023/2024`).
+**Bước 4:** Thiết lập bộ lọc cho `DIM Time` (Hierarchy `Season`). Đặt Operator là **Equal** và chọn Filter Expression là **{ 2023/2024 }**.
 
 **Bước 5:** Thiết lập bộ lọc cho `DIM Player` (Hierarchy `Player Name`). Đặt Operator là **Custom** và nhấp vào nút `...` để mở cửa sổ *Expression Builder*.
 
@@ -35,7 +35,7 @@ TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals
 
 **Bước 3:** Nhấp vào bộ lọc `Competition ID` và chọn **{ GB1 }**.
 
-**Bước 4:** Nhấp vào bộ lọc `Season` và chọn **{ 2023 }** (mùa bóng 2023/2024).
+**Bước 4:** Nhấp vào bộ lọc `Season` và chọn **{ 2023/2024 }**.
 
 **Bước 5:** PivotTable hiển thị danh sách các cầu thủ thuộc giải Ngoại Hạng Anh mùa giải 2023/2024.
 
@@ -53,11 +53,11 @@ TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Goals
 * ● SELECT measure `[Measures].[Goals]` trên **COLUMNS** (Cột).
 * ● Sử dụng hàm `TOPCOUNT` để SELECT 10 bản ghi hàng đầu trên **ROWS** (Hàng), dựa trên tập hợp `NONEMPTY` của `[DIM Player].[Player Name]` theo `[Measures].[Goals]`.
 * ● Lấy dữ liệu từ khối Cube `[DW Football Transfermarkt]`.
-* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn trong giải Ngoại Hạng Anh (`[DIM Competition].[Competition ID].[GB1]`) và mùa giải 2023 (`[DIM Time].[Season].[2023]`).
+* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn trong giải Ngoại Hạng Anh (`[DIM Competition].[Competition ID].[GB1]`) và mùa giải 2023/2024 (`[DIM Time].[Season].[2023/2024]`).
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024 (Season = '2023')
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -72,7 +72,7 @@ SELECT
             (
                 [Measures].[Goals],
                 [DIM Competition].[Competition ID].[GB1],
-                [DIM Time].[Season].[2023]
+                [DIM Time].[Season].[2023/2024]
             )
         ),
         10,
@@ -85,7 +85,7 @@ FROM [DW Football Transfermarkt]
 -- Trục lát cắt ngữ cảnh (Slicer Axis): Giới hạn trong giải GB1 và mùa 2023/2024
 WHERE (
     [DIM Competition].[Competition ID].[GB1],
-    [DIM Time].[Season].[2023]
+    [DIM Time].[Season].[2023/2024]
 );
 ```
 
