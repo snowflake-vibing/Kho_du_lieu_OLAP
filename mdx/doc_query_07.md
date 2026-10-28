@@ -6,14 +6,14 @@
 
 ### 3.10.7.1 Sử dụng Cube Browser
 
-**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo 2 thước đo tính toán tổng bàn thắng tại Anh và tỷ lệ phần trăm Pareto:
-* ● Thước đo thứ nhất: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `England Total Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
+**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo thước đo tỷ lệ phần trăm Pareto:
+* ● Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Pct Of England Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức tự động chia cho tổng bàn thắng cấp All của quốc gia:
 ```mdx
-([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All], [DIM Competition].[Country Name].[England])
-```
-* ● Thước đo thứ hai: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Pct Of England Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
-```mdx
-IIF([Measures].[England Total Goals] = 0, NULL, [Measures].[Goals] / [Measures].[England Total Goals])
+IIF(
+    ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All]) = 0, 
+    NULL, 
+    [Measures].[Goals] / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
+)
 ```
 Đặt Format String là `0.00%`.
 
@@ -78,7 +78,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 **Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
 **Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu ở Anh. Truy vấn chỉ định rõ các mệnh đề:
-* ● Mệnh đề `WITH MEMBER` định nghĩa `[Measures].[England Total Goals]` cố định cấp All làm mẫu số và `[Measures].[Pct Of England Goals]` tính tỷ lệ phần trăm đóng góp.
+* ● Mệnh đề `WITH MEMBER` định nghĩa `[Measures].[Pct Of England Goals]` tính tỷ lệ phần trăm đóng góp trực tiếp trên tổng cấp All của quốc gia.
 * ● Lựa chọn 2 thước đo hiển thị trên trục cột COLUMNS.
 * ● Sử dụng hàm `TOPPERCENT` lấy các quốc gia đạt ngưỡng 80% số bàn thắng trên trục hàng ROWS, kết hợp hàm `ORDER` với cờ `BDESC` để sắp xếp giảm dần.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
@@ -91,20 +91,12 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
    ============================================================================== */
 
 WITH 
-    -- 1. Tổng số bàn thắng của toàn bộ giải đấu tại Anh cố định cấp All làm mẫu số
-    MEMBER [Measures].[England Total Goals] AS
-        (
-            [Measures].[Goals],
-            [DIM Player].[Country Of Citizenship].[All],
-            [DIM Competition].[Country Name].[England]
-        )
-
-    -- 2. Tỷ lệ phần trăm đóng góp bàn thắng của từng quốc gia
+    -- Tỷ lệ phần trăm đóng góp bàn thắng của từng quốc gia
     MEMBER [Measures].[Pct Of England Goals] AS
         IIF(
-            ISEMPTY([Measures].[England Total Goals]) OR [Measures].[England Total Goals] = 0,
+            ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All]) = 0,
             NULL,
-            [Measures].[Goals] / [Measures].[England Total Goals]
+            [Measures].[Goals] / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
         ),
         FORMAT_STRING = "0.00%"
 
