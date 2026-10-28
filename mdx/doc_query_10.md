@@ -40,7 +40,7 @@ IIF(
 * ● Mở rộng thư mục chiều DIM Time, mở rộng phân cấp Hierarchy, tìm cấp độ Quarter, nhấp giữ chuột trái kéo thả lên vùng Columns để chia bảng theo các Quý.
 * ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái và kéo các thước đo Goals và QoQ Goals Growth thả vào vùng dữ liệu.
 
-**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng ma trận phân bổ bàn thắng và tốc độ tăng trưởng QoQ qua các Quý năm 2023.
+**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng ma trận phân bổ bàn thắng và tốc độ tăng trưởng QoQ qua các Quý năm 2023. Do Quý 1 là quý đầu năm nên chỉ số tăng trưởng QoQ của Quý 1 mang giá trị NULL, người dùng có thể nhấp vào biểu tượng Design Mode để chuyển sang mã MDX và chỉ định chính xác 7 cột đo lường thực tế, loại bỏ hoàn toàn cột Quý 1 QoQ rỗng.
 
 ---
 
@@ -59,7 +59,10 @@ IIF(
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
 * ● Trong hộp thoại Top 10 Filter xuất hiện, thiết lập Top 10 theo trường Sum of Goals rồi nhấp nút OK để áp dụng.
 
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh phản ánh chi tiết sự tăng trưởng số bàn thắng qua các quý của Top 10 CLB Châu Âu.
+**Bước 4:** Loại bỏ cột Quý 1 QoQ Goals Growth bị rỗng:
+* ● Do Quý 1 là quý khởi đầu năm 2023 nên không có quý liền trước để tính tăng trưởng, dẫn đến toàn bộ cột QoQ Goals Growth của Quý 1 mang giá trị rỗng NULL.
+* ● Trên trang tính Excel, người dùng nhấp chuột phải vào ô tiêu đề cột QoQ Goals Growth bên dưới Quý 1 rồi chọn lệnh Hide để ẩn cột rỗng này đi.
+* ● Bảng PivotTable lúc này hiển thị hoàn chỉnh đúng 7 cột số liệu thực tế sạch đẹp, gồm số bàn thắng Quý 1 cùng số bàn thắng và tỷ lệ tăng trưởng QoQ của 3 Quý tiếp theo gồm Quý 2, Quý 3 và Quý 4.
 
 ---
 
