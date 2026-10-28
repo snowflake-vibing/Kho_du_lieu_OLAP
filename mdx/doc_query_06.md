@@ -6,34 +6,48 @@
 
 ### 3.10.6.1 Sử dụng Cube Browser
 
-**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo tập hợp và 3 thước đo tính toán thể hình theo ngữ cảnh cầu thủ:
-* ● Khởi tạo tập hợp ValidPlayers: Nhấp chuột phải vào khung Script Organizer, chọn New Named Set. Đặt Name là `ValidPlayers`, tại ô Expression nhập biểu thức:
-```mdx
-NONEMPTY(
-    EXISTING CrossJoin(
-        [DIM Player].[Player Name].[Player Name].MEMBERS,
-        EXCEPT(
-            [DIM Player].[Height In Cm].[Height In Cm].MEMBERS,
-            { [DIM Player].[Height In Cm].[0], [DIM Player].[Height In Cm].[All] }
-        )
-    ),
-    [Measures].[FACT Player Match Perf Count]
-)
-```
+**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo 3 thước đo tính toán thể hình. Không cần tạo Named Set nhằm tránh làm chậm và xung đột với Excel:
 * ● Thước đo thứ nhất: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Avg Height Cm`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
 ```mdx
-ROUND(AVG([ValidPlayers], [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE), 1)
+ROUND(
+    AVG(
+        NONEMPTY(
+            EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+            [Measures].[FACT Player Match Perf Count]
+        ),
+        IIF([DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0, 
+            [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE, 
+            NULL)
+    ), 1
+)
 ```
 * ● Thước đo thứ hai: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Max Height Cm`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
 ```mdx
-MAX([ValidPlayers], [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)
+MAX(
+    NONEMPTY(
+        EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+        [Measures].[FACT Player Match Perf Count]
+    ),
+    IIF([DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0, 
+        [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE, 
+        NULL)
+)
 ```
 * ● Thước đo thứ ba: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Min Height Cm`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
 ```mdx
-MIN([ValidPlayers], [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)
+MIN(
+    FILTER(
+        NONEMPTY(
+            EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+            [Measures].[FACT Player Match Perf Count]
+        ),
+        [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0
+    ),
+    [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+)
 ```
 
-**Bước 2:** Trên thanh menu công cụ của Visual Studio, chọn menu Build rồi nhấp chọn Deploy Solution để đồng bộ tập hợp và các thước đo mới vào cấu trúc Cube.
+**Bước 2:** Trên thanh menu công cụ của Visual Studio, chọn menu Build rồi nhấp chọn Deploy Solution để đồng bộ các thước đo mới vào cấu trúc Cube.
 
 **Bước 3:** Chuyển sang tab **Browser** trên thanh tab của trình thiết kế Cube Designer. Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào nút Reconnect để nhận các thước đo mới, sau đó nhấp chọn biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan.
 
@@ -70,8 +84,7 @@ MIN([ValidPlayers], [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)
 **Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
 **Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích khảo sát thể hình và hiệu suất theo vị trí chính. Truy vấn chỉ định rõ các mệnh đề:
-* ● Mệnh đề `WITH SET` định nghĩa tập hợp `[ValidPlayers]` tạo các cặp Cầu thủ và Chiều cao hợp lệ bằng hàm `CrossJoin` và `NONEMPTY`.
-* ● Mệnh đề `WITH MEMBER` tính toán 3 chỉ số thể hình gồm `[Measures].[Avg Height Cm]` dùng hàm `AVG`, `[Measures].[Max Height Cm]` dùng hàm `MAX`, và `[Measures].[Min Height Cm]` dùng hàm `MIN`.
+* ● Mệnh đề `WITH MEMBER` tính toán 3 chỉ số thể hình gồm `[Measures].[Avg Height Cm]` dùng hàm `AVG`, `[Measures].[Max Height Cm]` dùng hàm `MAX`, và `[Measures].[Min Height Cm]` dùng hàm `MIN` được tối ưu hóa duyệt theo thuộc tính khóa `[DIM Player].[Player ID]` kết hợp cờ `EXISTING`.
 * ● Lựa chọn 5 thước đo hiển thị trên trục cột COLUMNS.
 * ● Sử dụng hàm `EXCEPT` loại bỏ giá trị Missing và nút All trên chiều `[DIM Player].[Main Position]`, kết hợp hàm `ORDER` với cờ `BDESC` để sắp xếp giảm dần theo số bàn thắng trên trục hàng ROWS.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
@@ -83,42 +96,45 @@ MIN([ValidPlayers], [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE)
    ============================================================================== */
 
 WITH 
-    -- 1. Tập hợp các cặp Cầu thủ và Chiều cao hợp lệ theo ngữ cảnh từng tuyến thi đấu
-    SET [ValidPlayers] AS
-        NONEMPTY(
-            EXISTING CrossJoin(
-                [DIM Player].[Player Name].[Player Name].MEMBERS,
-                EXCEPT(
-                    [DIM Player].[Height In Cm].[Height In Cm].MEMBERS,
-                    { [DIM Player].[Height In Cm].[0], [DIM Player].[Height In Cm].[All] }
-                )
-            ),
-            [Measures].[FACT Player Match Perf Count]
-        )
-
-    -- 2. Chiều cao trung bình theo vị trí
+    -- 1. Chiều cao trung bình theo vị trí thi đấu
     MEMBER [Measures].[Avg Height Cm] AS
         ROUND(
             AVG(
-                [ValidPlayers],
-                [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+                NONEMPTY(
+                    EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+                    [Measures].[FACT Player Match Perf Count]
+                ),
+                IIF([DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0, 
+                    [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE, 
+                    NULL)
             ),
             1
         ),
         FORMAT_STRING = "#,##0.0"
 
-    -- 3. Chiều cao lớn nhất theo vị trí
+    -- 2. Chiều cao lớn nhất theo vị trí thi đấu
     MEMBER [Measures].[Max Height Cm] AS
         MAX(
-            [ValidPlayers],
-            [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+            NONEMPTY(
+                EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+                [Measures].[FACT Player Match Perf Count]
+            ),
+            IIF([DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0, 
+                [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE, 
+                NULL)
         ),
         FORMAT_STRING = "#,##0"
 
-    -- 4. Chiều cao nhỏ nhất theo vị trí
+    -- 3. Chiều cao nhỏ nhất theo vị trí thi đấu
     MEMBER [Measures].[Min Height Cm] AS
         MIN(
-            [ValidPlayers],
+            FILTER(
+                NONEMPTY(
+                    EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS,
+                    [Measures].[FACT Player Match Perf Count]
+                ),
+                [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0
+            ),
             [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
         ),
         FORMAT_STRING = "#,##0"
