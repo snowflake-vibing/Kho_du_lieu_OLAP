@@ -2,7 +2,7 @@
 
 ## 3.10.6 Câu truy vấn 6
 
-**Nội dung truy vấn:** Đánh giá tương quan thể hình gồm chiều cao trung bình Avg Height Cm, chiều cao lớn nhất Max Height Cm, chiều cao nhỏ nhất Min Height Cm và hiệu suất thi đấu gồm tổng bàn thắng Goals, tổng thẻ vàng Yellow Cards phân bổ theo 4 tuyến thi đấu chính trên sân cỏ Main Position gồm Attack, Midfield, Defender và Goalkeeper. Phân tích này hỗ trợ ban huấn luyện đánh giá tiêu chí thể hình tối ưu cho từng vai trò trên sân.
+**Nội dung truy vấn:** Đánh giá mối tương quan giữa các chỉ số thể hình gồm chiều cao trung bình, chiều cao lớn nhất, chiều cao nhỏ nhất với hiệu suất thi đấu gồm tổng số bàn thắng và tổng số thẻ vàng trên 4 tuyến thi đấu chính gồm tiền đạo, tiền vệ, hậu vệ và thủ môn nhằm phân tích tiêu chí thể hình tối ưu cho từng vai trò trên sân.
 
 ### 3.10.6.1 Sử dụng Cube Browser
 

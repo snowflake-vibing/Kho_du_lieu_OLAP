@@ -2,7 +2,7 @@
 
 ## 3.10.12 Câu truy vấn 12
 
-**Nội dung truy vấn:** Xác định tháng có số lượng thẻ phạt kỷ lục cao nhất của từng Huấn luyện viên trưởng danh tiếng trong năm thi đấu, đi kèm tổng số thẻ vàng Yellow Cards và thẻ đỏ Red Cards. Ứng dụng hàm lặp tập hợp GENERATE kết hợp TOPCOUNT lấy đúng 1 tháng cao nhất giải quyết triệt để bài toán Group By Top 1 Per Category trong đại số đa chiều, hỗ trợ ban kỷ luật và truyền thông nhận diện thời điểm căng thẳng tâm lý lớn nhất của các huấn luyện viên.
+**Nội dung truy vấn:** Xác định tháng ghi nhận số lượng thẻ phạt nhiều nhất trong năm của từng huấn luyện viên trưởng, đi kèm số thẻ vàng và thẻ đỏ cụ thể nhằm nhận diện giai đoạn căng thẳng tâm lý và áp lực thi đấu lớn nhất của ban huấn luyện.
 
 ### 3.10.12.1 Sử dụng Cube Browser
 

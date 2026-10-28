@@ -2,7 +2,7 @@
 
 ## 3.10.11 Câu truy vấn 11
 
-**Nội dung truy vấn:** Thống kê danh sách các Sân vận động quy chuẩn quốc tế có sức chứa từ 60.000 chỗ ngồi trở lên cùng Câu lạc bộ chủ quản, tổng số bàn thắng ghi được và số lượng trận đấu duy nhất Distinct Matches Played đã từng tổ chức tại các sân đấu này. Ứng dụng hàm COALESCEEMPTY để làm sạch dữ liệu khuyết thiếu sức chứa và hàm DISTINCTCOUNT kết hợp EXISTING để loại trừ việc đếm trùng 22 đến 30 cầu thủ ra sân trong cùng một trận.
+**Nội dung truy vấn:** Thống kê danh sách các sân vận động có sức chứa từ 60.000 chỗ ngồi trở lên cùng câu lạc bộ chủ quản, tổng số trận đấu đã diễn ra và tổng số bàn thắng ghi được tại các sân đấu này nhằm đánh giá quy mô cơ sở vật chất và mức độ sôi động của các cầu trường lớn.
 
 ### 3.10.11.1 Sử dụng Cube Browser
 

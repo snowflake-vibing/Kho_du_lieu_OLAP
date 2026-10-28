@@ -2,7 +2,7 @@
 
 ## 3.10.3 Câu truy vấn 3
 
-**Nội dung truy vấn:** Đo lường khối lượng thời gian thi đấu Minutes Played và hiệu quả tạo dấu ấn lên bàn thắng Goal Contributions bằng tổng bàn thắng cộng kiến tạo đối với những ngôi sao tấn công hàng đầu đạt cột mốc trên 20 đóng góp bàn thắng trong mùa giải 2023/2024 nhằm đánh giá mức độ phụ thuộc vào trụ cột và tải trọng thi đấu.
+**Nội dung truy vấn:** Thống kê tổng số phút thi đấu cùng tổng số bàn thắng và kiến tạo của các cầu thủ đạt mốc từ 20 lần đóng góp vào bàn thắng trở lên trong mùa giải 2023/2024 nhằm đánh giá mức độ phụ thuộc vào các trụ cột tấn công.
 
 ### 3.10.3.1 Sử dụng Cube Browser
 
@@ -57,7 +57,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 4:** Sắp xếp danh sách giảm dần theo đóng góp bàn thắng: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Goal Contributions trên bảng tính, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
 
-**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các ngôi sao tấn công đạt trên 20 bàn thắng và kiến tạo trong mùa giải 2023/2024, được sắp xếp từ cao xuống thấp theo thứ tự đóng góp bàn thắng Sum of Goal Contributions giảm dần.
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các ngôi sao tấn công đạt trên 20 bàn thắng và kiến tạo trong mùa giải 2023/2024, được sắp xếp từ cao xuống thấp theo thứ tự đóng góp bàn thắng giảm dần.
 
 ---
 

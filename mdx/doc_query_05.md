@@ -2,7 +2,7 @@
 
 ## 3.10.5 Câu truy vấn 5
 
-**Nội dung truy vấn:** Khảo sát xem đặc điểm chân thuận Foot gồm chân trái, chân phải và hai chân tương quan như thế nào với số lượng bàn thắng ghi được ở từng vai trò vị trí cụ thể trên sân cỏ Sub Position như tiền đạo cắm Centre-Forward, tiền đạo cánh trái Left Winger, tiền đạo cánh phải Right Winger, tiền vệ tấn công Attacking Midfield và hộ công Second Striker. Sử dụng phép toán hợp tập hợp UNION để gom nhóm các vị trí tiền đạo và tiền vệ tấn công chủ lực, phục vụ công tác phân tích chiến thuật và bố trí cầu thủ chạy cánh nghịch chân.
+**Nội dung truy vấn:** Khảo sát mối tương quan giữa đặc điểm chân thuận gồm chân trái, chân phải, hai chân với số lượng bàn thắng ghi được theo từng vị trí tấn công cụ thể gồm tiền đạo cắm, tiền đạo cánh trái, tiền đạo cánh phải, tiền vệ tấn công và hộ công nhằm phục vụ phân tích chiến thuật và bố trí đội hình.
 
 ### 3.10.5.1 Sử dụng Cube Browser
 

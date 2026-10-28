@@ -2,7 +2,7 @@
 
 ## 3.10.4 Câu truy vấn 4
 
-**Nội dung truy vấn:** Khảo sát sự phân bố hiệu suất ghi bàn Goals, kiến tạo Assists và thời lượng thi đấu trung bình mỗi trận Avg Minutes Played theo từng độ tuổi cầu thủ Age trong năm 2023. Đồng thời áp dụng cấu trúc rẽ nhánh CASE WHEN để phân loại cầu thủ vào 3 giai đoạn sự nghiệp gồm Tài năng trẻ U21, Độ tuổi đỉnh cao Prime 22 đến 29, và Lão tướng Veteran từ 30 tuổi trở lên, giúp phân tích chu kỳ phát triển của vận động viên.
+**Nội dung truy vấn:** Khảo sát sự phân bố bàn thắng, kiến tạo và thời lượng thi đấu trung bình mỗi trận theo từng độ tuổi của cầu thủ trong năm 2023, đồng thời phân loại cầu thủ theo 3 giai đoạn sự nghiệp gồm lứa trẻ dưới 21 tuổi, độ tuổi đỉnh cao từ 22 đến 29 tuổi và lão tướng từ 30 tuổi trở lên nhằm phân tích chu kỳ phát triển phong độ của vận động viên.
 
 ### 3.10.4.1 Sử dụng Cube Browser
 

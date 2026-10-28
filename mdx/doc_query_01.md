@@ -2,7 +2,7 @@
 
 ## 3.10.1 Câu truy vấn 1
 
-**Nội dung truy vấn:** Xác định danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh Premier League có mã giải đấu GB1 trong mùa giải 2023/2024. Phân tích này giúp ban chuyên môn và nhà quản lý nhận diện các tiền đạo có hiệu suất làm bàn xuất sắc nhất, phục vụ công tác chuyển nhượng và đánh giá phong độ.
+**Nội dung truy vấn:** Liệt kê danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024 nhằm nhận diện các chân sút hàng đầu phục vụ công tác chuyển nhượng và đánh giá phong độ thi đấu.
 
 ### 3.10.1.1 Sử dụng Cube Browser
 
@@ -59,7 +59,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
 * ● Hộp thoại Top 10 Filter xuất hiện, giữ nguyên ô thứ nhất là Top, nhập số 10 vào ô thứ hai, giữ nguyên ô thứ ba là Items, tại ô thứ tư By nhấp mở danh sách thả xuống và chọn thước đo Sum of Goals. Nhấp nút OK để áp dụng bộ lọc.
 
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa 2023/2024 được sắp xếp theo thứ tự số bàn thắng Sum of Goals giảm dần.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa giải 2023/2024 được sắp xếp theo thứ tự số bàn thắng giảm dần.
 
 ---
 
@@ -109,7 +109,7 @@ WHERE (
 
 **Bước 3:** Kiểm tra thanh công cụ phía trên đảm bảo ô chọn cơ sở dữ liệu đang trỏ đúng vào DW Football SSAS. Nhấp chuột vào nút Execute có biểu tượng hình dấu chấm than màu đỏ trên thanh công cụ hoặc nhấn phím F5 trên bàn phím.
 
-**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về ma trận dữ liệu hiển thị đúng 10 dòng tên cầu thủ và 1 cột số bàn thắng Goals tương ứng, khớp hoàn toàn với các tiêu chí lọc, trong đó Erling Haaland dẫn đầu với 27 bàn thắng, Cole Palmer với 22 bàn thắng và Alexander Isak với 21 bàn thắng.
+**Bước 4:** Quan sát kết quả trong tab Results ở khung phía dưới màn hình. Hệ thống trả về ma trận dữ liệu hiển thị đúng 10 dòng tên cầu thủ và 1 cột số bàn thắng tương ứng, khớp hoàn toàn với các tiêu chí lọc, trong đó Erling Haaland dẫn đầu với 27 bàn thắng, Cole Palmer với 22 bàn thắng và Alexander Isak với 21 bàn thắng.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 3.10.9 Câu truy vấn 9
 
-**Nội dung truy vấn:** Xác định danh sách các Câu lạc bộ bóng đá toàn diện hàng đầu xuất hiện đồng thời trong cả hai nhóm gồm Top 30 CLB ghi bàn nhiều nhất vào Cuối tuần Is Weekend bằng 1 và Top 30 CLB ghi bàn nhiều nhất vào Ngày thường Is Weekend bằng 0. Ứng dụng phép toán giao tập hợp INTERSECT giúp lọc ra những đội bóng có bản lĩnh thi đấu đồng đều đỉnh cao, duy trì sức tấn công và kiểm soát kỷ luật bất kể thời điểm thi đấu từ các trận giải vô địch quốc gia cuối tuần đến các trận đấu cúp châu Âu giữa tuần.
+**Nội dung truy vấn:** Xác định các câu lạc bộ bóng đá toàn diện xuất hiện đồng thời trong cả hai nhóm gồm 30 đội ghi bàn nhiều nhất vào ngày cuối tuần và 30 đội ghi bàn nhiều nhất vào ngày thường, đồng thời so sánh số bàn thắng và số thẻ phạt giữa hai thời điểm thi đấu nhằm đánh giá tính ổn định về phong độ của các đội bóng.
 
 ### 3.10.9.1 Sử dụng Cube Browser
 

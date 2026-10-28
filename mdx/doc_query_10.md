@@ -2,7 +2,7 @@
 
 ## 3.10.10 Câu truy vấn 10
 
-**Nội dung truy vấn:** Phân tích sự biến động số bàn thắng và tốc độ tăng trưởng Quý-trên-Quý Quarter-over-Quarter QoQ Growth của Top 10 Câu lạc bộ bóng đá hàng đầu Châu Âu có tổng số bàn thắng cao nhất trong năm 2023. Truy vấn ứng dụng hàm phân cấp thời gian PREVMEMBER kết hợp hàm logic IIF để tính tỷ lệ tăng trưởng bàn thắng giữa các quý liên tiếp gồm Quý 2 so với Quý 1, Quý 3 so với Quý 2, và Quý 4 so với Quý 3. Đặc biệt, nhằm loại bỏ hoàn toàn các giá trị rỗng, tại Quý 1 truy vấn chỉ lấy số bàn thắng do là quý đầu tiên của năm phân tích chưa có quý liền trước làm mốc so sánh, và hiển thị song song cả Bàn thắng lẫn Tỷ lệ Tăng trưởng QoQ ở các Quý 2, Quý 3, Quý 4. Nhờ đó, kết quả đạt đúng 7 cột dữ liệu đồng nhất không có ô rỗng.
+**Nội dung truy vấn:** Phân tích biến động số bàn thắng và tốc độ tăng trưởng qua từng quý của 10 câu lạc bộ có tổng số bàn thắng cao nhất châu Âu trong năm 2023 nhằm đánh giá tính ổn định về phong độ của các đội bóng lớn qua các giai đoạn trong năm.
 
 ### 3.10.10.1 Sử dụng Cube Browser
 

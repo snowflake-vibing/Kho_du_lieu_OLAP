@@ -2,7 +2,7 @@
 
 ## 3.10.7 Câu truy vấn 7
 
-**Nội dung truy vấn:** Xác định nhóm các quốc gia có cầu thủ đóng góp vào 80% tổng số bàn thắng được ghi tại tất cả các giải đấu bóng đá diễn ra trên lãnh thổ Nước Anh Country Name là England. Ứng dụng nguyên lý Pareto 80/20 giúp liên đoàn bóng đá và các câu lạc bộ đánh giá thị trường xuất khẩu cầu thủ chủ lực, phục vụ chiến lược cấp giấy phép lao động và chính sách ngoại binh.
+**Nội dung truy vấn:** Xác định nhóm các quốc gia có cầu thủ đóng góp vào 80% tổng số bàn thắng tại tất cả các giải đấu diễn ra trên lãnh thổ nước Anh theo nguyên lý Pareto 80/20 nhằm nhận diện thị trường cung cấp ngoại binh chủ lực phục vụ chính sách chuyển nhượng.
 
 ### 3.10.7.1 Sử dụng Cube Browser
 
