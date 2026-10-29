@@ -2,7 +2,7 @@
 
 ## 3.10.3 Câu truy vấn 3
 
-**Nội dung truy vấn:** Thống kê tổng số phút thi đấu cùng tổng số bàn thắng và kiến tạo của các cầu thủ đạt mốc từ 20 lần đóng góp vào bàn thắng trở lên trong mùa giải 2023 nhằm đánh giá mức độ phụ thuộc vào các trụ cột tấn công.
+**Nội dung truy vấn:** Thống kê tổng số phút thi đấu cùng tổng số bàn thắng và kiến tạo của các cầu thủ đạt mốc từ 20 lần đóng góp vào bàn thắng trở lên trong mùa giải 2023/2024 nhằm đánh giá mức độ phụ thuộc vào các trụ cột tấn công.
 
 ### 3.10.3.1 Sử dụng Cube Browser
 
@@ -14,7 +14,7 @@
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Time.
 * ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Season.
 * ● Tại cột Operator, giữ nguyên giá trị là Equal.
-* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn mùa bóng 2023 rồi nhấp nút OK để xác nhận.
+* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn mùa bóng 2023/2024 rồi nhấp nút OK để xác nhận.
 
 **Bước 4:** Thiết lập điều kiện lọc cầu thủ có đóng góp bàn thắng trên 20 tại dòng thứ hai trong vùng bộ lọc Filter Pane:
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Player.
@@ -28,7 +28,7 @@ ORDER(
     FILTER(
         NONEMPTY(
             [DIM Player].[Player Name].[Player Name].MEMBERS,
-            ([Measures].[Goal Contributions], [DIM Time].[Season].[2023])
+            ([Measures].[Goal Contributions], [DIM Time].[Season].[2023/2024])
         ),
         [Measures].[Goal Contributions] > 20
     ),
@@ -43,7 +43,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Tiếp tục trong khung Metadata, nhấp chuột mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, nhấp giữ chuột trái vào thước đo Minutes Played, kéo con trỏ chuột sang khu vực lưới dữ liệu và thả chuột vào vị trí ngay bên cạnh cột Player Name.
 * ● Tiếp tục nhấp giữ chuột trái vào thước đo Goal Contributions trong nhóm FACT Player Match Perf, kéo con trỏ chuột sang và thả chuột vào vị trí ngay bên cạnh cột Minutes Played.
 
-**Bước 7:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị danh sách các cầu thủ đạt mốc trên 20 đóng góp bàn thắng trong mùa giải 2023 kèm theo tổng số phút thi đấu.
+**Bước 7:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị danh sách các cầu thủ đạt mốc trên 20 đóng góp bàn thắng trong mùa giải 2023/2024 kèm theo tổng số phút thi đấu.
 
 ---
 
@@ -55,7 +55,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Minutes Played, kéo chuột xuống phía dưới và thả vào ô Values với giá trị hiển thị là Sum of Minutes Played.
 * ● Tiếp tục mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Goal Contributions, kéo chuột xuống phía dưới và thả tiếp vào ô Values với giá trị hiển thị là Sum of Goal Contributions.
 
-**Bước 2:** Thiết lập giá trị cho bộ lọc mùa giải trên trang tính Excel: Tại ô B1 nằm cạnh nhãn Season, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mùa bóng 2023 rồi nhấp nút OK.
+**Bước 2:** Thiết lập giá trị cho bộ lọc mùa giải trên trang tính Excel: Tại ô B1 nằm cạnh nhãn Season, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mùa bóng 2023/2024 rồi nhấp nút OK.
 
 **Bước 3:** Thiết lập bộ lọc cầu thủ có đóng góp bàn thắng lớn hơn 20:
 * ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 có nhãn Row Labels.
@@ -64,7 +64,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 4:** Sắp xếp danh sách giảm dần theo đóng góp bàn thắng: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Goal Contributions trên bảng tính, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
 
-**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các ngôi sao tấn công đạt trên 20 bàn thắng và kiến tạo trong mùa giải 2023, được sắp xếp từ cao xuống thấp theo thứ tự đóng góp bàn thắng giảm dần.
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các ngôi sao tấn công đạt trên 20 bàn thắng và kiến tạo trong mùa giải 2023/2024, được sắp xếp từ cao xuống thấp theo thứ tự đóng góp bàn thắng giảm dần.
 
 ---
 
@@ -72,15 +72,15 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định danh sách cầu thủ có trên 20 đóng góp bàn thắng trong mùa giải 2023. Truy vấn chỉ định rõ các mệnh đề:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định danh sách cầu thủ có trên 20 đóng góp bàn thắng trong mùa giải 2023/2024. Truy vấn chỉ định rõ các mệnh đề:
 * ● Lựa chọn hai thước đo `[Measures].[Minutes Played]` và `[Measures].[Goal Contributions]` hiển thị trên trục cột COLUMNS.
 * ● Sử dụng hàm `FILTER` kết hợp hàm `NONEMPTY` để lọc các cầu thủ có `Goal Contributions` lớn hơn 20 trên trục hàng ROWS, đồng thời bọc ngoài bằng hàm `ORDER` với cờ `BDESC` để sắp xếp giảm dần toàn cục.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
-* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn phạm vi tính toán trong mùa giải 2023 `[DIM Time].[Season].[2023]`.
+* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn phạm vi tính toán trong mùa giải 2023/2024 `[DIM Time].[Season].[2023/2024]`.
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 03: Cầu thủ có trên 20 đóng góp bàn thắng G+A mùa giải 2023
+   Truy vấn MDX 03: Cầu thủ có trên 20 đóng góp bàn thắng G+A mùa giải 2023/2024
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -98,7 +98,7 @@ SELECT
                 [DIM Player].[Player Name].[Player Name].MEMBERS,
                 (
                     [Measures].[Goal Contributions],
-                    [DIM Time].[Season].[2023]
+                    [DIM Time].[Season].[2023/2024]
                 )
             ),
             [Measures].[Goal Contributions] > 20
@@ -110,9 +110,9 @@ SELECT
 -- Khối Cube nguồn
 FROM [DW Football Transfermarkt]
 
--- Trục lát cắt Slicer Axis: Mùa giải 2023
+-- Trục lát cắt Slicer Axis: Mùa giải 2023/2024
 WHERE (
-    [DIM Time].[Season].[2023]
+    [DIM Time].[Season].[2023/2024]
 );
 ```
 

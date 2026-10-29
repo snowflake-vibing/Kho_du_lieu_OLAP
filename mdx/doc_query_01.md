@@ -2,7 +2,7 @@
 
 ## 3.10.1 Câu truy vấn 1
 
-**Nội dung truy vấn:** Liệt kê danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023 nhằm nhận diện các chân sút hàng đầu phục vụ công tác chuyển nhượng và đánh giá phong độ thi đấu.
+**Nội dung truy vấn:** Liệt kê danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024 nhằm nhận diện các chân sút hàng đầu phục vụ công tác chuyển nhượng và đánh giá phong độ thi đấu.
 
 ### 3.10.1.1 Sử dụng Cube Browser
 
@@ -20,7 +20,7 @@
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Time.
 * ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Season.
 * ● Tại cột Operator, giữ nguyên giá trị là Equal.
-* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn mùa bóng 2023 rồi nhấp nút OK để xác nhận.
+* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn mùa bóng 2023/2024 rồi nhấp nút OK để xác nhận.
 
 **Bước 5:** Thiết lập điều kiện lọc và sắp xếp Top 10 cầu thủ tại dòng thứ ba trong vùng bộ lọc Filter Pane:
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Player.
@@ -37,7 +37,7 @@ ORDER(
             (
                 [Measures].[Goals],
                 [DIM Competition].[Competition ID].[GB1],
-                [DIM Time].[Season].[2023]
+                [DIM Time].[Season].[2023/2024]
             )
         ),
         10,
@@ -53,7 +53,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Trong khung Metadata ở bên trái màn hình, nhấp chuột mở rộng thư mục chiều DIM Player, nhấp giữ chuột trái vào thuộc tính Player Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng trống.
 * ● Tiếp tục trong khung Metadata, nhấp chuột mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, nhấp giữ chuột trái vào thước đo Goals, kéo con trỏ chuột sang khu vực lưới dữ liệu và thả chuột vào vị trí ngay bên cạnh cột Player Name.
 
-**Bước 8:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả gồm 10 dòng đại diện cho 10 cầu thủ ghi nhiều bàn thắng nhất giải Ngoại Hạng Anh mùa giải 2023.
+**Bước 8:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả gồm 10 dòng đại diện cho 10 cầu thủ ghi nhiều bàn thắng nhất giải Ngoại Hạng Anh mùa giải 2023/2024.
 
 ---
 
@@ -67,7 +67,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 2:** Thiết lập giá trị cho các bộ lọc trên trang tính Excel:
 * ● Tại ô B1 nằm cạnh nhãn Competition ID, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mã giải đấu GB1 rồi nhấp nút OK.
-* ● Tại ô B2 nằm cạnh nhãn Season, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mùa bóng 2023 rồi nhấp nút OK.
+* ● Tại ô B2 nằm cạnh nhãn Season, nhấp chuột vào nút mũi tên xổ xuống, tích chọn mùa bóng 2023/2024 rồi nhấp nút OK.
 
 **Bước 3:** Thiết lập bộ lọc Top 10 cầu thủ ghi bàn:
 * ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 có nhãn Row Labels.
@@ -76,7 +76,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 4:** Sắp xếp giảm dần theo số bàn thắng: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Goals, ví dụ ô B5, di chuyển con trỏ chuột vào mục Sort rồi nhấp chọn Sort Largest to Smallest để đưa cầu thủ ghi nhiều bàn nhất lên vị trí dẫn đầu bảng.
 
-**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa giải 2023 được sắp xếp giảm dần chính xác tuyệt đối từ Erling Haaland 27 bàn xuống Jean-Philippe Mateta 16 bàn.
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa giải 2023/2024 được sắp xếp giảm dần chính xác tuyệt đối từ Erling Haaland 27 bàn xuống Jean-Philippe Mateta 16 bàn.
 
 ---
 
@@ -84,15 +84,15 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 **Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
-**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định top 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023. Truy vấn chỉ định rõ các mệnh đề:
+**Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích xác định top 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024. Truy vấn chỉ định rõ các mệnh đề:
 * ● Lựa chọn measure `[Measures].[Goals]` hiển thị trên trục cột COLUMNS.
 * ● Sử dụng hàm `ORDER` kết hợp `TOPCOUNT` để lựa chọn 10 bản ghi hàng đầu và sắp xếp giảm dần theo số bàn thắng trên trục hàng ROWS, kết hợp hàm `NONEMPTY` lọc trước các cầu thủ có phát sinh bàn thắng trong chiều `[DIM Player].[Player Name]` theo `[Measures].[Goals]`.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
-* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn phạm vi tính toán trong giải Ngoại Hạng Anh `[DIM Competition].[Competition ID].[GB1]` và mùa giải 2023 `[DIM Time].[Season].[2023]`.
+* ● Sử dụng mệnh đề `WHERE` để làm lát cắt ngữ cảnh giới hạn phạm vi tính toán trong giải Ngoại Hạng Anh `[DIM Competition].[Competition ID].[GB1]` và mùa giải 2023/2024 `[DIM Time].[Season].[2023/2024]`.
 
 ```mdx
 /* ==============================================================================
-   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
    Database: DW_Football_SSAS | Cube: [DW Football Transfermarkt]
    ============================================================================== */
 
@@ -108,7 +108,7 @@ SELECT
                 (
                     [Measures].[Goals],
                     [DIM Competition].[Competition ID].[GB1],
-                    [DIM Time].[Season].[2023]
+                    [DIM Time].[Season].[2023/2024]
                 )
             ),
             10,
@@ -121,10 +121,10 @@ SELECT
 -- Khối Cube nguồn
 FROM [DW Football Transfermarkt]
 
--- Trục lát cắt Slicer Axis: Giới hạn trong giải GB1 và mùa 2023
+-- Trục lát cắt Slicer Axis: Giới hạn trong giải GB1 và mùa 2023/2024
 WHERE (
     [DIM Competition].[Competition ID].[GB1],
-    [DIM Time].[Season].[2023]
+    [DIM Time].[Season].[2023/2024]
 );
 ```
 
