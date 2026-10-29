@@ -107,9 +107,10 @@ AI phải rà soát xem từng bước hướng dẫn trong 3 cách có thực s
 * **Vùng `Filters` (Bộ lọc báo cáo):** Có kéo đầy đủ các trường ngữ cảnh lát cắt (ví dụ: `Competition ID`, `Season`, `Is Home Game`) vào ô Filters và tick chọn giá trị tương ứng không?
 * **Vùng `Rows` (Dòng dữ liệu):** Có đặt đúng các thuộc tính phân nhóm theo đúng thứ bậc phân cấp không?
 * **Vùng `Values` ($\Sigma$ Thước đo):** Có kéo đúng Measure cần tính không? Hàm tổng hợp hiển thị có đúng không (ví dụ: `Sum of Goals`, `Distinct Count of Games`)?
-* **Thao tác cấu hình Bộ lọc Giá trị (Value Filters):**
-  * Đề bài yêu cầu Top 10: Hướng dẫn có chỉ rõ vào `Value Filters` $\rightarrow$ chọn `Top 10...` $\rightarrow$ chọn theo thước đo tương ứng không?
-  * Đề bài yêu cầu điều kiện ngưỡng (`> 20`, `>= 60.000`): Hướng dẫn có chỉ rõ vào `Value Filters` $\rightarrow$ chọn `Greater Than...` không?
+* **Thao tác cấu hình Bộ lọc Giá trị hoặc Tạo Set MDX chuyên dụng:**
+  * Lọc phẳng thông thường: Đề bài yêu cầu Top N hoặc so sánh ngưỡng số học đơn giản (`> 20`, `>= 60.000`), hướng dẫn chỉ rõ vào `Value Filters` $\rightarrow$ chọn `Top 10...` hoặc `Greater Than...`.
+  * Đại số tập hợp OLAP: Đề bài yêu cầu `INTERSECT`, `UNION`, `EXCEPT` hoặc lọc giao/hợp giữa các lát cắt thời gian/không gian, hướng dẫn BẮT BUỘC phải chỉ rõ vào thẻ `PivotTable Analyze` $\rightarrow$ chọn `Fields, Items, & Sets` $\rightarrow$ chọn `Create Set Using MDX...` để tạo tập hợp tính toán. Nghiêm cấm dùng `Value Filters` vì sẽ làm sai lệch bản chất giao tập hợp và làm sai lệch số dòng dữ liệu.
+* **Xử lý Cột rỗng và Giá trị khởi đầu NULL:** Với các chỉ số chuỗi thời gian (QoQ, MoM, YoY) có kỳ đầu tiên mang giá trị NULL, hướng dẫn Excel phải chỉ dẫn bước nhấp chuột phải vào tiêu đề cột và chọn `Hide` để ẩn cột rỗng, đảm bảo số cột số liệu hiển thị trong Excel khớp chính xác 100% với trục COLUMNS của MDX.
 
 ### 3.3. Kiểm tra Cách 3: Ngôn ngữ MDX (SSMS)
 * **Trục `COLUMNS`:** Chọn đúng Measure và thuộc tính hiển thị ngang.
@@ -151,8 +152,8 @@ Dưới đây là kết quả kiểm định thực nghiệm thực tế trên l
 | [query_05.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_05.md) | Bàn thắng theo chân thuận & vị trí chi tiết | ✅ **ĐÃ CHẠY LOCAL** (CF-right: 5.457, LW-right: 2.015) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `UNION`, `CrossJoin`, `DESC` | **100/100 (A+)** |
 | [query_06.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_06.md) | Chiều cao TB, bàn thắng và thẻ phạt theo vị trí | ✅ **ĐÃ CHẠY LOCAL** (Defender: 183.9cm, Attack: 180.9cm) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `AVG`, `EXISTING`, `ROUND` | **100/100 (A+)** |
 | [query_07.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_07.md) | Bàn thắng theo quốc tịch theo nguyên lý Pareto 80/20 | ✅ **ĐÃ CHẠY LOCAL** (Top 13 nước đạt 81.66% bàn thắng) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `TOPPERCENT (80)`, Tuple All | **100/100 (A+)** |
-| [query_09.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_09.md) | Các CLB thuộc Top Cuối tuần & Ngày thường | ✅ **ĐÃ CHẠY LOCAL** (16 CLB giao thoa: Man City, Bayern...) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `INTERSECT`, `TOPCOUNT` | **100/100 (A+)** |
-| [query_10.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_10.md) | Bàn thắng Real Madrid & Tăng trưởng QoQ | ✅ **ĐÃ CHẠY LOCAL** (Đối thủ bị ghi bàn theo từng Quý) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `.PREVMEMBER`, `DESCENDANTS` | **100/100 (A+)** |
+| [query_09.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_09.md) | Các CLB thuộc Top Cuối tuần & Ngày thường | ✅ **ĐÃ CHẠY LOCAL** (9 CLB giao thoa: Man City, Bayern...) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `INTERSECT`, `TOPCOUNT` | **100/100 (A+)** |
+| [query_10.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_10.md) | Top 10 CLB Châu Âu 2023 & Tăng trưởng QoQ | ✅ **ĐÃ CHẠY LOCAL** (Ẩn cột Q1 QoQ rỗng, đủ 7 cột chuẩn) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `.PREVMEMBER`, `ROUND` | **100/100 (A+)** |
 | [query_11.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_11.md) | Số trận tại SVĐ có sức chứa $\ge$ 60.000 chỗ | ✅ **ĐÃ CHẠY LOCAL** (Bernabéu: 83k, Signal Iduna: 81k) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `COALESCEEMPTY`, `DISTINCTCOUNT` | **100/100 (A+)** |
 | [query_12.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_12.md) | Tháng nhận thẻ kỷ lục phân theo Huấn luyện viên | ✅ **ĐÃ CHẠY LOCAL** (Almeyda: Th.10 32 thẻ, Simeone: 27 thẻ) | ✅ Khớp 100% | ✅ Chuẩn xác | ✅ `GENERATE`, `TOPCOUNT(1)` | **100/100 (A+)** |
 
