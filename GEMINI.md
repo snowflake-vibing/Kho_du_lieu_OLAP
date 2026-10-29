@@ -24,3 +24,9 @@
      - Số lượng cột số liệu: Các cột đo lường phải khớp hoàn toàn về số lượng và thứ tự.
      - Giá trị số học từng ô: Mọi con số định lượng và tỷ lệ phần trăm phải trùng khớp tuyệt đối, không có sai lệch.
    - Nếu phát hiện bất kỳ sự vênh nào giữa thao tác Excel, Cube Browser và câu lệnh MDX, kết luận kiểm tra phải là KHÔNG ĐẠT và lập tức điều chỉnh lại tài liệu.
+
+5. **Quy tắc Kỷ luật và Chế tài Nghiêm ngặt (Strict Disciplinary Accountability):**
+   - Mọi câu trả lời nghiệm thu của AI nếu chỉ chạy riêng lệnh MDX mà khẳng định đã đối soát 3 chiều thì mặc định bị coi là **VI PHẠM KỶ LUẬT VÀ KHÔNG ĐẠT**.
+   - Nghiêm cấm tuyệt đối việc suy diễn toán tử giao diện. Trong Cube Browser của Visual Studio (SSDT), danh sách toán tử chuẩn chỉ gồm: `Equal`, `Not Equal`, `In`, `Not In`, `Contains`, `Begins With`, `Range (Inclusive)`, `Range (Exclusive)`, `Custom`. Tuyệt đối KHÔNG hướng dẫn các toán tử không tồn tại như `Greater Than`, `Less Than`... Đối với các bài toán lọc ngưỡng số học hoặc Top N trong Cube Browser, BẮT BUỘC hướng dẫn dùng toán tử **`Custom`** hoặc kéo **`Named Set`**.
+   - Khi tạo thước đo hiển thị giá trị thuộc tính Dimension (như `Stadium Capacity`), BẮT BUỘC dùng cú pháp `MAX(EXISTING [Dimension].[Attribute].[Attribute].MEMBERS, [Dimension].[Attribute].CURRENTMEMBER.MEMBER_VALUE)` để ngăn chặn triệt để lỗi trả về chữ `All` khi thuộc tính không nằm trên trục Rows.
+   - Lịch sử các sai phạm thực tế và bài học kỷ luật được ghi nhận vĩnh viễn tại `docs/BIEN_BAN_KIEM_DIEM_AI_SU_CO_QUERY_10_11.md`.
