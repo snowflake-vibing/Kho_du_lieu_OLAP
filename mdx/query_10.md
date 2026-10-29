@@ -94,13 +94,12 @@ flowchart TD
 
 Phương pháp này được thực hiện trực tiếp trong môi trường phát triển khối đa chiều (SQL Server Data Tools / Visual Studio).
 
-#### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures Tăng Trưởng QoQ
+#### Bước 1: Mở giao diện Cube Designer & Tạo Thước Đo và Named Set Top 10 CLB
 1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSAS_Football_Transfermarkt`).
 2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
-3. Nếu đã tạo `Prev_Quarter_Goals` / `QoQ_Goals_Growth` từ hướng dẫn cũ → **xóa cả hai** (chuột phải → Delete). Hướng dẫn cũ bị lỗi: thước đo QoQ gọi tới `[Prev Quarter Goals]` (có dấu cách) nhưng thước đo thật tên `Prev_Quarter_Goals` (gạch dưới) → Excel báo `#VALUE!`, Browser báo `(null)`. Ngoài ra bản cũ nhân `* 100` rồi lại format `0.00%` → sai gấp 100 lần.
-4. Bấm **New Calculated Member**, tạo **duy nhất 1** thước đo tự chủ (không phụ thuộc thước đo tính toán nào khác):
-   * Name: `[QoQ Goals Growth]` | Parent hierarchy: `Measures`
-   * Expression (copy nguyên văn):
+3. **Tạo Calculated Member tính tỷ lệ tăng trưởng QoQ (tự chủ):**
+   * Bấm **New Calculated Member**, đặt Name là `[QoQ Goals Growth]`, Parent hierarchy là `Measures`.
+   * Expression:
      ```mdx
      IIF(
          [DIM Time].[Hierarchy].CURRENTMEMBER.LEVEL IS [DIM Time].[Hierarchy].[Quarter]
@@ -113,24 +112,39 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
      )
      ```
    * Format String: `"0.00%"`
-5. Chọn menu **Build** → **Deploy Solution** để cập nhật Cube lên Analysis Services.
+4. **Tạo Named Set lọc Top 10 CLB năm 2023:**
+   * Bấm nút **New Named Set** trên thanh công cụ tab Calculations.
+   * Đặt Name là `[Top 10 Clubs 2023]`.
+   * Expression:
+     ```mdx
+     TOPCOUNT(
+         NONEMPTY(
+             EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+             ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+         ),
+         10,
+         ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+     )
+     ```
+5. Chọn menu **Build** → **Deploy Solution** để đồng bộ Cube lên Analysis Services server.
 
 #### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
 1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
 2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa kéo thả.
 
 #### Bước 3: Thiết lập Vùng Bộ lọc (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, tạo dòng lọc cố định năm 2023:
+Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 2 dòng lọc để cố định năm 2023 và giới hạn chính xác Top 10 CLB:
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
 | **Dòng 1** | Nhấp chọn **`DIM Time`** | Nhấp chọn **`Year`** | Chọn **`Equal`** ($=$) | Bấm vào ô, tick chọn năm **`2023`** → Bấm **OK** (hiển thị `{ 2023 }`) |
+| **Dòng 2** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Club Name`** | Chọn **`Custom`** (hoặc chọn **`In`**) | Nếu chọn **`Custom`**: nhập `[Top 10 Clubs 2023]`.<br>Nếu chọn **`In`**: tick chọn đúng 10 CLB hàng đầu: *Manchester City, PSV Eindhoven, Bayer 04 Leverkusen, Feyenoord Rotterdam, Bayern Munich, Real Madrid, Arsenal FC, Atlético de Madrid, Liverpool FC, Borussia Dortmund*. |
 
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
 1. **Kéo Chiều Câu lạc bộ (Rows):**
-   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows.
+   * Trong cây Metadata bên trái, mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Club Name`**: Kéo thả vào vùng Rows *(hoặc mở thư mục **Sets** → kéo trực tiếp **`Top 10 Clubs 2023`** thả vào vùng Rows)*.
 2. **Kéo Phân cấp Quý (Columns):**
-   * Mở rộng thư mục **`DIM Time`** → mở rộng phân cấp **`Hierarchy`** → tìm cấp độ **`Quarter`**: Kéo thả lên vùng cột (Columns) để chia bảng theo các Quý (1, 2, 3, 4).
+   * Mở rộng thư mục **`DIM Time`** → mở rộng phân cấp **`Hierarchy`** → tìm cấp độ **`Quarter`**: Kéo thả vào vùng Rows (ngay bên cạnh cột `Club Name`) để phân tích theo 4 Quý của năm 2023.
 3. **Kéo Thước đo Bàn thắng & Tăng trưởng QoQ (Measures):**
    * Mở rộng thư mục **`Measures`**:
      * Kéo **`Goals`** thả vào vùng dữ liệu.
@@ -138,8 +152,8 @@ Tại bảng lưới thiết lập bộ lọc phía trên, tạo dòng lọc c�
 
 #### Bước 5: Thực thi truy vấn và Xem kết quả
 1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
-2. Lưới Browser hiển thị dạng danh sách phẳng `Club Name | Quarter | Goals | QoQ Goals Growth` (Browser không hỗ trợ xoay Quarter lên cột). Dòng Quarter = 1 có QoQ trống là đúng bản chất (không có quý trước trong năm 2023).
-3. Đối chiếu: các dòng của 10 CLB ở bảng Mục 3 phải trùng khớp từng số (ví dụ Manchester City: 30 / 37 & 23.33% / 20 & -45.95% / 42 & 110.00%).
+2. Lưới Browser lập tức hiển thị chuẩn xác **đúng 10 câu lạc bộ hàng đầu** $\times$ 4 quý = 40 dòng dữ liệu sạch sẽ, không còn hiện tượng hiển thị toàn bộ hàng trăm CLB không liên quan.
+3. Đối chiếu: Từng số bàn thắng và tỷ lệ tăng trưởng QoQ của 10 CLB khớp 100% tuyệt đối với kết quả MDX và bảng PivotTable trong Excel.
 
 ---
 

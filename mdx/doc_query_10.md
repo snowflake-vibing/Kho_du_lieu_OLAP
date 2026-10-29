@@ -6,8 +6,8 @@
 
 ### 3.10.10.1 Sử dụng Cube Browser
 
-**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên. Nếu trước đó đã tạo `Prev_Quarter_Goals` và `QoQ_Goals_Growth` theo hướng dẫn cũ thì nhấp chuột phải vào từng thước đo trong Script Organizer, chọn Delete để xóa cả hai (bản cũ gọi `[Prev Quarter Goals]` có dấu cách, không khớp tên thật có gạch dưới nên Excel báo `#VALUE!`, Browser báo `(null)`). Sau đó khởi tạo **duy nhất một** thước đo tự chủ:
-* ● Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `[QoQ Goals Growth]`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập nguyên văn biểu thức:
+**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên:
+* ● **Khởi tạo Calculated Member:** Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `[QoQ Goals Growth]`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập nguyên văn biểu thức:
 ```mdx
 IIF(
     [DIM Time].[Hierarchy].CURRENTMEMBER.LEVEL IS [DIM Time].[Hierarchy].[Quarter]
@@ -20,23 +20,34 @@ IIF(
 )
 ```
 Đặt Format String là `"0.00%"`.
+* ● **Khởi tạo Named Set Top 10 CLB:** Nhấp chuột phải vào khung Script Organizer, chọn New Named Set. Đặt Name là `[Top 10 Clubs 2023]`, tại ô Expression nhập:
+```mdx
+TOPCOUNT(
+    NONEMPTY(
+        EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+        ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+    ),
+    10,
+    ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+)
+```
 
 **Bước 2:** Trên thanh menu công cụ của Visual Studio, chọn menu Build rồi nhấp chọn Deploy Solution để đồng bộ cấu trúc mới vào máy chủ SSAS.
 
 **Bước 3:** Chuyển sang tab **Browser** trên thanh tab của trình thiết kế Cube Designer. Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào nút Reconnect để nhận cấu trúc mới, sau đó nhấp chọn biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan.
 
-**Bước 4:** Thiết lập bộ lọc năm tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
-* ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Time.
-* ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Year.
-* ● Tại cột Operator, giữ nguyên giá trị là Equal.
-* ● Nhấp chuột vào ô tại cột Filter Expression, tích chọn năm 2023 rồi nhấp nút OK để xác nhận.
+**Bước 4:** Thiết lập 2 dòng lọc trong vùng bộ lọc Filter Pane ở phía trên để cố định năm 2023 và giới hạn chính xác Top 10 CLB:
+* ● **Dòng 1:** Cột Dimension chọn `DIM Time`, cột Hierarchy chọn `Year`, cột Operator chọn `Equal` ($=$), cột Filter Expression tích chọn năm `2023`.
+* ● **Dòng 2:** Cột Dimension chọn `DIM Club`, cột Hierarchy chọn `Club Name`, cột Operator chọn **`Custom`** (hoặc **`In`**):
+  * Nếu chọn `Custom`: Cột Filter Expression nhập `[Top 10 Clubs 2023]`.
+  * Nếu chọn `In`: Tích chọn đúng 10 CLB hàng đầu: *Manchester City, PSV Eindhoven, Bayer 04 Leverkusen, Feyenoord Rotterdam, Bayern Munich, Real Madrid, Arsenal FC, Atlético de Madrid, Liverpool FC, Borussia Dortmund*.
 
 **Bước 5:** Kéo thả các trường dữ liệu vào lưới Data Grid:
-* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Club Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
-* ● Mở rộng thư mục chiều DIM Time, mở rộng phân cấp Hierarchy, tìm cấp độ Quarter, nhấp giữ chuột trái kéo thả vào lưới ngay bên phải cột Club Name (Cube Browser chỉ hiển thị dạng danh sách phẳng, không xoay được lên cột).
+* ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Club Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows *(hoặc mở thư mục Sets, kéo trực tiếp `Top 10 Clubs 2023` thả vào vùng Rows)*.
+* ● Mở rộng thư mục chiều DIM Time, mở rộng phân cấp Hierarchy, tìm cấp độ Quarter, nhấp giữ chuột trái kéo thả vào lưới ngay bên phải cột Club Name.
 * ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái và kéo các thước đo Goals và QoQ Goals Growth thả vào vùng dữ liệu.
 
-**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới hiển thị các dòng `Club Name | Quarter | Goals | QoQ Goals Growth`. Dòng Quarter 1 có QoQ trống là đúng bản chất vì không có quý liền trước trong năm 2023; các dòng Quarter 2, 3, 4 của 10 câu lạc bộ trong bảng nhận xét phải khớp từng con số (ví dụ Manchester City: 30, 37 và 23.33%, 20 và -45.95%, 42 và 110.00%).
+**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới hiển thị chuẩn xác đúng 10 câu lạc bộ hàng đầu $\times$ 4 quý = 40 dòng dữ liệu `Club Name | Quarter | Goals | QoQ Goals Growth`, khớp 100% từng con số với kết quả SSMS và Excel.
 
 ---
 
