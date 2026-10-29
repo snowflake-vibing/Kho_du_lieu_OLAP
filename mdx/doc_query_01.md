@@ -59,7 +59,9 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
 * ● Hộp thoại Top 10 Filter xuất hiện, giữ nguyên ô thứ nhất là Top, nhập số 10 vào ô thứ hai, giữ nguyên ô thứ ba là Items, tại ô thứ tư By nhấp mở danh sách thả xuống và chọn thước đo Sum of Goals. Nhấp nút OK để áp dụng bộ lọc.
 
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa giải 2023/2024 được sắp xếp theo thứ tự số bàn thắng giảm dần.
+**Bước 4:** Sắp xếp giảm dần theo số bàn thắng: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Goals, ví dụ ô B5, di chuyển con trỏ chuột vào mục Sort rồi nhấp chọn Sort Largest to Smallest để đưa cầu thủ ghi nhiều bàn nhất lên vị trí dẫn đầu bảng.
+
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm 10 cầu thủ có số bàn thắng cao nhất giải Ngoại Hạng Anh mùa giải 2023/2024 được sắp xếp giảm dần chính xác tuyệt đối từ Erling Haaland 27 bàn xuống Jean-Philippe Mateta 16 bàn.
 
 ---
 
