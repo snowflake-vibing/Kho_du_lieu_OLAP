@@ -49,19 +49,41 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 
 ### 3.10.9.2 Sử dụng Pivot Excel
 
-**Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
-* ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Is Weekend, kéo chuột xuống phía dưới và thả vào ô Columns.
-* ● Mở rộng thư mục DIM Club, nhấp giữ chuột trái vào trường Club Name, kéo chuột xuống phía dưới và thả vào ô Rows.
+**Bước 1:** Khởi tạo tập hợp giao INTERSECT bằng công cụ Sets của Excel:
+* ● Trên thanh Ribbon của Excel, nhấp chọn thẻ **PivotTable Analyze**.
+* ● Trong nhóm công cụ Calculations, nhấp vào mục **Fields, Items, & Sets**, sau đó chọn dòng lệnh **Create Set Using MDX...**
+* ● Trong hộp thoại New Set, tại ô Set name nhập tên: `Top30_Common_Weekend_Weekday`.
+* ● Tại khung soạn thảo mã lệnh Set definition MDX, nhập biểu thức giao tập hợp giữa Top 30 cuối tuần và Top 30 ngày thường:
+```mdx
+INTERSECT(
+    TOPCOUNT(
+        NONEMPTY(
+            EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+            ([Measures].[Goals], [DIM Time].[Is Weekend].[1])
+        ),
+        30,
+        ([Measures].[Goals], [DIM Time].[Is Weekend].[1])
+    ),
+    TOPCOUNT(
+        NONEMPTY(
+            EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+            ([Measures].[Goals], [DIM Time].[Is Weekend].[0])
+        ),
+        30,
+        ([Measures].[Goals], [DIM Time].[Is Weekend].[0])
+    )
+)
+```
+* ● Nhấp nút OK ở góc dưới để lưu tập hợp tính toán vào danh sách trường của PivotTable.
+
+**Bước 2:** Thao tác kéo thả các trường vào từng khu vực PivotTable:
+* ● Trong khung PivotTable Fields ở cạnh phải, tìm đến mục **Sets**, nhấp giữ chuột trái vào tập hợp vừa tạo `Top30_Common_Weekend_Weekday` kéo thả vào ô Rows.
+* ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Is Weekend kéo thả vào ô Columns.
 * ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái vào các thước đo kéo thả vào ô Values gồm Goals và Yellow Cards.
 
-**Bước 2:** Thiết lập bộ lọc Top 30 câu lạc bộ xuất sắc:
-* ● Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 nhãn Row Labels của cột Club Name.
-* ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
-* ● Trong hộp thoại Top 10 Filter xuất hiện, đổi số 10 thành 30 theo trường Sum of Goals rồi nhấp nút OK để áp dụng.
+**Bước 3:** Tắt dòng tổng phụ để bảng dữ liệu gọn gàng: Trên thanh Ribbon, chọn thẻ Design, nhấp vào mục Subtotals rồi chọn Do Not Show Subtotals.
 
-**Bước 3:** Tắt dòng tổng phụ để bảng gọn gàng: Trên thanh Ribbon, chọn thẻ Design, nhấp vào mục Subtotals rồi chọn Do Not Show Subtotals.
-
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh ma trận 4 cột gồm bàn thắng và thẻ vàng cho cả hai thời điểm ngày thường và cuối tuần của các câu lạc bộ ưu tú.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh ma trận 4 cột dữ liệu của đúng 9 câu lạc bộ ưu tú thỏa mãn đồng thời cả hai điều kiện, hoàn toàn trùng khớp với kết quả từ Visual Studio và SSMS.
 
 ---
 
