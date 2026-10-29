@@ -65,8 +65,18 @@ Phương pháp này được thực hiện trực tiếp trong môi trường ph
 3. Tạo 2 Calculated Members để làm sạch sức chứa và đếm số trận đấu duy nhất:
    * **Thước đo 1 (`Stadium Capacity Cleaned`):**
      * Name: `Stadium Capacity Cleaned` | Parent hierarchy: `Measures`
-     * Expression: `COALESCEEMPTY([DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE, 0)`
-     * Format String: `#,##0`
+     * Expression:
+       ```mdx
+       COALESCEEMPTY(
+           MAX(
+               EXISTING [DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS,
+               [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE
+           ),
+           0
+       )
+       ```
+     * Format String: `"#,##0 Chỗ"`
+     * Lưu ý: công thức cũ `COALESCEEMPTY([DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE, 0)` bị lỗi trong Browser/Excel: vì `Stadium Seats` không nằm trên Rows nên CURRENTMEMBER là `All` và ô trả về chữ `All` thay vì con số. `MAX(EXISTING ...)` lấy sức chứa của CLB/sân đang ở dòng hiện tại.
    * **Thước đo 2 (`Distinct Matches Played`):**
      * Name: `Distinct Matches Played` | Parent hierarchy: `Measures`
      * Expression: `DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)`
@@ -82,7 +92,7 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọ
 
 | Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
 | :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Stadium Seats`** | Bấm dropdown chọn **`Greater Than or Equal`** | Nhập số **`60000`** → Bấm **OK** (hiển thị `>= 60000`) |
+| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Stadium Seats`** | Bấm dropdown chọn **`Custom`** (Browser không có Greater Than; danh sách chỉ gồm Equal, Not Equal, In, Not In, Contains, Begins With, Range (Inclusive), Range (Exclusive), Custom) | Nhập biểu thức: `FILTER([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000)` |
 
 #### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
 1. **Kéo Chiều Sân vận động & CLB (Rows):**

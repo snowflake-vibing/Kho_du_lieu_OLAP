@@ -6,24 +6,20 @@
 
 ### 3.10.10.1 Sử dụng Cube Browser
 
-**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo 2 thước đo tính toán bàn thắng quý trước và tỷ lệ tăng trưởng QoQ:
-* ● Thước đo thứ nhất: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Prev Quarter Goals`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
+**Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên. Nếu trước đó đã tạo `Prev_Quarter_Goals` và `QoQ_Goals_Growth` theo hướng dẫn cũ thì nhấp chuột phải vào từng thước đo trong Script Organizer, chọn Delete để xóa cả hai (bản cũ gọi `[Prev Quarter Goals]` có dấu cách, không khớp tên thật có gạch dưới nên Excel báo `#VALUE!`, Browser báo `(null)`). Sau đó khởi tạo **duy nhất một** thước đo tự chủ:
+* ● Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `[QoQ Goals Growth]`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập nguyên văn biểu thức:
 ```mdx
 IIF(
-    [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT,
-    ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER),
+    [DIM Time].[Hierarchy].CURRENTMEMBER.LEVEL IS [DIM Time].[Hierarchy].[Quarter]
+    AND [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT
+    AND NOT ISEMPTY(([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+    AND ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER) <> 0,
+    ([Measures].[Goals] - ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+        / ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER),
     NULL
 )
 ```
-* ● Thước đo thứ hai: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `QoQ Goals Growth`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
-```mdx
-IIF(
-    ISEMPTY([Measures].[Prev Quarter Goals]) OR [Measures].[Prev Quarter Goals] = 0,
-    NULL,
-    ROUND((([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals]), 4)
-)
-```
-Đặt Format String là `0.00%`.
+Đặt Format String là `"0.00%"`.
 
 **Bước 2:** Trên thanh menu công cụ của Visual Studio, chọn menu Build rồi nhấp chọn Deploy Solution để đồng bộ cấu trúc mới vào máy chủ SSAS.
 
@@ -37,10 +33,10 @@ IIF(
 
 **Bước 5:** Kéo thả các trường dữ liệu vào lưới Data Grid:
 * ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Club Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
-* ● Mở rộng thư mục chiều DIM Time, mở rộng phân cấp Hierarchy, tìm cấp độ Quarter, nhấp giữ chuột trái kéo thả lên vùng Columns để chia bảng theo các Quý.
+* ● Mở rộng thư mục chiều DIM Time, mở rộng phân cấp Hierarchy, tìm cấp độ Quarter, nhấp giữ chuột trái kéo thả vào lưới ngay bên phải cột Club Name (Cube Browser chỉ hiển thị dạng danh sách phẳng, không xoay được lên cột).
 * ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái và kéo các thước đo Goals và QoQ Goals Growth thả vào vùng dữ liệu.
 
-**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng ma trận phân bổ bàn thắng và tốc độ tăng trưởng QoQ qua các Quý năm 2023. Do Quý 1 là quý đầu năm nên chỉ số tăng trưởng QoQ của Quý 1 mang giá trị NULL, người dùng có thể nhấp vào biểu tượng Design Mode để chuyển sang mã MDX và chỉ định chính xác 7 cột đo lường thực tế, loại bỏ hoàn toàn cột Quý 1 QoQ rỗng.
+**Bước 6:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới hiển thị các dòng `Club Name | Quarter | Goals | QoQ Goals Growth`. Dòng Quarter 1 có QoQ trống là đúng bản chất vì không có quý liền trước trong năm 2023; các dòng Quarter 2, 3, 4 của 10 câu lạc bộ trong bảng nhận xét phải khớp từng con số (ví dụ Manchester City: 30, 37 và 23.33%, 20 và -45.95%, 42 và 110.00%).
 
 ---
 
@@ -71,7 +67,7 @@ IIF(
 **Bước 1:** Trong cửa sổ Object Explorer của phần mềm SQL Server Management Studio, mở rộng cơ sở dữ liệu DW Football SSAS, mở rộng thư mục Cubes, nhấp chuột phải vào khối Cube DW Football Transfermarkt, di chuột chọn New Query rồi nhấp chuột chọn MDX để mở trình soạn thảo truy vấn.
 
 **Bước 2:** Nhấp chuột vào khung soạn thảo MDX và viết truy vấn với mục đích phân tích tăng trưởng bàn thắng theo Quý QoQ của Top 10 CLB Châu Âu năm 2023. Truy vấn chỉ định rõ các mệnh đề:
-* ● Mệnh đề `WITH MEMBER` định nghĩa `[Measures].[Prev Quarter Goals]` lấy bàn thắng của quý liền trước trong cùng năm 2023 bằng hàm `PREVMEMBER` kết hợp điều kiện so sánh `PARENT`, và `[Measures].[QoQ Goals Growth]` tính tỷ lệ tăng trưởng QoQ.
+* ● Mệnh đề `WITH MEMBER` định nghĩa duy nhất `[Measures].[QoQ Goals Growth]` với công thức giống hệt tab Calculations: tự lấy bàn thắng quý liền trước bằng `PREVMEMBER` (chỉ trong cùng năm nhờ so sánh `PARENT`) và tính tỷ lệ tăng trưởng, không phụ thuộc thước đo trung gian.
 * ● Lựa chọn 7 cột đo lường chính xác trên trục cột COLUMNS gồm bàn thắng Quý 1, bàn thắng và tăng trưởng Quý 2, Quý 3, Quý 4.
 * ● Sử dụng hàm `TOPCOUNT` để lấy 10 CLB ghi nhiều bàn nhất trong năm 2023 trên trục hàng ROWS.
 * ● Truy vấn dữ liệu từ khối Cube nguồn `[DW Football Transfermarkt]`.
@@ -83,27 +79,16 @@ IIF(
    ============================================================================== */
 
 WITH 
-    -- 1. Bàn thắng của Quý liền trước chỉ xét trong cùng năm phân cấp 2023
-    MEMBER [Measures].[Prev Quarter Goals] AS
-        IIF(
-            [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT,
-            (
-                [Measures].[Goals],
-                [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER
-            ),
-            NULL
-        ),
-        FORMAT_STRING = "#,##0"
-
-    -- 2. Tỷ lệ tăng trưởng so với Quý liền trước QoQ Goals Growth
+    -- Tỷ lệ tăng trưởng so với Quý liền trước - công thức tự chủ, giống hệt tab Calculations
     MEMBER [Measures].[QoQ Goals Growth] AS
         IIF(
-            ISEMPTY([Measures].[Prev Quarter Goals]) OR [Measures].[Prev Quarter Goals] = 0,
-            NULL,
-            ROUND(
-                ([Measures].[Goals] - [Measures].[Prev Quarter Goals]) / [Measures].[Prev Quarter Goals],
-                4
-            )
+            [DIM Time].[Hierarchy].CURRENTMEMBER.LEVEL IS [DIM Time].[Hierarchy].[Quarter]
+            AND [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT
+            AND NOT ISEMPTY(([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+            AND ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER) <> 0,
+            ([Measures].[Goals] - ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+                / ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER),
+            NULL
         ),
         FORMAT_STRING = "0.00%"
 

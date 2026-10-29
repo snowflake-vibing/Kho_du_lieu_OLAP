@@ -9,9 +9,15 @@
 **Bước 1:** Trong trình thiết kế cube `DW Football Transfermarkt.cube`, nhấp chuột vào tab **Calculations** ở mép trên để khởi tạo 2 thước đo tính toán làm sạch sức chứa và đếm số trận đấu duy nhất:
 * ● Thước đo thứ nhất: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Stadium Capacity Cleaned`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
 ```mdx
-COALESCEEMPTY([DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE, 0)
+COALESCEEMPTY(
+    MAX(
+        EXISTING [DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS,
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE
+    ),
+    0
+)
 ```
-Đặt Format String là `#,##0 Chỗ`.
+Đặt Format String là `"#,##0 Chỗ"`. (Công thức cũ dùng trực tiếp `CURRENTMEMBER.MEMBER_VALUE` sẽ trả về chữ `All` vì Stadium Seats không nằm trên Rows.)
 * ● Thước đo thứ hai: Nhấp chuột phải vào khung Script Organizer, chọn New Calculated Member. Đặt Name là `Distinct Matches Played`, đặt Parent hierarchy là `Measures`, tại ô Expression nhập biểu thức:
 ```mdx
 DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)
@@ -25,8 +31,8 @@ DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)
 **Bước 4:** Thiết lập bộ lọc sức chứa sân tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:
 * ● Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Club.
 * ● Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Stadium Seats.
-* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn toán tử Greater Than or Equal.
-* ● Nhấp chuột vào ô tại cột Filter Expression, nhập số 60000 rồi nhấp nút OK để xác nhận.
+* ● Tại cột Operator, nhấp mở danh sách thả xuống và chọn **Custom** (Cube Browser không có toán tử Greater Than).
+* ● Nhấp chuột vào ô tại cột Filter Expression, nhập biểu thức `FILTER([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000)` rồi nhấn Enter.
 
 **Bước 5:** Kéo thả các trường dữ liệu vào lưới Data Grid:
 * ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Stadium Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows.
