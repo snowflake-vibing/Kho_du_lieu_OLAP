@@ -1,0 +1,43 @@
+/* ==============================================================================
+   Truy vấn MDX 10: Tăng trưởng bàn thắng theo Quý (QoQ) của Top 10 CLB Châu Âu
+   Database: SSAS_Football_Transfermarkt (hoặc DW_Football_SSAS)
+   Cube: [DW Football Transfermarkt]
+   ============================================================================== */
+
+WITH 
+    -- Tỷ lệ tăng trưởng so với Quý liền trước - công thức tự chủ, giống hệt tab Calculations
+    MEMBER [Measures].[QoQ Goals Growth] AS
+        IIF(
+            [DIM Time].[Hierarchy].CURRENTMEMBER.LEVEL IS [DIM Time].[Hierarchy].[Quarter]
+            AND [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER.PARENT IS [DIM Time].[Hierarchy].CURRENTMEMBER.PARENT
+            AND NOT ISEMPTY(([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+            AND ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER) <> 0,
+            ([Measures].[Goals] - ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER))
+                / ([Measures].[Goals], [DIM Time].[Hierarchy].CURRENTMEMBER.PREVMEMBER),
+            NULL
+        ),
+        FORMAT_STRING = "0.00%"
+
+SELECT
+    -- Trục Cột: Liệt kê rõ ràng 7 cột đo lường, loại bỏ cột Q1 QoQ rỗng
+    {
+        ([DIM Time].[Hierarchy].[Year].[2023].[1], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[2], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[2], [Measures].[QoQ Goals Growth]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[3], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[3], [Measures].[QoQ Goals Growth]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[4], [Measures].[Goals]),
+        ([DIM Time].[Hierarchy].[Year].[2023].[4], [Measures].[QoQ Goals Growth])
+    } ON COLUMNS,
+
+    -- Trục Dòng: Top 10 CLB có tổng số bàn thắng cao nhất trong năm 2023
+    TOPCOUNT(
+        NONEMPTY(
+            EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+            ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+        ),
+        10,
+        ([Measures].[Goals], [DIM Time].[Hierarchy].[Year].[2023])
+    ) ON ROWS
+
+FROM [DW Football Transfermarkt];

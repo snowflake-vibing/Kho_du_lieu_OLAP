@@ -1,0 +1,50 @@
+/* ==============================================================================
+   Truy vấn MDX 11: Số trận đấu diễn ra tại sân vận động có sức chứa > 60.000 khán giả
+   Database: SSAS_Football_Transfermarkt (hoặc DW_Football_SSAS)
+   Cube: [DW Football Transfermarkt]
+   Khai thác: COALESCEEMPTY, DISTINCTCOUNT, EXISTING, FILTER, ORDER (BDESC)
+   ============================================================================== */
+
+WITH 
+    -- 1. Tập hợp các sân vận động quy mô lớn (sức chứa >= 60.000 chỗ)
+    SET [ValidStadiums] AS
+        FILTER(
+            NONEMPTY(
+                CrossJoin(
+                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
+                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                    EXCEPT([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, { [DIM Club].[Stadium Seats].[0], [DIM Club].[Stadium Seats].[All] })
+                ),
+                [Measures].[FACT Player Match Perf Count]
+            ),
+            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000
+        )
+
+    -- 2. Sức chứa sân vận động định dạng chuẩn
+    MEMBER [Measures].[Stadium Capacity Cleaned] AS
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
+        FORMAT_STRING = "#,##0 Chỗ"
+
+    -- 3. Đếm số trận đấu duy nhất diễn ra tại sân vận động
+    MEMBER [Measures].[Distinct Matches Played] AS
+        DISTINCTCOUNT(
+            EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
+        ),
+        FORMAT_STRING = "#,##0"
+
+SELECT
+    -- Trục Cột: Sức chứa sân đã làm sạch, số trận duy nhất và tổng bàn thắng
+    {
+        [Measures].[Stadium Capacity Cleaned],
+        [Measures].[Distinct Matches Played],
+        [Measures].[Goals]
+    } ON COLUMNS,
+
+    -- Trục Dòng: Các sân vận động có sức chứa >= 60.000 chỗ, xếp giảm dần
+    ORDER(
+        [ValidStadiums],
+        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
+        BDESC
+    ) ON ROWS
+
+FROM [DW Football Transfermarkt];
