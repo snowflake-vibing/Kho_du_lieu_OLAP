@@ -49,9 +49,11 @@ DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Greater Than Or Equal To...
 * ● Trong hộp thoại xuất hiện, chọn lọc theo trường Stadium Capacity Cleaned với giá trị lớn hơn hoặc bằng 60000 rồi nhấp nút OK để áp dụng.
 
-**Bước 3:** Sắp xếp giảm dần theo số trận đấu: Nhấp chuột phải vào một ô số bất kỳ trong cột Distinct Matches Played, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
+**Bước 3:** Sắp xếp giảm dần theo sức chứa sân vận động: Nhấp chuột phải vào một ô số bất kỳ trong cột Stadium Capacity Cleaned, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
 
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các siêu sân vận động bóng đá Châu Âu.
+**Bước 4:** Định dạng hiển thị bảng dạng danh sách phẳng: Trên thanh Ribbon, chọn thẻ Design, tại mục Report Layout nhấp chọn Show in Tabular Form, tiếp tục tại mục Subtotals nhấp chọn Do Not Show Subtotals để hiển thị rõ ràng từng sân vận động cùng câu lạc bộ chủ quản trên từng dòng riêng biệt.
+
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách 23 siêu sân vận động bóng đá Châu Âu.
 
 ---
 
@@ -139,4 +141,16 @@ Cả 3 cách gồm duyệt cube trong SSAS, dùng PivotTable trong Excel và vi�
 | **8** | **Olympiastadion Berlin** | Hertha BSC | 74667 Chỗ | 34 | 40 |
 | **9** | **La Cartuja** | Real Betis Balompié | 71374 Chỗ | 90 | 111 |
 | **10** | **Olimpico di Roma** | Associazione Sportiva Roma | 70634 Chỗ | 105 | 156 |
-| **11** | **Olimpico di Roma** | Società Sportiva Lazio | 70634 Chỗ | 97 | 146 |
+| **11** | **Olimpico di Roma** | Società Sportiva Lazio S.p.A. | 70634 Chỗ | 90 | 122 |
+| **12** | **Riyadh Air Metropolitano** | Atlético de Madrid | 70460 Chỗ | 92 | 160 |
+| **13** | **Estádio da Luz** | SL Benfica | 68100 Chỗ | 90 | 192 |
+| **14** | **Orange Vélodrome** | Olympique Marseille | 67394 Chỗ | 92 | 145 |
+| **15** | **Tottenham Hotspur Stadium** | Tottenham Hotspur | 62850 Chỗ | 84 | 145 |
+| **16** | **Spotify Camp Nou** | FC Barcelona | 62657 Chỗ | 94 | 179 |
+| **17** | **London Stadium** | West Ham United | 62500 Chỗ | 86 | 115 |
+| **18** | **Veltins-Arena** | FC Schalke 04 | 62271 Chỗ | 34 | 32 |
+| **19** | **Anfield** | Liverpool FC | 61276 Chỗ | 94 | 198 |
+| **20** | **Etihad Stadium** | Manchester City | 61000 Chỗ | 99 | 245 |
+| **21** | **Emirates Stadium** | Arsenal FC | 60704 Chỗ | 94 | 199 |
+| **22** | **MHPArena Stuttgart** | VfB Stuttgart | 60449 Chỗ | 68 | 123 |
+| **23** | **Celtic Park** | Celtic FC | 60411 Chỗ | 78 | 186 |
