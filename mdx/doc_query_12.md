@@ -56,14 +56,20 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Mở rộng thư mục DIM Time, nhấp giữ chuột trái vào trường Month, kéo chuột xuống phía dưới và thả tiếp vào ô Rows ngay phía dưới trường Coach Name.
 * ● Mở rộng thư mục Measures, lần lượt nhấp giữ chuột trái vào các thước đo kéo thả vào ô Values gồm Yellow Cards và Red Cards.
 
-**Bước 2:** Cấu hình bộ lọc Top 1 tháng kỷ lục cho từng huấn luyện viên:
+**Bước 2:** Loại bỏ dữ liệu huấn luyện viên không xác định:
+* ● Trên bảng tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề Coach Name.
+* ● Trong danh sách hiện ra, bỏ tích chọn hai mục Unknown và Unknown Coach rồi nhấp nút OK để chỉ giữ lại các huấn luyện viên chính thức.
+
+**Bước 3:** Cấu hình bộ lọc Top 1 tháng kỷ lục cho từng huấn luyện viên:
 * ● Trên bảng PivotTable, nhấp chuột vào nút mũi tên lọc bên cạnh một ô giá trị thuộc cột Month.
 * ● Di chuột vào mục Value Filters, nhấp chuột chọn dòng lệnh Top 10...
 * ● Trong hộp thoại Top 10 Filter xuất hiện, thiết lập Top 1 Items theo trường Sum of Yellow Cards rồi nhấp nút OK để áp dụng.
 
-**Bước 3:** Sắp xếp giảm dần theo số thẻ vàng kỷ lục: Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Yellow Cards, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
+**Bước 4:** Sắp xếp giảm dần và định dạng bố cục hiển thị:
+* ● Nhấp chuột phải vào một ô số bất kỳ trong cột Sum of Yellow Cards, di chuột chọn mục Sort rồi nhấp chọn Sort Largest to Smallest.
+* ● Trên thanh Ribbon, chọn thẻ Design, tại mục Report Layout nhấp chọn Show in Tabular Form, tiếp tục tại mục Subtotals nhấp chọn Do Not Show Subtotals để bảng hiển thị dạng phẳng rõ ràng từng huấn luyện viên cùng tháng cao điểm trên từng dòng.
 
-**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các huấn luyện viên cùng tháng cao điểm phải nhận nhiều thẻ phạt nhất.
+**Bước 5:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh danh sách các huấn luyện viên cùng tháng cao điểm phải nhận nhiều thẻ phạt nhất, dẫn đầu là Matías Almeyda 32 thẻ vàng ở Tháng 10.
 
 ---
 

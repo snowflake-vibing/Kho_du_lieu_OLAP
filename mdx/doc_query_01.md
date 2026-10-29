@@ -2,7 +2,7 @@
 
 ## 3.10.1 Câu truy vấn 1
 
-**Nội dung truy vấn:** Liệt kê danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023/2024 nhằm nhận diện các chân sút hàng đầu phục vụ công tác chuyển nhượng và đánh giá phong độ thi đấu.
+**Nội dung truy vấn:** Liệt kê danh sách 10 cầu thủ ghi nhiều bàn thắng nhất tại giải Ngoại Hạng Anh mùa giải 2023 nhằm nhận diện các chân sút hàng đầu phục vụ công tác chuyển nhượng và đánh giá phong độ thi đấu.
 
 ### 3.10.1.1 Sử dụng Cube Browser
 
@@ -53,7 +53,7 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 * ● Trong khung Metadata ở bên trái màn hình, nhấp chuột mở rộng thư mục chiều DIM Player, nhấp giữ chuột trái vào thuộc tính Player Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng trống.
 * ● Tiếp tục trong khung Metadata, nhấp chuột mở rộng thư mục Measures, mở rộng tiếp nhóm FACT Player Match Perf, nhấp giữ chuột trái vào thước đo Goals, kéo con trỏ chuột sang khu vực lưới dữ liệu và thả chuột vào vị trí ngay bên cạnh cột Player Name.
 
-**Bước 8:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả gồm 10 dòng đại diện cho 10 cầu thủ ghi nhiều bàn thắng nhất giải Ngoại Hạng Anh mùa giải 2023/2024.
+**Bước 8:** Nhấp chuột vào dòng chữ màu xanh Click to execute the query trên lưới dữ liệu hoặc nhấn biểu tượng Execute có hình dấu chấm than màu đỏ trên thanh công cụ phía trên. Lưới dữ liệu lập tức hiển thị bảng kết quả gồm 10 dòng đại diện cho 10 cầu thủ ghi nhiều bàn thắng nhất giải Ngoại Hạng Anh mùa giải 2023.
 
 ---
 

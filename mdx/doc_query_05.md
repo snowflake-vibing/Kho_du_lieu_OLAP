@@ -47,15 +47,15 @@ Sau đó nhấp nút OK ở góc dưới cửa sổ Expression Builder để lư
 ### 3.10.5.2 Sử dụng Pivot Excel
 
 **Bước 1:** Từ cửa sổ danh sách trường PivotTable Fields ở cạnh phải màn hình Excel, thao tác kéo thả các trường vào từng khu vực:
-* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Foot, kéo chuột xuống phía dưới và thả vào ô Columns.
 * ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Sub Position, kéo chuột xuống phía dưới và thả vào ô Rows.
+* ● Mở rộng thư mục DIM Player, nhấp giữ chuột trái vào trường Foot, kéo chuột xuống phía dưới và thả tiếp vào ô Rows ngay bên dưới trường Sub Position.
 * ● Mở rộng thư mục Measures, nhấp giữ chuột trái vào thước đo Goals, kéo chuột xuống phía dưới và thả vào ô Values với giá trị hiển thị là Sum of Goals.
 
 **Bước 2:** Thiết lập lọc các vị trí trọng điểm: Trên trang tính Excel, nhấp chuột vào nút mũi tên lọc tại ô tiêu đề A4 nhãn Row Labels của cột Sub Position, bỏ chọn ô Select All, chỉ tích chọn 5 vị trí gồm Centre-Forward, Second Striker, Left Winger, Right Winger và Attacking Midfield rồi nhấp nút OK.
 
-**Bước 3:** Tạo dải màu trực quan phân tích chiến thuật: Dùng chuột bôi đen toàn bộ vùng số liệu bàn thắng bên trong bảng ma trận. Trên thanh Ribbon, chọn thẻ Home, nhấp chọn Conditional Formatting, di chuột chọn Color Scales rồi chọn dải màu xanh lá sang vàng và đỏ để làm nổi bật các ô có số lượng bàn thắng vượt trội.
+**Bước 3:** Định dạng bố cục bảng danh sách phẳng: Trên thanh Ribbon, chọn thẻ Design, tại mục Report Layout nhấp chọn Show in Tabular Form, tiếp tục tại mục Subtotals nhấp chọn Do Not Show Subtotals để bảng hiển thị dạng phẳng 3 cột gồm Vị trí chi tiết, Chân thuận và Số bàn thắng.
 
-**Bước 4:** Trang tính Excel hiển thị bảng ma trận hoàn chỉnh phản ánh sự tương quan rõ nét giữa chân thuận và vị trí thi đấu, nổi bật là tiền đạo cắm chân phải và tiền đạo cánh phải thuận chân trái.
+**Bước 4:** Trang tính Excel hiển thị bảng PivotTable hoàn chỉnh gồm đúng 18 dòng dữ liệu phân bổ bàn thắng theo từng vị trí chi tiết và chân thuận, hoàn toàn trùng khớp với kết quả từ Cube Browser và MDX.
 
 ---
 
