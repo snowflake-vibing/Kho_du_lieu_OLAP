@@ -26,6 +26,22 @@ def check(name, condition, details=""):
     else:
         print(f"  [FAIL] {name} {details}")
 
+# 0. AUDIT QUERY 04
+print("\n--- 0. AUDIT QUERY 04: Bàn thắng, kiến tạo & phút thi đấu theo độ tuổi ---")
+with open("mdx/query_04.mdx", "r", encoding="utf-8") as f:
+    mdx_04 = f.read()
+
+rs04 = win32com.client.Dispatch("ADODB.Recordset")
+rs04.Open(mdx_04, conn)
+rows04 = []
+while not rs04.EOF:
+    rows04.append([rs04.Fields(i).Value for i in range(rs04.Fields.Count)])
+    rs04.MoveNext()
+rs04.Close()
+
+check("Q04 - MDX Row Count == 29", len(rows04) == 29, f"(Actual: {len(rows04)})")
+check("Q04 - MDX Column Count == 3 (No Career Stage)", len(rows04[0]) - 1 == 3, f"(Actual: {len(rows04[0]) - 1})")
+
 # 1. AUDIT QUERY 10
 print("\n--- 1. AUDIT QUERY 10: Top 10 CLB Châu Âu theo 4 Quý năm 2023 ---")
 with open("mdx/query_10.mdx", "r", encoding="utf-8") as f:
@@ -99,8 +115,10 @@ check("Q11 - Browser Custom Filter Row Count == 23", browser11_rows == 23, f"(Ac
 print("\n--- 3. AUDIT EXCEL DOUBLE-CHECK WORKBOOK ---")
 import openpyxl
 wb = openpyxl.load_workbook("mdx/Bao_Cao_Double_Check_Query_10_11.xlsx")
+ws04 = wb["Query 04 - Hieu Suat Do Tuoi"]
 ws10 = wb["Query 10 - QoQ Top 10 CLB"]
 ws11 = wb["Query 11 - Sân trên 60k Chỗ"]
+check("Excel - Q04 Sheet has 29 data rows", ws04.max_row - 4 == 29, f"(Actual: {ws04.max_row - 4})")
 check("Excel - Q10 Sheet has 10 data rows", ws10.max_row - 4 == 10, f"(Actual: {ws10.max_row - 4})")
 check("Excel - Q11 Sheet has 23 data rows", ws11.max_row - 4 == 23, f"(Actual: {ws11.max_row - 4})")
 

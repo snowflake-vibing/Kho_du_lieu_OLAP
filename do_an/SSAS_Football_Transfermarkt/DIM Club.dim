@@ -1,0 +1,180 @@
+<Dimension xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500" xmlns:dwd="http://schemas.microsoft.com/DataWarehouse/Designer/1.0" dwd:design-time-name="cf958704-3157-40c3-ab8b-e2b31384068a" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+  <ID>DIM Club</ID>
+  <Name>DIM Club</Name>
+  <CreatedTimestamp>0001-01-01T00:00:00Z</CreatedTimestamp>
+  <LastSchemaUpdate>0001-01-01T00:00:00Z</LastSchemaUpdate>
+  <Annotations>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramLayout</Name>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:ShowFriendlyNames</Name>
+      <Value>true</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:ShowRelationshipNames</Name>
+      <Value>false</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:UseDiagramDefaultLayout</Name>
+      <Value>true</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramViewPortLeft</Name>
+      <Value>0</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramViewPortTop</Name>
+      <Value>0</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramBoundingLeft</Name>
+      <Value>0</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramBoundingTop</Name>
+      <Value>0</Value>
+    </Annotation>
+    <Annotation>
+      <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramZoom</Name>
+      <Value>100</Value>
+    </Annotation>
+  </Annotations>
+  <LastProcessed>0001-01-01T00:00:00Z</LastProcessed>
+  <State>Unprocessed</State>
+  <Source xsi:type="DataSourceViewBinding" dwd:design-time-name="63da8d65-74eb-472a-8043-169f9e0945cd">
+    <DataSourceViewID>DW Football Transfermarkt</DataSourceViewID>
+  </Source>
+  <ErrorConfiguration dwd:design-time-name="f213b9de-a9c9-4675-8fd1-710c61daf4ba">
+    <KeyNotFound>IgnoreError</KeyNotFound>
+    <KeyDuplicate>IgnoreError</KeyDuplicate>
+    <NullKeyConvertedToUnknown>IgnoreError</NullKeyConvertedToUnknown>
+    <NullKeyNotAllowed>IgnoreError</NullKeyNotAllowed>
+  </ErrorConfiguration>
+  <CurrentStorageMode>Molap</CurrentStorageMode>
+  <Attributes>
+    <Attribute dwd:design-time-name="49c64361-4b46-4177-ad38-6df2d634b042">
+      <ID>Club ID</ID>
+      <Name>Club ID</Name>
+      <Usage>Key</Usage>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="0eb61ffc-5ff2-4900-bca0-8165dbf5502b">
+          <DataType>Integer</DataType>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="ee3d172e-7af1-4062-87bf-660f63af9820">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Club_ID</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <AttributeRelationships>
+        <AttributeRelationship dwd:design-time-name="85d1dd2f-3e16-4e10-9011-baf370e316d2">
+          <AttributeID>Club Name</AttributeID>
+          <Name>Club Name</Name>
+        </AttributeRelationship>
+        <AttributeRelationship dwd:design-time-name="19dc5b61-13dd-486e-871e-d5cb277dce01">
+          <AttributeID>Stadium Name</AttributeID>
+          <Name>Stadium Name</Name>
+        </AttributeRelationship>
+        <AttributeRelationship dwd:design-time-name="625db94a-abe0-44e1-a824-475c64ad3cd6">
+          <AttributeID>Stadium Seats</AttributeID>
+          <Name>Stadium Seats</Name>
+        </AttributeRelationship>
+        <AttributeRelationship dwd:design-time-name="1146be95-532f-404e-b7fc-0d25cd53c7e0">
+          <AttributeID>Coach Name</AttributeID>
+          <Name>Coach Name</Name>
+        </AttributeRelationship>
+        <AttributeRelationship dwd:design-time-name="94bd3932-cb33-4c09-8155-7abb802ca22a">
+          <AttributeID>Squad Size</AttributeID>
+          <Name>Squad Size</Name>
+        </AttributeRelationship>
+      </AttributeRelationships>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+    <Attribute dwd:design-time-name="c2ec2a94-cb31-4b9c-acfe-18aef6a624c7">
+      <ID>Club Name</ID>
+      <Name>Club Name</Name>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="3581b4f9-8894-4fb6-aec8-2d6a559522b0">
+          <DataType>WChar</DataType>
+          <DataSize>200</DataSize>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="9651bed1-6269-4c4c-a750-744ccbe77af2">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Club_Name</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+    <Attribute dwd:design-time-name="ff503ce1-8011-4e8a-a9e6-1e9c3d23bcb3">
+      <ID>Stadium Name</ID>
+      <Name>Stadium Name</Name>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="294f79e2-0f79-4b3e-9734-4923ecd6fe78">
+          <DataType>WChar</DataType>
+          <DataSize>200</DataSize>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="b4a7ea7c-cd37-4b55-aa02-47ab73c12403">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Stadium_Name</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+    <Attribute dwd:design-time-name="c48ee47c-59ae-45fb-8ccd-59dfffcf0fce">
+      <ID>Stadium Seats</ID>
+      <Name>Stadium Seats</Name>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="dfdc8892-4a7e-4728-8bc5-fedd6698a804">
+          <DataType>Integer</DataType>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="e86e3602-4cdc-48b8-91d7-d3320d4ebc52">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Stadium_Seats</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+    <Attribute dwd:design-time-name="d0d05d4c-265a-42a1-be52-5bf380a80e85">
+      <ID>Coach Name</ID>
+      <Name>Coach Name</Name>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="298dbaf8-9ed0-4f70-b03d-cd8d5cfe99d5">
+          <DataType>WChar</DataType>
+          <DataSize>200</DataSize>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="cfbb7939-3c8c-4334-a97f-b1e4d5031eae">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Coach_Name</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+    <Attribute dwd:design-time-name="7a9f63c3-5719-4db8-a03b-a0a356a25121">
+      <ID>Squad Size</ID>
+      <Name>Squad Size</Name>
+      <KeyColumns>
+        <KeyColumn dwd:design-time-name="6170f479-8457-4cd2-8be8-4cef77edfb04">
+          <DataType>Integer</DataType>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="c56fbfcc-5b82-4f43-a2f1-0039f843ac0b">
+            <TableID>dbo_DIM_Club</TableID>
+            <ColumnID>Squad_Size</ColumnID>
+          </Source>
+        </KeyColumn>
+      </KeyColumns>
+      <OrderBy>Key</OrderBy>
+      <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
+      <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
+    </Attribute>
+  </Attributes>
+  <ddl300:ProcessingState>Unprocessed</ddl300:ProcessingState>
+</Dimension>
