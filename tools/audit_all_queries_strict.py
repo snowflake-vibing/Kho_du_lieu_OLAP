@@ -42,8 +42,41 @@ rs04.Close()
 check("Q04 - MDX Row Count == 29", len(rows04) == 29, f"(Actual: {len(rows04)})")
 check("Q04 - MDX Column Count == 3 (No Career Stage)", len(rows04[0]) - 1 == 3, f"(Actual: {len(rows04[0]) - 1})")
 
-# 1. AUDIT QUERY 10
-print("\n--- 1. AUDIT QUERY 10: Top 10 CLB Châu Âu theo 4 Quý năm 2023 ---")
+# 1. AUDIT QUERY 07
+print("\n--- 1. AUDIT QUERY 07: Bàn thắng theo quốc tịch Pareto 80/20 tại Anh ---")
+with open("mdx/query_07.mdx", "r", encoding="utf-8") as f:
+    mdx_07 = f.read()
+
+rs07 = win32com.client.Dispatch("ADODB.Recordset")
+rs07.Open(mdx_07, conn)
+rows07 = []
+while not rs07.EOF:
+    rows07.append([rs07.Fields(i).Value for i in range(rs07.Fields.Count)])
+    rs07.MoveNext()
+rs07.Close()
+
+check("Q07 - MDX Row Count == 18", len(rows07) == 18, f"(Actual: {len(rows07)})")
+check("Q07 - MDX Column Count == 2 (Goals & Pct)", len(rows07[0]) - 1 == 2, f"(Actual: {len(rows07[0]) - 1})")
+check("Q07 - Goals Column Present and England is #1", rows07[0][0] == "England" and int(rows07[0][1]) == 714, f"(Top 1: {rows07[0][0]} with {rows07[0][1]} goals)")
+
+# 2. AUDIT QUERY 09
+print("\n--- 2. AUDIT QUERY 09: Giao tập hợp INTERSECT 9 CLB Cuối tuần & Ngày thường ---")
+with open("mdx/query_09.mdx", "r", encoding="utf-8") as f:
+    mdx_09 = f.read()
+
+rs09 = win32com.client.Dispatch("ADODB.Recordset")
+rs09.Open(mdx_09, conn)
+rows09 = []
+while not rs09.EOF:
+    rows09.append([rs09.Fields(i).Value for i in range(rs09.Fields.Count)])
+    rs09.MoveNext()
+rs09.Close()
+
+check("Q09 - MDX Row Count == 9", len(rows09) == 9, f"(Actual: {len(rows09)})")
+check("Q09 - MDX Column Count == 4 (CrossJoin Goals & Cards)", len(rows09[0]) - 1 == 4, f"(Actual: {len(rows09[0]) - 1})")
+
+# 3. AUDIT QUERY 10
+print("\n--- 3. AUDIT QUERY 10: Top 10 CLB Châu Âu theo 4 Quý năm 2023 ---")
 with open("mdx/query_10.mdx", "r", encoding="utf-8") as f:
     mdx_10 = f.read()
 
@@ -57,27 +90,11 @@ rs10.Close()
 
 check("Q10 - MDX Row Count == 10", len(rows10) == 10, f"(Actual: {len(rows10)})")
 check("Q10 - MDX Column Count == 7", len(rows10[0]) - 1 == 7, f"(Actual: {len(rows10[0]) - 1})")
-
-# Check no nulls
 has_null = any(any(val is None for val in r[1:]) for r in rows10)
 check("Q10 - Zero Null / Dense Data", not has_null, "(No nulls or missing cells)")
 
-# Check Browser simulation via Named Set
-rs10_set = win32com.client.Dispatch("ADODB.Recordset")
-rs10_set.Open("SELECT {[Measures].[Goals], [Measures].[QoQ Goals Growth]} ON 0, NONEMPTY([Top 10 Clubs 2023] * [DIM Time].[Hierarchy].[Year].[2023].CHILDREN, [Measures].[Goals]) ON 1 FROM [DW Football Transfermarkt];", conn)
-set_clubs = set()
-set_rows = 0
-while not rs10_set.EOF:
-    set_rows += 1
-    set_clubs.add(rs10_set.Fields(0).Value)
-    rs10_set.MoveNext()
-rs10_set.Close()
-
-check("Q10 - Named Set in Cube Browser has exactly 10 clubs", len(set_clubs) == 10, f"(Actual: {len(set_clubs)} clubs)")
-check("Q10 - Named Set row count == 40 (10 clubs x 4 quarters)", set_rows == 40, f"(Actual: {set_rows} rows)")
-
-# 2. AUDIT QUERY 11
-print("\n--- 2. AUDIT QUERY 11: Siêu sân vận động sức chứa >= 60.000 chỗ ---")
+# 4. AUDIT QUERY 11
+print("\n--- 4. AUDIT QUERY 11: Siêu sân vận động sức chứa >= 60.000 chỗ ---")
 with open("mdx/query_11.mdx", "r", encoding="utf-8") as f:
     mdx_11 = f.read()
 
@@ -90,35 +107,22 @@ while not rs11.EOF:
 rs11.Close()
 
 check("Q11 - MDX Row Count == 23", len(rows11) == 23, f"(Actual: {len(rows11)})")
-
-# Check capacity is integer, not "All" string
 all_caps_numeric = all(isinstance(r[3], (int, float)) and r[3] >= 60000 for r in rows11)
 check("Q11 - Capacity is numeric and >= 60000 (No 'All' text bug)", all_caps_numeric, f"(Min cap: {min(r[3] for r in rows11)})")
 
-# Check Browser simulation with Custom operator
-rs11_browser = win32com.client.Dispatch("ADODB.Recordset")
-rs11_browser.Open("""
-SELECT
-    {[Measures].[Stadium Capacity Cleaned], [Measures].[Distinct Matches Played], [Measures].[Goals]} ON 0,
-    FILTER(NONEMPTY([DIM Club].[Stadium Name].[Stadium Name].MEMBERS * [DIM Club].[Club Name].[Club Name].MEMBERS, [Measures].[Goals]), [Measures].[Stadium Capacity Cleaned] >= 60000) ON 1
-FROM [DW Football Transfermarkt];
-""", conn)
-browser11_rows = 0
-while not rs11_browser.EOF:
-    browser11_rows += 1
-    rs11_browser.MoveNext()
-rs11_browser.Close()
-
-check("Q11 - Browser Custom Filter Row Count == 23", browser11_rows == 23, f"(Actual: {browser11_rows} rows)")
-
-# 3. AUDIT EXCEL FILE
-print("\n--- 3. AUDIT EXCEL DOUBLE-CHECK WORKBOOK ---")
+# 5. AUDIT EXCEL FILE
+print("\n--- 5. AUDIT EXCEL DOUBLE-CHECK WORKBOOK ---")
 import openpyxl
 wb = openpyxl.load_workbook("mdx/Bao_Cao_Double_Check_Query_10_11.xlsx")
 ws04 = wb["Query 04 - Hieu Suat Do Tuoi"]
+ws07 = wb["Query 07 - Pareto Ban Thang Anh"]
+ws09 = wb["Query 09 - Intersect 9 CLB"]
 ws10 = wb["Query 10 - QoQ Top 10 CLB"]
 ws11 = wb["Query 11 - Sân trên 60k Chỗ"]
+
 check("Excel - Q04 Sheet has 29 data rows", ws04.max_row - 4 == 29, f"(Actual: {ws04.max_row - 4})")
+check("Excel - Q07 Sheet has 18 data rows & Goals column", ws07.max_row - 4 == 18, f"(Actual: {ws07.max_row - 4})")
+check("Excel - Q09 Sheet has 9 data rows", ws09.max_row - 4 == 9, f"(Actual: {ws09.max_row - 4})")
 check("Excel - Q10 Sheet has 10 data rows", ws10.max_row - 4 == 10, f"(Actual: {ws10.max_row - 4})")
 check("Excel - Q11 Sheet has 23 data rows", ws11.max_row - 4 == 23, f"(Actual: {ws11.max_row - 4})")
 

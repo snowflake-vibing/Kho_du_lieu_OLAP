@@ -278,7 +278,7 @@ FROM [DW Football Transfermarkt];
 
 Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 9 dòng dữ liệu thực tế từ khối Cube OLAP:
 
-| STT | Tên Câu Lạc Bộ (`Club Name`) | Sân Nhà - Bàn Thắng | Sân Nhà - Thẻ Vàng | Sân Khách - Bàn Thắng | Sân Khách - Thẻ Vàng |
+| STT | Tên Câu Lạc Bộ (`Club Name`) | Cuối tuần - Bàn Thắng | Cuối tuần - Thẻ Vàng | Ngày thường - Bàn Thắng | Ngày thường - Thẻ Vàng |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | **1** | **Manchester City** | 94 | 49 | 151 | 80 |
 | **2** | **Bayern Munich** | 115 | 62 | 110 | 67 |

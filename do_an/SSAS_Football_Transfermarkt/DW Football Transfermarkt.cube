@@ -727,6 +727,17 @@ CREATE MEMBER CURRENTCUBE.[Measures].[Avg Minutes Played]
     ROUND([Measures].[Minutes Played] / [Measures].[FACT Player Match Perf Count], 2)
 ), 
 FORMAT_STRING = "#,##0.00", 
+VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf'; 
+
+-- Thước đo cho Query 07: Tỷ lệ phần trăm đóng góp bàn thắng giải đấu tại Anh
+CREATE MEMBER CURRENTCUBE.[Measures].[Pct Of England Goals]
+ AS IIF(
+    IsEmpty(([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])) 
+    OR ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All]) = 0,
+    NULL,
+    [Measures].[Goals] / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
+), 
+FORMAT_STRING = "0.00%", 
 VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf'; </Text>
         </Command>
       </Commands>

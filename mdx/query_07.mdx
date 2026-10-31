@@ -1,0 +1,52 @@
+/* ==============================================================================
+   Truy vấn MDX 07: Thống kê bàn thắng theo quốc tịch cầu thủ tại các giải đấu ở Anh
+   Database: SSAS_Football_Transfermarkt (hoặc DW_Football_SSAS)
+   Cube: [DW Football Transfermarkt]
+   Khai thác: TOPPERCENT, NONEMPTY, EXCEPT, ORDER (BDESC)
+   ============================================================================== */
+
+WITH 
+    -- Tỷ lệ phần trăm đóng góp bàn thắng của từng quốc gia trên tổng bàn thắng nước Anh
+    MEMBER [Measures].[Pct Of England Goals] AS
+        IIF(
+            IsEmpty(([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])) 
+            OR ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All]) = 0,
+            NULL,
+            [Measures].[Goals] / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
+        ),
+        FORMAT_STRING = "0.00%"
+
+SELECT
+    -- Trục Cột COLUMNS: Đầy đủ 2 cột gồm Tổng bàn thắng (Goals) và Tỷ lệ phần trăm đóng góp
+    {
+        [Measures].[Goals],
+        [Measures].[Pct Of England Goals]
+    } ON COLUMNS,
+
+    -- Trục Dòng ROWS: Các quốc gia chiếm 80% tổng số bàn thắng theo nguyên lý Pareto, xếp giảm dần
+    ORDER(
+        TOPPERCENT(
+            NONEMPTY(
+                EXCEPT(
+                    [DIM Player].[Country Of Citizenship].[Country Of Citizenship].MEMBERS,
+                    { [DIM Player].[Country Of Citizenship].[All] }
+                ),
+                (
+                    [Measures].[Goals],
+                    [DIM Competition].[Country Name].[England]
+                )
+            ),
+            80,
+            [Measures].[Goals]
+        ),
+        [Measures].[Goals],
+        BDESC
+    ) ON ROWS
+
+-- Khối Cube nguồn
+FROM [DW Football Transfermarkt]
+
+-- Trục lát cắt Slicer Axis: Giới hạn trong phạm vi các giải đấu diễn ra tại Nước Anh
+WHERE (
+    [DIM Competition].[Country Name].[England]
+);

@@ -1,0 +1,50 @@
+/* ==============================================================================
+   Truy vấn MDX 09 (STT 07 trong Báo cáo): Các CLB xuất sắc toàn diện cả Cuối tuần & Ngày thường
+   Database: SSAS_Football_Transfermarkt (hoặc DW_Football_SSAS)
+   Cube: [DW Football Transfermarkt]
+   Khai thác: INTERSECT, TOPCOUNT, CrossJoin, NONEMPTY, ORDER (BDESC)
+   ============================================================================== */
+
+WITH 
+    -- 1. Top 30 CLB ghi nhiều bàn thắng nhất vào Cuối tuần (Is Weekend = 1)
+    SET [Top_Weekend_Clubs] AS
+        TOPCOUNT(
+            NONEMPTY(
+                EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                ([Measures].[Goals], [DIM Time].[Is Weekend].[1])
+            ),
+            30,
+            ([Measures].[Goals], [DIM Time].[Is Weekend].[1])
+        )
+
+    -- 2. Top 30 CLB ghi nhiều bàn thắng nhất vào Ngày thường (Is Weekend = 0)
+    SET [Top_Weekday_Clubs] AS
+        TOPCOUNT(
+            NONEMPTY(
+                EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                ([Measures].[Goals], [DIM Time].[Is Weekend].[0])
+            ),
+            30,
+            ([Measures].[Goals], [DIM Time].[Is Weekend].[0])
+        )
+
+    -- 3. Giao tập hợp INTERSECT: Các CLB duy trì sức tấn công ưu tú ở cả 2 khung thời gian
+    SET [Elite_Clubs_All_Days] AS
+        INTERSECT([Top_Weekend_Clubs], [Top_Weekday_Clubs])
+
+SELECT
+    -- Trục Cột COLUMNS: Phân rã 4 cột ma trận (Cuối tuần Goals/Cards & Ngày thường Goals/Cards)
+    CrossJoin(
+        { [DIM Time].[Is Weekend].[1], [DIM Time].[Is Weekend].[0] },
+        { [Measures].[Goals], [Measures].[Yellow Cards] }
+    ) ON COLUMNS,
+
+    -- Trục Dòng ROWS: Danh sách 9 CLB ưu tú giao thoa, sắp xếp giảm dần theo tổng bàn thắng
+    ORDER(
+        [Elite_Clubs_All_Days],
+        [Measures].[Goals],
+        BDESC
+    ) ON ROWS
+
+-- Khối Cube nguồn
+FROM [DW Football Transfermarkt];
