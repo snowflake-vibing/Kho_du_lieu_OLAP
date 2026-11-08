@@ -18,17 +18,35 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 
 ## 2. Hướng dẫn các bước thiết lập chi tiết trên giao diện Power BI
 
-### Bước 1: Khởi tạo trang báo cáo và cấu hình trang vẽ (Canvas Settings)
-1. Mở file Power BI Desktop đã kết nối Live Connection với SSAS Cube `[DW Football Transfermarkt]`.
-2. Tại thanh tab trang ở mép dưới màn hình, nhấp đúp vào `Page 1` và đổi tên thành: `Hiệu suất Cầu thủ`.
-3. Nhấp chuột vào vùng trống bất kỳ trên trang vẽ Canvas.
-4. Tại khung công cụ bên phải, nhấp chọn biểu tượng cây cọ sơn **Format report page**:
-   * Mở rộng mục **Canvas settings** -> Tại ô **Type**, chọn tỷ lệ **16:9** (hoặc chọn **Custom** với `Width: 1280 px`, `Height: 720 px`).
-   * Mở rộng mục **Canvas background** -> Chọn màu nền xám nhạt (mã `#F8F9FA`), kéo thanh **Transparency** về `0%`.
+### Bước 1: Khởi động Power BI Desktop và Thiết lập Kết nối Live Connection tới SSAS Cube
+1. Khởi động phần mềm **Power BI Desktop** từ màn hình Desktop, thanh Taskbar hoặc Menu Start của Windows.
+2. Tại màn hình khởi động (Splash screen/Welcome screen), nhấp chuột vào dấu **X** ở góc trên bên phải hộp thoại chào mừng để đóng lại và đi vào giao diện thiết kế chính.
+3. Quan sát dải Ribbon trên cùng tại thẻ **Home**, nhấp chuột vào biểu tượng **Get data** (hoặc nhấp vào mũi tên xổ xuống tại nút Get data).
+4. Trong danh mục các nguồn dữ liệu xuất hiện, nhấp chuột chọn dòng **SQL Server Analysis Services database** (nếu không thấy, nhấp vào *More...* -> chọn mục *Database* ở cột trái -> nhấp chọn *SQL Server Analysis Services database* -> nhấp nút **Connect**).
+5. Hộp thoại cấu hình kết nối **SQL Server Analysis Services database** xuất hiện trên màn hình:
+   * **Server:** Nhập địa chỉ máy chủ SSAS cục bộ của bạn, nhập dấu chấm `.` (đại diện cho localhost) hoặc nhập `localhost` hoặc tên máy tính của bạn (ví dụ: `DESKTOP-ABCXYZ`).
+   * **Database (optional):** Nhập chính xác tên cơ sở dữ liệu phân tích SSAS đã được deploy từ Visual Studio: `DW Football SSAS` (hoặc `DW_Football_SSAS`).
+   * **Data Connectivity mode (Phương thức kết nối):** Tích chọn tùy chọn **Connect live** (Kết nối trực tiếp tới mô hình dữ liệu đa chiều SSAS Cube để khai thác tức thì toàn bộ các Calculated Member, Named Sets và Hierarchy mà không cần Import dữ liệu).
+   * Nhấp nút **OK** để tiến hành kết nối.
+6. Cửa sổ điều hướng **Navigator** xuất hiện hiển thị cấu trúc của máy chủ SSAS:
+   * Nhấp chuột mở rộng cơ sở dữ liệu `DW Football SSAS`.
+   * Tích chọn khối Cube phân tích chính: **`[DW Football Transfermarkt]`**.
+   * Quan sát khung xem trước bên phải để kiểm tra toàn bộ cấu trúc: Thư mục thước đo **Measures** (`Goals`, `Assists`, `Goal Contributions`, `Minutes Played`...) và các chiều phân tích (`DIM Player`, `DIM Club`, `DIM Competition`, `DIM Game`, `DIM Time`).
+   * Nhấp nút **Load** (hoặc nút **OK**) ở góc dưới cùng bên phải để hoàn tất việc kết nối.
+7. Power BI nạp thành công cấu trúc Cube và chuyển về giao diện thiết kế Report Canvas. Khung **Data** ở mép phải màn hình xuất hiện đầy đủ cây đối tượng sẵn sàng kéo thả.
 
 ---
 
-### Bước 2: Tạo Banner Tiêu đề báo cáo (Title Header)
+### Bước 2: Cấu hình kích thước trang báo cáo và hình nền (Canvas Settings)
+1. Tại thanh tab trang ở mép dưới cùng của màn hình, nhấp đúp chuột vào nhãn `Page 1` và đổi tên thành: `Hiệu suất Cầu thủ`.
+2. Nhấp chuột vào một khoảng trống bất kỳ trên trang vẽ Canvas để đảm bảo không visual nào đang được chọn.
+3. Tại khung công cụ bên phải, nhấp chọn biểu tượng cây cọ sơn **Format report page** (Định dạng trang báo cáo):
+   * Mở rộng mục **Canvas settings** -> Tại ô **Type**, nhấp mở danh sách thả xuống và chọn tỷ lệ **16:9** (hoặc chọn **Custom** với chiều rộng `Width: 1280 px`, chiều cao `Height: 720 px`).
+   * Mở rộng mục **Canvas background** -> Nhấp vào ô màu sắc chọn màu nền xám nhạt chuyên nghiệp (mã màu `#F8F9FA`), sau đó kéo thanh trượt **Transparency** về mức **`0%`** để màu nền có hiệu lực hiển thị.
+
+---
+
+### Bước 3: Tạo Banner Tiêu đề báo cáo (Title Header)
 1. Trên thanh Ribbon **Insert**, nhấp chuột vào biểu tượng **Text box**.
 2. Kéo khung Text box đặt ở sát mép trên cùng của trang báo cáo (vị trí `X: 10`, `Y: 10`, `Width: 1260`, `Height: 50`).
 3. Nhập nội dung tiêu đề:
@@ -40,7 +58,7 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 
 ---
 
-### Bước 3: Tạo khối 4 Thẻ KPI chỉ số tổng quan (Card Visuals)
+### Bước 4: Tạo khối 4 Thẻ KPI chỉ số tổng quan (Card Visuals)
 Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề để người xem nắm bắt ngay bức tranh toàn cảnh:
 
 1. **Card 1: Tổng số Bàn thắng (Total Goals)**:
@@ -63,7 +81,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 
 ---
 
-### Bước 4: Tạo Biểu đồ thanh ngang Top 10 Chân sút ghi bàn nhiều nhất (Clustered Bar Chart)
+### Bước 5: Tạo Biểu đồ thanh ngang Top 10 Chân sút ghi bàn nhiều nhất (Clustered Bar Chart)
 1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered bar chart** (biểu đồ thanh ngang nằm ở góc trái).
 2. Kéo khung đặt ở góc phía dưới bên trái màn hình.
 3. Kéo thả các trường từ khung **Data**:
@@ -83,7 +101,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 
 ---
 
-### Bước 5: Tạo Biểu đồ vành khăn Cơ cấu đóng góp bàn thắng theo Vị trí (Donut Chart)
+### Bước 6: Tạo Biểu đồ vành khăn Cơ cấu đóng góp bàn thắng theo Vị trí (Donut Chart)
 1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Donut chart**.
 2. Kéo khung đặt ở khoảng giữa trang báo cáo.
 3. Kéo thả các trường dữ liệu:
@@ -96,7 +114,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 
 ---
 
-### Bước 6: Tạo Biểu đồ kết hợp Xu hướng Bàn thắng và Kiến tạo qua các Mùa giải (Line and Clustered Column Chart)
+### Bước 7: Tạo Biểu đồ kết hợp Xu hướng Bàn thắng và Kiến tạo qua các Mùa giải (Line and Clustered Column Chart)
 1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Line and clustered column chart** (biểu đồ cột kết hợp đường).
 2. Kéo khung đặt ở góc trên bên phải màn hình.
 3. Kéo thả các trường dữ liệu:
@@ -111,7 +129,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 
 ---
 
-### Bước 7: Tạo Bảng Ma trận chi tiết phong độ cầu thủ (Matrix Visual)
+### Bước 8: Tạo Bảng Ma trận chi tiết phong độ cầu thủ (Matrix Visual)
 1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Matrix**.
 2. Kéo khung đặt ở góc dưới bên phải trang Canvas.
 3. Kéo thả các trường dữ liệu:
@@ -123,7 +141,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 
 ---
 
-### Bước 8: Thêm các bộ lọc tương tác đa chiều (Slicers)
+### Bước 9: Thêm các bộ lọc tương tác đa chiều (Slicers)
 Thêm 3 Slicer điều khiển đặt gọn gàng ở cột bên trái hoặc góc trên trang:
 1. **Slicer 1 (Mùa giải):** Kéo `DIM Time [Season]` vào visual **Slicer**, thiết lập kiểu hiển thị là **Dropdown**.
 2. **Slicer 2 (Giải đấu):** Kéo `DIM Competition [Competition Name]` vào visual **Slicer**, kiểu **Dropdown**.
@@ -131,7 +149,7 @@ Thêm 3 Slicer điều khiển đặt gọn gàng ở cột bên trái hoặc g�
 
 ---
 
-### Bước 9: Kết quả và Nhận xét phân tích
+### Bước 10: Kết quả và Nhận xét phân tích
 * **Kết quả trực quan:** Dashboard hiển thị đồng bộ và mượt mà. Khi người dùng nhấp chọn mùa giải `2023` hoặc giải đấu `Premier League`, toàn bộ 4 thẻ KPI, Top 10 chân sút (Erling Haaland, Mohamed Salah, Harry Kane...), cơ cấu vị trí và bảng ma trận lập tức tự động lọc theo giải đấu đã chọn.
 * **Nhận xét chuyên môn:**
   * Vị trí Tiền đạo (Attack) đóng góp áp đảo trên 65% tổng số bàn thắng, tuy nhiên vị trí Tiền vệ (Midfield) chiếm tới hơn 55% tổng số đường kiến tạo thành bàn.
