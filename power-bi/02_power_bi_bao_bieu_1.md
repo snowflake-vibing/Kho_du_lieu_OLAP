@@ -1,136 +1,138 @@
-# 4.2.1 Báo biểu 1: Thống kê tổng hợp số lượng, quy mô và xu hướng phân bổ theo vị trí và phân loại
+# 4.2.1 Báo biểu 1: Phân tích Hiệu suất Ghi bàn và Đóng góp Kiến tạo của Cầu thủ (Player Performance & Goal Contributions)
 
-Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để thiết kế hoàn chỉnh **Báo biểu 1 (Dashboard 1)** trên phần mềm **Power BI Desktop**, kết nối trực tiếp với khối dữ liệu SSAS.
+Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để thiết kế hoàn chỉnh **Báo biểu 1 (Dashboard 1)** trên phần mềm **Power BI Desktop**, kết nối trực tiếp (Live Connection) với khối dữ liệu SSAS `[DW Football Transfermarkt]`.
 
 ---
 
 ## 1. Mục tiêu và nội dung phân tích
-* **Nội dung:** Thống kê tổng hợp rủi ro giao dịch, số tiền và xu hướng phân bổ hàng ngày theo từng vị trí địa lý (State/City) và loại hình phân loại giao dịch.
+* **Nội dung:** Giám sát và đánh giá phong độ, hiệu suất ghi bàn (`Goals`), năng lực kiến tạo (`Assists`), tổng mức đóng góp bàn thắng (`Goal Contributions = Goals + Assists`) và thời lượng thi đấu (`Minutes Played`) của các cầu thủ theo vị trí thi đấu, câu lạc bộ và giải đấu qua các mùa giải.
 * **Đối tượng theo dõi:**
-  * Bảng ma trận đa chiều (Matrix) phân rã theo Ngày (`Day`) và Phân cấp Địa lý (`PhanCapLocation`).
-  * Cơ cấu số vụ rủi ro/giao dịch theo từng Bang/Khu vực (Pie Chart 1).
-  * Cơ cấu tổng quy mô số tiền theo từng loại hình giao dịch (Pie Chart 2).
-  * Biểu đồ cột phân cụm (Clustered Column Chart) so sánh tương quan chéo giữa Loại hình và Khu vực địa lý.
+  * Khối KPI Cards hiển thị tổng quan 4 chỉ số cốt lõi: Tổng Bàn Thắng, Tổng Kiến Tạo, Tổng G+A và Hiệu suất Số phút / Bàn thắng (`Mins Per Goal`).
+  * Biểu đồ thanh ngang (Clustered Bar Chart): Top 10 Cầu thủ ghi nhiều bàn thắng nhất Châu Âu.
+  * Biểu đồ vành khăn (Donut Chart): Cơ cấu đóng góp bàn thắng phân bổ theo Vị trí thi đấu chính (`Main_Position`: Attack, Midfield, Defender).
+  * Biểu đồ kết hợp cột và đường (Line and Clustered Column Chart): Xu hướng bàn thắng và kiến tạo qua các mùa giải (`Season`) và các quý trong năm (`Quarter`).
+  * Bảng ma trận đa cấp (Matrix Visual): Bảng tra cứu phong độ chi tiết từng cầu thủ theo Câu lạc bộ và Vị trí.
+  * Hệ thống bộ lọc cắt lát (Slicers): Mùa giải (`Season`), Giải đấu (`Competition_Name`), Vị trí thi đấu (`Main_Position`).
 
 ---
 
 ## 2. Hướng dẫn các bước thiết lập chi tiết trên giao diện Power BI
 
-### Bước 1: Kết nối dữ liệu vào Report
-1. Khởi động Power BI Desktop, tạo một tệp báo cáo mới (`File` -> `New`).
-2. Trên thanh Ribbon **Home**, nhấp chuột vào biểu tượng **Get data** -> chọn **SQL Server Analysis Services database**.
-3. Nhập tên máy chủ tại ô **Server** (ví dụ: `.` hoặc `localhost`), nhập tên database SSAS tại ô **Database**.
-4. Tích chọn tùy chọn **Connect live**, nhấp nút **OK**.
-5. Trong cửa sổ Navigator, chọn Cube phân tích và nhấp nút **OK**.
+### Bước 1: Khởi tạo trang báo cáo và cấu hình trang vẽ (Canvas Settings)
+1. Mở file Power BI Desktop đã kết nối Live Connection với SSAS Cube `[DW Football Transfermarkt]`.
+2. Tại thanh tab trang ở mép dưới màn hình, nhấp đúp vào `Page 1` và đổi tên thành: `Hiệu suất Cầu thủ`.
+3. Nhấp chuột vào vùng trống bất kỳ trên trang vẽ Canvas.
+4. Tại khung công cụ bên phải, nhấp chọn biểu tượng cây cọ sơn **Format report page**:
+   * Mở rộng mục **Canvas settings** -> Tại ô **Type**, chọn tỷ lệ **16:9** (hoặc chọn **Custom** với `Width: 1280 px`, `Height: 720 px`).
+   * Mở rộng mục **Canvas background** -> Chọn màu nền xám nhạt (mã `#F8F9FA`), kéo thanh **Transparency** về `0%`.
 
 ---
 
-### Bước 2: Cấu hình kích thước trang báo cáo (Canvas Settings)
-1. Nhấp chuột vào một khoảng trống bất kỳ trên trang vẽ báo cáo (Canvas) để đảm bảo không visual nào được chọn.
-2. Tại khung công cụ bên phải, nhấp vào biểu tượng cây cọ sơn **Format report page** (Định dạng trang báo cáo).
-3. Nhấp mở rộng mục **Canvas settings**:
-   * Tại ô **Type**: Nhấp mở danh sách thả xuống và chọn **16:9** (hoặc chọn **Custom** nếu muốn tùy chỉnh chiều rộng `Width: 1280 px`, chiều cao `Height: 720 px` hoặc `900 px` để chứa đủ nhiều biểu đồ).
-4. Nhấp mở rộng mục **Canvas background**:
-   * Thiết lập **Color**: Chọn màu xám nhạt (ví dụ `#F5F5F5`) hoặc giữ màu trắng.
-   * Kéo thanh **Transparency** về `0%` để màu nền có hiệu lực.
-
----
-
-### Bước 3: Tạo Text Box tiêu đề báo cáo (Label)
+### Bước 2: Tạo Banner Tiêu đề báo cáo (Title Header)
 1. Trên thanh Ribbon **Insert**, nhấp chuột vào biểu tượng **Text box**.
-2. Một khung văn bản xuất hiện trên Canvas. Nhấp giữ chuột vào khung để di chuyển lên sát mép trên cùng của trang báo cáo và kéo dãn chiều rộng sang hai bên.
-3. Nhấp đúp chuột vào bên trong Text box và nhập nội dung tiêu đề:
-   `BÁO BIỂU 1: THỐNG KÊ TỔNG HỢP RỦI RO, QUY MÔ SỐ TIỀN VÀ XU HƯỚNG THEO VỊ TRÍ VÀ LOẠI HÌNH GIAO DỊCH`
-4. Bôi đen toàn bộ đoạn văn bản vừa nhập:
-   * Đặt cỡ chữ: Chọn **14 pt** hoặc **16 pt**.
-   * Đặt định dạng: Nhấp chọn biểu tượng chữ **B** (Bold) để in đậm.
-   * Màu chữ: Chọn màu xanh đậm hoặc đen xám chuyên nghiệp.
-5. Tại khung Format Text box bên phải: Vào mục **Effects** -> chuyển công tắc **Visual border** sang **On**, bo góc 4px để tạo đường viền bo tròn nhẹ.
+2. Kéo khung Text box đặt ở sát mép trên cùng của trang báo cáo (vị trí `X: 10`, `Y: 10`, `Width: 1260`, `Height: 50`).
+3. Nhập nội dung tiêu đề:
+   `BÁO BIỂU 1: PHÂN TÍCH HIỆU SUẤT GHI BÀN & ĐÓNG GÓP KIẾN TẠO CỦA CẦU THỦ CHÂU ÂU`
+4. Bôi đen toàn bộ đoạn văn bản:
+   * Thiết lập Font: `Segoe UI`, Cỡ chữ: `15 pt`, In đậm (**Bold**), Căn lề giữa (**Center**).
+   * Màu chữ: Chọn màu trắng hoặc xanh đậm `Navy`.
+5. Tại bảng **Format Text box** bên phải: Vào mục **Effects** -> **Background** chọn màu xanh đậm `#0F2027` (hoặc chuyển viền bo góc bo tròn 6px).
 
 ---
 
-### Bước 4: Tạo biểu đồ Ma trận đa cấp (Matrix Visual)
-Biểu đồ Matrix cho phép xem chi tiết dữ liệu ở cấp độ dòng đa tầng (drill-down).
+### Bước 3: Tạo khối 4 Thẻ KPI chỉ số tổng quan (Card Visuals)
+Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề để người xem nắm bắt ngay bức tranh toàn cảnh:
 
-1. Tại khung **Visualizations** ở góc trên bên phải, nhấp chuột vào biểu tượng **Matrix** (biểu đồ lưới có các hàng và cột phân cấp).
-2. Một khung Matrix trống xuất hiện trên trang vẽ. Kéo khung đặt ở góc phía trên bên trái và căn chỉnh chiều rộng chiếm khoảng 60% trang báo cáo.
-3. Kéo thả các trường dữ liệu từ khung **Data** (bên phải) vào các ô cấu hình của Matrix:
-   * **Vùng Rows (Dòng):**
-     * Tìm và kéo trường `Day` (từ chiều thời gian `DIM Time`) thả vào ô **Rows**.
-     * Tìm và kéo phân cấp địa lý `PhanCapLocationTransaction` (hoặc lần lượt `Transaction State`, `Transaction City` từ chiều địa lý) thả vào ô **Rows** ngay bên dưới trường `Day`.
-   * **Vùng Values (Giá trị):** Lần lượt kéo các thước đo đo lường từ thư mục Measures thả vào ô **Values**:
-     1. `Total Transaction` (Tổng số lượng giao dịch)
-     2. `Total Fraud` (Tổng số giao dịch gian lận/bất thường)
-     3. `Total Transaction Amount` (Tổng số tiền giao dịch)
-     4. `Total Fraud Amount` (Tổng số tiền gian lận)
-     5. `Average Transaction Amount` (Số tiền giao dịch trung bình)
-     6. `Average Fraud Amount` (Số tiền gian lận trung bình)
-4. **Đổi tên hiển thị các cột trong bảng Matrix:**
-   * Tại vùng Values, nhấp chuột phải vào từng trường (hoặc nhấp đúp) -> chọn **Rename for this visual**:
-     * Đổi `Total Transaction` thành `Tổng GD`.
-     * Đổi `Total Fraud` thành `Số vụ rủi ro`.
-     * Đổi `Total Transaction Amount` thành `Tổng giá trị (VND/$)`.
-     * Đổi `Total Fraud Amount` thành `Giá trị rủi ro`.
-     * Đổi `Average Transaction Amount` thành `TB GD`.
-     * Đổi `Average Fraud Amount` thành `TB Rủi ro`.
-5. **Định dạng bảng Matrix:**
-   * Chọn visual Matrix, chuyển sang tab **Format visual**:
-   * Mục **Style presets**: Chọn kiểu **Alternating rows** (hàng xen kẽ màu để dễ đọc).
-   * Mục **Column headers**: Đặt Font in đậm (Bold), nền màu xanh nhạt.
-   * Mục **Subtotals**: Bật hoặc tắt Row subtotals tùy theo nhu cầu hiển thị tổng dòng.
+1. **Card 1: Tổng số Bàn thắng (Total Goals)**:
+   * Tại khung **Visualizations**, nhấp chọn biểu tượng **Card** (hoặc *New Card*).
+   * Kéo thước đo `[Measures].[Goals]` từ thư mục Measures thả vào ô **Fields**.
+   * Đổi tên hiển thị: Nhấp đúp vào trường vừa thả, đổi tên thành `Tổng Bàn Thắng`.
+   * Định dạng: Vào tab **Format visual** -> **Callout value**: Cỡ chữ `26 pt`, In đậm, màu xanh lục `#28A745`.
+2. **Card 2: Tổng số Kiến tạo (Total Assists)**:
+   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 1.
+   * Kéo thước đo `[Measures].[Assists]` thả vào ô **Fields**, đổi tên thành `Tổng Kiến Tạo`.
+   * Định dạng: Cỡ chữ `26 pt`, In đậm, màu xanh lam `#007BFF`.
+3. **Card 3: Tổng Đóng góp Bàn thắng (Goal Contributions)**:
+   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 2.
+   * Kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Goals] + [Assists]`) thả vào ô **Fields**, đổi tên thành `Tổng Đóng Góp (G+A)`.
+   * Định dạng: Cỡ chữ `26 pt`, In đậm, màu cam hổ phách `#FD7E14`.
+4. **Card 4: Hiệu suất Phút / Bàn thắng (Mins Per Goal)**:
+   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 3.
+   * Kéo thước đo `[Measures].[Minutes Played]` kết hợp tính toán số phút cần thiết để ghi 1 bàn thắng thả vào ô **Fields**, đổi tên thành `Số phút / Bàn thắng`.
+   * Định dạng: Cỡ chữ `26 pt`, In đậm, hiển thị 1 chữ số thập phân (`#,##0.0`).
 
 ---
 
-### Bước 5: Tạo Biểu đồ tròn 1 (Pie Chart - Phân bổ theo Khu vực/Bang)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Pie chart**.
-2. Kéo khung biểu đồ tròn đặt vào góc phía trên bên phải trang báo cáo (ngang hàng với Matrix).
-3. Kéo thả các trường dữ liệu từ khung Data vào ô cấu hình:
-   * **Vùng Legend (Chú giải):** Kéo thuộc tính `Transaction State` (hoặc `Tên Bang / Khu Vực`) thả vào ô **Legend**.
-   * **Vùng Values (Giá trị):** Kéo thước đo `Total Fraud` (hoặc `Số lượng giao dịch rủi ro`) thả vào ô **Values**.
+### Bước 4: Tạo Biểu đồ thanh ngang Top 10 Chân sút ghi bàn nhiều nhất (Clustered Bar Chart)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered bar chart** (biểu đồ thanh ngang nằm ở góc trái).
+2. Kéo khung đặt ở góc phía dưới bên trái màn hình.
+3. Kéo thả các trường từ khung **Data**:
+   * **Vùng Y-axis (Trục tung):** Tìm chiều `DIM Player`, kéo thuộc tính `Player Name` thả vào ô **Y-axis**.
+   * **Vùng X-axis (Trục hoành):** Kéo thước đo `Goals` thả vào ô **X-axis**.
+   * **Vùng Tooltips:** Kéo thêm các trường `Assists`, `DIM Club [Club Name]`, `DIM Player [Main Position]` để khi di chuột hiển thị đầy đủ thông tin hỗ trợ.
+4. **Thiết lập bộ lọc Top 10 Cầu thủ:**
+   * Tại khung **Filters** (bên cạnh khung Visualizations), tìm mục **Filters on this visual** -> nhấp mở rộng mục `Player Name`.
+   * Tại mục **Filter type**, mở danh sách thả xuống và chọn **Top N**.
+   * Tại ô **Show items**, nhập số `10`.
+   * Tại ô **By value**, kéo thước đo `Goals` thả vào ô này.
+   * Nhấp nút **Apply filter**.
+5. **Định dạng visual:**
+   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Top 10 Cầu thủ ghi nhiều bàn thắng nhất Châu Âu`. In đậm, căn giữa.
+   * Mục **Data labels**: Bật **On** để hiển thị số bàn thắng cụ thể ở cuối mỗi thanh ngang.
+   * Mục **Bars**: Đặt màu thanh là màu xanh navy đậm.
+
+---
+
+### Bước 5: Tạo Biểu đồ vành khăn Cơ cấu đóng góp bàn thắng theo Vị trí (Donut Chart)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Donut chart**.
+2. Kéo khung đặt ở khoảng giữa trang báo cáo.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng Legend:** Tìm chiều `DIM Player`, kéo thuộc tính `Main Position` (Attack, Midfield, Defender) thả vào ô **Legend**.
+   * **Vùng Values:** Kéo thước đo `Goal Contributions` (hoặc `Goals`) thả vào ô **Values**.
 4. **Định dạng visual:**
-   * Tại tab **Format visual**:
-   * Mục **Title**: Bật **On**, nhập nội dung: `Tỷ lệ số vụ rủi ro theo Bang/Khu vực`. Đặt căn giữa (Center), chữ in đậm.
-   * Mục **Detail labels**: Chọn **Label contents** là `Category, percent of total` (Hiển thị tên phân loại và phần trăm tổng thể).
-   * Mục **Legend**: Đặt vị trí **Position** là `Right center` (ở giữa cạnh phải).
+   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Tỷ trọng Đóng góp bàn thắng theo Vị trí thi đấu`.
+   * Mục **Detail labels**: Chọn **Label contents** là `Category, percent of total` (Hiển thị tên vị trí và tỷ lệ %).
+   * Mục **Legend**: Đặt vị trí **Position** là `Right center`.
 
 ---
 
-### Bước 6: Tạo Biểu đồ tròn 2 (Pie Chart - Phân bổ theo Loại hình giao dịch)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Pie chart** để thêm biểu đồ tròn thứ hai.
-2. Kéo khung đặt ngay bên dưới Biểu đồ tròn 1.
-3. Kéo thả các trường dữ liệu vào ô cấu hình:
-   * **Vùng Legend:** Kéo thuộc tính `Transaction Type` (Loại hình giao dịch: POS, Online, ATM, Transfer...) thả vào ô **Legend**.
-   * **Vùng Values:** Kéo thước đo `Total Amount Fraud` (hoặc `Total Fraud Amount`) thả vào ô **Values**.
-4. **Định dạng visual:**
-   * Tại tab **Format visual**:
-   * Mục **Title**: Bật **On**, nhập nội dung: `Tỷ lệ tổn thất số tiền theo Loại hình giao dịch`. Căn giữa, in đậm.
-   * Mục **Detail labels**: Chọn **Label contents** là `Category, percent of total`.
-   * Mục **Legend**: Đặt vị trí là `Bottom center` hoặc `Right center`.
+### Bước 6: Tạo Biểu đồ kết hợp Xu hướng Bàn thắng và Kiến tạo qua các Mùa giải (Line and Clustered Column Chart)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Line and clustered column chart** (biểu đồ cột kết hợp đường).
+2. Kéo khung đặt ở góc trên bên phải màn hình.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng X-axis:** Tìm chiều `DIM Time`, kéo thuộc tính `Season` (Mùa giải: 2021/22, 2022/23, 2023/24) và `Quarter` thả vào ô **X-axis**.
+   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` thả vào ô này.
+   * **Vùng Line Y-axis (Đường):** Kéo thước đo `Assists` thả vào ô này.
+4. **Đổi tên và định dạng visual:**
+   * Đổi tên cột thành `Tổng số Bàn thắng`.
+   * Đổi tên đường thành `Tổng số Kiến tạo`.
+   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Xu hướng Bàn thắng (Cột) và Kiến tạo (Đường) qua các Mùa giải`.
+   * Mục **Data labels**: Bật **On** cho cả Cột và Đường.
 
 ---
 
-### Bước 7: Tạo Biểu đồ cột phân cụm (Clustered Column Chart)
-Biểu đồ so sánh tương quan số lượng rủi ro giữa các loại hình giao dịch trên từng Bang.
-
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered column chart** (biểu đồ cột phân cụm đứng).
-2. Kéo biểu đồ đặt ở nửa dưới trang Canvas, trải dài ở cạnh dưới của Matrix và Pie Charts.
-3. Kéo thả các trường dữ liệu vào các ô cấu hình:
-   * **Vùng X-axis (Trục hoành):** Kéo trường `Transaction Type` (Loại giao dịch) thả vào ô **X-axis**.
-   * **Vùng Y-axis (Trục tung):** Kéo thước đo `Total Fraud` (Tổng số giao dịch rủi ro) thả vào ô **Y-axis**.
-   * **Vùng Legend (Phân cụm cột):** Kéo trường `Transaction State` (Tiểu bang / Khu vực) thả vào ô **Legend**.
-4. **Đổi tên hiển thị và định dạng:**
-   * Nhấp chuột phải vào trường `Total Fraud` trên ô Y-axis -> chọn **Rename for this visual** -> đổi thành `Số lượng vụ việc`.
-   * Tại tab **Format visual**:
-   * Mục **Title**: Bật **On**, nhập: `So sánh số lượng giao dịch rủi ro theo Loại hình và Khu vực`. Căn giữa, in đậm.
-   * Mục **Data labels**: Bật công tắc sang **On** để hiển thị con số chính xác trên đầu mỗi cột.
-   * Mục **X-axis**: Đặt cỡ chữ 10 pt, bật tiêu đề trục.
-   * Mục **Y-axis**: Đặt cỡ chữ 10 pt.
+### Bước 7: Tạo Bảng Ma trận chi tiết phong độ cầu thủ (Matrix Visual)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Matrix**.
+2. Kéo khung đặt ở góc dưới bên phải trang Canvas.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng Rows:** Kéo lần lượt `DIM Player [Player Name]` và `DIM Club [Club Name]` vào ô **Rows**.
+   * **Vùng Values:** Kéo các thước đo: `Minutes Played`, `Goals`, `Assists`, `Goal Contributions`, `Yellow Cards`.
+4. **Định dạng bảng Matrix:**
+   * Vào tab **Format visual** -> **Style presets**: Chọn kiểu `Alternating rows`.
+   * Đổi tên các cột hiển thị: `Số phút`, `Bàn thắng`, `Kiến tạo`, `G+A`, `Thẻ vàng`.
 
 ---
 
-### Bước 8: Căn chỉnh bố cục tổng thể và kiểm tra tính tương tác
-1. **Căn chỉnh vị trí (Align):** Giữ phím `Ctrl`, nhấp chọn lần lượt các biểu đồ -> trên thanh Ribbon chuyển sang tab **Format** -> chọn **Align** -> chọn **Distribute horizontally** hoặc **Align top** để các khung biểu đồ thẳng hàng, ngay ngắn và cân đối.
-2. **Kiểm tra tính tương tác (Cross-filtering):**
-   * Nhấp chuột vào một lát cắt (slice) trên Pie Chart (ví dụ: Bang New York hoặc Loại hình Online) -> Kiểm tra xem bảng Matrix và biểu đồ Clustered Column Chart có tự động làm nổi bật (highlight) hoặc lọc dữ liệu tương ứng hay không.
-   * Nhấp chuột lần nữa vào lát cắt để bỏ chọn.
-3. Vào menu **File** -> chọn **Save As** -> lưu tệp báo cáo với tên `IS217_Bao_Bieu_PowerBI.pbix`.
+### Bước 8: Thêm các bộ lọc tương tác đa chiều (Slicers)
+Thêm 3 Slicer điều khiển đặt gọn gàng ở cột bên trái hoặc góc trên trang:
+1. **Slicer 1 (Mùa giải):** Kéo `DIM Time [Season]` vào visual **Slicer**, thiết lập kiểu hiển thị là **Dropdown**.
+2. **Slicer 2 (Giải đấu):** Kéo `DIM Competition [Competition Name]` vào visual **Slicer**, kiểu **Dropdown**.
+3. **Slicer 3 (Vị trí thi đấu):** Kéo `DIM Player [Main Position]` vào visual **Slicer**, kiểu **Tile** (nút bấm nhanh).
+
+---
+
+### Bước 9: Kết quả và Nhận xét phân tích
+* **Kết quả trực quan:** Dashboard hiển thị đồng bộ và mượt mà. Khi người dùng nhấp chọn mùa giải `2023` hoặc giải đấu `Premier League`, toàn bộ 4 thẻ KPI, Top 10 chân sút (Erling Haaland, Mohamed Salah, Harry Kane...), cơ cấu vị trí và bảng ma trận lập tức tự động lọc theo giải đấu đã chọn.
+* **Nhận xét chuyên môn:**
+  * Vị trí Tiền đạo (Attack) đóng góp áp đảo trên 65% tổng số bàn thắng, tuy nhiên vị trí Tiền vệ (Midfield) chiếm tới hơn 55% tổng số đường kiến tạo thành bàn.
+  * Hiệu suất số phút/bàn thắng của Top 10 chân sút hàng đầu đạt mức ấn tượng dưới 110 phút/bàn, thể hiện sự ổn định vượt trội của các ngôi sao tấn công hàng đầu châu Âu.

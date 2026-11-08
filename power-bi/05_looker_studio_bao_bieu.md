@@ -1,76 +1,60 @@
-# 4.3 Quá trình lập báo biểu bằng công cụ Google Data Studio (Looker Studio)
+# 4.3 Quá trình lập báo biểu bằng công cụ Google Data Studio (Looker Studio) cho Dữ liệu Bóng đá Châu Âu
 
-Tài liệu này hướng dẫn chi tiết quy trình xây dựng hệ thống báo biểu trực quan hóa dữ liệu trên nền tảng đám mây **Google Data Studio (Looker Studio)** dựa trên tệp dữ liệu phẳng đã được trích xuất từ kho dữ liệu ở mục 4.1.2.
+Tài liệu này hướng dẫn chi tiết quy trình xây dựng hệ thống 3 báo biểu trực quan hóa dữ liệu bóng đá trên nền tảng đám mây **Google Data Studio (Looker Studio)** dựa trên tệp dữ liệu phẳng `Football_Report_Data.csv` đã được trích xuất từ kho dữ liệu ở mục 4.1.2.
 
 ---
 
-## 4.3.1 Báo biểu 1: Thống kê chi tiết các sự vụ rủi ro trong khoảng thời gian xác định (15 ngày đầu tháng)
+## 4.3.1 Báo biểu 1: Giám sát hiệu suất ghi bàn của các chân sút chủ lực theo giải đấu
 
 ### 1. Mục tiêu và nội dung
-* **Nội dung:** Giám sát và thống kê biến động số lượng các sự vụ rủi ro/giao dịch gian lận diễn ra từ ngày **01/01/2025 đến ngày 15/01/2025** thông qua bộ 3 biểu đồ đồng bộ: Cột đứng, Hình tròn và Đường xu hướng.
+* **Nội dung:** Giám sát danh sách các chân sút chủ lực có hiệu suất ghi bàn cao trong các giải đấu hàng đầu châu Âu, phân tích phân bổ bàn thắng theo thời gian và giải đấu thông qua bộ 3 biểu đồ: Cột đứng, Hình tròn và Đường xu hướng.
 
 ### 2. Các bước thực hiện chi tiết
 
 #### Bước 1: Khởi tạo và thêm các visual lên trang báo cáo
-1. Tại cửa sổ làm việc của báo cáo trống trên Looker Studio, quan sát thanh menu phía trên và nhấp chuột vào nút **Thêm biểu đồ** (Add a chart).
-2. Lần lượt chọn và kéo thả 3 loại biểu đồ vào Canvas:
-   * **Biểu đồ cột (Column Chart):** Đặt ở nửa bên trái.
+1. Tại giao diện chỉnh sửa của báo cáo Looker Studio, nhấp nút **Thêm biểu đồ** (Add a chart) trên thanh menu.
+2. Thêm 3 loại biểu đồ vào trang Canvas:
+   * **Biểu đồ cột (Column Chart):** Đặt ở nửa bên trái trang.
    * **Biểu đồ hình tròn (Pie Chart):** Đặt ở góc trên bên phải.
-   * **Biểu đồ chuỗi thời gian / đường (Line Chart):** Đặt ở góc dưới bên phải.
+   * **Biểu đồ chuỗi thời gian (Time Series / Line Chart):** Đặt ở góc dưới bên phải.
 
 #### Bước 2: Thiết lập cấu hình dữ liệu cho Biểu đồ Cột
-1. Nhấp chuột chọn biểu đồ cột vừa thêm.
+1. Nhấp chọn biểu đồ Cột vừa thêm.
 2. Tại bảng điều khiển **Thiết lập** (Setup) ở cạnh phải màn hình:
-   * **Phương diện (Dimension):** Kéo trường `Day` thả vào ô Phương diện.
-   * **Chỉ số (Metric):** Kéo trường `Record Count` (hoặc `Transaction_ID` với hàm `COUNT`) thả vào ô Chỉ số.
+   * **Phương diện (Dimension):** Kéo trường `Player_Name` vào ô Phương diện.
+   * **Chỉ số (Metric):** Kéo trường `Goals` vào ô Chỉ số (hàm `SUM`).
+   * **Sắp xếp (Sort):** Chọn `Goals` theo chiều **Giảm dần (Descending)**, giới hạn hiển thị **10 thanh (Top 10)**.
 
 #### Bước 3: Tạo và áp dụng các bộ lọc chuyên sâu (Filters)
-Để chỉ hiển thị đúng các giao dịch rủi ro trong 15 ngày đầu tiên, ta cần tạo 2 bộ lọc kết hợp:
-1. Tại bảng Thiết lập, cuộn xuống mục **Bộ lọc biểu đồ** (Chart Filter) -> nhấp **Thêm bộ lọc** (Add a filter) -> nhấp **Tạo bộ lọc** (Create a filter).
-2. **Tạo bộ lọc thứ nhất - `Fraud`:**
-   * **Tên bộ lọc:** Nhập `Fraud`.
+1. Tại bảng Thiết lập của biểu đồ cột, cuộn xuống mục **Bộ lọc biểu đồ** -> nhấp **Thêm bộ lọc** -> **Tạo bộ lọc**:
+   * **Tên bộ lọc:** Nhập `Scorers_Only`.
    * **Quy tắc:** Chọn `Bao gồm` (Include).
-   * **Trường:** Chọn `Is_Fraud` (hoặc cờ chỉ báo rủi ro).
-   * **Điều kiện:** Chọn `Bằng (=)`.
-   * **Giá trị:** Nhập `1`.
-   * Nhấp nút **Lưu** (Save).
-3. **Tạo bộ lọc thứ hai - `15 days`:**
-   * Nhấp chuột tiếp tục vào **Thêm bộ lọc** -> chọn **Tạo bộ lọc**.
-   * **Tên bộ lọc:** Nhập `15 days`.
-   * **Quy tắc:** Chọn `Bao gồm` (Include).
-   * **Trường:** Chọn `Day`.
-   * **Điều kiện:** Chọn `Nhỏ hơn hoặc bằng (<=)`.
-   * **Giá trị:** Nhập `15`.
-   * Nhấp nút **Lưu** (Save).
+   * **Trường:** Chọn `Goals`.
+   * **Điều kiện:** Chọn `Lớn hơn (>)`.
+   * **Giá trị:** Nhập `0`.
+   * Nhấp nút **Lưu** (Save) để loại bỏ các cầu thủ không ghi bàn.
 
-#### Bước 4: Cấu hình quy tắc sắp xếp (Sort)
-1. Tại bảng Thiết lập của biểu đồ cột, cuộn đến mục **Sắp xếp** (Sort):
-   * Nhấp vào trường sắp xếp hiện tại và chọn lại thuộc tính `Day`.
-   * Tích chọn tùy chọn **Tăng dần** (Ascending) để các ngày từ ngày 1 đến ngày 15 hiển thị theo đúng thứ tự thời gian tự nhiên.
+#### Bước 4: Cấu hình đồng bộ cho Biểu đồ Tròn và Biểu đồ Đường
+1. Nhấp chọn Biểu đồ Tròn:
+   * **Phương diện:** Chọn `Competition_Name` (Tên giải đấu).
+   * **Chỉ số:** Chọn `Goals` (SUM).
+   * **Bộ lọc:** Áp dụng bộ lọc `Scorers_Only`.
+2. Nhấp chọn Biểu đồ Đường:
+   * **Phương diện:** Chọn `Month` hoặc `Quarter`.
+   * **Chỉ số:** Chọn `Goals` (SUM).
+   * **Sắp xếp:** Chọn thời gian Tăng dần.
+   * **Bộ lọc:** Áp dụng bộ lọc `Scorers_Only`.
 
-#### Bước 5: Cấu hình đồng bộ cho Biểu đồ Tròn và Biểu đồ Đường
-1. Nhấp chuột chọn Biểu đồ Tròn:
-   * Phương diện: Chọn `Day`.
-   * Chỉ số: Chọn `Record Count`.
-   * Bộ lọc: Áp dụng cả 2 bộ lọc đã lưu ở Bước 3 là `Fraud` và `15 days`.
-2. Nhấp chuột chọn Biểu đồ Đường:
-   * Phương diện: Chọn `Day`.
-   * Chỉ số: Chọn `Record Count`.
-   * Sắp xếp: Chọn `Day` theo chiều Tăng dần.
-   * Bộ lọc: Áp dụng cả 2 bộ lọc `Fraud` và `15 days`.
-
-#### Bước 6: Đổi tên nhãn hiển thị và định dạng thẩm mỹ
-1. Tại ô Chỉ số của từng biểu đồ, di chuột vào chữ `Record Count`, nhấp vào biểu tượng cây bút chì chỉnh sửa -> đổi tên hiển thị thành `Giao dịch gian lận`.
-2. Chuyển sang thẻ **Kiểu** (Style):
-   * Tích chọn ô **Hiển thị nhãn dữ liệu** (Show data labels) để hiển thị con số trên đỉnh các cột và điểm mút của đường.
-   * Đặt màu sắc chủ đạo là xanh navy và cam cảnh báo.
+#### Bước 5: Đổi tên hiển thị và định dạng thẩm mỹ
+1. Tại ô Chỉ số, đổi tên hiển thị thành `Tổng Bàn Thắng`.
+2. Tại tab **Kiểu** (Style), bật ô **Hiển thị nhãn dữ liệu** (Show data labels) để hiển thị con số trên đỉnh các cột và điểm mút của đường.
 
 ---
 
-## 4.3.2 Báo biểu 2: Thống kê số lượng giao dịch rủi ro trên tổng số giao dịch theo danh mục đối tượng
+## 4.3.2 Báo biểu 2: Cơ cấu đóng góp bàn thắng theo Vị trí thi đấu và Giải đấu
 
 ### 1. Mục tiêu và nội dung
-* **Nội dung:** So sánh tỷ trọng giữa số lượng giao dịch bình thường và giao dịch rủi ro phát sinh trên từng danh mục ngành hàng/đối tượng (`Merchant_Category`).
+* **Nội dung:** So sánh tỷ trọng giữa số bàn thắng (`Goals`) và kiến tạo (`Assists`) của các tuyến thi đấu (`Main_Position`: Attack, Midfield, Defender) trên từng giải đấu bóng đá châu Âu.
 
 ### 2. Các bước thực hiện chi tiết
 
@@ -78,48 +62,47 @@ Tài liệu này hướng dẫn chi tiết quy trình xây dựng hệ thống b
 1. Tạo một trang báo cáo mới trên Looker Studio (`Trang` -> `Thêm trang mới`).
 2. Nhấp menu **Thêm biểu đồ** và chọn 3 dạng trực quan:
    * **Bảng tổng hợp (Pivot Table):** Hiển thị dạng bảng lưới chéo đa chiều có thanh nhiệt (heatmap).
-   * **Biểu đồ cột chồng 100% (100% Stacked Column Chart):** So sánh tỷ lệ phần trăm phân bổ 0 và 1.
-   * **Biểu đồ kết hợp cột và đường (Combo Chart):** So sánh tổng số lượng với số vụ rủi ro.
+   * **Biểu đồ cột chồng 100% (100% Stacked Column Chart):** So sánh tỷ lệ phần trăm phân bổ bàn thắng theo vị trí.
+   * **Biểu đồ kết hợp cột và đường (Combo Chart):** So sánh tổng bàn thắng với số phút thi đấu.
 
 #### Bước 2: Thiết lập cấu hình cho Bảng tổng hợp (Pivot Table)
 1. Nhấp chọn biểu đồ Bảng tổng hợp.
 2. Tại bảng **Thiết lập**:
-   * **Phương diện hàng (Row Dimension):** Chọn trường `Merchant_Category` (Danh mục ngành hàng/đối tượng).
-   * **Phương diện cột (Column Dimension):** Chọn trường `Is_Fraud` (Trạng thái rủi ro: 0 là bình thường, 1 là gian lận).
-   * **Chỉ số (Metric):** Chọn `Record Count`.
+   * **Phương diện hàng (Row Dimension):** Chọn trường `Competition_Name` (Giải đấu).
+   * **Phương diện cột (Column Dimension):** Chọn trường `Main_Position` (Vị trí thi đấu).
+   * **Chỉ số (Metric):** Chọn `Goals` (SUM).
 3. Tại thẻ **Kiểu**:
-   * Chọn định dạng số liệu có thanh nhiệt (Heatmap) để làm nổi bật các ô có giá trị lớn bằng màu đậm hơn.
+   * Chọn định dạng số liệu có thanh nhiệt (Heatmap) với gam màu xanh navy để làm nổi bật các ô có số lượng bàn thắng vượt trội.
 
 #### Bước 3: Thiết lập cho Biểu đồ Cột chồng 100% và Biểu đồ Kết hợp
 1. Nhấp chọn biểu đồ Cột chồng 100%:
-   * **Phương diện:** Chọn `Merchant_Category`.
-   * **Phương diện phân tích (Breakdown Dimension):** Chọn `Is_Fraud`.
-   * **Chỉ số:** Chọn `Record Count`.
+   * **Phương diện:** Chọn `Competition_Name`.
+   * **Phương diện phân tích (Breakdown Dimension):** Chọn `Main_Position`.
+   * **Chỉ số:** Chọn `Goals`.
 2. Nhấp chọn biểu đồ Kết hợp cột và đường:
-   * **Phương diện:** Chọn `Merchant_Category`.
-   * **Chỉ số cột (Bars):** Chọn `Record Count` (Tổng giao dịch).
-   * **Chỉ số đường (Lines):** Chọn `Is_Fraud` (Tổng số vụ gian lận).
+   * **Phương diện:** Chọn `Main_Position`.
+   * **Chỉ số cột (Bars):** Chọn `Goals`.
+   * **Chỉ số đường (Lines):** Chọn `Assists`.
 3. Đổi tên hiển thị các trường và bật hiển thị nhãn số liệu trong thẻ Kiểu.
 
 ---
 
-## 4.3.3 Báo biểu 3: Phân bố số tiền rủi ro theo Tiểu bang (State) và Thành phố (City) với tính năng xem chi tiết (Drill-down)
+## 4.3.3 Báo biểu 3: Phân bố Sức chứa Sân vận động và Bàn thắng theo Cấp Quốc gia và Câu lạc bộ với tính năng Khoan sâu (Drill-down)
 
 ### 1. Mục tiêu và nội dung
-* **Nội dung:** Theo dõi tổng số tiền thiệt hại phân bổ theo cấp địa lý, hỗ trợ tính năng khoan sâu (Drill-down) từ cấp Vùng/Tiểu bang xuống chi tiết từng Thành phố trực thuộc.
-* **Xử lý trùng lặp:** Do có nhiều thành phố ở các bang khác nhau trùng tên nhau (ví dụ: Arlington, Springfield), cần tạo một trường thuộc tính tính toán mới kết hợp cả Tên Bang và Tên Thành phố để đảm bảo phân nhóm chính xác.
+* **Nội dung:** Theo dõi tổng số bàn thắng và sức chứa sân vận động của các câu lạc bộ, hỗ trợ tính năng khoan sâu (Drill-down) từ cấp Quốc gia giải đấu (`Competition_Country`) xuống chi tiết từng Câu lạc bộ (`Club_Name`).
 
 ### 2. Các bước thực hiện chi tiết
 
-#### Bước 1: Tạo trường đã tính (Calculated Field) để phân biệt Thành phố
-1. Tại khung **Dữ liệu** ở bên phải, nhấp chuột vào nút **Thêm trường** (Add field) -> chọn **Thêm trường đã tính** (Add calculated field).
-2. Trong cửa sổ soạn thảo công thức:
-   * **Tên trường (Field Name):** Nhập `State_City`.
-   * **Công thức (Formula):** Nhập biểu thức nối chuỗi:
+#### Bước 1: Tạo trường đã tính (Calculated Field) phân biệt Câu lạc bộ
+1. Tại khung **Dữ liệu** ở bên phải, nhấp nút **Thêm trường** (Add field) -> chọn **Thêm trường đã tính** (Add calculated field).
+2. Trong cửa sổ công thức:
+   * **Tên trường:** Nhập `Club_Country`.
+   * **Công thức:** Nhập biểu thức nối chuỗi:
      ```sql
-     CONCAT(Transaction_State, " - ", Transaction_City)
+     CONCAT(Competition_Country, " - ", Club_Name)
      ```
-3. Nhấp nút **Lưu** (Save) và nhấp nút **Xong** (Done) để hoàn tất. Trường mới `State_City` xuất hiện trong danh sách dữ liệu.
+3. Nhấp nút **Lưu** (Save) và nhấp nút **Xong** (Done).
 
 #### Bước 2: Thêm các biểu đồ trực quan hóa
 1. Thêm một trang báo cáo mới (`Trang 3`).
@@ -131,20 +114,15 @@ Tài liệu này hướng dẫn chi tiết quy trình xây dựng hệ thống b
 #### Bước 3: Thiết lập cấu hình tính năng Khoan sâu (Drill-down)
 1. Nhấp chuột chọn biểu đồ Cột.
 2. Tại bảng **Thiết lập**:
-   * Tại mục **Phương diện**, nhấp chọn trường `Transaction_State`.
+   * Tại mục **Phương diện**, nhấp chọn trường `Competition_Country`.
    * Bật công tắc **Xem chi tiết** (Drill-down) sang trạng thái **BẬT (ON)**.
-   * Nhấp vào nút **Thêm phương diện** nằm ngay bên dưới và chọn trường tính toán vừa tạo: `State_City`.
-   * Tại mục **Chỉ số (Metric):** Kéo trường `Transaction_Amount` vào và đặt hàm tổng hợp là `SUM`.
-   * Tại mục **Bộ lọc:** Áp dụng bộ lọc `Fraud` (`Is_Fraud = 1`) để chỉ tính tiền của các sự vụ rủi ro.
+   * Nhấp nút **Thêm phương diện** nằm ngay bên dưới và chọn trường tính toán vừa tạo: `Club_Country`.
+   * Tại mục **Chỉ số (Metric):** Kéo trường `Goals` vào và đặt hàm tổng hợp là `SUM`.
+   * Kéo thêm chỉ số thứ hai: `Stadium_Seats` với hàm `AVERAGE`.
 
-#### Bước 4: Tạo bộ lọc giới hạn Top khu vực có thiệt hại cao nhất
-1. Để bảng báo cáo không bị quá tải bởi hàng trăm thành phố nhỏ, tạo thêm bộ lọc giới hạn:
-   * Bộ lọc `State_Most_Fraud_Amount` hoặc cấu hình mục **Sắp xếp** theo `Transaction_Amount` Giảm dần (Descending), giới hạn số hàng hiển thị là `10` hoặc `15`.
-2. Lần lượt áp dụng cấu hình trên cho Biểu đồ Đường và Bảng dữ liệu.
-
-#### Bước 5: Kiểm tra và trải nghiệm tính năng Drill-down
+#### Bước 4: Kiểm tra và trải nghiệm tính năng Drill-down
 1. Nhấp nút **Xem** (View) ở góc trên bên phải màn hình để chuyển sang chế độ người dùng xem báo cáo.
-2. Tại Biểu đồ Cột đang hiển thị mức Bang (`Transaction_State`):
-   * Quan sát thanh công cụ nhỏ ở góc trên bên phải của biểu đồ, nhấp chuột vào biểu tượng mũi tên trỏ xuống (`Khoan sâu` / `Drill down`).
-   * Biểu đồ lập tức chuyển đổi cấp độ hiển thị từ các Bang sang danh sách chi tiết các Thành phố trực thuộc (`State_City`) với số tiền thiệt hại tương ứng.
-   * Nhấp mũi tên trỏ lên (`Khoan lên` / `Drill up`) để quay trở lại cấp độ Bang tổng quát.
+2. Tại Biểu đồ Cột đang hiển thị mức Quốc gia (`England`, `Spain`, `Germany`, `Italy`, `France`):
+   * Nhấp chuột vào biểu tượng mũi tên trỏ xuống (`Khoan sâu` / `Drill down`) ở góc trên biểu đồ.
+   * Biểu đồ lập tức chuyển đổi cấp độ hiển thị từ các Quốc gia sang danh sách chi tiết các Câu lạc bộ trực thuộc (`Manchester City`, `Arsenal`, `Real Madrid`, `Bayern Munich`...) với số bàn thắng và sức chứa sân tương ứng.
+   * Nhấp mũi tên trỏ lên (`Khoan lên` / `Drill up`) để quay trở lại cấp độ Quốc gia tổng quát.

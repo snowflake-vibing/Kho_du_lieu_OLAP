@@ -1,106 +1,114 @@
-# 4.2.2 Báo biểu 2: Phân tích chi tiết biến động theo chuỗi thời gian và khung giờ
+# 4.2.2 Báo biểu 2: Vận hành Trận đấu, Câu lạc bộ và Tương quan Sân vận động (Club Match Operations & Stadium Capacity)
 
-Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để thiết kế **Báo biểu 2 (Dashboard 2)** trên **Power BI Desktop**, tập trung phân tích hành vi và xu hướng dữ liệu theo trục chuỗi thời gian (Time Series) và các khung giờ trong ngày.
+Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để thiết kế hoàn chỉnh **Báo biểu 2 (Dashboard 2)** trên **Power BI Desktop**, tập trung phân tích năng lực thi đấu của các câu lạc bộ bóng đá, ưu thế sân nhà / sân khách và ảnh hưởng của quy mô sức chứa sân vận động.
 
 ---
 
 ## 1. Mục tiêu và nội dung phân tích
-* **Nội dung:** Phân tích chi tiết dữ liệu giao dịch theo từng mốc thời gian diễn ra (Ngày, Giờ) nhằm phát hiện các khung giờ cao điểm có nguy cơ rủi ro bất thường hoặc biến động đột biến.
+* **Nội dung:** Phân tích tương quan giữa hiệu suất thi đấu sân nhà (`Is_Home_Game = 1`) và sân khách (`Is_Home_Game = 0`), tổng số bàn thắng theo các giải đấu hàng đầu châu Âu, đồng thời đánh giá tác động của quy mô sân vận động (`Stadium_Seats`) tới khả năng bùng nổ bàn thắng của các đội bóng.
 * **Đối tượng theo dõi:**
-  * Bảng ma trận thời gian (Matrix) phân rã theo phân cấp `PhanCapTime`.
-  * Biểu đồ vành khăn (Donut Chart) thể hiện tỷ trọng rủi ro theo từng Giờ (`Hour`) trong 24 giờ.
-  * Biểu đồ đường kép (Line Chart) biểu diễn xu hướng song song giữa Tổng số lượng giao dịch và Số lượng rủi ro kèm 2 đường mức trung bình chuẩn (Average Lines).
+  * Khối 4 Thẻ KPI: Tổng số trận đấu (`Total Games`), Bàn thắng sân nhà, Bàn thắng sân khách, Tỷ lệ thắng sân nhà (`Home Win Rate %`).
+  * Biểu đồ cột phân cụm (Clustered Column Chart): So sánh số bàn thắng Sân nhà vs Sân khách của Top các Câu lạc bộ ghi nhiều bàn nhất.
+  * Biểu đồ sơ đồ cây (Treemap Visual): Phân bổ tổng bàn thắng theo các Giải đấu hàng đầu (Premier League, LaLiga, Serie A, Bundesliga, Ligue 1, UEFA Champions League).
+  * Biểu đồ kết hợp cột và đường (Line and Clustered Column Chart): Tương quan giữa Sức chứa sân vận động (`Stadium_Seats`) và Hiệu số bàn thắng.
+  * Bảng ma trận xếp hạng câu lạc bộ (Matrix Visual): Bảng thống kê chi tiết Câu lạc bộ, Giải đấu, Số trận, Bàn thắng, Sức chứa sân.
+  * Hệ thống bộ lọc cắt lát (Slicers): Giải đấu (`Competition_Name`), Mùa giải (`Season`), Loại vòng đấu (`Round`).
 
 ---
 
 ## 2. Hướng dẫn các bước thiết lập chi tiết trên giao diện Power BI
 
-### Bước 1: Tạo trang báo cáo mới và thiết lập tiêu đề
-1. Ở mép dưới cùng của cửa sổ Power BI Desktop, nhấp chuột vào dấu cộng `+` bên cạnh thẻ `Page 1` để tạo một trang báo cáo mới (`Page 2`).
-2. Nhấp đúp chuột vào tên thẻ `Page 2`, nhập tên mới là `Báo biểu 2 - Chuỗi thời gian`.
-3. Nhấp vào khoảng trống Canvas, tại khung **Format report page** bên phải:
-   * **Canvas settings:** Chọn Type là `16:9` (hoặc giữ đồng bộ với Page 1).
-4. Trên thanh Ribbon **Insert**, nhấp nút **Text box**, kéo khung đặt ở đầu trang và nhập nội dung:
-   `BÁO BIỂU 2: PHÂN TÍCH CHI TIẾT DỮ LIỆU GIAO DỊCH VÀ XU HƯỚNG THEO QUÃNG THỜI GIAN VÀ KHUNG GIỜ`
-5. Bôi đen văn bản, đặt cỡ chữ `14 pt`, in đậm (Bold), căn lề giữa và bật viền bo tròn nhẹ tại thẻ Effects.
+### Bước 1: Khởi tạo trang báo cáo mới và tiêu đề
+1. Ở mép dưới cùng của Power BI Desktop, nhấp chuột vào dấu cộng `+` bên cạnh thẻ `Hiệu suất Cầu thủ` để tạo trang mới.
+2. Nhấp đúp chuột đổi tên thẻ thành: `Vận hành CLB & Sân đấu`.
+3. Kiểm tra Canvas settings đảm bảo tỷ lệ `16:9` và nền xám nhạt `#F8F9FA`.
+4. Trên thanh Ribbon **Insert**, nhấp nút **Text box**, kéo khung đặt ở đỉnh trang và nhập nội dung:
+   `BÁO BIỂU 2: PHÂN TÍCH VẬN HÀNH TRẬN ĐẤU, HIỆU SUẤT CLB VÀ TƯƠNG QUAN SÂN VẬN ĐỘNG`
+5. Định dạng văn bản: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm, Căn giữa, nền xanh navy đậm.
 
 ---
 
-### Bước 2: Tạo biểu đồ Ma trận chi tiết theo thời gian (Matrix Visual)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Matrix**.
-2. Kéo khung đặt ở góc phía trên bên trái trang vẽ, chỉnh kích thước chiếm 50% chiều rộng màn hình.
-3. Kéo thả các trường dữ liệu từ khung **Data** vào các ô cấu hình của Matrix:
-   * **Vùng Rows (Dòng):** Tìm chiều thời gian `DIM Time`, kéo phân cấp `PhanCapTime` (gồm các cấp độ `Year` -> `Month` -> `Day` -> `Hour`) thả vào ô **Rows**.
-   * **Vùng Values (Giá trị):** Lần lượt kéo 4 thước đo từ thư mục Measures thả vào ô **Values**:
-     1. `Total Transaction` (Tổng số giao dịch)
-     2. `Total Transaction Fraud` (Tổng số giao dịch rủi ro/gian lận)
-     3. `Total Transaction Amount` (Tổng doanh số giao dịch)
-     4. `Total Fraud Amount` (Tổng giá trị thiệt hại rủi ro)
-4. **Đổi tên hiển thị cho các cột:**
-   * Nhấp chuột phải vào từng trường trong ô Values -> chọn **Rename for this visual**:
-     * Đổi `Total Transaction` thành `Tổng số GD`.
-     * Đổi `Total Transaction Fraud` thành `Số GD Rủi ro`.
-     * Đổi `Total Transaction Amount` thành `Tổng giá trị`.
-     * Đổi `Total Fraud Amount` thành `Giá trị Rủi ro`.
-5. **Định dạng bảng:**
-   * Vào tab **Format visual** -> **Style presets**: Chọn `Alternating rows`.
-   * Mục **Row headers**: Bật **Stepped layout** (thụt lề phân cấp) sang **On** và thiết lập thụt dòng 12px để hiển thị cây thời gian rõ ràng khi nhấn nút drill-down mở rộng các cấp.
+### Bước 2: Thiết lập 4 Thẻ KPI vận hành trận đấu (Card Visuals)
+1. **Card 1: Tổng số Trận đấu (Total Matches)**:
+   * Thêm visual **Card**, kéo trường `DIM Game [Game_ID]` (chọn hàm `Distinct Count`) vào ô **Fields**.
+   * Đổi tên hiển thị thành `Tổng Trận Đấu`. Đặt màu số liệu xanh lam.
+2. **Card 2: Bàn thắng Sân nhà (Home Goals)**:
+   * Thêm visual **Card**, lọc `Is_Home_Game = 1`, kéo thước đo `Goals` vào ô **Fields**.
+   * Đổi tên thành `Bàn Thắng Sân Nhà`. Đặt màu xanh lục.
+3. **Card 3: Bàn thắng Sân khách (Away Goals)**:
+   * Thêm visual **Card**, lọc `Is_Home_Game = 0`, kéo thước đo `Goals` vào ô **Fields**.
+   * Đổi tên thành `Bàn Thắng Sân Khách`. Đặt màu cam hổ phách.
+4. **Card 4: Tỷ lệ Ưu thế Sân nhà (Home Advantage %)**:
+   * Thêm visual **Card**, kéo tỷ lệ phần trăm bàn thắng sân nhà trên tổng bàn thắng vào ô **Fields**.
+   * Đổi tên thành `Tỷ lệ Bàn Sân Nhà (%)`. Đặt định dạng phần trăm `0.0%`.
 
 ---
 
-### Bước 3: Tạo Biểu đồ vành khăn (Donut Chart - Phân bổ theo Giờ)
-Biểu đồ giúp nhận diện trực quan tỷ trọng rủi ro tập trung vào các khung giờ nào trong ngày (ví dụ các khung giờ rạng sáng 0h-4h hoặc giờ tan tầm 17h-19h).
+### Bước 3: Tạo Biểu đồ cột phân cụm Bàn thắng Sân nhà vs Sân khách (Clustered Column Chart)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered column chart**.
+2. Kéo khung đặt ở góc phía trên bên trái trang Canvas.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng X-axis:** Kéo thuộc tính `DIM Club [Club Name]` vào ô **X-axis**.
+   * **Vùng Y-axis:** Lần lượt kéo 2 thước đo:
+     1. `Bàn Thắng Sân Nhà` (Home Goals)
+     2. `Bàn Thắng Sân Khách` (Away Goals)
+4. **Thiết lập bộ lọc Top 10 Câu lạc bộ:**
+   * Tại khung **Filters on this visual**, mở mục `Club Name`, chọn **Top N**, nhập `10`, kéo thước đo `Goals` vào ô **By value** và nhấp **Apply filter**.
+5. **Định dạng visual:**
+   * Tab **Format visual** -> **Title**: Nhập: `So sánh Bàn thắng Sân nhà vs Sân khách của Top 10 CLB Châu Âu`.
+   * **Columns**: Đặt màu cột Sân nhà là xanh navy (`#1B365D`), màu cột Sân khách là xanh da trời nhạt (`#4A90E2`).
+   * **Data labels**: Bật **On** hiển thị số bàn trên mỗi đỉnh cột.
 
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Donut chart** (biểu đồ hình tròn rỗng tâm).
-2. Kéo khung đặt ở góc phía trên bên phải trang báo cáo, bên cạnh bảng Matrix.
-3. Kéo thả các trường dữ liệu vào các ô cấu hình:
-   * **Vùng Legend (Chú giải):** Tìm thuộc tính `Hour` (Giờ trong ngày từ 0 đến 23) trong chiều thời gian, kéo thả vào ô **Legend**.
-   * **Vùng Values (Giá trị):** Kéo thước đo `Total Transaction Fraud` (hoặc `Total Fraud`) thả vào ô **Values**.
+---
+
+### Bước 4: Tạo Biểu đồ Treemap phân bổ Bàn thắng theo Giải đấu (Treemap Visual)
+1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Treemap** (biểu đồ các khối hình chữ nhật phân cấp).
+2. Kéo khung đặt ở góc phía trên bên phải trang báo cáo.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng Category:** Kéo thuộc tính `DIM Competition [Competition Name]` vào ô **Category**.
+   * **Vùng Values:** Kéo thước đo `Goals` vào ô **Values**.
+4. **Định dạng visual:**
+   * Tab **Format visual** -> **Title**: Nhập: `Quy mô Bàn thắng phân bổ theo Giải đấu Châu Âu`.
+   * **Data labels**: Bật **On**, hiển thị tên giải đấu và số lượng bàn thắng tương ứng.
+
+---
+
+### Bước 5: Tạo Biểu đồ kết hợp Tương quan Sức chứa Sân và Bàn thắng (Line and Clustered Column Chart)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Line and clustered column chart**.
+2. Kéo khung đặt ở góc phía dưới bên trái Canvas.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng X-axis:** Kéo trường `DIM Club [Club Name]` vào ô **X-axis**.
+   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` vào ô này.
+   * **Vùng Line Y-axis (Đường):** Kéo thuộc tính `DIM Club [Stadium Seats]` (chọn hàm `Average` hoặc `Max`) vào ô này.
 4. **Đổi tên và định dạng visual:**
-   * Nhấp chuột phải vào trường `Total Transaction Fraud` tại ô Values -> chọn **Rename for this visual** -> đổi thành `Số vụ rủi ro`.
-   * Vào tab **Format visual**:
-   * Mục **Title**: Bật **On**, nhập nội dung: `Tỷ lệ giao dịch rủi ro theo Khung giờ trong ngày`. In đậm, căn giữa.
-   * Mục **Detail labels**: Chọn **Label contents** là `All detail labels` (hiển thị cả Giờ, số lượng vụ việc và tỷ lệ %).
-   * Mục **Legend**: Đặt **Position** là `Right center` để danh sách các giờ hiển thị gọn gàng bên phải.
+   * Đổi tên cột thành `Tổng số Bàn thắng`.
+   * Đổi tên đường thành `Sức chứa Sân vận động (Chỗ ngồi)`.
+   * Tab **Format visual** -> **Title**: Nhập: `Tương quan giữa Tổng số Bàn thắng và Sức chứa Sân vận động của CLB`.
+   * **Y-axis**: Bật cả 2 trục Y để thang đo Chỗ ngồi (hàng vạn người) và thang đo Bàn thắng (hàng trăm bàn) không bị xung đột.
 
 ---
 
-### Bước 4: Tạo Biểu đồ đường kép (Line Chart) kèm 2 Đường trung bình chuẩn
-Biểu đồ đường hiển thị biến động liên tục theo ngày và cho phép so sánh đường thực tế với mức trung bình chuẩn (Average Line).
-
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Line chart** (biểu đồ đường).
-2. Kéo khung đặt ở nửa dưới trang Canvas, kéo dãn chiều rộng phủ toàn bộ trang báo cáo.
-3. Kéo thả các trường dữ liệu vào các ô cấu hình:
-   * **Vùng X-axis (Trục hoành):** Kéo phân cấp `PhanCapTime` (hoặc trường `Day` / `Date`) thả vào ô **X-axis**.
-   * **Vùng Y-axis (Trục tung):** Lần lượt kéo 2 thước đo thả vào ô **Y-axis**:
-     1. `Total Transaction`
-     2. `Total Fraud`
-4. **Đổi tên hiển thị:**
-   * Đổi `Total Transaction` thành `Tổng giao dịch thực tế`.
-   * Đổi `Total Fraud` thành `Giao dịch rủi ro thực tế`.
-5. **Thiết lập 2 Đường trung bình chuẩn (Average Lines) trong Analytics Pane:**
-   * Chọn visual Line Chart vừa tạo.
-   * Tại khung bên phải, nhấp vào tab **Analytics** (biểu tượng chiếc kính lúp phóng to có đường đồ thị chéo).
-   * Tìm và nhấp mở rộng mục **Average line**:
-     * Nhấp chuột vào nút **+ Add line** lần thứ nhất:
-       * Tại ô **Series**: Chọn thước đo `Tổng giao dịch thực tế`.
-       * Tại ô **Color**: Chọn màu xanh dương nhạt.
-       * Tại ô **Style**: Chọn nét đứt đoạn (`Dashed`).
-       * Chuyển công tắc **Data label** sang **On** để hiển thị giá trị trung bình trên đường.
-     * Nhấp chuột vào nút **+ Add line** lần thứ hai:
-       * Tại ô **Series**: Chọn thước đo `Giao dịch rủi ro thực tế`.
-       * Tại ô **Color**: Chọn màu đỏ nổi bật.
-       * Tại ô **Style**: Chọn nét chấm gạch (`Dotted`).
-       * Chuyển công tắc **Data label** sang **On**.
-6. **Định dạng hiển thị Line Chart:**
-   * Chuyển lại tab **Format visual**:
-   * Mục **Title**: Bật **On**, nhập: `Xu hướng biến động giao dịch theo ngày và so sánh với mức trung bình`.
-   * Mục **Lines**: Đặt độ dày đường (`Stroke width`) là `3 px`.
-   * Mục **Markers** (Điểm đánh dấu): Bật **On**, chọn hình tròn nhỏ tại các mốc ngày.
+### Bước 6: Tạo Bảng Ma trận Xếp hạng Câu lạc bộ chi tiết (Matrix Visual)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
+2. Kéo khung đặt ở góc phía dưới bên phải màn hình.
+3. Kéo thả các trường dữ liệu:
+   * **Vùng Rows:** Kéo `DIM Competition [Competition Name]` ở cấp 1 và `DIM Club [Club Name]` ở cấp 2.
+   * **Vùng Values:** Kéo các trường: `Stadium Name`, `Stadium Seats`, `Total Games`, `Goals`, `QoQ Goals Growth`.
+4. **Định dạng bảng:**
+   * Style presets chọn `Alternating rows`.
+   * Row headers bật `Stepped layout` thụt lề 12px để mở rộng từng giải đấu ra danh sách CLB trực thuộc.
 
 ---
 
-### Bước 5: Căn chỉnh vị trí và hoàn thiện Báo biểu 2
-1. Sử dụng tính năng **Align** trên dải Ribbon Format để căn chỉnh mép trên của Matrix và Donut Chart thẳng hàng tuyệt đối.
-2. Kiểm tra tính năng Drill-down trên trục X của Line Chart: Nhấp vào biểu tượng hai mũi tên trỏ xuống `Click to turn on Drill down` để trải nghiệm mở rộng từ Năm -> Tháng -> Ngày -> Giờ.
-3. Lưu lại tiến độ làm việc bằng tổ hợp phím `Ctrl + S`.
+### Bước 7: Thêm các bộ lọc tương tác (Slicers)
+1. **Slicer 1 (Giải đấu):** `DIM Competition [Competition Name]`, kiểu Dropdown.
+2. **Slicer 2 (Mùa giải):** `DIM Time [Season]`, kiểu Dropdown.
+3. **Slicer 3 (Loại giải đấu):** `DIM Competition [Competition Type]` (Domestic League, Domestic Cup, International Cup), kiểu Tile.
+
+---
+
+### Bước 8: Kết quả và Nhận xét phân tích
+* **Kết quả trực quan:** Dashboard cho phép người xem khoan sâu vào từng giải đấu (ví dụ khi nhấp chọn `Bundesliga` hoặc `Champions League`), toàn bộ ma trận so sánh sân nhà/sân khách và tương quan sân bãi của các CLB lập tức cập nhật chuẩn xác.
+* **Nhận xét chuyên môn:**
+  * **Yếu tố sân nhà:** Các đội bóng hàng đầu châu Âu có tỷ lệ ghi bàn trên sân nhà chiếm từ **56% đến 62%** tổng số bàn thắng, cho thấy sự cổ vũ của khán giả nhà và sự quen thuộc mặt sân tạo ra lợi thế tâm lý và chiến thuật rất lớn.
+  * **Tương quan sức chứa sân vận động:** Các câu lạc bộ sở hữu sân vận động có sức chứa khổng lồ trên 60.000 chỗ (như Santiago Bernabéu của Real Madrid, Allianz Arena của Bayern Munich, Etihad Stadium của Man City) đều nằm trong nhóm có hiệu số bàn thắng vượt trội nhất toàn cầu.
