@@ -37,10 +37,20 @@ TOPCOUNT(
 **Bước 3:** Chuyển sang tab **Browser** trên thanh tab của trình thiết kế Cube Designer. Quan sát thanh công cụ phía trên tab Browser, nhấp chuột vào nút Reconnect để nhận cấu trúc mới, sau đó nhấp chọn biểu tượng **Design Mode** có hình lưới màu xanh và cây thước kẻ màu vàng để chuyển sang giao diện thiết kế đồ họa trực quan.
 
 **Bước 4:** Thiết lập 2 dòng lọc trong vùng bộ lọc Filter Pane ở phía trên để cố định năm 2023 và giới hạn chính xác Top 10 CLB:
-* ● **Dòng 1:** Cột Dimension chọn `DIM Time`, cột Hierarchy chọn `Year`, cột Operator chọn `Equal` ($=$), cột Filter Expression tích chọn năm `2023`.
-* ● **Dòng 2:** Cột Dimension chọn `DIM Club`, cột Hierarchy chọn `Club Name`, cột Operator chọn **`Custom`** (hoặc **`In`**):
-  * Nếu chọn `Custom`: Cột Filter Expression nhập `[Top 10 Clubs 2023]`.
-  * Nếu chọn `In`: Tích chọn đúng 10 CLB hàng đầu: *Manchester City, PSV Eindhoven, Bayer 04 Leverkusen, Feyenoord Rotterdam, Bayern Munich, Real Madrid, Arsenal FC, Atlético de Madrid, Liverpool FC, Borussia Dortmund*.
+
+* **Thiết lập bộ lọc năm tại dòng thứ nhất trong vùng bộ lọc Filter Pane ở phía trên:**
+  * Nhấp chuột vào ô tại cột Dimension, mở danh sách thả xuống và nhấp chọn chiều DIM Time.
+  * Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Year.
+  * Tại cột Operator, giữ nguyên giá trị là Equal.
+  * Nhấp chuột vào ô tại cột Filter Expression, tích chọn năm 2023 rồi nhấp nút OK để xác nhận.
+
+* **Thiết lập bộ lọc Top 10 CLB tại dòng thứ hai trong vùng bộ lọc Filter Pane:**
+  * Nhấp chuột vào ô tại cột Dimension ở dòng thứ hai, mở danh sách thả xuống và nhấp chọn chiều DIM Club.
+  * Nhấp chuột sang ô tại cột Hierarchy cùng dòng, mở danh sách thả xuống và nhấp chọn Hierarchy Club Name.
+  * Tại cột Operator, mở danh sách thả xuống và nhấp chọn toán tử Custom (hoặc chọn toán tử In).
+  * Tại cột Filter Expression:
+    * *Nếu chọn toán tử Custom:* Nhấp chuột vào ô tại cột Filter Expression và nhập tên Named Set: `[Top 10 Clubs 2023]`.
+    * *Nếu chọn toán tử In:* Nhấp chuột vào ô tại cột Filter Expression, mở danh sách các CLB và tích chọn đúng 10 câu lạc bộ hàng đầu: *Manchester City, PSV Eindhoven, Bayer 04 Leverkusen, Feyenoord Rotterdam, Bayern Munich, Real Madrid, Arsenal FC, Atlético de Madrid, Liverpool FC, Borussia Dortmund*, rồi nhấp nút OK để xác nhận.
 
 **Bước 5:** Kéo thả các trường dữ liệu vào lưới Data Grid:
 * ● Trong khung Metadata ở bên trái màn hình, mở rộng thư mục chiều DIM Club, nhấp giữ chuột trái vào thuộc tính Club Name, kéo con trỏ chuột sang khu vực lưới dữ liệu Data Grid bên phải và thả chuột vào vùng Rows *(hoặc mở thư mục Sets, kéo trực tiếp `Top 10 Clubs 2023` thả vào vùng Rows)*.
