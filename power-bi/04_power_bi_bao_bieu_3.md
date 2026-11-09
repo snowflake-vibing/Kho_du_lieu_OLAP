@@ -21,36 +21,70 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 ### Bước 1: Khởi tạo trang báo cáo và banner tiêu đề
 1. Ở mép dưới Power BI Desktop, nhấp chuột vào dấu cộng `+` để thêm trang thứ ba (`Page 3`).
 2. Đổi tên thẻ thành: `Kỷ luật & Tải trọng Thi đấu`.
-3. Kiểm tra Canvas settings: Tỷ lệ chuẩn `16:9`.
-4. Trên thanh Ribbon **Insert**, nhấp chọn **Text box**, kéo đặt ở đỉnh trang Canvas và nhập tiêu đề:
+3. Kiểm tra Canvas settings: Đảm bảo tỷ lệ chuẩn **16:9** (`Width: 1280 px`, `Height: 720 px`).
+   * **Canvas background**: Giữ nguyên mặc định nguyên bản của Power BI, tuyệt đối không chỉnh màu sắc hay độ trong suốt.
+4. Trên thanh Ribbon **Insert**, nhấp chọn **Text box**, nhập tiêu đề:
    `BÁO BIỂU 3: PHÂN TÍCH KỶ LUẬT THẺ PHẠT, CƯỜNG ĐỘ THI ĐẤU VÀ TẢI TRỌNG CẦU THỦ`
 5. Định dạng văn bản: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+6. Thiết lập vị trí và kích thước tại **Properties** (Tab **General** -> **Properties**):
+   * **Size:** `Width = 1250 px`, `Height = 45 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 10 px`
+
+> **MẸO NHẬP TỌA ĐỘ VÀ KÍCH THƯỚC CHUẨN XÁC TỪNG PIXEL:**
+> Sau khi tạo mỗi visual, nhấp chọn visual -> Tại khung **Visualizations**, chọn tab **General** -> Mở rộng mục **Properties**:
+> * **Size:** Nhập **Width** (Chiều rộng) và **Height** (Chiều cao).
+> * **Position:** Nhập **Horizontal** (Tọa độ ngang X) và **Vertical** (Tọa độ dọc Y).
 
 ---
 
 ### Bước 2: Thiết lập 4 Thẻ KPI Kỷ luật và Thể lực (Card Visuals)
+Tạo 4 thẻ Card đặt thành một hàng ngang ngay phía dưới Banner tiêu đề (Y = 65 px, Chiều cao = 85 px):
+
 1. **Card 1: Tổng số Thẻ Vàng (Total Yellow Cards)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Yellow Cards]` vào ô **Fields**.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
    * **Category label**: Bật **On**, Font `Segoe UI`, Cỡ chữ `10 pt`, đổi tên hiển thị thành `Tổng Thẻ Vàng`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 15 px`, `Vertical = 65 px`).
 2. **Card 2: Tổng số Thẻ Đỏ (Total Red Cards)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Red Cards]` vào ô **Fields**.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
    * **Category label**: Bật **On**, Font `Segoe UI`, Cỡ chữ `10 pt`, đổi tên hiển thị thành `Tổng Thẻ Đỏ`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 333 px`, `Vertical = 65 px`).
 3. **Card 3: Tỷ lệ Thẻ phạt / Trận (Cards Per Match)**:
    * Thêm visual **Card**, kéo thước đo tính trung bình thẻ mỗi trận vào ô **Fields**.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), định dạng 2 chữ số thập phân (`#,##0.00`).
    * **Category label**: Bật **On**, Font `Segoe UI`, Cỡ chữ `10 pt`, đổi tên hiển thị thành `Trung bình Thẻ / Trận`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 651 px`, `Vertical = 65 px`).
 4. **Card 4: Tổng Thời lượng Thi đấu (Total Minutes)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Minutes Played]` vào ô **Fields**.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), hiển thị rút gọn đơn vị triệu phút (`M mins`).
    * **Category label**: Bật **On**, Font `Segoe UI`, Cỡ chữ `10 pt`, đổi tên hiển thị thành `Tổng Số Phút Thi Đấu`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 970 px`, `Vertical = 65 px`).
 
 ---
 
-### Bước 3: Tạo Biểu đồ thanh ngang Top 10 CLB nhận nhiều thẻ phạt nhất (Clustered Bar Chart)
+### Bước 3: Thêm 3 Bộ lọc tương tác đa chiều (Slicers)
+Tạo 3 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 160 px, Chiều cao = 50 px):
+1. **Slicer 1 (Mùa giải):**
+   * Thêm visual **Slicer**, kéo `DIM Time [Season]` vào ô **Field**, chọn kiểu **Dropdown**.
+   * Định dạng: Header Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 15 px`, `Vertical = 160 px`).
+2. **Slicer 2 (Giải đấu):**
+   * Thêm visual **Slicer**, kéo `DIM Competition [Competition Name]` vào ô **Field**, chọn kiểu **Dropdown**.
+   * Định dạng: Header Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 420 px`, `Height = 50 px`), Position (`Horizontal = 445 px`, `Vertical = 160 px`).
+3. **Slicer 3 (Vị trí thi đấu):**
+   * Thêm visual **Slicer**, kéo `DIM Player [Main Position]` vào ô **Field**, chọn kiểu **Tile**.
+   * Định dạng: Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 875 px`, `Vertical = 160 px`).
+
+---
+
+### Bước 4: Tạo Biểu đồ thanh ngang Top 10 CLB nhận nhiều thẻ phạt nhất (Clustered Bar Chart)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Clustered bar chart**.
-2. Kéo khung đặt ở góc phía trên bên trái trang Canvas.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 475 px`, `Height = 485 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Y-axis:** Kéo thuộc tính `DIM Club [Club Name]` vào ô **Y-axis**.
    * **Vùng X-axis:** Lần lượt kéo 2 thước đo:
@@ -66,9 +100,11 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 
 ---
 
-### Bước 4: Tạo Biểu đồ vành khăn Cơ cấu thẻ phạt theo Vị trí thi đấu (Donut Chart)
+### Bước 5: Tạo Biểu đồ vành khăn Cơ cấu thẻ phạt theo Vị trí thi đấu (Donut Chart)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Donut chart**.
-2. Kéo khung đặt ở góc phía trên bên phải màn hình.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 330 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 505 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Legend:** Kéo thuộc tính `DIM Player [Main Position]` (Defender, Midfield, Attack, Goalkeeper) vào ô **Legend**.
    * **Vùng Values:** Kéo thước đo `Yellow Cards` vào ô **Values**.
@@ -79,9 +115,11 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 
 ---
 
-### Bước 5: Tạo Biểu đồ kết hợp Tương quan Số phút thi đấu và Thẻ phạt theo Độ tuổi (Line and Clustered Column Chart)
+### Bước 6: Tạo Biểu đồ kết hợp Tương quan Số phút thi đấu và Thẻ phạt theo Độ tuổi (Line and Clustered Column Chart)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Line and clustered column chart**.
-2. Kéo khung đặt ở nửa dưới trang Canvas, kéo dãn chiều rộng chiếm 60% màn hình.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 415 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 850 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng X-axis:** Kéo thuộc tính `DIM Player [Age]` (Độ tuổi từ 16 đến 40) vào ô **X-axis**.
    * **Vùng Column Y-axis (Cột):** Kéo thước đo `Minutes Played` vào ô này (đổi tên hiển thị thành `Tổng số Phút thi đấu`).
@@ -94,9 +132,11 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 
 ---
 
-### Bước 6: Tạo Bảng Ma trận Kỷ luật chi tiết (Matrix Visual)
+### Bước 7: Tạo Bảng Ma trận Kỷ luật chi tiết (Matrix Visual)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
-2. Kéo khung đặt ở góc phía dưới bên phải màn hình.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 760 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 505 px`, `Vertical = 470 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Rows:** Kéo lần lượt `DIM Player [Player Name]` và `DIM Club [Club Name]` vào ô **Rows**.
    * **Vùng Values:** Kéo các thước đo: `Minutes Played`, `Is Starter`, `Yellow Cards`, `Red Cards`.
@@ -105,13 +145,6 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
    * Tab **Format visual** -> **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
    * **Row headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
    * **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
-
----
-
-### Bước 7: Thêm các bộ lọc tương tác đa chiều (Slicers)
-1. **Slicer 1 (Mùa giải):** `DIM Time [Season]`, kiểu Dropdown. Header: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
-2. **Slicer 2 (Giải đấu):** `DIM Competition [Competition Name]`, kiểu Dropdown. Header: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
-3. **Slicer 3 (Vị trí thi đấu):** `DIM Player [Main Position]`, kiểu Tile. Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
 
 ---
 

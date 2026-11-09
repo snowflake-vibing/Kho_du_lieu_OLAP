@@ -41,111 +41,133 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 1. Tại thanh tab trang ở mép dưới cùng của màn hình, nhấp đúp chuột vào nhãn `Page 1` và đổi tên thành: `Hiệu suất Cầu thủ`.
 2. Nhấp chuột vào một khoảng trống bất kỳ trên trang vẽ Canvas để đảm bảo không visual nào đang được chọn.
 3. Tại khung công cụ bên phải, nhấp chọn biểu tượng cây cọ sơn **Format report page** (Định dạng trang báo cáo):
-   * Mở rộng mục **Canvas settings** -> Tại ô **Type**, nhấp mở danh sách thả xuống và chọn tỷ lệ chuẩn **16:9** (hoặc chọn **Custom** với chiều rộng `Width: 1280 px`, chiều cao `Height: 720 px`).
+   * Mở rộng mục **Canvas settings** -> Tại ô **Type**, chọn tỷ lệ chuẩn **16:9** (hoặc chọn **Custom** với `Width: 1280 px`, `Height: 720 px`).
+   * **Canvas background**: Giữ nguyên mặc định nguyên bản của Power BI, tuyệt đối không chỉnh màu hay độ trong suốt.
+
+> **MẸO NHẬP TỌA ĐỘ VÀ KÍCH THƯỚC CHUẨN XÁC TỪNG PIXEL:**
+> Để visual nằm đúng vị trí và không bao giờ bị thiếu chỗ hay đè lên nhau, sau khi tạo mỗi visual:
+> Nhấp chọn visual -> Tại khung **Visualizations**, chọn tab **General** -> Mở rộng mục **Properties**:
+> * **Size:** Nhập **Width** (Chiều rộng) và **Height** (Chiều cao).
+> * **Position:** Nhập **Horizontal** (Tọa độ ngang X) và **Vertical** (Tọa độ dọc Y).
 
 ---
 
 ### Bước 3: Tạo Banner Tiêu đề báo cáo (Title Header)
 1. Trên thanh Ribbon **Insert**, nhấp chuột vào biểu tượng **Text box**.
-2. Kéo khung Text box đặt ở sát mép trên cùng của trang báo cáo (vị trí `X: 10`, `Y: 10`, `Width: 1260`, `Height: 50`).
-3. Nhập nội dung tiêu đề:
+2. Nhập nội dung tiêu đề:
    `BÁO BIỂU 1: PHÂN TÍCH HIỆU SUẤT GHI BÀN & ĐÓNG GÓP KIẾN TẠO CỦA CẦU THỦ CHÂU ÂU`
-4. Bôi đen toàn bộ đoạn văn bản vừa nhập:
+3. Bôi đen toàn bộ đoạn văn bản vừa nhập:
    * Thiết lập Font: `Segoe UI`, Cỡ chữ: `15 pt`, In đậm (**Bold**), Căn lề giữa (**Center**).
+4. Thiết lập vị trí và kích thước tại **Properties**:
+   * **Size:** `Width = 1250 px`, `Height = 45 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 10 px`
 
 ---
 
 ### Bước 4: Tạo khối 4 Thẻ KPI chỉ số tổng quan (Card Visuals)
-Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề để người xem nắm bắt ngay bức tranh toàn cảnh:
+Tạo 4 thẻ Card đặt thẳng hàng ngang ngay phía dưới Banner tiêu đề (Y = 65 px, Chiều cao = 85 px):
 
 1. **Card 1: Tổng số Bàn thắng (Total Goals)**:
-   * Tại khung **Visualizations**, nhấp chọn biểu tượng **Card** (hoặc *New Card*).
+   * Tại khung **Visualizations**, nhấp chọn biểu tượng **Card**.
    * Kéo thước đo `[Measures].[Goals]` từ thư mục Measures thả vào ô **Fields**.
-   * Đổi tên hiển thị: Nhấp đúp vào trường vừa thả, đổi tên thành `Tổng Bàn Thắng`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Đổi tên hiển thị thành `Tổng Bàn Thắng`.
+   * Định dạng: Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 15 px`, `Vertical = 65 px`).
 2. **Card 2: Tổng số Kiến tạo (Total Assists)**:
-   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 1.
-   * Kéo thước đo `[Measures].[Assists]` thả vào ô **Fields**, đổi tên thành `Tổng Kiến Tạo`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Assists]` thả vào ô **Fields**, đổi tên thành `Tổng Kiến Tạo`.
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 333 px`, `Vertical = 65 px`).
 3. **Card 3: Tổng Đóng góp Bàn thắng (Goal Contributions)**:
-   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 2.
-   * Kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Goals] + [Assists]`) thả vào ô **Fields**, đổi tên thành `Tổng Đóng Góp (G+A)`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Goals] + [Assists]`) thả vào ô **Fields**, đổi tên thành `Tổng Đóng Góp (G+A)`.
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 651 px`, `Vertical = 65 px`).
 4. **Card 4: Hiệu suất Phút / Bàn thắng (Mins Per Goal)**:
-   * Nhấp chọn biểu tượng **Card**, đặt cạnh Card 3.
-   * Kéo thước đo `[Measures].[Minutes Played]` kết hợp tính toán số phút cần thiết để ghi 1 bàn thắng thả vào ô **Fields**, đổi tên thành `Số phút / Bàn thắng`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), hiển thị 1 chữ số thập phân (`#,##0.0`).
+   * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Minutes Played]` thả vào ô **Fields**, đổi tên thành `Số phút / Bàn thắng`.
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), hiển thị 1 chữ số thập phân (`#,##0.0`). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 970 px`, `Vertical = 65 px`).
 
 ---
 
-### Bước 5: Tạo Biểu đồ thanh ngang Top 10 Chân sút ghi bàn nhiều nhất (Clustered Bar Chart)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered bar chart** (biểu đồ thanh ngang nằm ở góc trái).
-2. Kéo khung đặt ở góc phía dưới bên trái màn hình.
+### Bước 5: Thêm 3 Bộ lọc tương tác đa chiều (Slicers)
+Tạo 3 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 160 px, Chiều cao = 50 px) giúp người dùng lọc dữ liệu nhanh:
+1. **Slicer 1 (Mùa giải):**
+   * Thêm visual **Slicer**, kéo trường `DIM Time [Season]` vào ô **Field**, chọn kiểu hiển thị **Dropdown**.
+   * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 15 px`, `Vertical = 160 px`).
+2. **Slicer 2 (Giải đấu):**
+   * Thêm visual **Slicer**, kéo trường `DIM Competition [Competition Name]` vào ô **Field**, chọn kiểu **Dropdown**.
+   * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 420 px`, `Height = 50 px`), Position (`Horizontal = 445 px`, `Vertical = 160 px`).
+3. **Slicer 3 (Vị trí thi đấu):**
+   * Thêm visual **Slicer**, kéo trường `DIM Player [Main Position]` vào ô **Field**, chọn kiểu **Tile** (nút bấm nhanh).
+   * Định dạng: Values: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 875 px`, `Vertical = 160 px`).
+
+---
+
+### Bước 6: Tạo Biểu đồ thanh ngang Top 10 Chân sút ghi bàn nhiều nhất (Clustered Bar Chart)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Clustered bar chart**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 475 px`, `Height = 485 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 220 px`
 3. Kéo thả các trường từ khung **Data**:
    * **Vùng Y-axis (Trục tung):** Tìm chiều `DIM Player`, kéo thuộc tính `Player Name` thả vào ô **Y-axis**.
    * **Vùng X-axis (Trục hoành):** Kéo thước đo `Goals` thả vào ô **X-axis**.
    * **Vùng Tooltips:** Kéo thêm các thước đo `Assists`, `Goal Contributions` (hoặc `Minutes Played`) để khi di chuột vào mỗi thanh của cầu thủ sẽ hiển thị bổ sung số pha kiến tạo và tổng đóng góp bàn thắng. *(Lưu ý: Chế độ Connect Live với SSAS Cube chỉ nhận các Thước đo - Measures vào ô Tooltips phẳng, không thả trực tiếp các thuộc tính văn bản Dimension như Club Name hay Main Position).*
 4. **Thiết lập bộ lọc Top 10 Cầu thủ:**
-   * Tại khung **Filters** (bên cạnh khung Visualizations), tìm mục **Filters on this visual** -> nhấp mở rộng mục `Player Name`.
-   * Tại mục **Filter type**, mở danh sách thả xuống và chọn **Top N**.
-   * Tại ô **Show items**, nhập số `10`.
-   * Tại ô **By value**, kéo thước đo `Goals` thả vào ô này.
-   * Nhấp nút **Apply filter**.
+   * Tại khung **Filters**, mục **Filters on this visual** -> nhấp mở rộng `Player Name`.
+   * Chọn **Top N**, tại ô **Show items** nhập `10`, tại ô **By value** kéo thước đo `Goals` vào và nhấp **Apply filter**.
 5. **Định dạng visual:**
-   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Top 10 Cầu thủ ghi nhiều bàn thắng nhất Châu Âu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * Mục **Data labels**: Bật **On** để hiển thị số bàn thắng cụ thể ở cuối mỗi thanh ngang, cỡ chữ `9 pt`.
-   * Mục **Values** trên trục Y và trục X: Font `Segoe UI`, cỡ chữ `10 pt`.
+   * Tab **Format visual** -> **Title**: Nhập `Top 10 Cầu thủ ghi nhiều bàn thắng nhất Châu Âu`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On**, cỡ chữ `9 pt`.
+   * **Values** trên trục Y và trục X: Font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
-### Bước 6: Tạo Biểu đồ vành khăn Cơ cấu đóng góp bàn thắng theo Vị trí (Donut Chart)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Donut chart**.
-2. Kéo khung đặt ở khoảng giữa trang báo cáo.
+### Bước 7: Tạo Biểu đồ vành khăn Cơ cấu đóng góp bàn thắng theo Vị trí (Donut Chart)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Donut chart**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 350 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 505 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Legend:** Tìm chiều `DIM Player`, kéo thuộc tính `Main Position` (Attack, Midfield, Defender) thả vào ô **Legend**.
    * **Vùng Values:** Kéo thước đo `Goal Contributions` (hoặc `Goals`) thả vào ô **Values**.
 4. **Định dạng visual:**
-   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Tỷ trọng Đóng góp bàn thắng theo Vị trí thi đấu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * Mục **Detail labels**: Chọn **Label contents** là `Category, percent of total` (Hiển thị tên vị trí và tỷ lệ %), cỡ chữ `9 pt`.
-   * Mục **Legend**: Đặt vị trí **Position** là `Right center`, cỡ chữ `10 pt`.
+   * Tab **Format visual** -> **Title**: Nhập `Tỷ trọng Đóng góp bàn thắng theo Vị trí thi đấu`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Detail labels**: Chọn `Category, percent of total`, cỡ chữ `9 pt`.
+   * **Legend**: Vị trí `Right center`, cỡ chữ `10 pt`.
 
 ---
 
-### Bước 7: Tạo Biểu đồ kết hợp Xu hướng Bàn thắng và Kiến tạo qua các Mùa giải (Line and Clustered Column Chart)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Line and clustered column chart** (biểu đồ cột kết hợp đường).
-2. Kéo khung đặt ở góc trên bên phải màn hình.
+### Bước 8: Tạo Biểu đồ kết hợp Xu hướng Bàn thắng và Kiến tạo qua các Mùa giải (Line and Clustered Column Chart)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Line and clustered column chart**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 395 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 870 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng X-axis:** Tìm chiều `DIM Time`, kéo thuộc tính `Season` (Mùa giải: 2021/22, 2022/23, 2023/24) và `Quarter` thả vào ô **X-axis**.
-   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` thả vào ô này.
-   * **Vùng Line Y-axis (Đường):** Kéo thước đo `Assists` thả vào ô này.
-4. **Đổi tên và định dạng visual:**
-   * Đổi tên cột thành `Tổng số Bàn thắng`.
-   * Đổi tên đường thành `Tổng số Kiến tạo`.
-   * Tab **Format visual** -> Mục **Title**: Bật **On**, nhập: `Xu hướng Bàn thắng (Cột) và Kiến tạo (Đường) qua các Mùa giải`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * Mục **Data labels**: Bật **On** cho cả Cột và Đường, cỡ chữ `9 pt`.
+   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` thả vào ô này (đổi tên hiển thị thành `Tổng số Bàn thắng`).
+   * **Vùng Line Y-axis (Đường):** Kéo thước đo `Assists` thả vào ô này (đổi tên hiển thị thành `Tổng số Kiến tạo`).
+4. **Định dạng visual:**
+   * Tab **Format visual** -> **Title**: Nhập `Xu hướng Bàn thắng (Cột) và Kiến tạo (Đường) qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On** cho cả Cột và Đường, cỡ chữ `9 pt`.
    * Trục X và Trục Y: Font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
-### Bước 8: Tạo Bảng Ma trận chi tiết phong độ cầu thủ (Matrix Visual)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Matrix**.
-2. Kéo khung đặt ở góc dưới bên phải trang Canvas.
+### Bước 9: Tạo Bảng Ma trận chi tiết phong độ cầu thủ (Matrix Visual)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 760 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 505 px`, `Vertical = 470 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Rows:** Kéo lần lượt `DIM Player [Player Name]` và `DIM Club [Club Name]` vào ô **Rows**.
    * **Vùng Values:** Kéo các thước đo: `Minutes Played`, `Goals`, `Assists`, `Goal Contributions`, `Yellow Cards`.
 4. **Định dạng bảng Matrix:**
-   * Vào tab **Format visual**:
-   * Mục **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
-   * Mục **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
-   * Đổi tên các cột hiển thị: `Số phút`, `Bàn thắng`, `Kiến tạo`, `G+A`, `Thẻ vàng`.
-
----
-
-### Bước 9: Thêm các bộ lọc tương tác đa chiều (Slicers)
-Thêm 3 Slicer điều khiển đặt gọn gàng ở cột bên trái hoặc góc trên trang (Định dạng tiêu đề Slicer header: Font `Segoe UI`, cỡ chữ `10 pt`, in đậm; Giá trị Values: cỡ chữ `10 pt`):
-1. **Slicer 1 (Mùa giải):** Kéo `DIM Time [Season]` vào visual **Slicer**, thiết lập kiểu hiển thị là **Dropdown**.
-2. **Slicer 2 (Giải đấu):** Kéo `DIM Competition [Competition Name]` vào visual **Slicer**, kiểu **Dropdown**.
-3. **Slicer 3 (Vị trí thi đấu):** Kéo `DIM Player [Main Position]` vào visual **Slicer**, kiểu **Tile** (nút bấm nhanh).
+   * Đổi tên các cột: `Số phút`, `Bàn thắng`, `Kiến tạo`, `G+A`, `Thẻ vàng`.
+   * Tab **Format visual** -> **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
+   * **Row headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
+   * **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
 
 ---
 

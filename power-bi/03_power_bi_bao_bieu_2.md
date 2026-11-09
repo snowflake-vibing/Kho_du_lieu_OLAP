@@ -21,36 +21,70 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 ### Bước 1: Khởi tạo trang báo cáo mới và tiêu đề
 1. Ở mép dưới cùng của Power BI Desktop, nhấp chuột vào dấu cộng `+` bên cạnh thẻ `Hiệu suất Cầu thủ` để tạo trang mới.
 2. Nhấp đúp chuột đổi tên thẻ thành: `Vận hành CLB & Sân đấu`.
-3. Kiểm tra Canvas settings đảm bảo tỷ lệ chuẩn `16:9`.
-4. Trên thanh Ribbon **Insert**, nhấp nút **Text box**, kéo khung đặt ở đỉnh trang và nhập nội dung:
+3. Kiểm tra Canvas settings: Đảm bảo tỷ lệ chuẩn **16:9** (`Width: 1280 px`, `Height: 720 px`).
+   * **Canvas background**: Giữ nguyên mặc định nguyên bản của Power BI, tuyệt đối không chỉnh màu sắc hay độ trong suốt.
+4. Trên thanh Ribbon **Insert**, nhấp nút **Text box**, nhập nội dung:
    `BÁO BIỂU 2: PHÂN TÍCH VẬN HÀNH TRẬN ĐẤU, HIỆU SUẤT CLB VÀ TƯƠNG QUAN SÂN VẬN ĐỘNG`
 5. Định dạng văn bản: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn lề giữa (**Center**).
+6. Thiết lập vị trí và kích thước tại **Properties** (Tab **General** -> **Properties**):
+   * **Size:** `Width = 1250 px`, `Height = 45 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 10 px`
+
+> **MẸO NHẬP TỌA ĐỘ VÀ KÍCH THƯỚC CHUẨN XÁC TỪNG PIXEL:**
+> Sau khi tạo mỗi visual, nhấp chọn visual -> Tại khung **Visualizations**, chọn tab **General** -> Mở rộng mục **Properties**:
+> * **Size:** Nhập **Width** (Chiều rộng) và **Height** (Chiều cao).
+> * **Position:** Nhập **Horizontal** (Tọa độ ngang X) và **Vertical** (Tọa độ dọc Y).
 
 ---
 
 ### Bước 2: Thiết lập 4 Thẻ KPI vận hành trận đấu (Card Visuals)
+Tạo 4 thẻ Card đặt thành một hàng ngang ngay phía dưới Banner tiêu đề (Y = 65 px, Chiều cao = 85 px):
+
 1. **Card 1: Tổng số Trận đấu (Total Matches)**:
    * Thêm visual **Card**, kéo trường `DIM Game [Game_ID]` (chọn hàm `Distinct Count`) vào ô **Fields**.
    * Đổi tên hiển thị thành `Tổng Trận Đấu`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Định dạng: Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 15 px`, `Vertical = 65 px`).
 2. **Card 2: Bàn thắng Sân nhà (Home Goals)**:
    * Thêm visual **Card**, lọc `Is_Home_Game = 1`, kéo thước đo `Goals` vào ô **Fields**.
    * Đổi tên thành `Bàn Thắng Sân Nhà`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 333 px`, `Vertical = 65 px`).
 3. **Card 3: Bàn thắng Sân khách (Away Goals)**:
    * Thêm visual **Card**, lọc `Is_Home_Game = 0`, kéo thước đo `Goals` vào ô **Fields**.
    * Đổi tên thành `Bàn Thắng Sân Khách`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**). Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 651 px`, `Vertical = 65 px`).
 4. **Card 4: Tỷ lệ Ưu thế Sân nhà (Home Advantage %)**:
    * Thêm visual **Card**, kéo tỷ lệ phần trăm bàn thắng sân nhà trên tổng bàn thắng vào ô **Fields**.
    * Đổi tên thành `Tỷ lệ Bàn Sân Nhà (%)`.
-   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), định dạng phần trăm `0.0%`.
+   * Định dạng: **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), định dạng phần trăm `0.0%`. Category label: Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 295 px`, `Height = 85 px`), Position (`Horizontal = 970 px`, `Vertical = 65 px`).
 
 ---
 
-### Bước 3: Tạo Biểu đồ cột phân cụm Bàn thắng Sân nhà vs Sân khách (Clustered Column Chart)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Clustered column chart**.
-2. Kéo khung đặt ở góc phía trên bên trái trang Canvas.
+### Bước 3: Thêm 3 Bộ lọc tương tác (Slicers)
+Tạo 3 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 160 px, Chiều cao = 50 px):
+1. **Slicer 1 (Giải đấu):**
+   * Thêm visual **Slicer**, kéo `DIM Competition [Competition Name]` vào ô **Field**, chọn kiểu **Dropdown**.
+   * Định dạng: Header Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm; Values Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 420 px`, `Height = 50 px`), Position (`Horizontal = 15 px`, `Vertical = 160 px`).
+2. **Slicer 2 (Mùa giải):**
+   * Thêm visual **Slicer**, kéo `DIM Time [Season]` vào ô **Field**, chọn kiểu **Dropdown**.
+   * Định dạng: Header Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm; Values Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 445 px`, `Vertical = 160 px`).
+3. **Slicer 3 (Loại giải đấu):**
+   * Thêm visual **Slicer**, kéo `DIM Competition [Competition Type]` vào ô **Field**, chọn kiểu **Tile**.
+   * Định dạng: Values Font `Segoe UI`, Cỡ chữ `10 pt`.
+   * **Properties:** Size (`Width = 390 px`, `Height = 50 px`), Position (`Horizontal = 875 px`, `Vertical = 160 px`).
+
+---
+
+### Bước 4: Tạo Biểu đồ cột phân cụm Bàn thắng Sân nhà vs Sân khách (Clustered Column Chart)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Clustered column chart**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 550 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng X-axis:** Kéo thuộc tính `DIM Club [Club Name]` vào ô **X-axis**.
    * **Vùng Y-axis:** Lần lượt kéo 2 thước đo:
@@ -59,59 +93,54 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 4. **Thiết lập bộ lọc Top 10 Câu lạc bộ:**
    * Tại khung **Filters on this visual**, mở mục `Club Name`, chọn **Top N**, nhập `10`, kéo thước đo `Goals` vào ô **By value** và nhấp **Apply filter**.
 5. **Định dạng visual:**
-   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `So sánh Bàn thắng Sân nhà vs Sân khách của Top 10 CLB Châu Âu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Data labels**: Bật **On** hiển thị số bàn trên mỗi đỉnh cột, cỡ chữ `9 pt`.
+   * Tab **Format visual** -> **Title**: Nhập `So sánh Bàn thắng Sân nhà vs Sân khách của Top 10 CLB Châu Âu`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On**, cỡ chữ `9 pt`.
    * Trục X và Trục Y: Font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
-### Bước 4: Tạo Biểu đồ Treemap phân bổ Bàn thắng theo Giải đấu (Treemap Visual)
-1. Tại khung **Visualizations**, nhấp chuột vào biểu tượng **Treemap** (biểu đồ các khối hình chữ nhật phân cấp).
-2. Kéo khung đặt ở góc phía trên bên phải trang báo cáo.
+### Bước 5: Tạo Biểu đồ Treemap phân bổ Bàn thắng theo Giải đấu (Treemap Visual)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Treemap**.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 550 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 15 px`, `Vertical = 470 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Category:** Kéo thuộc tính `DIM Competition [Competition Name]` vào ô **Category**.
    * **Vùng Values:** Kéo thước đo `Goals` vào ô **Values**.
 4. **Định dạng visual:**
-   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `Quy mô Bàn thắng phân bổ theo Giải đấu Châu Âu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Data labels**: Bật **On**, hiển thị tên giải đấu và số lượng bàn thắng tương ứng, cỡ chữ `9 pt`.
+   * Tab **Format visual** -> **Title**: Nhập `Quy mô Bàn thắng phân bổ theo Giải đấu Châu Âu`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On**, cỡ chữ `9 pt`.
 
 ---
 
-### Bước 5: Tạo Biểu đồ kết hợp Tương quan Sức chứa Sân và Bàn thắng (Line and Clustered Column Chart)
+### Bước 6: Tạo Biểu đồ kết hợp Tương quan Sức chứa Sân và Bàn thắng (Line and Clustered Column Chart)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Line and clustered column chart**.
-2. Kéo khung đặt ở góc phía dưới bên trái Canvas.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 685 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 580 px`, `Vertical = 220 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng X-axis:** Kéo trường `DIM Club [Club Name]` vào ô **X-axis**.
-   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` vào ô này.
-   * **Vùng Line Y-axis (Đường):** Kéo thuộc tính `DIM Club [Stadium Seats]` (chọn hàm `Average` hoặc `Max`) vào ô này.
-4. **Đổi tên và định dạng visual:**
-   * Đổi tên cột thành `Tổng số Bàn thắng`.
-   * Đổi tên đường thành `Sức chứa Sân vận động (Chỗ ngồi)`.
-   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `Tương quan giữa Tổng số Bàn thắng và Sức chứa Sân vận động của CLB`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` vào ô này (đổi tên thành `Tổng số Bàn thắng`).
+   * **Vùng Line Y-axis (Đường):** Kéo thuộc tính `DIM Club [Stadium Seats]` (chọn hàm `Average` hoặc `Max`) vào ô này (đổi tên thành `Sức chứa Sân vận động`).
+4. **Định dạng visual:**
+   * Tab **Format visual** -> **Title**: Nhập `Tương quan giữa Tổng số Bàn thắng và Sức chứa Sân vận động của CLB`, Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
    * **Data labels**: Bật **On** cho cả Cột và Đường, cỡ chữ `9 pt`.
-   * **Y-axis**: Bật cả 2 trục Y để thang đo Chỗ ngồi và thang đo Bàn thắng hiển thị rõ ràng, font `Segoe UI`, cỡ chữ `10 pt`.
+   * **Y-axis**: Bật cả 2 trục Y, Font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
-### Bước 6: Tạo Bảng Ma trận Xếp hạng Câu lạc bộ chi tiết (Matrix Visual)
+### Bước 7: Tạo Bảng Ma trận Xếp hạng Câu lạc bộ chi tiết (Matrix Visual)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
-2. Kéo khung đặt ở góc phía dưới bên phải màn hình.
+2. Thiết lập kích thước và vị trí tại **Properties**:
+   * **Size:** `Width = 685 px`, `Height = 235 px`
+   * **Position:** `Horizontal = 580 px`, `Vertical = 470 px`
 3. Kéo thả các trường dữ liệu:
    * **Vùng Rows:** Kéo `DIM Competition [Competition Name]` ở cấp 1 và `DIM Club [Club Name]` ở cấp 2.
    * **Vùng Values:** Kéo các trường: `Stadium Name`, `Stadium Seats`, `Total Games`, `Goals`, `QoQ Goals Growth`.
 4. **Định dạng bảng:**
-   * Vào tab **Format visual**:
-   * Mục **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
-   * Mục **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
-   * Row headers bật `Stepped layout` thụt lề 12px để mở rộng từng giải đấu ra danh sách CLB trực thuộc.
-
----
-
-### Bước 7: Thêm các bộ lọc tương tác (Slicers)
-Thêm 3 Slicer điều khiển (Tiêu đề Slicer header: Font `Segoe UI`, cỡ chữ `10 pt`, in đậm; Values: cỡ chữ `10 pt`):
-1. **Slicer 1 (Giải đấu):** `DIM Competition [Competition Name]`, kiểu Dropdown.
-2. **Slicer 2 (Mùa giải):** `DIM Time [Season]`, kiểu Dropdown.
-3. **Slicer 3 (Loại giải đấu):** `DIM Competition [Competition Type]` (Domestic League, Domestic Cup, International Cup), kiểu Tile.
+   * Tab **Format visual** -> **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
+   * **Row headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**), bật `Stepped layout` thụt lề 12px.
+   * **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
 
 ---
 
