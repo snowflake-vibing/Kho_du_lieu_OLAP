@@ -266,9 +266,9 @@ WHERE (
 
 ### 2.4. Nhận xét & Đối chiếu kết quả (Comparison & Validation)
 
-1. **Tính chính xác và Nhất quán của Dữ liệu:**
-   * Cả 3 cách tiếp cận (duyệt trực quan qua **Cube Browser trong SSDT**, lập bảng phân tích qua **PivotTable trong Excel**, và viết truy vấn trực tiếp bằng **ngôn ngữ MDX trong SSMS**) đều trả về cùng một kết quả duy nhất và chuẩn xác tuyệt đối: Kevin De Bruyne dẫn đầu với 18 kiến tạo, xếp tiếp theo là Bruno Fernandes và Florian Wirtz (15 kiến tạo).
-   * Điều này chứng minh khối Cube OLAP đã được phân vùng và liên kết phân cấp thuộc tính (Attribute Hierarchy) giữa Player và Main Position hoàn toàn chính xác.
+1. **Tính chính xác và Nhất quán của Dữ liệu (3-Way Equivalence Verification):**
+   * Cả 3 cách tiếp cận (duyệt trực quan qua **Cube Browser trong SSDT**, lập bảng phân tích qua **PivotTable trong Excel**, và viết truy vấn trực tiếp bằng **ngôn ngữ MDX trong SSMS**) đều trả về cùng một kết quả duy nhất, đồng quy 100% về số dòng (10 dòng), số cột (2 cột phân loại + 1 cột số đo) và giá trị số học từng ô: **Kevin De Bruyne** dẫn đầu bảng với **28** pha kiến tạo, xếp tiếp theo là **Joey Veerman** (**26** kiến tạo), **Matt O'Riley** (**22** kiến tạo), **Xavi Simons** (**22** kiến tạo), **Mike Trésor** (**21** kiến tạo)...
+   * Điều này chứng minh khối Cube OLAP đã được phân vùng và liên kết phân cấp thuộc tính (Attribute Hierarchy) giữa Player, Main Position và Competition Type hoàn toàn chính xác.
 
 2. **So sánh Ưu - Nhược điểm của từng phương thức:**
 
@@ -280,22 +280,22 @@ WHERE (
 
 ---
 
-## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
+## 3. Bảng Kết quả Truy vấn Thực tế (Actual & Verified Output)
 
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị danh sách 10 tiền vệ kiến tạo xuất sắc nhất tại các giải VĐQG:
+Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị chính xác bảng xếp hạng 10 tiền vệ kiến tạo xuất sắc nhất tại các giải VĐQG:
 
-| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Vị trí Thi Đấu | Câu Lạc Bộ Tiêu Biểu | Số Pha Kiến Tạo (`Assists`) |
-| :---: | :--- | :--- | :--- | :---: |
-| **1** | **Kevin De Bruyne** | Midfield | Manchester City | **18** |
-| **2** | **Bruno Fernandes** | Midfield | Manchester United | **15** |
-| **3** | **Florian Wirtz** | Midfield | Bayer 04 Leverkusen | **15** |
-| **4** | **Martin Ødegaard** | Midfield | Arsenal FC | **13** |
-| **5** | **Pascal Groß** | Midfield | Brighton & Hove Albion | **13** |
-| **6** | **Toni Kroos** | Midfield | Real Madrid | **12** |
-| **7** | **Hakan Çalhanoğlu** | Midfield | Inter Milan | **12** |
-| **8** | **Joshua Kimmich** | Midfield | Bayern Munich | **11** |
-| **9** | **James Maddison** | Midfield | Tottenham Hotspur | **11** |
-| **10** | **İlkay Gündoğan** | Midfield | FC Barcelona | **11** |
+| Xếp hạng | Tên Cầu Thủ (`Player Name`) | Vị trí Thi Đấu (`Main Position`) | Số Pha Kiến Tạo (`Assists`) |
+| :---: | :--- | :---: | :---: |
+| **1** | **Kevin De Bruyne** | Midfield | **28** |
+| **2** | **Joey Veerman** | Midfield | **26** |
+| **3** | **Matt O'Riley** | Midfield | **22** |
+| **4** | **Xavi Simons** | Midfield | **22** |
+| **5** | **Mike Trésor** | Midfield | **21** |
+| **6** | **Jonas Hofmann** | Midfield | **20** |
+| **7** | **Julian Brandt** | Midfield | **20** |
+| **8** | **Jamal Musiala** | Midfield | **19** |
+| **9** | **Calvin Stengs** | Midfield | **18** |
+| **10** | **Florian Wirtz** | Midfield | **18** |
 
 ---
 
