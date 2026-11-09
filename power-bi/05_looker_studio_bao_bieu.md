@@ -72,7 +72,7 @@ Tài liệu này hướng dẫn chi tiết quy trình xây dựng hệ thống 3
    * **Phương diện cột (Column Dimension):** Chọn trường `Main_Position` (Vị trí thi đấu).
    * **Chỉ số (Metric):** Chọn `Goals` (SUM).
 3. Tại thẻ **Kiểu**:
-   * Chọn định dạng số liệu có thanh nhiệt (Heatmap) với gam màu xanh navy để làm nổi bật các ô có số lượng bàn thắng vượt trội.
+   * Chọn định dạng số liệu có thanh nhiệt (Heatmap) để làm nổi bật các ô có số lượng bàn thắng vượt trội.
 
 #### Bước 3: Thiết lập cho Biểu đồ Cột chồng 100% và Biểu đồ Kết hợp
 1. Nhấp chọn biểu đồ Cột chồng 100%:

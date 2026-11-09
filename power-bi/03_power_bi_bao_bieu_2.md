@@ -21,26 +21,30 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 ### Bước 1: Khởi tạo trang báo cáo mới và tiêu đề
 1. Ở mép dưới cùng của Power BI Desktop, nhấp chuột vào dấu cộng `+` bên cạnh thẻ `Hiệu suất Cầu thủ` để tạo trang mới.
 2. Nhấp đúp chuột đổi tên thẻ thành: `Vận hành CLB & Sân đấu`.
-3. Kiểm tra Canvas settings đảm bảo tỷ lệ `16:9` và nền xám nhạt `#F8F9FA`.
+3. Kiểm tra Canvas settings đảm bảo tỷ lệ chuẩn `16:9`.
 4. Trên thanh Ribbon **Insert**, nhấp nút **Text box**, kéo khung đặt ở đỉnh trang và nhập nội dung:
    `BÁO BIỂU 2: PHÂN TÍCH VẬN HÀNH TRẬN ĐẤU, HIỆU SUẤT CLB VÀ TƯƠNG QUAN SÂN VẬN ĐỘNG`
-5. Định dạng văn bản: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm, Căn giữa, nền xanh navy đậm.
+5. Định dạng văn bản: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn lề giữa (**Center**).
 
 ---
 
 ### Bước 2: Thiết lập 4 Thẻ KPI vận hành trận đấu (Card Visuals)
 1. **Card 1: Tổng số Trận đấu (Total Matches)**:
    * Thêm visual **Card**, kéo trường `DIM Game [Game_ID]` (chọn hàm `Distinct Count`) vào ô **Fields**.
-   * Đổi tên hiển thị thành `Tổng Trận Đấu`. Đặt màu số liệu xanh lam.
+   * Đổi tên hiển thị thành `Tổng Trận Đấu`.
+   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
 2. **Card 2: Bàn thắng Sân nhà (Home Goals)**:
    * Thêm visual **Card**, lọc `Is_Home_Game = 1`, kéo thước đo `Goals` vào ô **Fields**.
-   * Đổi tên thành `Bàn Thắng Sân Nhà`. Đặt màu xanh lục.
+   * Đổi tên thành `Bàn Thắng Sân Nhà`.
+   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
 3. **Card 3: Bàn thắng Sân khách (Away Goals)**:
    * Thêm visual **Card**, lọc `Is_Home_Game = 0`, kéo thước đo `Goals` vào ô **Fields**.
-   * Đổi tên thành `Bàn Thắng Sân Khách`. Đặt màu cam hổ phách.
+   * Đổi tên thành `Bàn Thắng Sân Khách`.
+   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**).
 4. **Card 4: Tỷ lệ Ưu thế Sân nhà (Home Advantage %)**:
    * Thêm visual **Card**, kéo tỷ lệ phần trăm bàn thắng sân nhà trên tổng bàn thắng vào ô **Fields**.
-   * Đổi tên thành `Tỷ lệ Bàn Sân Nhà (%)`. Đặt định dạng phần trăm `0.0%`.
+   * Đổi tên thành `Tỷ lệ Bàn Sân Nhà (%)`.
+   * Định dạng: Vào tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `26 pt`, In đậm (**Bold**), định dạng phần trăm `0.0%`.
 
 ---
 
@@ -55,9 +59,9 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 4. **Thiết lập bộ lọc Top 10 Câu lạc bộ:**
    * Tại khung **Filters on this visual**, mở mục `Club Name`, chọn **Top N**, nhập `10`, kéo thước đo `Goals` vào ô **By value** và nhấp **Apply filter**.
 5. **Định dạng visual:**
-   * Tab **Format visual** -> **Title**: Nhập: `So sánh Bàn thắng Sân nhà vs Sân khách của Top 10 CLB Châu Âu`.
-   * **Columns**: Đặt màu cột Sân nhà là xanh navy (`#1B365D`), màu cột Sân khách là xanh da trời nhạt (`#4A90E2`).
-   * **Data labels**: Bật **On** hiển thị số bàn trên mỗi đỉnh cột.
+   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `So sánh Bàn thắng Sân nhà vs Sân khách của Top 10 CLB Châu Âu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On** hiển thị số bàn trên mỗi đỉnh cột, cỡ chữ `9 pt`.
+   * Trục X và Trục Y: Font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
@@ -68,8 +72,8 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
    * **Vùng Category:** Kéo thuộc tính `DIM Competition [Competition Name]` vào ô **Category**.
    * **Vùng Values:** Kéo thước đo `Goals` vào ô **Values**.
 4. **Định dạng visual:**
-   * Tab **Format visual** -> **Title**: Nhập: `Quy mô Bàn thắng phân bổ theo Giải đấu Châu Âu`.
-   * **Data labels**: Bật **On**, hiển thị tên giải đấu và số lượng bàn thắng tương ứng.
+   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `Quy mô Bàn thắng phân bổ theo Giải đấu Châu Âu`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On**, hiển thị tên giải đấu và số lượng bàn thắng tương ứng, cỡ chữ `9 pt`.
 
 ---
 
@@ -83,8 +87,9 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 4. **Đổi tên và định dạng visual:**
    * Đổi tên cột thành `Tổng số Bàn thắng`.
    * Đổi tên đường thành `Sức chứa Sân vận động (Chỗ ngồi)`.
-   * Tab **Format visual** -> **Title**: Nhập: `Tương quan giữa Tổng số Bàn thắng và Sức chứa Sân vận động của CLB`.
-   * **Y-axis**: Bật cả 2 trục Y để thang đo Chỗ ngồi (hàng vạn người) và thang đo Bàn thắng (hàng trăm bàn) không bị xung đột.
+   * Tab **Format visual** -> **Title**: Bật **On**, nhập: `Tương quan giữa Tổng số Bàn thắng và Sức chứa Sân vận động của CLB`. Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Data labels**: Bật **On** cho cả Cột và Đường, cỡ chữ `9 pt`.
+   * **Y-axis**: Bật cả 2 trục Y để thang đo Chỗ ngồi và thang đo Bàn thắng hiển thị rõ ràng, font `Segoe UI`, cỡ chữ `10 pt`.
 
 ---
 
@@ -95,12 +100,15 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
    * **Vùng Rows:** Kéo `DIM Competition [Competition Name]` ở cấp 1 và `DIM Club [Club Name]` ở cấp 2.
    * **Vùng Values:** Kéo các trường: `Stadium Name`, `Stadium Seats`, `Total Games`, `Goals`, `QoQ Goals Growth`.
 4. **Định dạng bảng:**
-   * Style presets chọn `Alternating rows`.
+   * Vào tab **Format visual**:
+   * Mục **Column headers**: Font `Segoe UI`, Cỡ chữ `10 pt`, In đậm (**Bold**).
+   * Mục **Values**: Font `Segoe UI`, Cỡ chữ `10 pt`.
    * Row headers bật `Stepped layout` thụt lề 12px để mở rộng từng giải đấu ra danh sách CLB trực thuộc.
 
 ---
 
 ### Bước 7: Thêm các bộ lọc tương tác (Slicers)
+Thêm 3 Slicer điều khiển (Tiêu đề Slicer header: Font `Segoe UI`, cỡ chữ `10 pt`, in đậm; Values: cỡ chữ `10 pt`):
 1. **Slicer 1 (Giải đấu):** `DIM Competition [Competition Name]`, kiểu Dropdown.
 2. **Slicer 2 (Mùa giải):** `DIM Time [Season]`, kiểu Dropdown.
 3. **Slicer 3 (Loại giải đấu):** `DIM Competition [Competition Type]` (Domestic League, Domestic Cup, International Cup), kiểu Tile.

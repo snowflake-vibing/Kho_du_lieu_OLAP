@@ -22,8 +22,8 @@ Power BI Desktop là công cụ phân tích và trực quan hóa dữ liệu kin
 2. Nhấp chuột vào biểu tượng **Get data** (hoặc nhấp mũi tên xổ xuống tại mục Get data).
 3. Trong menu danh sách các nguồn dữ liệu xuất hiện, nhấp chọn **SQL Server Analysis Services database** (hoặc chọn *More...* -> danh mục *Database* -> chọn *SQL Server Analysis Services database* -> nhấp **Connect**).
 4. Hộp thoại **SQL Server Analysis Services database** xuất hiện:
-   * **Server:** Nhập tên máy chủ SSAS của bạn (ví dụ: `localhost` hoặc `.` nếu là default instance, hoặc tên máy tính cục bộ).
-   * **Database (optional):** Nhập chính xác tên cơ sở dữ liệu SSAS đã deploy từ Visual Studio: `DW Football SSAS` (hoặc `DW_Football_SSAS`).
+   * **Server:** Nhập `localhost` (hoặc `.` hoặc tên máy tính: `DESKTOP-9B88R8P`).
+   * **Database (optional):** Nhập `SSAS_Football_Transfermarkt` (hoặc `DW Football SSAS`).
    * **Phương thức kết nối:** Tích chọn tùy chọn **Connect live** (Kết nối trực tiếp tới mô hình dữ liệu đa chiều SSAS thay vì Import dữ liệu, giúp báo cáo tự động cập nhật và giữ nguyên tính toán Cube).
 5. Nhấp nút **OK** để xác nhận kết nối.
 
