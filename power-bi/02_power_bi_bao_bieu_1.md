@@ -84,7 +84,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngay phía dưới Banner tiêu đề đ
 3. Kéo thả các trường từ khung **Data**:
    * **Vùng Y-axis (Trục tung):** Tìm chiều `DIM Player`, kéo thuộc tính `Player Name` thả vào ô **Y-axis**.
    * **Vùng X-axis (Trục hoành):** Kéo thước đo `Goals` thả vào ô **X-axis**.
-   * **Vùng Tooltips:** Kéo thêm các trường `Assists`, `DIM Club [Club Name]`, `DIM Player [Main Position]` để khi di chuột hiển thị đầy đủ thông tin hỗ trợ.
+   * **Vùng Tooltips:** Kéo thêm các thước đo `Assists`, `Goal Contributions` (hoặc `Minutes Played`) để khi di chuột vào mỗi thanh của cầu thủ sẽ hiển thị bổ sung số pha kiến tạo và tổng đóng góp bàn thắng. *(Lưu ý: Chế độ Connect Live với SSAS Cube chỉ nhận các Thước đo - Measures vào ô Tooltips phẳng, không thả trực tiếp các thuộc tính văn bản Dimension như Club Name hay Main Position).*
 4. **Thiết lập bộ lọc Top 10 Cầu thủ:**
    * Tại khung **Filters** (bên cạnh khung Visualizations), tìm mục **Filters on this visual** -> nhấp mở rộng mục `Player Name`.
    * Tại mục **Filter type**, mở danh sách thả xuống và chọn **Top N**.
