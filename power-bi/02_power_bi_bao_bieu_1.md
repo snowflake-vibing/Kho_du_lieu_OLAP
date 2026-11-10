@@ -48,28 +48,30 @@ Báo biểu được chuẩn hóa toàn diện theo các nguyên lý thiết k�
 
 ## 3. Sơ đồ Bố cục Không gian Lưới Pixel-Perfect (Canvas 1920 x 1080)
 
+Tuân thủ nghiêm ngặt **Quy tắc Bố cục Phân tầng**: Phần trên cùng dành trọn cho Title, KPI Cards và Slicers; phần dưới chia thành **lưới 2x2 đối xứng đúng 4 phần** dành cho **đúng 4 loại biểu đồ nâng cao**:
+
 ```
 +-------------------------------------------------------------------------------------------------------------------------+
 | [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 1 - PHÂN TÍCH HIỆU SUẤT GHI BÀN & KIẾN TẠO CẦU THỦ CHÂU ÂU (Font: 20pt Bold)   |
-| Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 65 px                                              |
+| Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
 | [Card 1: Tổng Bàn Thắng]  | [Card 2: Tổng Kiến Tạo]   | [Card 3: Tổng Đóng Góp G+A] | [Card 4: Mins / Bàn Thắng]        |
 | Nền: Pastel Blue #EFF6FF  | Nền: Pastel Green #F0FDF4 | Nền: Pastel Amber #FFFBEB   | Nền: Pastel Purple #FAF5FF        |
-| (W: 455, H: 110, X: 20)   | (W: 455, H: 110, X: 495)  | (W: 455, H: 110, X: 970)    | (W: 455, H: 110, X: 1445)         |
+| (W: 455, H: 105, X: 20)   | (W: 455, H: 105, X: 495)  | (W: 455, H: 105, X: 970)    | (W: 455, H: 105, X: 1445)         |
 +---------------------------+---------------------------+-----------------------------+-----------------------------------+
-| [Slicer 1: Mùa giải]      | [Slicer 2: Giải đấu]                                    | [Slicer 3: Vị trí thi đấu]        |
+| [Slicer 1: Mùa giải]      | [Slicer 2: Giải đấu]                                    | [Slicer 3: Vị trí thi đấu (Tile)] |
 | (W: 455, H: 50, X: 20)    | (W: 700, H: 50, X: 495)                                 | (W: 685, H: 50, X: 1215)          |
-+---------------------------+---------------------------------------------------------+-----------------------------------+
-| [Visual 7: Bar Chart]     | [Visual 8: SCATTER QUADRANT MATRIX]                     | [Visual 9: DECOMPOSITION TREE]    |
-| Top 10 Chân sút Ghi bàn   | Ma trận 4 Góc phần tư Hiệu quả Tấn công Cầu thủ         | Phân rã AI Đóng góp Bàn thắng     |
-| (Trục Y: Navy, Trục X: Grn)| (Tương quan Goals vs Assists vs Mins theo Vị trí)       | (Giải đấu -> CLB -> Vị trí)       |
-| (W: 580, H: 440, X: 20)   | (W: 680, H: 440, X: 620)                                | (W: 580, H: 440, X: 1320)         |
-+---------------------------+---------------------------------------------------------+-----------------------------------+
-| [Visual 10: EXECUTIVE MATRIX TABLE WITH EMBEDDED DATA BARS]                                                             |
-| Bảng Ma trận Tra cứu Toàn diện Phong độ Cầu thủ theo Câu lạc bộ (Tích hợp Thanh đo trực quan Data Bars)                  |
-| Cột: Cầu thủ (350px) | Vị trí (180px) | CLB (320px) | Số phút (200px) | Bàn thắng [Data Bar] | Kiến tạo | G+A [Heatmap]   |
-| Tọa độ: X = 20 px, Y = 740 px | Kích thước: Width = 1880 px, Height = 325 px (Không có bất kỳ dấu ba chấm nào)           |
-+-------------------------------------------------------------------------------------------------------------------------+
++---------------------------------------------------------+---------------------------------------------------------------+
+| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH PHÂN CẤP]             | [Ô 2: TRÊN - PHẢI | MA TRẬN 4 GÓC PHẦN TƯ (SCATTER QUADRANT)] |
+| Top 10 Chân sút ghi nhiều bàn nhất Châu Âu              | Ma trận Tương quan Goals vs Assists vs Mins theo Vị trí       |
+| Trục Y (Navy Blue #0D47A1), Trục X (Forest Green #1B5E20)| 2 Đường phân chia Trung vị (Median Reference Lines)           |
+| Tọa độ: X = 20 px, Y = 265 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 265 px | W = 925 px, H = 385 px       |
++---------------------------------------------------------+---------------------------------------------------------------+
+| [Ô 3: DƯỚI - TRÁI | CÂY PHÂN RÃ NGUYÊN NHÂN AI]         | [Ô 4: DƯỚI - PHẢI | BẢNG MA TRẬN ĐA CẤP (EXECUTIVE MATRIX)]   |
+| Cây phân rã AI Đóng góp Bàn thắng (Decomposition Tree)  | Bảng tra cứu phong độ chi tiết từng Cầu thủ theo CLB          |
+| Phân rã: Giải đấu -> Vị trí -> CLB -> Cầu thủ           | Tích hợp Mini Data Bars & Heatmap, Stepped Layout = Off       |
+| Tọa độ: X = 20 px, Y = 675 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 675 px | W = 925 px, H = 385 px       |
++---------------------------------------------------------+---------------------------------------------------------------+
 ```
 
 ---
@@ -190,11 +192,11 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 6: Tạo Biểu đồ Thanh phân cấp Top 10 Chân sút Châu Âu (Clustered Bar Chart)
+### Bước 6: Tạo Biểu đồ Thanh phân cấp Top 10 Chân sút Châu Âu (Ô 1: Trên - Trái)
 1. Thêm visual **Clustered bar chart**.
-2. Thiết lập kích thước và vị trí:
-   * **Size:** `Width = 580 px`, `Height = 440 px`
-   * **Position:** `Horizontal = 20 px`, `Vertical = 285 px`
+2. Thiết lập kích thước và vị trí theo quy chuẩn lưới 2x2:
+   * **Size:** `Width = 925 px`, `Height = 385 px`
+   * **Position:** `Horizontal = 20 px`, `Vertical = 265 px`
 3. Kéo thả các trường:
    * **Y-axis (Trục tung):** Kéo `DIM Player [Player Name]` vào ô này.
    * **X-axis (Trục hoành):** Kéo thước đo `[Measures].[Goals]` vào ô này.
@@ -210,15 +212,15 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 7: Tạo Biểu đồ Nâng cao 1: Ma trận 4 Góc phần tư Hiệu quả Tấn công (Scatter / Bubble Quadrant Plot)
+### Bước 7: Tạo Biểu đồ Nâng cao 1: Ma trận 4 Góc phần tư Hiệu quả Tấn công (Ô 2: Trên - Phải)
 
 > **GIÁ TRỊ HỌC THUẬT & ĐIỂM NHẤN CHUYÊN MÔN:**
 > Đây là visual nâng cao thể hiện tư duy phân tích thể thao đỉnh cao (Sports Analytics). Thay vì xem xét số liệu phẳng, biểu đồ phân tán 4 góc phần tư giúp giảng viên đánh giá trực quan "hồ sơ năng lực" của từng danh thủ: ai là người săn bàn thuần túy, ai là tiền vệ sáng tạo và ai là ngôi sao toàn diện.
 
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Scatter chart** (Biểu đồ phân tán).
-2. Thiết lập kích thước và vị trí:
-   * **Size:** `Width = 680 px`, `Height = 440 px`
-   * **Position:** `Horizontal = 620 px`, `Vertical = 285 px`
+2. Thiết lập kích thước và vị trí theo quy chuẩn lưới 2x2:
+   * **Size:** `Width = 925 px`, `Height = 385 px`
+   * **Position:** `Horizontal = 975 px`, `Vertical = 265 px`
 3. Kéo thả các trường dữ liệu:
    * **Values (Điểm chi tiết):** Tìm chiều `DIM Player`, kéo thuộc tính `Player Name` vào ô **Values**.
    * **X-axis (Trục hoành):** Kéo thước đo `[Measures].[Assists]` (Tổng số đường kiến tạo thành bàn).
@@ -249,12 +251,12 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 8: Tạo Biểu đồ Nâng cao 2: Cây Phân rã Trực quan AI (Decomposition Tree)
+### Bước 8: Tạo Biểu đồ Nâng cao 2: Cây Phân rã Trực quan AI (Ô 3: Dưới - Trái)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Decomposition tree** (Cây phân rã nguyên nhân).
    *(Ghi chú: Nếu muốn phân tích xếp hạng theo mùa giải, có thể chọn biểu tượng **Ribbon chart**).*
-2. Thiết lập kích thước và vị trí:
-   * **Size:** `Width = 580 px`, `Height = 440 px`
-   * **Position:** `Horizontal = 1320 px`, `Vertical = 285 px`
+2. Thiết lập kích thước và vị trí theo quy chuẩn lưới 2x2:
+   * **Size:** `Width = 925 px`, `Height = 385 px`
+   * **Position:** `Horizontal = 20 px`, `Vertical = 675 px`
 3. Kéo thả các trường dữ liệu:
    * **Analyze (Chỉ số phân tích gốc):** Kéo thước đo `[Measures].[Goal Contributions]` vào ô này.
    * **Explain by (Các chiều không gian giải thích nguyên nhân):** Kéo lần lượt theo thứ tự phân tầng từ vĩ mô xuống vi mô:
@@ -270,11 +272,11 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 9: Tạo Bảng Ma trận Đa cấp Tích hợp Mini Data Bars (Executive Matrix Table)
+### Bước 9: Tạo Bảng Ma trận Đa cấp Tích hợp Mini Data Bars (Ô 4: Dưới - Phải)
 1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
-2. Thiết lập kích thước và vị trí:
-   * **Size:** `Width = 1880 px`, `Height = 325 px` (Trải rộng toàn bộ chiều ngang chân trang)
-   * **Position:** `Horizontal = 20 px`, `Vertical = 740 px`
+2. Thiết lập kích thước và vị trí theo quy chuẩn lưới 2x2:
+   * **Size:** `Width = 925 px`, `Height = 385 px`
+   * **Position:** `Horizontal = 975 px`, `Vertical = 675 px`
 3. Kéo thả các trường dữ liệu:
    * **Rows (Phân tầng dòng):** Kéo lần lượt `DIM Player [Player Name]`, `DIM Player [Main Position]`, `DIM Club [Club Name]`.
    * **Values (Các cột đo lường):** Kéo các thước đo:

@@ -42,7 +42,45 @@ Mọi visual trên Dashboard bắt buộc phải tuân thủ nghiêm ngặt than
 
 ---
 
-## 3. QUY TẮC KHÔNG GIAN & TRIỆT TIÊU DẤU BA CHẤM (ZERO ELLIPSIS GUARANTEE)
+## 3. QUY TẮC BỐ CỤC PHÂN VÙNG TRANG BÁO BIỂU (PAGE ARCHITECTURE & 4-QUADRANT GRID)
+
+Bố cục không gian tổng thể của trang báo biểu được quy định chặt chẽ thành **2 tầng chức năng rõ rệt**:
+
+```
++-------------------------------------------------------------------------------------------------------------------------+
+| [TẦNG TRÊN CÙNG: HEADER, KPI CARDS & FILTERS]                                                                           |
+| 1. Title Banner trên cùng (Font 20pt Bold)                                                                              |
+| 2. Khối các thẻ KPI Cards (Title 15pt, Value 18pt trên nền sáng pastel)                                                 |
+| 3. Hệ thống Bộ lọc tương tác đa chiều (Slicers / Filters)                                                                |
++-------------------------------------------------------------+-----------------------------------------------------------+
+| [TẦNG DƯỚI: LƯỚI ĐỐI XỨNG CHIA ĐÚNG 4 PHẦN - ĐẶT ĐÚNG 4 LOẠI BIỂU ĐỒ (KHUYẾN KHÍCH NÂNG CAO)]                          |
++-------------------------------------------------------------+-----------------------------------------------------------+
+| [Ô 1: TRÊN - TRÁI]                                          | [Ô 2: TRÊN - PHẢI (NÂNG CAO)]                             |
+| Biểu đồ 1: Thanh Phân cấp (Clustered Bar Chart)             | Biểu đồ 2: Ma trận 4 Góc phần tư (Scatter Quadrant Plot)  |
+| Top 10 Chân sút (Trục Y Navy, Trục X Forest Green)          | Goals vs Assists vs Mins theo Vị trí, 2 đường Median      |
++-------------------------------------------------------------+-----------------------------------------------------------+
+| [Ô 3: DƯỚI - TRÁI (NÂNG CAO)]                               | [Ô 4: DƯỚI - PHẢI (NÂNG CAO)]                             |
+| Biểu đồ 3: Cây Phân rã Trực quan AI (Decomposition Tree)    | Biểu đồ 4: Bảng Ma trận Đa cấp (Executive Matrix)         |
+| Phân tích nguồn gốc đóng góp bàn thắng (Giải -> Vị trí->CLB)| Tích hợp Mini Data Bars & Heatmap, Stepped = Off          |
++-------------------------------------------------------------+-----------------------------------------------------------+
+```
+
+### Chi tiết phân vùng:
+1. **Phần trên cùng (Top Section - Control & Summary Zone):**
+   * **Title Banner:** Đặt ở vị trí cao nhất (X: 20px, Y: 15px), font 20pt Bold, nhận diện rõ tên báo cáo và khối dữ liệu OLAP.
+   * **Khối KPI Cards:** Dàn đều ngay bên dưới (Y: 85px), hiển thị các chỉ số tổng quan sống còn (Title 15pt, Value 18pt trên nền Pastel sáng).
+   * **Khối Bộ lọc Slicers/Filters:** Đặt ngay dưới khối KPI (Y: 205px), đóng vai trò thanh điều hướng tương tác đa chiều trước khi đi vào phân tích sâu.
+2. **Phần dưới (Bottom Section - 4-Quadrant Visual Analytics Grid):**
+   * Được chia cân đối thành **đúng 4 phần (lưới 2x2 đối xứng hoàn hảo)**, mỗi phần chiếm kích thước đồng đều (ví dụ: `Width = 925 px`, `Height = 390 px` trên canvas 1920x1080).
+   * Đặt **đúng 4 loại biểu đồ độc lập**, khuyến khích sử dụng các biểu đồ phân tích chuyên sâu nâng cao:
+     * **Ô 1 (Trên - Trái):** Biểu đồ thanh ngang phân cấp (Top 10 Chân sút Châu Âu).
+     * **Ô 2 (Trên - Phải):** Biểu đồ phân tán 4 góc phần tư (Scatter / Quadrant Bubble Plot) phân loại cầu thủ.
+     * **Ô 3 (Dưới - Trái):** Cây phân rã nguyên nhân AI (Decomposition Tree) hoặc Biểu đồ dải lụa (Ribbon Chart).
+     * **Ô 4 (Dưới - Phải):** Bảng ma trận đa cấp tích hợp thanh đo trực quan (Matrix with Embedded Data Bars).
+
+---
+
+## 4. QUY TẮC KHÔNG GIAN & TRIỆT TIÊU DẤU BA CHẤM (ZERO ELLIPSIS GUARANTEE)
 
 1. **Tuyệt đối không có dấu ba chấm (`...`):** Không một ô dữ liệu, tiêu đề visual, tiêu đề cột hay nhãn trục nào được phép co rút hiển thị `...`.
 2. **Kích hoạt tự động xuống dòng và tự co giãn cột:**
@@ -61,11 +99,11 @@ Mọi visual trên Dashboard bắt buộc phải tuân thủ nghiêm ngặt than
 
 ---
 
-## 4. QUY CHUẨN BIỂU ĐỒ NÂNG CAO & Ý NGHĨA THỐNG KÊ (SPORTS ANALYTICS)
+## 5. QUY CHUẨN BIỂU ĐỒ NÂNG CAO & Ý NGHĨA THỐNG KÊ (SPORTS ANALYTICS)
 
 Để đáp ứng gu thẩm mỹ và yêu cầu chuyên môn khắt khe của giảng viên, dashboard phải vượt lên trên các biểu đồ sơ cấp bằng hệ thống phân tích nâng cao:
 
-### 4.1. Ma trận 4 Góc phần tư Hiệu quả Tấn công (Scatter Quadrant Plot)
+### 5.1. Ma trận 4 Góc phần tư Hiệu quả Tấn công (Scatter Quadrant Plot)
 * **Ý nghĩa thống kê:** Chuyển từ thống kê mô tả đơn biến sang **phân tích tương quan đa biến (Multivariate Analysis)** giữa 3 biến định lượng: $X = \text{Assists}$, $Y = \text{Goals}$, $\text{Size} = \text{Minutes Played}$ và 1 biến phân loại $\text{Color} = \text{Main Position}$.
 * **Kháng ngoại lai (Robust Statistics):** Sử dụng **2 đường tham chiếu Trung vị (Median Reference Lines)** thay vì Trung bình (Mean) để loại trừ ảnh hưởng bóp méo của các Outlier ghi 30-40 bàn (Haaland, Mbappé).
 * **Phân loại chiến thuật 4 góc phần tư:**
@@ -74,18 +112,18 @@ Mọi visual trên Dashboard bắt buộc phải tuân thủ nghiêm ngặt than
   * *Góc III (Bottom-Right):* **Nhạc trưởng Kiến thiết** (Low Goals, High Assists - De Bruyne).
   * *Góc IV (Bottom-Left):* **Cầu thủ Hỗ trợ / Dự bị xoay tua**.
 
-### 4.2. Thước đo tỷ suất chuẩn hóa `Mins Per Goal`
+### 5.2. Thước đo tỷ suất chuẩn hóa `Mins Per Goal`
 * Thước đo $R = \frac{\text{Minutes Played}}{\text{Goals}}$ khử hoàn toàn **sai số về thời lượng ra sân (Exposure Time Bias)**, đánh giá công bằng hiệu quả của cầu thủ đá chính lẫn cầu thủ dự bị bùng nổ.
 
-### 4.3. Cây Phân rã Trực quan AI (Decomposition Tree)
+### 5.3. Cây Phân rã Trực quan AI (Decomposition Tree)
 * Cung cấp khả năng phân tích nguyên nhân gốc rễ (Root Cause Analysis) cho chỉ số `Goal Contributions`: Phân rã đa tầng từ `Giải đấu` $\rightarrow$ `Vị trí thi đấu` $\rightarrow$ `Câu lạc bộ` $\rightarrow$ `Cầu thủ cụ thể`.
 
-### 4.4. Bảng Ma trận Tích hợp Mini Data Bars & Heatmap
+### 5.4. Bảng Ma trận Tích hợp Mini Data Bars & Heatmap
 * Tích hợp thanh tiến độ trực quan **Data Bars** trong cột `Bàn thắng` và dải màu **Heatmap** trong cột `Tổng G+A`. Tắt `Stepped layout` để bảng hiển thị dạng phẳng chuyên nghiệp như báo cáo điều hành tài chính.
 
 ---
 
-## 5. GIẢI QUYẾT BÀI TOÁN NGHIỆP VỤ THỰC TẾ (REAL-WORLD VALUE)
+## 6. GIẢI QUYẾT BÀI TOÁN NGHIỆP VỤ THỰC TẾ (REAL-WORLD VALUE)
 
 Mọi biểu đồ trên Báo biểu 1 phải trả lời trực tiếp cho 3 bài toán quyết định của ban lãnh đạo CLB bóng đá:
 1. **Bài toán Tuyển trạch Moneyball:** Tìm kiếm các cầu thủ có hiệu suất số phút/bàn thắng cực thấp (dưới 110 phút/bàn) nhưng thời lượng ra sân chưa nhiều $\rightarrow$ Đây là những món hời chuyển nhượng bị định giá thấp.
@@ -94,7 +132,7 @@ Mọi biểu đồ trên Báo biểu 1 phải trả lời trực tiếp cho 3 b�
 
 ---
 
-## 6. QUY TẮC KỸ THUẬT & KIỂM TRA THỰC TẾ (CLEAN TESTING PROTOCOL)
+## 7. QUY TẮC KỸ THUẬT & KIỂM TRA THỰC TẾ (CLEAN TESTING PROTOCOL)
 
 1. **Đồng bộ 3 chiều tuyệt đối:** Mã MDX trong SSMS, thao tác kéo thả trên Power BI và tài liệu hướng dẫn Markdown (`power-bi/02_power_bi_bao_bieu_1.md`) phải ăn khớp 100% về số lượng dòng, cột, tọa độ và con số thực tế.
 2. **Quy tắc dọn dẹp Workspace:** Mọi script kiểm tra tạm thời trong terminal phải được xóa hoàn toàn sau khi chạy, giữ workspace luôn sạch sẽ.
