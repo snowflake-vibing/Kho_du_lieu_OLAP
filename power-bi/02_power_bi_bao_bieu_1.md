@@ -65,28 +65,40 @@ Tài liệu này hướng dẫn chi tiết từng thao tác click chuột để 
 ---
 
 ### Bước 4: Tạo khối 4 Thẻ KPI chỉ số tổng quan (Card Visuals)
-Tạo 4 thẻ Card đặt thẳng hàng ngang ngay phía dưới Banner tiêu đề (Y = 66 px, Chiều cao = 80 px, dàn đều trên chiều rộng 1250 px):
+Tạo 4 thẻ Card đặt thẳng hàng ngang ngay phía dưới Banner tiêu đề (Y = 66 px, Chiều cao = 80 px, dàn đều trên chiều rộng 1250 px, áp dụng màu nền sáng pastel để chữ màu đen nổi bật):
 
 1. **Card 1: Tổng số Bàn thắng (Total Goals)**:
    * Tại khung **Visualizations**, nhấp chọn biểu tượng **Card**.
    * Kéo thước đo `[Measures].[Goals]` từ thư mục Measures thả vào ô **Fields**.
    * Định dạng: Tab **General** -> **Title**: Bật **On**, nhập `Tổng Bàn Thắng`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ `24 pt`, In đậm (**Bold**). **Category label**: Tắt **Off**.
+   * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **18 pt**, In đậm (**Bold**), màu đen (`#0F172A`). **Category label**: Tắt **Off**.
+   * Tab **General** -> **Effects**:
+     * **Background**: Màu xanh dương nhạt (Pastel Light Blue `#E3F2FD`), Transparency: `0%`.
+     * **Visual border**: Bật **On**, màu `#90CAF9`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 296 px`, `Height = 80 px`), Position (`Horizontal = 15 px`, `Vertical = 66 px`).
 2. **Card 2: Tổng số Kiến tạo (Total Assists)**:
    * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Assists]` thả vào ô **Fields**.
    * Định dạng: **Title**: Bật **On**, nhập `Tổng Kiến Tạo`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Callout value**: Font `Segoe UI`, Cỡ chữ `24 pt`, In đậm (**Bold**). **Category label**: Tắt **Off**.
+   * **Callout value**: Font `Segoe UI`, Cỡ chữ **18 pt**, In đậm (**Bold**), màu đen (`#0F172A`). **Category label**: Tắt **Off**.
+   * Tab **General** -> **Effects**:
+     * **Background**: Màu xanh lục nhạt (Pastel Mint Green `#E8F5E9`), Transparency: `0%`.
+     * **Visual border**: Bật **On**, màu `#A5D6A7`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 296 px`, `Height = 80 px`), Position (`Horizontal = 333 px`, `Vertical = 66 px`).
 3. **Card 3: Tổng Đóng góp Bàn thắng (Goal Contributions)**:
    * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Goals] + [Assists]`) thả vào ô **Fields**.
    * Định dạng: **Title**: Bật **On**, nhập `Tổng Đóng Góp (G+A)`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Callout value**: Font `Segoe UI`, Cỡ chữ `24 pt`, In đậm (**Bold**). **Category label**: Tắt **Off**.
+   * **Callout value**: Font `Segoe UI`, Cỡ chữ **18 pt**, In đậm (**Bold**), màu đen (`#0F172A`). **Category label**: Tắt **Off**.
+   * Tab **General** -> **Effects**:
+     * **Background**: Màu vàng cam nhạt (Pastel Warm Amber `#FFF8E1`), Transparency: `0%`.
+     * **Visual border**: Bật **On**, màu `#FFE082`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 296 px`, `Height = 80 px`), Position (`Horizontal = 651 px`, `Vertical = 66 px`).
 4. **Card 4: Thời gian thi đấu trung bình (Avg Minutes Played)**:
    * Nhấp chọn biểu tượng **Card**, kéo thước đo `[Measures].[Avg Minutes Played]` thả vào ô **Fields**.
    * Định dạng: **Title**: Bật **On**, nhập `Thời Gian Thi Đấu TB`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Callout value**: Font `Segoe UI`, Cỡ chữ `24 pt`, In đậm (**Bold**), Display units: `None`. **Category label**: Tắt **Off**.
+   * **Callout value**: Font `Segoe UI`, Cỡ chữ **18 pt**, In đậm (**Bold**), màu đen (`#0F172A`), Display units: `None`. **Category label**: Tắt **Off**.
+   * Tab **General** -> **Effects**:
+     * **Background**: Màu tím oải hương nhạt (Pastel Lavender `#F3E5F5`), Transparency: `0%`.
+     * **Visual border**: Bật **On**, màu `#CE93D8`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 296 px`, `Height = 80 px`), Position (`Horizontal = 969 px`, `Vertical = 66 px`).
 
 ---
@@ -96,10 +108,12 @@ Tạo 2 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 153 px, Ch
 1. **Slicer 1 (Mùa giải):**
    * Thêm visual **Slicer**, kéo trường `DIM Time [Season]` vào ô **Field**, chọn kiểu hiển thị **Dropdown**.
    * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `12 pt`.
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#E2E8F0`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 450 px`, `Height = 50 px`), Position (`Horizontal = 15 px`, `Vertical = 153 px`).
 2. **Slicer 2 (Giải đấu):**
    * Thêm visual **Slicer**, kéo trường `DIM Competition [Competition Name]` vào ô **Field**, chọn kiểu **Dropdown**.
    * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ `12 pt`.
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#E2E8F0`, Rounded corners: `8 px`.
    * **Properties:** Size (`Width = 780 px`, `Height = 50 px`), Position (`Horizontal = 485 px`, `Vertical = 153 px`).
 
 ---
@@ -116,10 +130,13 @@ Tạo 2 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 153 px, Ch
 4. **Thiết lập bộ lọc Top 10 Cầu thủ:**
    * Tại khung **Filters**, mục **Filters on this visual** -> nhấp mở rộng `Player Name`.
    * Chọn **Top N**, tại ô **Show items** nhập `10`, tại ô **By value** kéo thước đo `Goals` vào và nhấp **Apply filter**.
-5. **Định dạng visual:**
+5. **Định dạng visual và màu sắc các trục để phân biệt:**
    * Tab **Format visual** -> **Title**: Nhập `Top 10 Cầu thủ ghi nhiều bàn thắng nhất Châu Âu`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Data labels**: Bật **On**, cỡ chữ `12 pt`.
-   * **Values** trên trục Y (Category axis) và trục X (Value axis): Font `Segoe UI`, cỡ chữ `12 pt`. Đảm bảo toàn bộ tên cầu thủ hiển thị trọn vẹn, không có dấu ba chấm.
+   * **Trục Y (Category axis - Tên cầu thủ):** Font `Segoe UI`, cỡ chữ `12 pt`, màu sắc: **Xanh dương đậm Navy** (`#0D47A1`) giúp nổi bật họ tên danh thủ.
+   * **Trục X (Value axis - Thang đo bàn thắng):** Font `Segoe UI`, cỡ chữ `12 pt`, màu sắc: **Xanh lục Forest Green** (`#1B5E20`) phân biệt rõ ràng với trục tên cầu thủ.
+   * **Data labels**: Bật **On**, cỡ chữ `12 pt`, màu `#0F172A`.
+   * **Bars (Cột thanh):** Màu Royal Blue (`#1976D2`).
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
 
 ---
 
@@ -133,8 +150,10 @@ Tạo 2 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 153 px, Ch
    * **Vùng Values:** Kéo thước đo `Goal Contributions` thả vào ô **Values**.
 4. **Định dạng visual:**
    * Tab **Format visual** -> **Title**: Nhập `Tỷ trọng Đóng góp theo Vị trí`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Slices (Màu từng vị trí):** Đỏ cam `#E53935` (Tiền đạo - Attack), Xanh dương `#1E88E5` (Tiền vệ - Midfield), Xanh lục `#43A047` (Hậu vệ - Defender).
    * **Detail labels**: Chọn `Category, percent of total`, cỡ chữ `12 pt`.
    * **Legend**: Font `Segoe UI`, cỡ chữ `12 pt`.
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
 
 ---
 
@@ -146,10 +165,12 @@ Tạo 2 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 153 px, Ch
 3. Kéo thả các trường dữ liệu:
    * **Vùng X-axis:** Tìm chiều `DIM Time`, kéo thuộc tính `Season` và `Quarter` thả vào ô **X-axis**.
    * **Vùng Column Y-axis (Cột):** Kéo thước đo `Goals` thả vào ô này.
-4. **Định dạng visual:**
+4. **Định dạng visual và màu sắc các trục:**
    * Tab **Format visual** -> **Title**: Nhập `Xu hướng Bàn thắng qua Mùa giải`, Font `Segoe UI`, Cỡ chữ `15 pt`, In đậm (**Bold**), Căn giữa (**Center**).
+   * **Trục X (Category axis - Thời gian):** Font `Segoe UI`, cỡ chữ `12 pt`, màu sắc: **Xám đen Slate Charcoal** (`#334155`).
+   * **Trục Y (Value axis - Thang bàn thắng):** Font `Segoe UI`, cỡ chữ `12 pt`, màu sắc: **Xanh đại dương Ocean Blue** (`#1565C0`).
    * **Data labels**: Bật **On**, cỡ chữ `12 pt`.
-   * Trục X và Trục Y: Font `Segoe UI`, cỡ chữ `12 pt`.
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
 
 ---
 
@@ -168,6 +189,7 @@ Tạo 2 Slicer đặt thành hàng ngang ngay dưới khối KPI (Y = 153 px, Ch
    * **Row headers**: Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**), Text wrap: **On**.
    * **Values**: Font `Segoe UI`, Cỡ chữ `12 pt`, Text wrap: **On**.
    * **Subtotals**: Font `Segoe UI`, Cỡ chữ `12 pt`, In đậm (**Bold**). Đảm bảo bảng hiển thị rõ ràng từng cột, không xuất hiện dấu ba chấm (`...`).
+   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
 
 ---
 
