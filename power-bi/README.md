@@ -9,10 +9,19 @@ Thư mục này chứa toàn bộ tài liệu hướng dẫn chi tiết quy trì
 | STT | Tên tài liệu | Nội dung chính | Khối dữ liệu áp dụng |
 | :---: | :--- | :--- | :---: |
 | **01** | [01_chuan_bi_cong_cu_ket_noi.md](file:///d:/Kho_du_lieu_OLAP/power-bi/01_chuan_bi_cong_cu_ket_noi.md) | Cài đặt Power BI Desktop; Thiết lập Live Connection trực tiếp tới Cube `[DW Football Transfermarkt]`; Xuất dữ liệu phẳng từ `DW_Football` ra file CSV và nạp vào Google Data Studio | Power BI Desktop, SSMS, Looker Studio |
-| **02** | [02_power_bi_bao_bieu_1.md](file:///d:/Kho_du_lieu_OLAP/power-bi/02_power_bi_bao_bieu_1.md) | **Báo biểu 1:** Phân tích Hiệu suất Ghi bàn và Đóng góp Kiến tạo của Cầu thủ (`Player Performance & Goal Contributions`): 4 KPI Cards, Top 10 Chân sút, Donut Chart vị trí, Combo Chart mùa giải, Matrix chi tiết | Cube `[DW Football Transfermarkt]` |
-| **03** | [03_power_bi_bao_bieu_2.md](file:///d:/Kho_du_lieu_OLAP/power-bi/03_power_bi_bao_bieu_2.md) | **Báo biểu 2:** Vận hành Trận đấu, Câu lạc bộ và Tương quan Sân vận động (`Club Match Operations & Stadium Capacity`): Bàn thắng Sân nhà vs Sân khách, Treemap giải đấu, Tương quan sức chứa sân | Cube `[DW Football Transfermarkt]` |
-| **04** | [04_power_bi_bao_bieu_3.md](file:///d:/Kho_du_lieu_OLAP/power-bi/04_power_bi_bao_bieu_3.md) | **Báo biểu 3:** Kỷ luật Thẻ phạt, Cường độ Thi đấu và Tải trọng Cầu thủ (`Discipline & Match Load Analysis`): Thẻ vàng, thẻ đỏ, tương quan thời lượng thi đấu và độ tuổi | Cube `[DW Football Transfermarkt]` |
+| **02** | [02_power_bi_bao_bieu_1.md](file:///d:/Kho_du_lieu_OLAP/power-bi/02_power_bi_bao_bieu_1.md) | **Báo biểu 1:** Hiệu suất Ghi bàn & Kiến tạo: 4 KPI Cards, Slicers; lưới 2x2: Top 10 Chân sút, Scatter 4 góc phần tư, Decomposition Tree, Matrix + Data Bars | Cube `[DW Football Transfermarkt]` |
+| **03** | [03_power_bi_bao_bieu_2.md](file:///d:/Kho_du_lieu_OLAP/power-bi/03_power_bi_bao_bieu_2.md) | **Báo biểu 2:** Vận hành Trận đấu & Lợi thế Sân nhà: 4 KPI Cards, Slicers; lưới 2x2: Sân nhà vs Sân khách Top 10 CLB, Scatter Sức chứa sân vs Bàn thắng, Ribbon Chart giải đấu theo mùa, Matrix + Data Bars | Cube `[DW Football Transfermarkt]` |
+| **04** | [04_power_bi_bao_bieu_3.md](file:///d:/Kho_du_lieu_OLAP/power-bi/04_power_bi_bao_bieu_3.md) | **Báo biểu 3:** Kỷ luật & Tải trọng: 4 KPI Cards, Slicers; lưới 2x2: Top 10 CLB nhiều thẻ, Scatter Ma trận rủi ro kỷ luật, Combo 2 trục theo Độ tuổi, Matrix + Heatmap | Cube `[DW Football Transfermarkt]` |
 | **05** | [05_looker_studio_bao_bieu.md](file:///d:/Kho_du_lieu_OLAP/power-bi/05_looker_studio_bao_bieu.md) | **Báo biểu Looker Studio (Google Data Studio):** 3 báo biểu trực tuyến trên nền web, cấu hình bộ lọc chân sút chủ lực, bảng tổng hợp phân cấp và tính năng khoan sâu Drill-down từ Quốc gia xuống CLB | Tệp `Football_Report_Data.csv` trên Looker Studio |
+
+---
+
+## Quy chuẩn thiết kế chung (theo [rule.md](../rule.md))
+* **Canvas:** 1920 x 1080 px, nền `#F8FAFC`; mọi visual nền `#FFFFFF`, viền `#CBD5E1`, bo góc 10 px.
+* **Bố cục 2 tầng:** Tầng trên = Title + KPI Cards + Slicers; Tầng dưới = lưới 2x2 (mỗi ô 925 x 385 px) đặt đúng 4 biểu đồ, ưu tiên biểu đồ nâng cao.
+* **Cỡ chữ:** Title trang 20 pt · Title visual 15 pt · Giá trị Card 18 pt · Dữ liệu/trục/nhãn 12 pt.
+* **Màu:** Card nền pastel sáng, chữ đen; trục danh mục và trục số đo dùng màu khác nhau.
+* **Không có dấu ba chấm (`...`)** ở bất kỳ visual nào.
 
 ---
 
