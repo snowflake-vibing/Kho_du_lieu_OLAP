@@ -86,18 +86,19 @@ Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo lần lượ
 TOPCOUNT([DIM Player].[Player Name].[Player Name].MEMBERS, 10, [Measures].[Assists])
 ```
 
-#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu (Grid Canvas phía dưới)
+#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu [Grid Canvas phía dưới]
 Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
-1. **Kéo Chiều Cầu thủ (Rows):**
+1. **Kéo Chiều Cầu thủ và Vị trí [Rows]:**
    * Mở rộng chiều **`DIM Player`** $\rightarrow$ tìm thuộc tính **`Player Name`**.
    * Nhấp giữ chuột vào **`Player Name`**, kéo và thả vào vùng chữ trống *"Drag levels or measures here to add to the query"*. Lúc này trên lưới xuất hiện cột `Player Name`.
-2. **Kéo Thước đo Kiến tạo (Measures):**
+   * Tìm tiếp thuộc tính **`Main Position`** trong `DIM Player`: Kéo và thả vào ngay bên cạnh cột `Player Name`.
+2. **Kéo Thước đo Kiến tạo [Measures]:**
    * Mở rộng thư mục **`Measures`** $\rightarrow$ mở rộng nhóm **`FACT Player Match Perf`**.
-   * Nhấp giữ chuột vào thước đo **`Assists`**, kéo và thả vào **ngay bên cạnh cột `Player Name`** trên lưới.
+   * Nhấp giữ chuột vào thước đo **`Assists`**, kéo và thả vào **ngay bên cạnh cột `Main Position`** trên lưới.
 
 #### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than màu đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ).
-2. Lưới dữ liệu lập tức chạy và hiển thị chính xác bảng xếp hạng đúng **10 tiền vệ kiến tạo nhiều nhất** (Kevin De Bruyne dẫn đầu với 18 kiến tạo, Bruno Fernandes 15 kiến tạo...).
+1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** hoặc bấm biểu tượng dấu chấm than màu đỏ **`! Execute`** / phím tắt **F5** trên thanh công cụ.
+2. Lưới dữ liệu lập tức chạy và hiển thị chính xác bảng xếp hạng đúng **10 tiền vệ kiến tạo nhiều nhất**, trong đó Kevin De Bruyne dẫn đầu với 28 kiến tạo, Joey Veerman 26 kiến tạo, Matt O'Riley và Xavi Simons cùng 22 kiến tạo.
 3. **Mẹo chuyên môn:** Nhấp vào biểu tượng **`Design Mode`** trên thanh công cụ để xem câu lệnh MDX mà Visual Studio tự động biên dịch phía sau giao diện kéo thả này.
 
 ---
@@ -107,51 +108,51 @@ Quan sát cây thư mục **Metadata** ở bên trái tab Browser:
 Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác dữ liệu trực tiếp trên Excel.
 
 #### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
+1. Khởi động **Microsoft Excel**, tạo một trang tính trống [Blank Workbook].
 2. Chọn thẻ tab **`Data`** trên thanh Ribbon.
-3. Trong nhóm lệnh *Get & Transform Data* (hoặc *Get External Data*):
+3. Trong nhóm lệnh *Get & Transform Data* hoặc *Get External Data*:
    * Nhấp chọn **`Get Data`** $\rightarrow$ chọn **`From Database`** $\rightarrow$ chọn **`From Analysis Services`**.
 4. Cửa sổ **Data Connection Wizard** xuất hiện:
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
+   * **Server name:** Nhập `localhost` hoặc tên máy tính / instance SSAS.
    * **Log on credentials:** Chọn **`Use Windows Authentication`**.
    * Nhấn nút **Next >**.
 
 #### Bước 2: Chọn Database và Khối đa chiều
 1. Tại màn hình *Select Database and Table*:
-   * Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** (hoặc tên database SSAS tương ứng).
-   * Chọn Cube: **`DW Football Transfermarkt`** (hoặc `DW_Football_Cube`).
-2. Nhấn nút **Finish**.
-3. Hộp thoại **Import Data** hiện lên:
+   * Chọn cơ sở dữ liệu: **`SSAS_Football_Transfermarkt`** hoặc **`DW_Football_SSAS`**.
+   * Chọn Cube: **`DW Football Transfermarkt`** $\rightarrow$ Nhấn nút **Finish**.
+2. Hộp thoại **Import Data** hiện lên:
    * Chọn dạng hiển thị: Tích chọn **`PivotTable Report`**.
    * Vị trí đặt bảng: Chọn ô **`=$A$3`** của Sheet hiện tại $\rightarrow$ Nhấn **OK**.
 
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
+| Vùng PivotTable [Kéo vào đâu] | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Competition Type`** | Mở thư mục **`DIM Competition`** $\rightarrow$ Kéo `Competition Type` thả vào ô Filters. |
-| **Ô `Filters` (Bộ lọc báo cáo)** | **`Main Position`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Main Position` thả vào ô Filters. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Assists`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Assists` thả vào ô Values (hiển thị `Sum of Assists`). |
+| **Ô `Filters` [Bộ lọc báo cáo]** | **`Competition Type`** | Mở thư mục **`DIM Competition`** $\rightarrow$ Kéo `Competition Type` thả vào ô Filters. |
+| **Ô `Rows` [Dòng dữ liệu]** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
+| **Ô `Rows` [Dòng dữ liệu]** | **`Main Position`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Main Position` thả vào ô Rows [nằm dưới `Player Name`]. |
+| **Ô `Values` [$\Sigma$ Thước đo]** | **`Assists`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Assists` thả vào ô Values [hiển thị `Sum of Assists`]. |
 
 #### Bước 4: Thiết lập Giá trị Bộ lọc trên Sheet Excel
-1. **Lọc Loại giải đấu:** Tại ô **`B1`** (bên cạnh nhãn `Competition Type`), nhấp mũi tên xổ xuống $\rightarrow$ tick chọn **`domestic_league`** $\rightarrow$ Nhấn **OK**.
-2. **Lọc Vị trí Tiền vệ:** Tại ô **`B2`** (bên cạnh nhãn `Main Position`), nhấp mũi tên xổ xuống $\rightarrow$ tick chọn **`Midfield`** $\rightarrow$ Nhấn **OK**.
+1. **Lọc Loại giải đấu:** Tại ô **`B1`** [bên cạnh nhãn `Competition Type`], nhấp mũi tên xổ xuống $\rightarrow$ tick chọn **`domestic_league`** $\rightarrow$ Nhấn **OK**.
+2. **Lọc Vị trí Tiền vệ:** Tại ô mũi tên lọc của trường `Main Position` trên bảng, tick chọn duy nhất vị trí **`Midfield`** $\rightarrow$ Nhấn **OK**.
 
 #### Bước 5: Cấu hình Bộ lọc Top 10 Vua kiến tạo
-1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
+1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** [ô `A4`].
 2. Di chuột vào mục **`Value Filters`** $\rightarrow$ chọn tiếp **`Top 10...`**.
-3. Trong hộp thoại **Top 10 Filter (Player Name)**:
+3. Trong hộp thoại **Top 10 Filter [Player Name]**:
    * Ô thứ nhất: Chọn **`Top`**.
    * Ô thứ hai: Nhập số **`10`**.
    * Ô thứ ba: Chọn **`Items`**.
-   * Ô thứ tư (By): Chọn thước đo **`Sum of Assists`**.
+   * Ô thứ tư [By]: Chọn thước đo **`Sum of Assists`**.
 4. Nhấn **OK**.
 
 #### Bước 6: Trình bày bảng kết quả
-* Vô thẻ ngữ cảnh **`Design`** trên Ribbon $\rightarrow$ chọn **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`** (để tiêu đề cột đổi thành `Player Name`).
-* Chọn **Grand Totals** $\rightarrow$ chọn **`Off for Rows and Columns`** để ẩn dòng tổng cộng, giữ lại đúng bảng xếp hạng 10 cầu thủ.
+* Vào thẻ ngữ cảnh **`Design`** trên Ribbon $\rightarrow$ chọn **Report Layout** $\rightarrow$ chọn **`Show in Tabular Form`**.
+* Chọn **Subtotals** $\rightarrow$ chọn **`Do Not Show Subtotals`**.
+* Chọn **Grand Totals** $\rightarrow$ chọn **`Off for Rows and Columns`** để ẩn dòng tổng cộng, giữ lại đúng bảng xếp hạng 10 tiền vệ tương ứng.
 
 ---
 

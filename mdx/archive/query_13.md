@@ -130,21 +130,43 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
+| Vùng PivotTable [Kéo vào đâu] | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** $\rightarrow$ Kéo `Club Name` thả vào ô Rows. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Squad Size`** | Mở thư mục **`DIM Club`** $\rightarrow$ Kéo `Squad Size` thả vào ô Rows (dưới `Club Name`). |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`FACT Player Match Perf Count`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `FACT Count` thả vào ô Values. |
+| **Ô `Values` [$\Sigma$ Thước đo]** | **`FACT Player Match Perf Count`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `FACT Count` thả vào ô Values. |
 
-#### Bước 4: Lọc Top 15 và Sắp xếp hiển thị
-1. Nhấp mũi tên lọc tại `Row Labels` (ô `A3`) $\rightarrow$ chọn **`Value Filters`** $\rightarrow$ chọn **`Top 10...`**:
-   * Ô thứ nhất: Chọn **`Top`**.
-   * Ô thứ hai: Nhập số **`15`**.
-   * Ô thứ ba: Chọn **`Items`**.
-   * Ô thứ tư (By): Chọn thuộc tính **`Squad Size`** (hoặc `Sum of FACT Player Match Perf Count`) $\rightarrow$ Nhấn **OK**.
-2. Chuột phải vào một ô trong cột `Squad Size` $\rightarrow$ chọn **Sort** $\rightarrow$ chọn **`Sort Largest to Smallest`**.
-3. Thẻ ngữ cảnh **`Design`** $\rightarrow$ **Report Layout** $\rightarrow$ **`Show in Tabular Form`**.
-4. Chọn **Subtotals** $\rightarrow$ **`Do Not Show Subtotals`** và **Grand Totals** $\rightarrow$ **`Off for Rows and Columns`**.
+#### Bước 4: Tạo tập hợp MDX Set trích xuất Top 15 CLB quy mô lớn nhất
+Do `Squad Size` là thuộc tính phân loại của chiều `DIM Club` chứ không phải thước đo số học trong vùng `Values`, tính năng `Value Filters` của Excel sẽ không hiển thị trường này trong danh sách xếp hạng. Vì vậy, ta áp dụng tính năng tạo Set MDX chuyên sâu của OLAP PivotTable:
+1. Trên thanh Ribbon, chọn thẻ **`PivotTable Analyze`** $\rightarrow$ nhấp chọn mục **`Fields, Items, & Sets`** $\rightarrow$ chọn **`Create Set Using MDX...`**.
+2. Cửa sổ thiết lập tập hợp xuất hiện:
+   * **Set name:** Nhập `Top 15 CLB Quy Mo Doi Hinh`.
+   * **MDX expression:** Dán biểu thức sau vào khung soạn thảo:
+```mdx
+TOPCOUNT(
+    ORDER(
+        NONEMPTY(
+            CrossJoin(
+                EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
+                EXCEPT([DIM Club].[Squad Size].[Squad Size].MEMBERS, { [DIM Club].[Squad Size].[All] })
+            ),
+            [Measures].[FACT Player Match Perf Count]
+        ),
+        [DIM Club].[Squad Size].CURRENTMEMBER.MEMBERVALUE,
+        BDESC
+    ),
+    15,
+    [DIM Club].[Squad Size].CURRENTMEMBER.MEMBERVALUE
+)
+```
+   * Nhấn nút **OK** để hoàn tất.
+3. Trong khung danh sách trường `PivotTable Fields`, mở thư mục `Sets`, kéo tập hợp vừa tạo vào ô **`Rows`**. Bảng lập tức xuất hiện 15 CLB có quân số đăng ký lớn nhất xếp giảm dần từ 45 xuống 37.
+4. **Thêm thước đo Số cầu thủ thực chiến Active Players Count:**
+   * Chọn thẻ **`PivotTable Analyze`** $\rightarrow$ **`Fields, Items, & Sets`** $\rightarrow$ chọn **`Calculated Measure...`**.
+   * Measure name: Nhập `Active Players Count`.
+   * MDX formula: Dán công thức `DISTINCTCOUNT(EXISTING [DIM Player].[Player ID].[Player ID].MEMBERS)`.
+   * Nhấn nút **OK** để thêm thước đo vào ô **`Values`** bên cạnh `FACT Player Match Perf Count`.
+5. **Định dạng bố cục bảng:**
+   * Thẻ **`Design`** $\rightarrow$ **Report Layout** $\rightarrow$ **`Show in Tabular Form`**.
+   * Chọn **Subtotals** $\rightarrow$ **`Do Not Show Subtotals`** và **Grand Totals** $\rightarrow$ **`Off for Rows and Columns`**.
 
 ---
 

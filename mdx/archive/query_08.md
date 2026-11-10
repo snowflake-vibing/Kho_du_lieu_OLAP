@@ -123,21 +123,38 @@ Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác d�
 #### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
 Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
 
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
+| Vùng PivotTable [Kéo vào đâu] | Tên Trường dữ liệu | Vị trí thư mục nguồn |
 | :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values. |
-| **Ô `Values` ($\Sigma$ Thước đo)** | **`Minutes Played`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Minutes Played` thả vào ô Values. |
+| **Ô `Rows` [Dòng dữ liệu]** | **`Player Name`** | Mở thư mục **`DIM Player`** $\rightarrow$ Kéo `Player Name` thả vào ô Rows. |
+| **Ô `Values` [$\Sigma$ Thước đo]** | **`Goals`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Goals` thả vào ô Values. |
+| **Ô `Values` [$\Sigma$ Thước đo]** | **`Minutes Played`** | Mở thư mục **`Measures`** $\rightarrow$ Kéo `Minutes Played` thả vào ô Values. |
 
-#### Bước 4: Lọc ngưỡng bàn thắng và Xếp hạng Bottom 15
-1. **Lọc ngưỡng $\ge 15$ bàn:** Nhấp mũi tên lọc tại ô **`Row Labels`** (ô `A3`), di chuột vào **`Value Filters`** $\rightarrow$ chọn **`Greater Than Or Equal To...`**:
-   * Nhập số **`15`** theo thước đo `Sum of Goals` $\rightarrow$ Nhấn **OK**.
-2. **Lọc Bottom 15 thời gian thi đấu:** Nhấp tiếp mũi tên lọc tại `Row Labels` $\rightarrow$ **`Value Filters`** $\rightarrow$ chọn **`Top 10...`**:
-   * Ô thứ nhất: Chọn **`Bottom`**.
-   * Ô thứ hai: Nhập số **`15`**.
-   * Ô thứ ba: Chọn **`Items`**.
-   * Ô thứ tư (By): Chọn **`Sum of Minutes Played`** $\rightarrow$ Nhấn **OK**.
-3. **Sắp xếp tăng dần:** Chuột phải vào một ô trong cột `Sum of Minutes Played` $\rightarrow$ chọn **Sort Smallest to Largest**.
+#### Bước 4: Tạo tập hợp MDX Set lọc ngưỡng bàn thắng và Xếp hạng Bottom 15
+Do bài toán yêu cầu kết hợp đồng thời hai điều kiện là lọc ngưỡng từ 15 bàn trở lên và lấy Top 15 thời gian thi đấu ít nhất [Bottom 15 Minutes Played], nếu dùng bộ lọc `Value Filters` thông thường trong Excel thì điều kiện sau sẽ ghi đè làm mất điều kiện trước. Vì vậy, ta áp dụng tính năng tạo Set MDX chuẩn xác:
+1. Trên thanh Ribbon, chọn thẻ **`PivotTable Analyze`** $\rightarrow$ nhấp chọn mục **`Fields, Items, & Sets`** $\rightarrow$ chọn **`Create Set Using MDX...`**.
+2. Cửa sổ thiết lập tập hợp xuất hiện:
+   * **Set name:** Nhập `Top 15 Hieu Suat San Ban`.
+   * **MDX expression:** Dán biểu thức sau vào khung soạn thảo:
+```mdx
+BOTTOMCOUNT(
+    FILTER(
+        NONEMPTY([DIM Player].[Player Name].[Player Name].MEMBERS, [Measures].[Goals]),
+        [Measures].[Goals] >= 15
+    ),
+    15,
+    [Measures].[Minutes Played]
+)
+```
+   * Nhấn nút **OK** để hoàn tất.
+3. Trong khung danh sách trường `PivotTable Fields`, xuất hiện mục Set vừa tạo tại thư mục `Sets`, kéo tập hợp này vào ô **`Rows`** [thay thế cho trường `Player Name` phẳng trước đó].
+4. **Thêm thước đo Hiệu suất Mins Per Goal:**
+   * Chọn thẻ **`PivotTable Analyze`** $\rightarrow$ **`Fields, Items, & Sets`** $\rightarrow$ chọn **`Calculated Measure...`**.
+   * Measure name: Nhập `Mins Per Goal`.
+   * MDX formula: Dán công thức `ROUND([Measures].[Minutes Played] / [Measures].[Goals], 1)`.
+   * Nhấn nút **OK** để thêm thước đo vào ô **`Values`**.
+5. **Sắp xếp và định dạng:**
+   * Chuột phải vào một ô trong cột `Minutes Played` $\rightarrow$ chọn **Sort Smallest to Largest**.
+   * Thẻ **`Design`** $\rightarrow$ chọn **Report Layout** $\rightarrow$ **`Show in Tabular Form`** $\rightarrow$ **Subtotals** $\rightarrow$ **`Do Not Show Subtotals`** $\rightarrow$ **Grand Totals** $\rightarrow$ **`Off for Rows and Columns`**.
 
 ---
 
