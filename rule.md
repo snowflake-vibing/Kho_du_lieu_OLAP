@@ -60,8 +60,8 @@ Bố cục không gian tổng thể của trang báo biểu được quy định
 | Top 10 Chân sút (Trục Y Navy, Trục X Forest Green)          | Goals vs Assists vs Mins theo Vị trí, 2 đường Median      |
 +-------------------------------------------------------------+-----------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI (NÂNG CAO)]                               | [Ô 4: DƯỚI - PHẢI (NÂNG CAO)]                             |
-| Biểu đồ 3: Cây Phân rã Trực quan AI (Decomposition Tree)    | Biểu đồ 4: Bảng Ma trận Đa cấp (Executive Matrix)         |
-| Phân tích nguồn gốc đóng góp bàn thắng (Giải -> Vị trí->CLB)| Tích hợp Mini Data Bars & Heatmap, Stepped = Off          |
+| Biểu đồ 3: Bản đồ Phân tầng Đa cấp (Hierarchical Treemap)   | Biểu đồ 4: Bảng Ma trận Đa cấp (Executive Matrix)         |
+| Phân tích cơ cấu tỷ trọng bàn thắng (Giải -> Vị trí -> CLB) | Tích hợp Mini Data Bars & Heatmap, Stepped = Off          |
 +-------------------------------------------------------------+-----------------------------------------------------------+
 ```
 
@@ -75,7 +75,7 @@ Bố cục không gian tổng thể của trang báo biểu được quy định
    * Đặt **đúng 4 loại biểu đồ độc lập**, khuyến khích sử dụng các biểu đồ phân tích chuyên sâu nâng cao:
      * **Ô 1 (Trên - Trái):** Biểu đồ thanh ngang phân cấp (Top 10 Chân sút Châu Âu).
      * **Ô 2 (Trên - Phải):** Biểu đồ phân tán 4 góc phần tư (Scatter / Quadrant Bubble Plot) phân loại cầu thủ.
-     * **Ô 3 (Dưới - Trái):** Cây phân rã nguyên nhân AI (Decomposition Tree) hoặc Biểu đồ dải lụa (Ribbon Chart).
+     * **Ô 3 (Dưới - Trái):** Bản đồ phân tầng đa cấp (Hierarchical Treemap Drill-down) phân tích cơ cấu tỷ trọng Part-to-Whole (tương thích 100% với SSAS Multidimensional Live Connection, loại bỏ triệt để lỗi không tương thích của AI Tree).
      * **Ô 4 (Dưới - Phải):** Bảng ma trận đa cấp tích hợp thanh đo trực quan (Matrix with Embedded Data Bars).
 
 ---

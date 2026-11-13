@@ -2,7 +2,7 @@
 
 Tài liệu này cung cấp hướng dẫn thiết kế hoàn chỉnh **Báo biểu 1 (Executive Dashboard 1)** trên phần mềm **Power BI Desktop**, kết nối trực tiếp (Live Connection) với khối dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`. 
 
-Báo biểu được thiết kế theo chuẩn **Dashboard Doanh nghiệp & Nghiên cứu Học thuật Quốc tế**, tối ưu hóa không gian hiển thị trên độ phân giải **Full HD 1920 x 1080 px (16:9)**, tích hợp các dạng biểu đồ phân tích chuyên sâu (Scatter Quadrant Matrix, Decomposition Tree / Ribbon Chart, Clustered Bar Tooltips và Matrix Data Bars), tuân thủ nghiêm ngặt nguyên lý tương phản thị giác, hệ màu ngữ nghĩa (Semantic Colors) và triệt tiêu hoàn toàn hiện tượng co rút hay dấu ba chấm (`...`).
+Báo biểu được thiết kế theo chuẩn **Dashboard Doanh nghiệp & Nghiên cứu Học thuật Quốc tế**, tối ưu hóa không gian hiển thị trên độ phân giải **Full HD 1920 x 1080 px (16:9)**, tích hợp các dạng biểu đồ phân tích chuyên sâu (Scatter Quadrant Matrix, Hierarchical Treemap Drill-down, Clustered Bar Tooltips và Matrix Data Bars), tuân thủ nghiêm ngặt nguyên lý tương phản thị giác, hệ màu ngữ nghĩa (Semantic Colors) và triệt tiêu hoàn toàn hiện tượng co rút hay dấu ba chấm (`...`).
 
 ---
 
@@ -23,7 +23,7 @@ Báo biểu được thiết kế theo chuẩn **Dashboard Doanh nghiệp & Nghi
        * *Góc II (Top-Left) - Sát thủ vòng cấm (Pure Goal Scorers):* Bàn thắng vượt trội, tập trung dứt điểm độc lập (Erling Haaland, Robert Lewandowski).
        * *Góc III (Bottom-Right) - Nhạc trưởng kiến tạo (Master Playmakers):* Kiến tạo dồi dào, điều tiết nhịp độ tấn công (Kevin De Bruyne, Bruno Fernandes).
        * *Góc IV (Bottom-Left) - Cầu thủ hỗ trợ / Luân phiên thi đấu (Rotational Squad).*
-  4. **Biểu đồ Nâng cao 2: Phân bổ Đóng góp & Dịch chuyển Xu hướng qua các Mùa giải:** Kết hợp phân bổ tỷ trọng theo vị trí (`Main Position`) và cây phân rã nguyên nhân AI (`Decomposition Tree`) hoặc biểu đồ dải lụa (`Ribbon Chart`) theo dõi sự biến thiên thứ hạng qua các mùa giải (`Season`).
+  4. **Biểu đồ Nâng cao 2: Bản đồ Phân tầng Đa cấp (Hierarchical Treemap Drill-down):** Phân tích cơ cấu đóng góp bàn thắng (Part-to-Whole Composition) phân cấp đa tầng từ Giải đấu (`Competition Name`) -> Vị trí thi đấu (`Main Position`) -> Câu lạc bộ (`Club Name`), hỗ trợ tính năng khoan sâu (Drill-down) trực quan, tương thích tuyệt đối 100% với Live Connection tới SSAS Multidimensional Cube (loại bỏ hoàn toàn lỗi AI query của Decomposition Tree).
   5. **Bảng Ma trận Tra cứu Đa cấp Tích hợp Mini Data Bars (Executive Matrix):** Trải rộng toàn bộ nửa dưới dashboard, tích hợp thanh đo dữ liệu trực quan (**Data Bars**) ngay trong ô số liệu, định dạng xen kẽ dòng Zebra Striping, hiển thị rõ ràng thông tin chi tiết của từng cầu thủ theo CLB mà không có bất kỳ dấu ba chấm (`...`) nào.
   6. **Hệ thống Lọc Thông minh (Smart Slicers):** Mùa giải (`Season`), Giải đấu (`Competition Name`), Vị trí thi đấu (`Main Position`).
 
@@ -67,10 +67,10 @@ Tuân thủ nghiêm ngặt **Quy tắc Bố cục Phân tầng**: Phần trên c
 | Trục Y (Navy Blue #0D47A1), Trục X (Forest Green #1B5E20)| 2 Đường phân chia Trung vị (Median Reference Lines)           |
 | Tọa độ: X = 20 px, Y = 265 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 265 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | CÂY PHÂN RÃ NGUYÊN NHÂN AI]         | [Ô 4: DƯỚI - PHẢI | BẢNG MA TRẬN ĐA CẤP (EXECUTIVE MATRIX)]   |
-| Cây phân rã AI Đóng góp Bàn thắng (Decomposition Tree)  | Bảng tra cứu phong độ chi tiết từng Cầu thủ theo CLB          |
-| Phân rã: Giải đấu -> Vị trí -> CLB -> Cầu thủ           | Tích hợp Mini Data Bars & Heatmap, Stepped Layout = Off       |
-| Tọa độ: X = 20 px, Y = 675 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 675 px | W = 925 px, H = 385 px       |
+| [Ô 3: DƯỚI - TRÁI | BẢN ĐỒ PHÂN TẦNG ĐA CẤP (TREEMAP)]      | [Ô 4: DƯỚI - PHẢI | BẢNG MA TRẬN ĐA CẤP (EXECUTIVE MATRIX)]   |
+| Bản đồ phân tầng tỷ trọng Đóng góp Bàn thắng (Treemap)    | Bảng tra cứu phong độ chi tiết từng Cầu thủ theo CLB          |
+| Phân cấp Drill-down: Giải đấu -> Vị trí -> CLB            | Tích hợp Mini Data Bars & Heatmap, Stepped Layout = Off       |
+| Tọa độ: X = 20 px, Y = 675 px | W = 925 px, H = 385 px    | Tọa độ: X = 975 px, Y = 675 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
 
@@ -251,23 +251,27 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 8: Tạo Biểu đồ Nâng cao 2: Cây Phân rã Trực quan AI (Ô 3: Dưới - Trái)
-1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Decomposition tree** (Cây phân rã nguyên nhân).
-   *(Ghi chú: Nếu muốn phân tích xếp hạng theo mùa giải, có thể chọn biểu tượng **Ribbon chart**).*
+### Bước 8: Tạo Biểu đồ Nâng cao 2: Bản đồ Phân tầng Đa cấp (Treemap Drill-down) (Ô 3: Dưới - Trái)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Treemap** (Bản đồ phân tầng diện tích đa cấp).
+   *(Lưu ý kỹ thuật: Visual Treemap sử dụng phép toán phân vùng diện tích hình chữ nhật chuẩn OLAP, tương thích tuyệt đối 100% với SSAS Multidimensional Live Connection, loại bỏ triệt để lỗi không tương thích "Something's wrong with the visual" của AI Split trên Decomposition Tree).*
 2. Thiết lập kích thước và vị trí theo quy chuẩn lưới 2x2:
    * **Size:** `Width = 925 px`, `Height = 385 px`
    * **Position:** `Horizontal = 20 px`, `Vertical = 675 px`
-3. Kéo thả các trường dữ liệu:
-   * **Analyze (Chỉ số phân tích gốc):** Kéo thước đo `[Measures].[Goal Contributions]` vào ô này.
-   * **Explain by (Các chiều không gian giải thích nguyên nhân):** Kéo lần lượt theo thứ tự phân tầng từ vĩ mô xuống vi mô:
-     1. `DIM Competition [Competition Name]` (Giải đấu)
-     2. `DIM Player [Main Position]` (Vị trí thi đấu)
-     3. `DIM Club [Club Name]` (Câu lạc bộ)
-     4. `DIM Player [Player Name]` (Cầu thủ cụ thể)
-4. **Định dạng visual:**
-   * Tab **Format visual** -> **Title**: Nhập `Cây Phân rã AI Đóng góp Bàn thắng (Decomposition Tree)`, Font `Segoe UI`, Cỡ chữ **`15 pt`**, In đậm (**Bold**), Căn giữa.
-   * **Tree bars:** Primary color chọn Xanh dương `#2563EB`.
-   * **Data labels:** Cỡ chữ **`12 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`.
+3. Kéo thả các trường dữ liệu vào khung **Build visual**:
+   * **Category (Phân cấp nhóm đa tầng):** Kéo lần lượt 3 trường phân cấp từ vĩ mô xuống vi mô:
+     1. `DIM Competition [Competition Name]` (Tầng 1: Giải đấu)
+     2. `DIM Player [Main Position]` (Tầng 2: Vị trí thi đấu)
+     3. `DIM Club [Club Name]` (Tầng 3: Câu lạc bộ)
+   * **Values (Kích thước ô tỷ trọng):** Kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Measures].[Goals]`).
+4. **Hướng dẫn kích hoạt tính năng Khoan sâu (Drill-down):**
+   * Rê chuột lên góc trên bên phải thanh tiêu đề của visual Treemap:
+     * Nhấp mũi tên đơn trỏ xuống (↓) để bật chế độ **Click to turn on Drill down**: Khi nhấp vào một khối Giải đấu (ví dụ: `Premier League`), visual sẽ lập tức phóng to phân rã thành các khối Vị trí thi đấu (`Attack`, `Midfield`, `Defender`) trong giải đấu đó.
+     * Nhấp biểu tượng mũi tên đôi trỏ xuống (↓↓) để chuyển toàn bộ biểu đồ xuống cấp phân tích tiếp theo.
+     * Nhấp mũi tên phân nhánh (⑂) để mở rộng đồng thời cả 2 cấp phân tầng trên cùng một màn hình hiển thị.
+5. **Định dạng visual:**
+   * Tab **Format visual** -> **Title**: Bật **On**, nhập `Bản đồ Phân tầng Đa cấp Đóng góp Bàn thắng (Hierarchical Treemap)`, Font `Segoe UI`, Cỡ chữ **`15 pt`**, In đậm (**Bold**), Căn giữa (**Center**).
+   * Tab **Format visual** -> **Data labels**: Bật **On**, Font `Segoe UI`, Cỡ chữ **`12 pt`**, In đậm (**Bold**), màu sắc: `#FFFFFF` (tương phản nổi bật trên nền các khối màu).
+   * Tab **Format visual** -> **Category labels**: Bật **On**, Font `Segoe UI`, Cỡ chữ **`12 pt`**, In đậm (**Bold**).
    * Tab **General** -> **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
@@ -316,7 +320,7 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 * **Khả năng tương tác chéo (Cross-filtering & Drill-down):** Khi giảng viên nhấp vào nhóm vị trí `Attack` trên Slicer hoặc nhấp vào giải đấu `Premier League`:
   * Cả 4 thẻ KPI Cards lập tức cập nhật lại số liệu riêng cho giải Ngoại Hạng Anh.
   * Ma trận phân tán 4 góc phần tư lập tức làm nổi bật các chân sút Premier League, tách biệt rõ Haaland (săn bàn thuần túy góc II) và Salah (siêu sao toàn diện góc I).
-  * Cây phân rã AI tự động mở nhánh dòng đóng góp bàn thắng cho từng CLB.
+  * Bản đồ phân tầng Treemap tự động thu phóng và hiển thị cơ cấu đóng góp bàn thắng của từng tuyến thi đấu và từng CLB.
   * Bảng ma trận bên dưới lọc chính xác danh sách cầu thủ thuộc giải đấu, từng ô hiển thị thanh Data Bar sinh động, sắc nét, không một lỗi tràn ô hay dấu `...`.
 
 ### B. Lập luận phân tích dữ liệu thể thao chuyên sâu (Sport Intelligence Insights)
@@ -326,4 +330,4 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 2. **Hiệu suất thời lượng thi đấu (Minutes per Goal Efficiency):**
    * Các chân sút thuộc Top 10 Châu Âu duy trì hiệu suất dưới **105 phút/bàn**, trong khi mức trung bình của toàn bộ các giải đấu là **214 phút/bàn**. Điều này cho thấy tính ổn định cực cao của nhóm tinh hoa.
 3. **Phân tích chiều sâu đội hình (Squad Depth Analysis):**
-   * Thông qua Cây phân rã AI, người phân tích dễ dàng nhận ra các CLB vô địch (như Manchester City, Real Madrid) có cơ cấu đóng góp bàn thắng trải đều ở cả 3 tuyến (Tiền đạo, Tiền vệ và Hậu vệ biên), trong khi các đội bóng tầm trung phụ thuộc tới hơn 75% vào một chân sút chủ lực duy nhất.
+   * Thông qua Bản đồ phân tầng Treemap, người phân tích dễ dàng nhận ra các CLB vô địch (như Manchester City, Real Madrid) có cơ cấu đóng góp bàn thắng trải đều ở cả 3 tuyến (Tiền đạo, Tiền vệ và Hậu vệ biên), trong khi các đội bóng tầm trung phụ thuộc tới hơn 75% vào một chân sút chủ lực duy nhất.
