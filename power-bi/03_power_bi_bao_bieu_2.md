@@ -43,10 +43,10 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 2 - VẬN HÀNH CLB, SÂN ĐẤU & QUY MÔ ĐỘI HÌNH (Font: 20pt Bold, Center)         |
 | Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Trận Đấu]   | [Card 2: Tổng Lượt Ra Sân]| [Card 3: Lượt Xuất Phát Chính]| [Card 4: Thời Lượng Thi Đấu TB]   |
-| Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold          | Callout: 35pt Bold                |
-| Nền: Pastel Blue #EFF6FF  | Nền: Pastel Green #F0FDF4 | Nền: Pastel Amber #FFFBEB   | Nền: Pastel Purple #FAF5FF        |
-| (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)          |
+| [Card 1: Tổng Trận Đấu]   | [Card 2: Tổng Lượt Ra Sân]| [Card 3: Tổng Phút Vận Hành]  | [Card 4: Thời Lượng Thi Đấu TB]   |
+| Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold (Millions) | Callout: 35pt Bold                |
+| Nền: Pastel Blue #EFF6FF  | Nền: Pastel Green #F0FDF4 | Nền: Pastel Amber #FFFBEB     | Nền: Pastel Purple #FAF5FF        |
+| (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)       | (W: 455, H: 95, X: 1445)          |
 +---------------------------+---------------------------+-----------------------------+-----------------------------------+
 | [Slicer 1: Giải đấu]                                  | [Slicer 2: Mùa giải]        | [Slicer 3: Loại giải đấu (Tile)]  |
 | (W: 650, H: 75, X: 20, Y: 210)                        | (W: 600, H: 75, X: 690)     | (W: 590, H: 75, X: 1310)          |
@@ -116,13 +116,13 @@ Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều 
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Green **`#F0FDF4`**, Viền `#86EFAC`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 495 px`, `Y = 95 px`.
 
-#### 3. Card 3: Tổng Lượt Xuất phát Đá chính (Total Starters)
+#### 3. Card 3: Tổng Số Phút Vận Hành Thi Đấu (Total Minutes Played)
 * Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Is Starter]`** vào ô **Fields** (tính tổng số lượt ra sân trong đội hình xuất phát 11 người).
+* Kéo thước đo **`[Measures].[Minutes Played]`** vào ô **Fields** (tổng khối lượng thời gian thi đấu toàn giải, hoàn toàn là số dương).
 * **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Lượt đá chính`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG LƯỢT XUẤT PHÁT ĐÁ CHÍNH`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#92400E`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
+  * Đổi tên trường thành: **`Tổng số phút`**.
+* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG SỐ PHÚT VẬN HÀNH THI ĐẤU`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#92400E`.
+* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`, mục **Display units** chọn **`Millions`** (hoặc `Auto` để hiện dạng triệu phút, ví dụ `13.56M`). **Category label**: Tắt **Off**.
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Amber **`#FFFBEB`**, Viền `#FCD34D`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 970 px`, `Y = 95 px`.
 

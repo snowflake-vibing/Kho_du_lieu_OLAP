@@ -42,7 +42,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 3 - KỶ LUẬT THẺ PHẠT & TẢI TRỌNG THI ĐẤU (Font: 20pt Bold, Center)           |
 | Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Thẻ Vàng]   | [Card 2: Tổng Thẻ Đỏ]     | [Card 3: Lượt Đá Chính]     | [Card 4: Tổng Số Phút]            |
+| [Card 1: Tổng Thẻ Vàng]   | [Card 2: Tổng Thẻ Đỏ]     | [Card 3: Tổng Lượt Ra Sân]| [Card 4: Tổng Số Phút]            |
 | Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold          | Callout: 35pt Bold (Millions)     |
 | Nền: Pastel Amber #FFFBEB | Nền: Pastel Red #FEF2F2   | Nền: Pastel Blue #EFF6FF    | Nền: Pastel Green #F0FDF4         |
 | (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)          |
@@ -115,12 +115,12 @@ Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều 
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Red **`#FEF2F2`**, Viền `#FCA5A5`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 495 px`, `Y = 95 px`.
 
-#### 3. Card 3: Tổng Lượt Cầu thủ Đá chính (Total Starters)
+#### 3. Card 3: Tổng Lượt Cầu thủ Thi đấu (Total Appearances)
 * Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Is Starter]`** vào ô **Fields** (thước đo tính tổng số lượt cầu thủ xuất phát trong đội hình chính, có sẵn 100% trong Cube).
+* Kéo thước đo **`[Measures].[FACT Player Match Perf Count]`** vào ô **Fields** (tổng số lượt ra sân thi đấu của các cầu thủ toàn giải).
 * **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Lượt đá chính`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `LƯỢT RA SÂN ĐÁ CHÍNH`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#1E3A8A`.
+  * Đổi tên trường thành: **`Tổng lượt ra sân`**.
+* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG LƯỢT CẦU THỦ RA SÂN`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#1E3A8A`.
 * Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Blue **`#EFF6FF`**, Viền `#93C5FD`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 970 px`, `Y = 95 px`.
@@ -262,7 +262,7 @@ Bạn có thể sử dụng visual **Table (Bảng phẳng)** hoặc visual **Ma
   1. `DIM Player [Player Name]`
   2. `DIM Club [Club Name]`
   3. `[Measures].[Minutes Played]`
-  4. `[Measures].[Is Starter]`
+  4. `[Measures].[FACT Player Match Perf Count]`
   5. `[Measures].[Yellow Cards]`
   6. `[Measures].[Red Cards]`
 
@@ -271,7 +271,7 @@ Bạn có thể sử dụng visual **Table (Bảng phẳng)** hoặc visual **Ma
   * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
   * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
-  * `Is Starter` $\rightarrow$ Đổi tên thành: **`Lượt đá chính`**
+  * `FACT Player Match Perf Count` $\rightarrow$ Đổi tên thành: **`Số trận ra sân`**
   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
   * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ`**
 
