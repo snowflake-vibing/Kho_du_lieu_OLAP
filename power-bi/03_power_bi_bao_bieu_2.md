@@ -37,7 +37,7 @@ Tài liệu hướng dẫn thiết kế **Báo biểu 2** trên **Power BI Deskt
 | X=20, Y=80, W=455, H=105  | X=495                     | X=970                       | X=1445                            |
 +---------------------------+---------------------------+-----------------------------+-----------------------------------+
 | [Slicer 1: Giải đấu] X=20, W=650           | [Slicer 2: Mùa giải] X=690, W=600     | [Slicer 3: Loại giải đấu] X=1310, W=590 |
-| Y = 195, H = 50                                                                                                         |
+| Y = 195, H = 75 (chiều cao thoáng đãng, không bị cụt dropdown/tile)                                                         |
 +---------------------------------------------------------+---------------------------------------------------------------+
 | [Ô 1: TRÊN - TRÁI] Clustered Column Chart               | [Ô 2: TRÊN - PHẢI] SCATTER (NÂNG CAO)                         |
 | Bàn thắng Sân nhà vs Sân khách - Top 10 CLB             | Sức chứa sân vs Tổng bàn thắng (Trend + Median lines)         |
@@ -70,7 +70,7 @@ Tài liệu hướng dẫn thiết kế **Báo biểu 2** trên **Power BI Deskt
 4. **Properties:** `W = 1880`, `H = 55`, `X = 20`, `Y = 15`.
 
 ### Bước 3: 4 Thẻ KPI (Tầng trên)
-Chung cho cả 4 thẻ: **Title** On, `15 pt` Bold, căn giữa · **Callout value** `18 pt` Bold, màu `#0F172A` · **Category label** Off · `W = 455`, `H = 105`, `Y = 80`.
+Chung cho cả 4 thẻ: **Title** On, `15 pt - 18 pt` Bold, căn giữa · **Callout value** `35 pt` Bold (nổi bật tối đa), màu `#0F172A` · **Category label** Off · `W = 455`, `H = 95 - 105`, `Y = 80 - 95`.
 
 | Thẻ | Trường / Thước đo | Title | Nền / Viền | X |
 | :--- | :--- | :--- | :--- | :---: |
@@ -89,7 +89,7 @@ Chung cho cả 4 thẻ: **Title** On, `15 pt` Bold, căn giữa · **Callout val
 > *Bắt buộc kiểm tra tên Hierarchy `Is Home Game` thực tế trong Cube trước khi deploy.*
 
 ### Bước 4: 3 Slicers (Tầng trên)
-Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#E2E8F0`, bo góc `8 px`, `Y = 195`, `H = 50`.
+Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#CBD5E1`, bo góc `8 px`, `Y = 195 - 210`, **`H = 75 px - 80 px`** (chiều cao thoáng đãng, hiển thị trọn vẹn dropdown và tile, không bị cắt chữ).
 
 | Slicer | Trường | Kiểu | X | W |
 | :--- | :--- | :--- | :---: | :---: |
@@ -100,18 +100,18 @@ Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#E2
 ---
 
 ### Bước 5 – Ô 1 (Trên - Trái): Clustered Column Chart – Sân nhà vs Sân khách Top 10 CLB
-1. Visual **Clustered column chart** · `W = 925`, `H = 385`, `X = 20`, `Y = 265`.
+1. Visual **Clustered column chart** · `W = 925`, `H = 385`, `X = 20`, `Y = 265 - 300`.
 2. **X-axis:** `DIM Club [Club Name]` · **Y-axis:** `[Measures].[Goals]` · **Legend:** `Is Home Game` (đổi nhãn `1 → Sân nhà`, `0 → Sân khách` bằng *Rename for this visual*).
 3. **Filters on this visual:** `Club Name` → **Top N** = `10`, By value `Goals`.
 4. Định dạng:
-   * **Title:** `So sánh Bàn thắng Sân nhà vs Sân khách – Top 10 CLB`, `15 pt` Bold, căn giữa.
+   * **Title:** `So sánh Bàn thắng Sân nhà vs Sân khách – Top 10 CLB`, `18 pt` Bold, căn giữa.
    * **X-axis (Tên CLB):** `12 pt`, màu **Navy `#0D47A1`**, *Label orientation* nghiêng 45° để hiển thị trọn tên CLB.
    * **Y-axis (Bàn thắng):** `12 pt`, màu **Forest Green `#1B5E20`**.
    * **Columns:** Sân nhà `#2563EB`, Sân khách `#F59E0B`.
    * **Data labels:** On, `12 pt`. **Legend:** Top center, `12 pt`.
 
 ### Bước 6 – Ô 2 (Trên - Phải): Scatter Chart – Sức chứa Sân vs Bàn thắng (NÂNG CAO)
-1. Visual **Scatter chart** · `W = 925`, `H = 385`, `X = 975`, `Y = 265`.
+1. Visual **Scatter chart** · `W = 925`, `H = 385`, `X = 975`, `Y = 265 - 300`.
 2. Trường dữ liệu:
    * **Values:** `DIM Club [Club Name]`.
    * **X-axis:** `[Measures].[Stadium Capacity]`.
@@ -122,7 +122,7 @@ Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#E2
    * **Trend line:** On, màu `#64748B`, nét đứt.
    * **Median line (X):** On, nhãn `Median Sức chứa`. **Median line (Y):** On, nhãn `Median Bàn thắng`.
 4. Định dạng:
-   * **Title:** `Tương quan Sức chứa Sân vận động và Tổng Bàn thắng của CLB`, `15 pt` Bold.
+   * **Title:** `Tương quan Sức chứa Sân vận động và Tổng Bàn thắng của CLB`, `18 pt` Bold, căn giữa.
    * **X-axis:** Title `Sức chứa sân (chỗ ngồi)`, `12 pt`, màu **Slate `#334155`**.
    * **Y-axis:** Title `Tổng bàn thắng`, `12 pt`, màu **Ocean Blue `#1565C0`**.
 
@@ -135,16 +135,16 @@ Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#E2
 > ```
 
 ### Bước 7 – Ô 3 (Dưới - Trái): Ribbon Chart – Dịch chuyển Thứ hạng Giải đấu theo Mùa (NÂNG CAO)
-1. Visual **Ribbon chart** · `W = 925`, `H = 385`, `X = 20`, `Y = 675`.
+1. Visual **Ribbon chart** · `W = 925`, `H = 385`, `X = 20`, `Y = 675 - 695`.
 2. **X-axis:** `DIM Time [Season]` · **Y-axis:** `[Measures].[Goals]` · **Legend:** `DIM Competition [Competition Name]`.
 3. **Filters on this visual:** `Competition Name` → **Top N** = `6`, By value `Goals` (6 giải hàng đầu, tránh rối mắt).
 4. Định dạng:
-   * **Title:** `Dịch chuyển Thứ hạng Bàn thắng giữa các Giải đấu qua các Mùa`, `15 pt` Bold.
+   * **Title:** `Dịch chuyển Thứ hạng Bàn thắng giữa các Giải đấu qua các Mùa`, `18 pt` Bold, căn giữa.
    * **X-axis (Mùa giải):** `12 pt`, màu **Slate `#334155`**. **Y-axis:** `12 pt`, màu **Ocean Blue `#1565C0`**.
    * **Ribbons:** Transparency `30%` để thấy rõ đường chuyển hạng. **Data labels:** On, `12 pt`. **Legend:** Right, `12 pt`.
 
 ### Bước 8 – Ô 4 (Dưới - Phải): Matrix + Data Bars – Bảng xếp hạng CLB (NÂNG CAO)
-1. Visual **Matrix** · `W = 925`, `H = 385`, `X = 975`, `Y = 675`.
+1. Visual **Matrix** · `W = 925`, `H = 385`, `X = 975`, `Y = 675 - 695`.
 2. **Rows:** `DIM Competition [Competition Name]` → `DIM Club [Club Name]`.
 3. **Values:** `[Measures].[Stadium Capacity]`, `[Measures].[Goals]`, `[Measures].[Home Goals Ratio]`.
 4. **Rename for this visual:** `Competition Name → Giải đấu`, `Club Name → Câu lạc bộ`, `Stadium Capacity → Sức chứa sân`, `Goals → Bàn thắng`, `Home Goals Ratio → Tỷ lệ bàn sân nhà`.
@@ -152,7 +152,7 @@ Chung: Header `15 pt` Bold, Values `12 pt`, Effects nền `#FFFFFF`, viền `#E2
    * `Bàn thắng` → **Data bars**, Positive bar `#3B82F6`.
    * `Tỷ lệ bàn sân nhà` → **Background color** gradient `#FFFFFF` (50%) → `#FEF3C7` (≥ 65%).
 6. Định dạng:
-   * **Title:** `Bảng Xếp hạng CLB theo Sức chứa Sân và Lợi thế Sân nhà`, `15 pt` Bold.
+   * **Title:** `Bảng Xếp hạng CLB theo Sức chứa Sân và Lợi thế Sân nhà`, `18 pt` Bold, căn giữa.
    * **Row headers:** `12 pt` Bold, Text wrap **On**, **Stepped layout Off**.
    * **Column headers:** `12 pt` Bold, Text wrap **On**, Auto-size width **On**, nền `#F1F5F9`.
    * **Values:** `12 pt`, Text wrap **On**. **Subtotals:** `12 pt` Bold.

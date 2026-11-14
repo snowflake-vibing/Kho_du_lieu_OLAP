@@ -18,8 +18,8 @@ Thư mục này chứa toàn bộ tài liệu hướng dẫn chi tiết quy trì
 
 ## Quy chuẩn thiết kế chung (theo [rule.md](../rule.md))
 * **Canvas:** 1920 x 1080 px, nền `#F8FAFC`; mọi visual nền `#FFFFFF`, viền `#CBD5E1`, bo góc 10 px.
-* **Bố cục 2 tầng:** Tầng trên = Title + KPI Cards + Slicers; Tầng dưới = lưới 2x2 (mỗi ô 925 x 385 px) đặt đúng 4 biểu đồ, ưu tiên biểu đồ nâng cao.
-* **Cỡ chữ:** Title trang 20 pt · Title visual 15 pt · Giá trị Card 18 pt · Dữ liệu/trục/nhãn 12 pt.
+* **Bố cục 2 tầng:** Tầng trên = Title + KPI Cards + Slicers (H = 75 - 80 px thoáng đãng, không bị cụt dropdown/tile); Tầng dưới = 4 biểu đồ nâng cao linh hoạt diện tích trực quan.
+* **Cỡ chữ:** Title trang 20 pt · Title visual 18 pt Bold · Giá trị Callout Card 35 pt Bold (cực kỳ nổi bật) · Dữ liệu/trục/nhãn 12 pt.
 * **Màu:** Card nền pastel sáng, chữ đen; trục danh mục và trục số đo dùng màu khác nhau.
 * **Không có dấu ba chấm (`...`)** ở bất kỳ visual nào.
 

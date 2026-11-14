@@ -11,10 +11,10 @@ Mọi visual trên Dashboard bắt buộc phải tuân thủ nghiêm ngặt than
 
 | Thành phần giao diện | Cỡ chữ quy định | Kiểu chữ (Style) | Vị trí / Căn lề | Ghi chú & Ý nghĩa |
 | :--- | :---: | :---: | :---: | :--- |
-| **Tiêu đề Banner trên cùng (Header)** | **`20 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Tiêu đề chính của báo biểu, màu chữ đen tuyền (`#0F172A`). |
-| **Tiêu đề từng Visual / Bảng (Title)** | **`15 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Áp dụng cho mọi biểu đồ, thẻ KPI, bộ lọc Slicer và bảng số liệu. |
-| **Giá trị Callout trên KPI Cards** | **`18 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Màu chữ đen (`#0F172A`), nổi bật rõ nét trên nền sáng. |
-| **Dữ liệu ô bảng số liệu (Cell Values)** | **`12 pt`** | Thường (Regular) | Canh lề theo kiểu dữ liệu | Đảm bảo tính dễ đọc trong Bảng Ma trận (Matrix Visual). |
+| **Tiêu đề Banner trên cùng (Header)** | **`20 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Tiêu đề chính của báo biểu, màu chữ đen tuyền (`#0F172A`) hoặc trắng tương phản trên nền banner. |
+| **Tiêu đề từng Visual / Bảng (Title)** | **`18 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Tăng lên 18 pt để làm nổi bật rõ ràng chủ đề của từng biểu đồ, thẻ KPI, bộ lọc Slicer và bảng số liệu. |
+| **Giá trị Callout trên KPI Cards** | **`35 pt`** | In đậm (**Bold**) | Căn giữa (**Center**) | Cỡ chữ 35 pt lớn nổi bật, thu hút thị giác ngay lập tức vào các con số chỉ số cốt lõi. |
+| **Dữ liệu ô bảng số liệu (Cell Values)** | **`12 pt`** | Thường (Regular) | Canh lề theo kiểu dữ liệu | Đảm bảo tính dễ đọc trong Bảng Ma trận (Matrix Visual), không bị tràn ô. |
 | **Tiêu đề Cột & Dòng bảng số liệu** | **`12 pt`** | In đậm (**Bold**) | Khớp với cột dữ liệu | Tiêu đề cột chuẩn tiếng Việt, không viết tắt gây khó hiểu. |
 | **Nhãn trục tọa độ (Axes Labels & Values)** | **`12 pt`** | Thường (Regular) | Trục X & Trục Y | Trục số đo và trục danh mục đều đặt cỡ chữ 12 pt. |
 | **Nhãn dữ liệu (Data Labels)** | **`12 pt`** | In đậm nhẹ | Trên thanh / điểm dữ liệu | Bật On để người xem đọc ngay số liệu mà không cần rà chuột. |
@@ -50,33 +50,32 @@ Bố cục không gian tổng thể của trang báo biểu được quy định
 +-------------------------------------------------------------------------------------------------------------------------+
 | [TẦNG TRÊN CÙNG: HEADER, KPI CARDS & FILTERS]                                                                           |
 | 1. Title Banner trên cùng (Font 20pt Bold)                                                                              |
-| 2. Khối các thẻ KPI Cards (Title 15pt, Value 18pt trên nền sáng pastel)                                                 |
-| 3. Hệ thống Bộ lọc tương tác đa chiều (Slicers / Filters)                                                                |
+| 2. Khối các thẻ KPI Cards (Title 15-18pt, Value 35pt Bold cực kỳ nổi bật trên thẻ nổi)                                 |
+| 3. Hệ thống Bộ lọc tương tác (Slicers): Chiều cao thoáng đãng (H = 75 - 80px), không bị cụt thanh Dropdown/Tile       |
 +-------------------------------------------------------------+-----------------------------------------------------------+
-| [TẦNG DƯỚI: LƯỚI ĐỐI XỨNG CHIA ĐÚNG 4 PHẦN - ĐẶT ĐÚNG 4 LOẠI BIỂU ĐỒ (KHUYẾN KHÍCH NÂNG CAO)]                          |
+| [TẦNG DƯỚI: LƯỚI PHÂN TÍCH 4 BIỂU ĐỒ NÂNG CAO (LINH HOẠT TỶ LỆ TRỰC QUAN)]                                               |
 +-------------------------------------------------------------+-----------------------------------------------------------+
 | [Ô 1: TRÊN - TRÁI]                                          | [Ô 2: TRÊN - PHẢI (NÂNG CAO)]                             |
-| Biểu đồ 1: Thanh Phân cấp (Clustered Bar Chart)             | Biểu đồ 2: Ma trận 4 Góc phần tư (Scatter Quadrant Plot)  |
-| Top 10 Chân sút (Trục Y Navy, Trục X Forest Green)          | Goals vs Assists vs Mins theo Vị trí, 2 đường Median      |
+| Biểu đồ 1: Thanh Phân cấp (Clustered Bar Chart, Title 18pt) | Biểu đồ 2: Ma trận 4 Góc phần tư (Scatter Quadrant, 18pt) |
+| Top 10 Chân sút (Trục Y Navy, Trục X Forest Green, 12pt)    | Goals vs Assists vs Mins theo Vị trí, 2 đường Median      |
 +-------------------------------------------------------------+-----------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI (NÂNG CAO)]                               | [Ô 4: DƯỚI - PHẢI (NÂNG CAO)]                             |
-| Biểu đồ 3: Bản đồ Phân tầng Đa cấp (Hierarchical Treemap)   | Biểu đồ 4: Bảng Ma trận Đa cấp (Executive Matrix)         |
-| Phân tích cơ cấu tỷ trọng bàn thắng (Giải -> Vị trí -> CLB) | Tích hợp Mini Data Bars & Heatmap, Stepped = Off          |
+| Biểu đồ 3: Bản đồ Phân tầng Đa cấp (Treemap, Title 18pt)    | Biểu đồ 4: Bảng Ma trận Đa cấp (Executive Matrix, 18pt)   |
+| Phân tích cơ cấu tỷ trọng bàn thắng (Giải -> Vị trí -> CLB) | Tích hợp Mini Data Bars & Heatmap, Dữ liệu 12pt phẳng     |
 +-------------------------------------------------------------+-----------------------------------------------------------+
 ```
 
 ### Chi tiết phân vùng:
 1. **Phần trên cùng (Top Section - Control & Summary Zone):**
    * **Title Banner:** Đặt ở vị trí cao nhất (X: 20px, Y: 15px), font 20pt Bold, nhận diện rõ tên báo cáo và khối dữ liệu OLAP.
-   * **Khối KPI Cards:** Dàn đều ngay bên dưới (Y: 85px), hiển thị các chỉ số tổng quan sống còn (Title 15pt, Value 18pt trên nền Pastel sáng).
-   * **Khối Bộ lọc Slicers/Filters:** Đặt ngay dưới khối KPI (Y: 205px), đóng vai trò thanh điều hướng tương tác đa chiều trước khi đi vào phân tích sâu.
+   * **Khối KPI Cards:** Dàn đều ngay bên dưới (Y: 95px, H: 95px - 105px), hiển thị các chỉ số tổng quan sống còn (Title 15pt - 18pt, **Value 35pt Bold** nổi bật thu hút ánh nhìn tức thì).
+   * **Khối Bộ lọc Slicers/Filters:** Đặt ngay dưới khối KPI (Y: 210px), **bắt buộc chiều cao H = 75px - 80px**, chiều rộng thoáng đãng (ví dụ: Season $W = 455\text{ px}$, Competition $W = 455\text{ px}$, Vị trí dạng ngang/Tile $W = 900\text{ px}$). Tuyệt đối không dùng chiều cao nhỏ hẹp ($50\text{ px}$) làm che khuất hoặc cụt thanh Dropdown và nhãn nút chọn.
 2. **Phần dưới (Bottom Section - 4-Quadrant Visual Analytics Grid):**
-   * Được chia cân đối thành **đúng 4 phần (lưới 2x2 đối xứng hoàn hảo)**, mỗi phần chiếm kích thước đồng đều (ví dụ: `Width = 925 px`, `Height = 390 px` trên canvas 1920x1080).
-   * Đặt **đúng 4 loại biểu đồ độc lập**, khuyến khích sử dụng các biểu đồ phân tích chuyên sâu nâng cao:
+   * Bố trí **đúng 4 loại biểu đồ nâng cao**, tiêu đề từng visual đặt **`18 pt` Bold** để làm nổi bật tên phân tích:
      * **Ô 1 (Trên - Trái):** Biểu đồ thanh ngang phân cấp (Top 10 Chân sút Châu Âu).
      * **Ô 2 (Trên - Phải):** Biểu đồ phân tán 4 góc phần tư (Scatter / Quadrant Bubble Plot) phân loại cầu thủ.
-     * **Ô 3 (Dưới - Trái):** Bản đồ phân tầng đa cấp (Hierarchical Treemap Drill-down) phân tích cơ cấu tỷ trọng Part-to-Whole (tương thích 100% với SSAS Multidimensional Live Connection, loại bỏ triệt để lỗi không tương thích của AI Tree).
-     * **Ô 4 (Dưới - Phải):** Bảng ma trận đa cấp tích hợp thanh đo trực quan (Matrix with Embedded Data Bars).
+     * **Ô 3 (Dưới - Trái):** Bản đồ phân tầng đa cấp (Hierarchical Treemap Drill-down) phân tích cơ cấu tỷ trọng Part-to-Whole. Có thể mở rộng chiều rộng ($W \approx 1230\text{ px}$) để các khối chữ nhật tỷ trọng hiển thị trọn vẹn và hoành tráng.
+     * **Ô 4 (Dưới - Phải):** Bảng ma trận đa cấp tích hợp thanh đo trực quan (Executive Matrix with Embedded Data Bars). Chiều rộng $W \approx 625\text{ px} - 925\text{ px}$ tùy theo mức phân bổ với Treemap.
 
 ---
 
