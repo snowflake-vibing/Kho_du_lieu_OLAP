@@ -268,37 +268,50 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 9: Tạo Bảng Ma trận Đa cấp Tích hợp Mini Data Bars (Ô 4: Dưới - Phải)
-1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix**.
-2. Thiết lập kích thước và vị trí:
-   * **Size:** `Width = 624 px` (hoặc mở rộng), `Height = 385 px`
-   * **Position:** `Horizontal = 1276 px`, `Vertical = 695 px`
-3. Kéo thả các trường dữ liệu:
-   * **Rows (Phân tầng dòng):** Kéo lần lượt `DIM Player [Player Name]`, `DIM Player [Main Position]`, `DIM Club [Club Name]`.
-   * **Values (Các cột đo lường):** Kéo các thước đo:
-     1. `[Measures].[Minutes Played]`
-     2. `[Measures].[Goals]`
-     3. `[Measures].[Assists]`
-     4. `[Measures].[Goal Contributions]`
-4. **Đổi tên hiển thị cột chuẩn tiếng Việt (Chuẩn hóa nhãn để không bao giờ bị dấu `...`):**
-   * Nhấp chuột phải vào từng trường trong ô Values -> chọn **Rename for this visual**:
-     * `Minutes Played` -> Đổi tên thành: `Số phút thi đấu`
-     * `Goals` -> Đổi tên thành: `Bàn thắng`
-     * `Assists` -> Đổi tên thành: `Kiến tạo`
-     * `Goal Contributions` -> Đổi tên thành: `Tổng G+A`
-5. **Cấu hình Định dạng Có điều kiện - Mini Data Bars (Conditional Formatting Data Bars):**
-   * Tại ô `Bàn thắng` trong vùng Values -> nhấp vào mũi tên xổ xuống -> chọn **Conditional formatting** -> chọn **Data bars**.
-   * Hộp thoại Data bars xuất hiện:
-     * Tích chọn **Positive bar**: Chọn màu xanh dương gradient `#3B82F6`.
-     * **Bar direction:** Chọn `Left-to-right`.
-     * Nhấp **OK**. Cột Bàn thắng lập tức hiển thị thanh tiến độ mini trực quan trong từng ô!
-   * Làm tương tự với cột `Tổng G+A`: Chọn **Conditional formatting** -> **Background color** -> chọn dải màu gradient từ trắng sang vàng cam nhạt `#FEF3C7` để tạo hiệu ứng Heatmap mật độ đóng góp.
-6. **Định dạng bảng Matrix toàn diện:**
-   * Tab **Format visual** -> **Title**: Bật **On**, nhập `Bảng tra cứu phong độ & đóng góp chi tiết từng cầu thủ theo câu lạc bộ`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**).
-   * **Row headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, In đậm (**Bold**), Text wrap: **On**, Show expand/collapse: **Off**.
-   * **Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, In đậm (**Bold**), Text wrap: **On**, Auto-size column width: **On**.
-   * **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, Text wrap: **On**.
-   * **Subtotals:** Row subtotals: **Off**, Column subtotals: **Off** (triệt tiêu phân mảnh để bảng phẳng rõ nét).
+### Bước 9: Tạo Bảng Tra cứu Phong độ Đóng góp Chi tiết Cầu thủ (Ô 4: Dưới - Phải)
+Tại ô này, bạn có 2 cách thực hiện (Khuyến nghị **Cách 1 dùng Table** phẳng 100% cực nhanh, hoặc **Cách 2 dùng Matrix** chuẩn OLAP):
+
+#### CÁCH 1 (KHUYẾN NGHỊ - CỰC NHANH & DỄ): Sử dụng visual Bảng phẳng (Table)
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Table** (Bảng dữ liệu phẳng, biểu tượng lưới bảng đơn giản nằm ngay bên trái Matrix).
+2. Thiết lập kích thước: `Width = 624 px` (hoặc mở rộng `850 px`), `Height = 385 px`, `X = 1276 px`, `Y = 695 px`.
+3. Kéo thả tất cả các trường vào duy nhất 1 ô **Columns**:
+   1. `DIM Player [Player Name]`
+   2. `DIM Player [Main Position]`
+   3. `DIM Club [Club Name]`
+   4. `FACT Player Match Perf [Minutes Played]`
+   5. `FACT Player Match Perf [Goals]`
+   6. `FACT Player Match Perf [Assists]`
+   7. `FACT Player Match Perf [Goal Contributions]`
+4. *Ưu điểm:* Bảng tự động hiển thị từng cột phẳng riêng biệt song song, không bao giờ bị ẩn cột hay phải nhấp mở rộng.
+
+#### CÁCH 2: Nếu giữ visual Ma trận đa cấp (Matrix)
+1. Giữ visual **Matrix**:
+   * **Rows:** Kéo `DIM Player [Player Name]`, `DIM Player [Main Position]`, `DIM Club [Club Name]`.
+   * **Values:** Kéo `[Measures].[Minutes Played]`, `[Measures].[Goals]`, `[Measures].[Assists]`, `[Measures].[Goal Contributions]`.
+2. **Cách bung toàn bộ các cột ra hiển thị (không bị ẩn):**
+   * Nhấp chọn vào bảng Matrix trên trang Canvas.
+   * Nhìn lên góc trên (thanh công cụ nhỏ màu xám xuất hiện ở mép trên bảng): Nhấp 2 lần vào biểu tượng **mũi tên phân nhánh (⑂)** có tên là *"Expand all down one level in the hierarchy"*. Lập tức bảng sẽ bung trọn vẹn cả 3 cột `Cầu thủ`, `Vị trí` và `Câu lạc bộ` thành các cột độc lập!
+   * Trong tab **Format visual** -> **Row headers** -> **Options** -> đảm bảo tắt **Stepped layout: Off** để các cột không bị thụt lề dồn vào 1 cột.
+   * **Subtotals:** Tắt **Row subtotals: Off** và **Column subtotals: Off** để bảng phẳng và gọn.
+
+---
+
+#### HƯỚNG DẪN BẬT MINI DATA BARS & HEATMAP (Tab Format visual -> Cell elements):
+*Trong giao diện Power BI Desktop mới, tính năng tô màu ô nằm tại mục **Cell elements**:*
+1. Nhấp chọn bảng (Table hoặc Matrix).
+2. Chuyển sang tab **Format visual** (biểu tượng Cọ vẽ) -> cuộn xuống tìm mục **Cell elements** (Phần tử ô):
+   * **Tạo thanh tiến độ Mini Data Bars cho cột Bàn thắng:**
+     * Tại mục **Select series** (Chọn chuỗi): Nhấp chọn cột `Goals` (hoặc `Bàn thắng`).
+     * Gạt công tắc **Data bars** sang **ON**! (Cột Bàn thắng lập tức xuất hiện thanh đo mini trực quan).
+     * Nhấp vào nút **`fx`** bên cạnh Data bars nếu muốn chọn màu thanh: chọn màu Xanh dương `#3B82F6` -> nhấp **OK**.
+   * **Tạo nền nhiệt Heatmap cho cột Tổng G+A:**
+     * Tại mục **Select series**: Chuyển sang chọn cột `Goal Contributions` (hoặc `Tổng G+A`).
+     * Gạt công tắc **Background color** sang **ON**!
+     * Nhấp vào nút **`fx`** bên cạnh Background color: chọn Format style là *Gradient*, màu từ trắng `#FFFFFF` sang vàng cam nhạt `#FEF3C7` -> nhấp **OK**.
+
+3. **Định dạng chung:**
+   * **Title:** Bật **On**, nhập `Bảng tra cứu phong độ & đóng góp chi tiết từng cầu thủ theo câu lạc bộ`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
+   * **Values / Column headers:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, Text wrap **On**.
    * Tab **General** -> **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
