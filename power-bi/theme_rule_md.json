@@ -1,0 +1,139 @@
+{
+  "name": "Football_OLAP_Executive_Theme",
+  "dataColors": [
+    "#2563EB",
+    "#F59E0B",
+    "#10B981",
+    "#DC2626",
+    "#8B5CF6",
+    "#06B6D4",
+    "#EC4899",
+    "#64748B"
+  ],
+  "background": "#F8FAFC",
+  "foreground": "#0F172A",
+  "tableAccent": "#2563EB",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontSize": 18,
+            "fontFamily": "Segoe UI",
+            "fontColor": { "solid": { "color": "#0F172A" } },
+            "alignment": "center",
+            "bold": true
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#CBD5E1" } },
+            "radius": 10
+          }
+        ],
+        "labels": [
+          {
+            "show": true,
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "color": { "solid": { "color": "#0F172A" } }
+          }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [
+          {
+            "fontSize": 35,
+            "fontFamily": "Segoe UI",
+            "color": { "solid": { "color": "#0F172A" } },
+            "bold": true
+          }
+        ],
+        "categoryLabels": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "header": [
+          {
+            "show": true,
+            "fontSize": 15,
+            "fontFamily": "Segoe UI",
+            "bold": true,
+            "fontColor": { "solid": { "color": "#0F172A" } }
+          }
+        ],
+        "items": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI"
+          }
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "bold": true,
+            "autoSizeColumnWidth": true,
+            "wordWrap": true
+          }
+        ],
+        "values": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "wordWrap": true
+          }
+        ]
+      }
+    },
+    "pivotTable": {
+      "*": {
+        "columnHeaders": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "bold": true,
+            "autoSizeColumnWidth": true,
+            "wordWrap": true
+          }
+        ],
+        "rowHeaders": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "bold": true,
+            "wordWrap": true,
+            "stepped": false
+          }
+        ],
+        "values": [
+          {
+            "fontSize": 12,
+            "fontFamily": "Segoe UI",
+            "wordWrap": true
+          }
+        ]
+      }
+    }
+  }
+}

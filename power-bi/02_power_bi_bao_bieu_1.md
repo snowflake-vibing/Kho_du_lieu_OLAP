@@ -38,9 +38,9 @@ Báo biểu được chuẩn hóa toàn diện theo các nguyên lý thiết k�
 | **Độ phân giải Canvas** | **Full HD 1920 x 1080 px** (Tỷ lệ 16:9) | Chuẩn màn hình thuyết trình cao cấp, mở rộng diện tích gấp 2.25 lần so với chuẩn cũ 1280x720, giải phóng hoàn toàn không gian chật chội. |
 | **Màu nền Canvas** | Xám khói hiện đại `#F8FAFC` (Slate 50), Transparency: `0%` | Tạo chiều sâu không gian, loại bỏ cảm giác chói gắt của nền trắng tinh truyền thống. |
 | **Thẻ Container (Visual Cards)** | Nền trắng `#FFFFFF`, Viền `#E2E8F0` (1px), **Bo góc `10 px`** | Cấu trúc khối nổi (Card Elevation UI) sang trọng, phân chia ranh giới visual mạch lạc, khoa học. |
-| **Banner Header** | Cỡ chữ **20 pt**, In đậm (**Bold**), Căn giữa | Tiêu đề trang trọng, dẫn dắt thị giác tức thì vào chủ đề báo biểu. |
-| **Tiêu đề Visual (Titles)** | Cỡ chữ **15 pt**, In đậm (**Bold**), Căn giữa / Căn trái | Chuẩn hóa toàn bộ tiêu đề visual, khẳng định rõ câu hỏi kinh doanh mà biểu đồ giải quyết. |
-| **Thẻ KPI (Cards)** | Title: **15 pt**, Value: **18 pt** (Bold), Màu chữ `#0F172A` | Tuân thủ tuyệt đối quy định: Chữ đen tuyền sắc nét trên nền sáng Pastel có độ tương phản > 12:1. |
+| **Banner Header** | Cỡ chữ **20 pt**, In đậm (**Bold**), Căn giữa (**Center**) | Tiêu đề trang trọng, dẫn dắt thị giác tức thì vào chủ đề báo biểu. |
+| **Tiêu đề Visual (Titles)** | Cỡ chữ **18 pt**, In đậm (**Bold**), Căn giữa (**Center**) | Chuẩn hóa toàn bộ tiêu đề visual, khẳng định rõ câu hỏi kinh doanh mà biểu đồ giải quyết. |
+| **Thẻ KPI (Cards)** | Title: **15 pt - 18 pt** Bold, Value: **35 pt** Bold, Màu chữ `#0F172A` | Tuân thủ tuyệt đối quy định: Giá trị 35pt nổi bật thu hút ánh nhìn tức thì trên nền sáng Pastel có độ tương phản > 12:1. |
 | **Dữ liệu & Trục số (Values)** | Cỡ chữ **12 pt**, Segoe UI | Đảm bảo kích thước chữ trong bảng ma trận, nhãn dữ liệu và trục tọa độ dễ đọc từ khoảng cách xa. |
 | **Phân biệt màu các trục** | Trục Y: **Navy Blue `#0D47A1`**, Trục X: **Forest Green `#1B5E20`** | Giúp người xem phân biệt ngay lập tức giữa trục danh mục (tên đối tượng) và trục số đo định lượng. |
 
@@ -133,58 +133,51 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 1. **Card 1: Tổng số Bàn thắng (Total Goals)**:
    * Nhấp chọn visual **Card**, kéo thước đo `[Measures].[Goals]` vào ô **Fields**.
-   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG BÀN THẮNG (GOALS)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#1E3A8A`.
+   * **Phần đặt tên (Rename for this visual):** Nhấp chuột phải vào trường trong ô Fields $\rightarrow$ Đổi tên thành: **`Tổng bàn thắng`**.
+   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG BÀN THẮNG (GOALS)`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#1E3A8A`.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A` (cực kỳ nổi bật trên thẻ). **Category label**: Tắt **Off**.
-   * Tab **General** -> **Effects**:
-     * **Background:** Nền thẻ nổi sáng, viền tinh tế `#CBD5E1`, Rounded corners: **`10 px`**.
+   * Tab **General** -> **Effects**: Nền Pastel Blue `#EFF6FF`, Viền `#93C5FD`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 20 px`, `Vertical = 95 px`).
 
 2. **Card 2: Tổng số Kiến tạo (Total Assists)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Assists]` vào ô **Fields**.
-   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG KIẾN TẠO (ASSISTS)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#065F46`.
+   * **Phần đặt tên (Rename for this visual):** Nhấp chuột phải vào trường $\rightarrow$ Đổi tên thành: **`Tổng kiến tạo`**.
+   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG KIẾN TẠO (ASSISTS)`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#065F46`.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
-   * Tab **General** -> **Effects**:
-     * **Background:** Nền thẻ nổi sáng, viền `#CBD5E1`, Rounded corners: **`10 px`**.
+   * Tab **General** -> **Effects**: Nền Pastel Green `#F0FDF4`, Viền `#86EFAC`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 495 px`, `Vertical = 95 px`).
 
 3. **Card 3: Tổng Đóng góp Bàn thắng (Goal Contributions = Goals + Assists)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Goal Contributions]` vào ô **Fields**.
-   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG ĐÓNG GÓP (G+A)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#92400E`.
+   * **Phần đặt tên (Rename for this visual):** Nhấp chuột phải vào trường $\rightarrow$ Đổi tên thành: **`Tổng đóng góp G+A`**.
+   * Tab **General** -> **Title**: Bật **On**, nhập `TỔNG ĐÓNG GÓP (G+A)`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#92400E`.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
-   * Tab **General** -> **Effects**:
-     * **Background:** Nền thẻ nổi sáng, viền `#CBD5E1`, Rounded corners: **`10 px`**.
+   * Tab **General** -> **Effects**: Nền Pastel Amber `#FFFBEB`, Viền `#FCD34D`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 970 px`, `Vertical = 95 px`).
 
 4. **Card 4: Hiệu suất Số phút / Bàn thắng (Mins Per Goal)**:
    * Thêm visual **Card**, kéo thước đo `[Measures].[Avg Minutes Played]` (hoặc thước đo tính toán `[Mins Per Goal]`) vào ô **Fields**.
-   * Tab **General** -> **Title**: Bật **On**, nhập `HIỆU SUẤT THỜI LƯỢNG (MINS/BÀN)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#5B21B6`.
+   * **Phần đặt tên (Rename for this visual):** Nhấp chuột phải vào trường $\rightarrow$ Đổi tên thành: **`Số phút TB / trận`**.
+   * Tab **General** -> **Title**: Bật **On**, nhập `HIỆU SUẤT THỜI LƯỢNG (MINS/BÀN)`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#5B21B6`.
    * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`, Display units: `None`. **Category label**: Tắt **Off**.
-   * Tab **General** -> **Effects**:
-     * **Background:** Nền thẻ nổi sáng, viền `#CBD5E1`, Rounded corners: **`10 px`**.
+   * Tab **General** -> **Effects**: Nền Pastel Purple `#FAF5FF`, Viền `#D8B4FE`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 1445 px`, `Vertical = 95 px`).
 
 ---
 
 ### Bước 5: Thêm Hệ thống Bộ lọc Đa chiều Thông minh (Smart Slicers)
-Đặt 3 Slicer tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px - 80 px`** (không dùng chiều cao 50px gây cụt thanh Dropdown), chiều rộng phân bổ thoáng đãng:
+Đắt 3 Slicer tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px - 80 px`** (không dùng chiều cao 50px gây cụt thanh Dropdown), chiều rộng phân bổ thoáng đãng:
 
-1. **Slicer 1 (Mùa giải - Season):**
-   * Thêm visual **Slicer**, kéo trường `DIM Time [Season]` vào ô **Field**, chọn kiểu **Dropdown**.
-   * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt`**, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ **`12 pt`**.
-   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
-   * **Properties:** Size (`Width = 455 px`, `Height = 75 px`), Position (`Horizontal = 20 px`, `Vertical = 210 px`).
+| Slicer | Trường dữ liệu | **Phần đặt tên (Rename for this visual)** | Kiểu hiển thị | X | Y | W | H |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Slicer 1** | `DIM Time [Season]` | **`Mùa giải`** | Dropdown | 20 px | 210 px | 455 px | 75 px |
+| **Slicer 2** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 495 px | 210 px | 455 px | 75 px |
+| **Slicer 3** | `DIM Player [Main Position]` | **`Vị trí thi đấu`** | Tile (Thẻ ngang) | 1000 px | 210 px | 900 px | 80 px |
 
-2. **Slicer 2 (Giải đấu - Competition Name):**
-   * Thêm visual **Slicer**, kéo trường `DIM Competition [Competition Name]` vào ô **Field**, chọn kiểu **Dropdown**.
-   * Định dạng: Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt`**, In đậm (**Bold**); Values: Font `Segoe UI`, Cỡ chữ **`12 pt`**.
-   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
-   * **Properties:** Size (`Width = 455 px`, `Height = 75 px`), Position (`Horizontal = 495 px`, `Vertical = 210 px`).
-
-3. **Slicer 3 (Vị trí thi đấu chính - Main Position):**
-   * Thêm visual **Slicer**, kéo trường `DIM Player [Main Position]` vào ô **Field**, chọn kiểu hiển thị **Tile** (dàn ngang trải rộng để bấm chọn nhanh: Attack, Midfield, Defender).
-   * Định dạng: Title: Bật **On**, Cỡ chữ **`15 pt` Bold**; Values: Font `Segoe UI`, Cỡ chữ **`12 pt`**, In đậm (**Bold**).
-   * Tab **General** -> **Effects**: Background: `#FFFFFF`, Border: `#CBD5E1`, Rounded corners: `8 px`.
-   * **Properties:** Size (`Width = 900 px`, `Height = 80 px`), Position (`Horizontal = 1000 px`, `Vertical = 210 px`). Mở rộng 900px giúp hiển thị trọn vẹn toàn bộ các nút lựa chọn vị trí mà không bao giờ bị cắt chữ.
+* **Định dạng chung cho Slicers:**
+  * Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt`**, In đậm (**Bold**), màu `#0F172A`.
+  * Values (mục chọn): Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+  * Effects: Nền trắng `#FFFFFF`, Viền mỏng `#CBD5E1`, Bo góc `8 px`.
 
 ---
 
@@ -197,8 +190,13 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
    * **Y-axis (Trục tung):** Kéo `DIM Player [Player Name]` vào ô này.
    * **X-axis (Trục hoành):** Kéo thước đo `[Measures].[Goals]` vào ô này.
    * **Tooltips:** Kéo các thước đo `[Measures].[Assists]`, `[Measures].[Minutes Played]`.
-4. **Bộ lọc Top 10:** Khung Filters -> `Player Name` -> chọn **Top N**, nhập `10`, By value kéo `Goals` -> nhấp **Apply filter**.
-5. **Định dạng visual & phân biệt màu sắc các trục:**
+4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
+   * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng`**
+   * `Assists` $\rightarrow$ Đổi tên thành: **`Kiến tạo`**
+   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
+5. **Bộ lọc Top 10:** Khung Filters -> `Player Name` -> chọn **Top N**, nhập `10`, By value kéo `Goals` -> nhấp **Apply filter**.
+6. **Định dạng visual & phân biệt màu sắc các trục:**
    * Tab **Format visual** -> **Title**: Nhập `Top 10 chân sút ghi bàn nhiều nhất Châu Âu`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**).
    * **Trục Y (Category axis - Tên cầu thủ):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu sắc: **Xanh Navy đậm `#0D47A1`** (tên cầu thủ nổi bật sắc nét).
    * **Trục X (Value axis - Bàn thắng):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu sắc: **Xanh lục Forest Green `#1B5E20`** (phân biệt rạch ròi với trục danh mục).
@@ -223,9 +221,15 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
    * **Y-axis (Trục tung):** Kéo thước đo `[Measures].[Goals]` (Tổng số bàn thắng ghi được).
    * **Size (Kích thước bong bóng):** Kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Minutes Played]`).
    * **Legend (Màu sắc theo nhóm):** Kéo `DIM Player [Main Position]` (Attack, Midfield, Defender) để phân biệt rõ vị trí thi đấu.
-4. **Bộ lọc Visual (Filters on this visual):**
+4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
+   * `Assists` $\rightarrow$ Đổi tên thành: **`Số pha kiến tạo`**
+   * `Goals` $\rightarrow$ Đổi tên thành: **`Số bàn thắng`**
+   * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Tổng G+A`**
+   * `Main Position` $\rightarrow$ Đổi tên thành: **`Vị trí`**
+5. **Bộ lọc Visual (Filters on this visual):**
    * Để biểu đồ không bị quá dày đặc điểm, tại ô `DIM Player [Player Name]`, chọn **Top N** -> nhập `30` (hoặc `40`) -> By value kéo `Goal Contributions` -> nhấp **Apply filter** (Tập trung phân tích 30-40 ngôi sao tấn công hàng đầu Châu Âu).
-5. **Kẻ 2 đường phân chia 4 Góc phần tư (Quadrant Reference Lines):**
+6. **Kẻ 2 đường phân chia 4 Góc phần tư (Quadrant Reference Lines):**
    * Chuyển sang thẻ kính lúp **Analytics** (bên cạnh tab Format visual):
    * **X-Axis Constant Line (Đường chia kiến tạo):**
      * Nhấp **Add line** -> Tại ô **Value**, nhập mức trung vị kiến tạo (ví dụ: `8.0`).
@@ -256,7 +260,12 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
      2. `DIM Player [Main Position]` (Tầng 2: Vị trí thi đấu)
      3. `DIM Club [Club Name]` (Tầng 3: Câu lạc bộ)
    * **Values (Kích thước ô tỷ trọng):** Kéo thước đo `[Measures].[Goal Contributions]` (hoặc `[Measures].[Goals]`).
-4. **Hướng dẫn kích hoạt tính năng Khoan sâu (Drill-down):**
+4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
+   * `Main Position` $\rightarrow$ Đổi tên thành: **`Vị trí thi đấu`**
+   * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
+   * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Tổng đóng góp G+A`**
+5. **Hướng dẫn kích hoạt tính năng Khoan sâu (Drill-down):**
    * Rê chuột lên góc trên bên phải thanh tiêu đề của visual Treemap:
      * Nhấp mũi tên đơn trỏ xuống (↓) để bật chế độ **Click to turn on Drill down**: Khi nhấp vào một khối Giải đấu (ví dụ: `Premier League`), visual sẽ lập tức phóng to phân rã thành các khối Vị trí thi đấu (`Attack`, `Midfield`, `Defender`) trong giải đấu đó.
      * Nhấp biểu tượng mũi tên đôi trỏ xuống (↓↓) để chuyển toàn bộ biểu đồ xuống cấp phân tích tiếp theo.
@@ -282,7 +291,16 @@ Tại ô này, bạn có 2 cách thực hiện (Khuyến nghị **Cách 1 dùng 
    5. `FACT Player Match Perf [Goals]`
    6. `FACT Player Match Perf [Assists]`
    7. `FACT Player Match Perf [Goal Contributions]`
-4. *Ưu điểm:* Bảng tự động hiển thị từng cột phẳng riêng biệt song song, không bao giờ bị ẩn cột hay phải nhấp mở rộng.
+4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * Nhấp chuột phải vào từng trường trong ô Columns (hoặc Values) $\rightarrow$ chọn **Rename for this visual**:
+     * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
+     * `Main Position` $\rightarrow$ Đổi tên thành: **`Vị trí`**
+     * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
+     * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
+     * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng`**
+     * `Assists` $\rightarrow$ Đổi tên thành: **`Kiến tạo`**
+     * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Tổng G+A`**
+5. *Ưu điểm:* Bảng tự động hiển thị từng cột phẳng riêng biệt song song, không bao giờ bị ẩn cột hay phải nhấp mở rộng.
 
 #### CÁCH 2: Nếu giữ visual Ma trận đa cấp (Matrix)
 1. Giữ visual **Matrix**:

@@ -13,6 +13,7 @@ Thư mục này chứa toàn bộ tài liệu hướng dẫn chi tiết quy trì
 | **03** | [03_power_bi_bao_bieu_2.md](file:///d:/Kho_du_lieu_OLAP/power-bi/03_power_bi_bao_bieu_2.md) | **Báo biểu 2:** Vận hành CLB & Sân đấu: 4 KPI Cards, Slicers; lưới 2x2: Top 10 CLB Hỏa lực (Bàn thắng & Kiến tạo), Scatter Sức chứa sân vs Bàn thắng, Ribbon Chart giải đấu theo mùa, Bảng Xếp hạng CLB | Cube `[DW Football Transfermarkt]` |
 | **04** | [04_power_bi_bao_bieu_3.md](file:///d:/Kho_du_lieu_OLAP/power-bi/04_power_bi_bao_bieu_3.md) | **Báo biểu 3:** Kỷ luật & Tải trọng: 4 KPI Cards, Slicers; lưới 2x2: Top 10 CLB nhiều thẻ, Scatter Ma trận rủi ro kỷ luật, Combo 2 trục theo Độ tuổi, Matrix + Heatmap | Cube `[DW Football Transfermarkt]` |
 | **05** | [05_looker_studio_bao_bieu.md](file:///d:/Kho_du_lieu_OLAP/power-bi/05_looker_studio_bao_bieu.md) | **Báo biểu Looker Studio (Google Data Studio):** 3 báo biểu trực tuyến trên nền web, cấu hình bộ lọc chân sút chủ lực, bảng tổng hợp phân cấp và tính năng khoan sâu Drill-down từ Quốc gia xuống CLB | Tệp `Football_Report_Data.csv` trên Looker Studio |
+| **Theme** | [theme_rule_md.json](file:///d:/Kho_du_lieu_OLAP/power-bi/theme_rule_md.json) | **File Theme tự động:** Nạp vào Power BI Desktop (Tab `View` $\rightarrow$ `Browse for themes`) để áp dụng tự động toàn bộ cỡ chữ (Title 18pt, KPI 35pt, Axis 12pt) và bo viền 10px | Power BI Desktop Theme |
 
 ---
 
