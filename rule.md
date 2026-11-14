@@ -114,8 +114,9 @@ Bố cục không gian tổng thể của trang báo biểu được quy định
 ### 5.2. Thước đo tỷ suất chuẩn hóa `Mins Per Goal`
 * Thước đo $R = \frac{\text{Minutes Played}}{\text{Goals}}$ khử hoàn toàn **sai số về thời lượng ra sân (Exposure Time Bias)**, đánh giá công bằng hiệu quả của cầu thủ đá chính lẫn cầu thủ dự bị bùng nổ.
 
-### 5.3. Cây Phân rã Trực quan AI (Decomposition Tree)
-* Cung cấp khả năng phân tích nguyên nhân gốc rễ (Root Cause Analysis) cho chỉ số `Goal Contributions`: Phân rã đa tầng từ `Giải đấu` $\rightarrow$ `Vị trí thi đấu` $\rightarrow$ `Câu lạc bộ` $\rightarrow$ `Cầu thủ cụ thể`.
+### 5.3. Bản đồ Phân tầng Đa cấp (Hierarchical Treemap Drill-down) thay thế Decomposition Tree
+* **Khắc phục giới hạn kỹ thuật:** Trên kết nối **Live Connection tới SSAS Multidimensional (MDX)**, visual AI *Decomposition Tree* thường phát sinh lỗi hệ thống (*"Something's wrong with the visual"*) do tầng phiên dịch DAX-MDX không hỗ trợ thuật toán chia nhánh tự động.
+* **Giải pháp chuẩn hóa:** Sử dụng **Treemap Drill-down** phân tích cơ cấu tỷ trọng đa tầng Part-to-Whole: Cho phép người dùng đào sâu phân tích từ `Giải đấu` $\rightarrow$ `Vị trí thi đấu` $\rightarrow$ `Câu lạc bộ` $\rightarrow$ `Cầu thủ cụ thể` một cách mượt mà, ổn định tuyệt đối $100\%$.
 
 ### 5.4. Bảng Ma trận Tích hợp Mini Data Bars & Heatmap
 * Tích hợp thanh tiến độ trực quan **Data Bars** trong cột `Bàn thắng` và dải màu **Heatmap** trong cột `Tổng G+A`. Tắt `Stepped layout` để bảng hiển thị dạng phẳng chuyên nghiệp như báo cáo điều hành tài chính.
@@ -136,3 +137,18 @@ Mọi biểu đồ trên Báo biểu 1 phải trả lời trực tiếp cho 3 b�
 1. **Đồng bộ 3 chiều tuyệt đối:** Mã MDX trong SSMS, thao tác kéo thả trên Power BI và tài liệu hướng dẫn Markdown (`power-bi/02_power_bi_bao_bieu_1.md`) phải ăn khớp 100% về số lượng dòng, cột, tọa độ và con số thực tế.
 2. **Quy tắc dọn dẹp Workspace:** Mọi script kiểm tra tạm thời trong terminal phải được xóa hoàn toàn sau khi chạy, giữ workspace luôn sạch sẽ.
 3. **Đồng bộ GitHub:** Mọi cập nhật trong file PBIX và tài liệu MD phải được commit và push lên nhánh `main` với commit message chuẩn Conventional Commits (`feat:`, `docs:`, `fix:`).
+
+---
+
+## 8. QUY TẮC KIẾN TRÚC KẾT NỐI: LIVE CONNECTION VS IMPORT MODE TRONG ĐỒ ÁN OLAP & RÀNG BUỘC KỸ THUẬT
+
+### 8.1. Tại sao đồ án OLAP bắt buộc dùng Live Connection?
+* **Mục tiêu học thuật:** Khẳng định sự thông suốt của toàn bộ quy trình từ ETL (SSIS) $\rightarrow$ Kho dữ liệu (DW SQL Server) $\rightarrow$ Khối đa chiều (SSAS Multidimensional Cube) $\rightarrow$ Lớp trực quan hóa (Power BI).
+* **Single Source of Truth (Điểm tin cậy duy nhất):** Mọi logic tính toán (Aggregations, Hierarchies, Measures) được quản trị tập trung tại SSAS Server. File `.pbix` đóng vai trò là tầng Presentation mỏng (Thin Client), dung lượng cực nhẹ và không sao chép trùng lặp dữ liệu vào bộ nhớ máy cục bộ.
+* **So sánh với Import Mode thực tế:** Trong doanh nghiệp hiện nay, 90% dự án dùng *Import Mode* hoặc *Direct Lake (Fabric Semantic Model)* vì cho phép viết DAX tự do, tạo Calculated Columns/Tables và hỗ trợ 100% visual AI. Tuy nhiên, trong đồ án môn học Kho dữ liệu & OLAP, chuyển sang Import Mode sẽ làm mất đi ý nghĩa thực nghiệm của việc xây dựng Cube SSAS.
+
+### 8.2. Các ràng buộc kỹ thuật bất khả xâm phạm khi dùng Live Connection (SSAS Multidimensional):
+1. **$100\%$ sử dụng Measures và Dimensions ĐÃ CÓ SẴN trong Cube:** Không thể viết thêm Calculated Columns trong Power BI, không tự ý thêm các measure mà Cube chưa hỗ trợ. Mọi thước đo phải lấy trực tiếp từ khối Cube `[DW Football Transfermarkt]`.
+2. **Tuyệt đối không lọc thẻ Card bằng Measure:** Trong Live Connection, kéo một Measure (như `Is Home Game`) vào bộ lọc visual của thẻ Card sẽ kích hoạt phép tính trên Grand Total (toàn giải) dẫn đến giá trị bị `(Blank)`. Muốn lọc, chỉ được lọc bằng **Dimension Attribute Hierarchy** (như `Season`, `Competition Name`, `Main Position`).
+3. **Không dùng các Visual AI không tương thích MDX:** *Decomposition Tree*, *Key Influencers*, *Q&A* sinh ra các truy vấn DAX nâng cao không thể dịch chuẩn sang ngôn ngữ MDX của SSAS Multidimensional. Bắt buộc thay bằng **Hierarchical Treemap Drill-down** hoặc **Matrix**.
+4. **Chuẩn hóa đặt tên hiển thị (Rename for this visual):** Mọi trường kéo thả từ Cube vào visual bắt buộc phải nhấp chuột phải chọn `Rename for this visual` để đổi tên tiếng Việt chuẩn hóa, loại bỏ hoàn toàn các tiền tố kỹ thuật `DIM...`, `FACT...` và triệt tiêu dấu ba chấm (`...`).
