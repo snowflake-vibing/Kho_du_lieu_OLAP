@@ -51,9 +51,9 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Nền: Pastel Blue #EFF6FF      | Nền: Pastel Green #F0FDF4  | Nền: Pastel Amber #FFFBEB  | Nền: Pastel Purple #FAF5FF        |
 | (W: 455, H: 95, X: 20)        | (W: 455, H: 95, X: 495)    | (W: 455, H: 95, X: 970)    | (W: 455, H: 95, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Slicer 1: Giải đấu]                                  | [Slicer 2: CLB Chủ quản Cần Phân Tích] | [Slicer 3: Mùa giải]       |
-| (W: 650, H: 75, X: 20, Y: 210)                        | (W: 600, H: 75, X: 690)                | (W: 590, H: 75, X: 1310)   |
-+---------------------------------------------------------+---------------------------------------------------------------+
+| [Slicer 1: Giải đấu]          | [Slicer 2: CLB Chủ quản]   | [Slicer 3: Năm thi đấu]    | [Slicer 4: Tháng thi đấu]         |
+| (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
++-------------------------------+----------------------------+----------------------------+-----------------------------------+
 | [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ CỘT THANH NGANG (18pt)]     | [Ô 2: TRÊN - PHẢI | MA TRẬN PHÂN TÁN SCATTER (Title: 18pt)]    |
 | Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Ma trận Khắc chế Đối thủ: Bàn thắng vs Thẻ phạt Đối đầu       |
 | Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: Bàn thắng (12pt), Y: Thẻ vàng (12pt), Size: Trận, 2 Median |
@@ -141,20 +141,25 @@ Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 4: Thiết lập Hệ thống 3 Slicers Mở rộng (Không bị cụt thanh Dropdown)
+### Bước 4: Thiết lập Hệ thống 4 Slicers Đối Xứng (Thay Season bằng Năm & Tháng)
 
-Cả 3 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px`**:
+Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px`**, chiều rộng đều đặn **`Width = 455 px`** (thẳng hàng và khớp $100\%$ với 4 thẻ KPI bên trên):
 
 | Slicer | Trường dữ liệu | **Phần đặt tên (Rename for this visual)** | Kiểu hiển thị | X | Y | W | H |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Slicer 1** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 20 px | 210 px | 650 px | 75 px |
-| **Slicer 2** | `DIM Club [Club Name]` | **`CLB Chủ quản (Đội phân tích)`** | Dropdown | 690 px | 210 px | 600 px | 75 px |
-| **Slicer 3** | `DIM Time [Season]` | **`Mùa giải`** | Dropdown | 1310 px | 210 px | 590 px | 75 px |
+| **Slicer 1** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 20 px | 210 px | 455 px | 75 px |
+| **Slicer 2** | `DIM Club [Club Name]` | **`CLB Chủ quản (Đội phân tích)`** | Dropdown | 495 px | 210 px | 455 px | 75 px |
+| **Slicer 3** | `DIM Time [Year]` | **`Năm thi đấu`** | Dropdown / Tile | 970 px | 210 px | 455 px | 75 px |
+| **Slicer 4** | `DIM Time [Month]` | **`Tháng thi đấu`** | Dropdown / Tile | 1445 px | 210 px | 455 px | 75 px |
 
 * **Định dạng chung cho Slicers:**
   * Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt` Bold**, màu chữ `#0F172A`.
   * Values (dữ liệu mục chọn): Font `Segoe UI`, Cỡ chữ **`12 pt`**.
   * Effects: Nền trắng `#FFFFFF`, Viền mỏng `#CBD5E1`, Bo góc `8 px`.
+
+> **Ưu điểm vượt trội:**
+> 1. **Khớp nối thời gian linh hoạt:** Thay vì chỉ chọn mùa giải gộp, người dùng có thể lọc đích danh năm (2022, 2023, 2024) và đào sâu từng tháng thi đấu cụ thể (Tháng 1 đến Tháng 12) để xem phong độ đối đầu của CLB ở giai đoạn nước rút hay đầu mùa.
+> 2. **Bố cục đối xứng 1:1 hoàn hảo:** 4 thẻ KPI rộng 455px đặt ngay trên 4 bộ lọc Slicers rộng 455px, tạo cấu trúc phân vùng cân đối tuyệt đối.
 
 > **Mẹo thao tác:** Khi người dùng chọn CLB ở Slicer 2 (ví dụ: `Real Madrid` hoặc `Manchester City`), toàn bộ 4 biểu đồ bên dưới sẽ tự động biến thành hồ sơ đối đầu riêng biệt của CLB đó với mọi đối thủ!
 
@@ -224,25 +229,26 @@ Cả 3 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 7 – Ô 3 (Dưới - Trái): Clustered Column Chart – Lịch sử Bàn thắng Ghi vào Lưới các Kỳ phùng Địch thủ qua các Mùa giải
+### Bước 7 – Ô 3 (Dưới - Trái): Clustered Column Chart – Lịch sử Bàn thắng Ghi vào Lưới Đối thủ theo Năm & Tháng
 
 1. Tại khung **Visualizations**, chọn visual **Clustered column chart** (Biểu đồ cột cụm theo chuỗi thời gian).
 2. Kích thước & Vị trí:
    * Size: `Width = 925 px`, `Height = 385 px`.
    * Position: `Horizontal = 20 px`, `Vertical = 695 px`.
 3. Kéo thả trường dữ liệu:
-   * **X-axis:** Kéo `DIM Time [Season]`.
+   * **X-axis:** Kéo phân cấp `DIM Time [Year]` $\rightarrow$ `DIM Time [Month]` (hỗ trợ Drill-down từ Năm xuống từng Tháng).
    * **Y-axis:** Kéo `[Measures].[Goals]`.
    * **Legend:** Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`**.
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
+   * `Year` $\rightarrow$ Đổi tên thành: **`Năm thi đấu`**
+   * `Month` $\rightarrow$ Đổi tên thành: **`Tháng`**
    * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
    * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
 5. **Bộ lọc Top 5 Đối thủ lớn nhất:**
    * Tại khung Filters on this visual $\rightarrow$ chọn `Club Name` (của Opponent Club) $\rightarrow$ chọn **Top N** = `5`, By value kéo `Goals` $\rightarrow$ nhấp **Apply filter** (giúp biểu đồ hiển thị thoáng mắt, tập trung vào 5 kỳ phùng địch thủ lớn nhất).
 6. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Lịch sử Bàn thắng Ghi vào Lưới các Kỳ phùng Địch thủ qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **X-axis (Mùa giải):** Cỡ chữ **`12 pt`**, màu `#334155`.
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Lịch sử Bàn thắng Ghi vào Lưới các Kỳ phùng Địch thủ theo Năm & Tháng`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
+   * **X-axis (Năm / Tháng):** Cỡ chữ **`12 pt`**, màu `#334155`.
    * **Y-axis:** Cỡ chữ **`12 pt`**, màu `#1565C0`.
    * **Data labels:** Bật **On**, Cỡ chữ **`12 pt` Bold**.
    * **Legend:** Vị trí `TopCenter`, Cỡ chữ **`12 pt`**.
