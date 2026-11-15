@@ -20,16 +20,16 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 
 ### 1.1. Câu hỏi nghiệp vụ độc lập
 1. **Ai là "con mồi" ưa thích nhất của từng CLB hàng đầu châu Âu?** Khi người dùng chọn một CLB (ví dụ: *Real Madrid* hoặc *Manchester City*), báo biểu sẽ chỉ ra ngay những đối thủ (`Opponent Club`) bị CLB này chọc thủng lưới nhiều lần nhất.
-2. **Tính chất của các cặp đấu đối đầu ra sao (Trận cầu tưng bừng hay Trận Derby nảy lửa)?** Đặt số bàn thắng ghi được (`Goals`) song song với số thẻ phạt (`Yellow Cards`) để phân biệt những trận cầu cống hiến với những cuộc chạm trán căng thẳng kịch liệt.
-3. **Lịch sử đối đầu giữa các kỳ phùng địch thủ thay đổi như thế nào qua các mùa giải?** Theo dõi sản lượng bàn thắng ghi vào lưới các đối thủ truyền kiếp qua từng mùa (`Season`).
+2. **Tương quan giữa số trận chạm trán và số bàn thắng ghi được?** Sử dụng Combo Chart 2 trục Y để đối chiếu trực quan giữa số trận đối đầu (`Distinct Matches Played`) và số bàn thắng (`Goals`), nhận diện ngay những đối thủ có hiệu suất bị chọc thủng lưới cao nhất (số trận ít nhưng phải nhận cơn mưa bàn thắng).
+3. **Biến thiên bàn thắng đối đầu theo chu kỳ các tháng trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi phân bố bàn thắng theo từng tháng (`Month`) qua các mùa giải (`Season`), nhận diện thời điểm bùng nổ bàn thắng đối đầu đỉnh cao trong năm.
 4. **Bản đồ đối đầu chéo toàn diện (Head-to-Head Cross Matrix):** Tạo bảng ma trận nhiệt giao cắt giữa toàn bộ các CLB trong giải đấu để tra cứu thành tích đối đầu song phương.
 
 ### 1.2. Ý nghĩa thống kê & Giá trị học thuật
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Biểu đồ Cột ngang Top 10 Đối thủ** | Xếp hạng các đối thủ bị ghi nhiều bàn nhất (`Opponent Club` by `Goals`), nhận diện đối thủ kỵ rơ và đối thủ dễ chịu của CLB. |
-| **Scatter Bàn thắng vs Thẻ phạt Đối đầu** | Phân tích tương quan 2 biến định lượng ($X = \text{Goals}$, $Y = \text{Yellow Cards}$); kết hợp **2 đường Trung vị (Median lines)** để phân loại 4 tính chất trận đấu: Derby nảy lửa (Thẻ cao - Bàn nhiều); Trận cầu kịch chiến bạo lực (Thẻ cao - Bàn ít); Đối thủ ưa thích (Thẻ ít - Bàn nhiều); Trận đấu thông thường. |
-| **Biểu đồ Cột Nhóm theo Mùa giải** | Biểu diễn biến thiên lịch sử bàn thắng qua chuỗi thời gian đối đầu giữa CLB chủ quản và Top 5 đối thủ truyền kiếp. |
+| **Combo Chart 2 Trục Y (Line & Clustered Column)** | Đối soát tương quan trực quan giữa Số trận đối đầu (Cột - Trục Y trái) và Bàn thắng ghi được (Đường - Trục Y phải) trên từng đối thủ. Nhận diện ngay đối thủ có hiệu suất ghi bàn hủy diệt. |
+| **Area Chart (Biểu đồ Vùng xếp chồng)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
 | **Ma trận Đối đầu Chéo (Cross Heatmap)** | Bảng ma trận $N \times N$ giữa `DIM Club` (Dòng) và `Opponent Club` (Cột), tích hợp dải màu **Heatmap Gradient** chuẩn mực trong phân tích thể thao chuyên nghiệp. |
 
 ### 1.3. Bài toán thực tế giải quyết
@@ -54,14 +54,14 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Slicer 1: Giải đấu]          | [Slicer 2: CLB Chủ quản]   | [Slicer 3: Mùa giải]       | [Slicer 4: Tháng thi đấu]         |
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ CỘT THANH NGANG (18pt)]     | [Ô 2: TRÊN - PHẢI | MA TRẬN PHÂN TÁN SCATTER (Title: 18pt)]    |
-| Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Ma trận Khắc chế Đối thủ: Bàn thắng vs Thẻ phạt Đối đầu       |
-| Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: Bàn thắng (12pt), Y: Thẻ vàng (12pt), Size: Trận, 2 Median |
+| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ CỘT THANH NGANG (18pt)]     | [Ô 2: TRÊN - PHẢI | COMBO CHART 2 TRỤC Y (Title: 18pt)]        |
+| Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Tương quan Số trận [Cột Y1] vs Bàn thắng [Đường Y2]           |
+| Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: CLB Đối thủ, Cột: Số trận (12pt), Đường: Bàn thắng (12pt)  |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | CỘT CỤM LỊCH SỬ MÙA GIẢI (18pt)]    | [Ô 4: DƯỚI - PHẢI | MA TRẬN ĐỐI ĐẦU CHÉO HEATMAP (18pt)]       |
-| Lịch sử Bàn thắng Ghi vào Lưới Đối thủ qua các Mùa      | Ma trận Đối đầu Trực tiếp Song phương (H2H Cross Matrix)      |
-| X: Mùa giải (12pt), Y: Bàn thắng, Legend: CLB Đối thủ   | Dòng: CLB Chủ quản, Cột: CLB Đối thủ, Giá trị: Bàn thắng      |
+| [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | MA TRẬN ĐỐI ĐẦU CHÉO HEATMAP (18pt)]       |
+| Biến thiên Bàn thắng theo Tháng qua các Mùa giải         | Ma trận Đối đầu Trực tiếp Song phương (H2H Cross Matrix)      |
+| X: Tháng (12pt), Y: Bàn thắng, Legend: Mùa giải         | Dòng: CLB Chủ quản, Cột: CLB Đối thủ, Giá trị: Bàn thắng      |
 | Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
@@ -192,67 +192,68 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Scatter Chart – Ma trận Khắc chế Đối thủ: Bàn thắng vs Thẻ phạt Chạm trán (NÂNG CAO)
+### Bước 6 – Ô 2 (Trên - Phải): Combo Chart 2 Trục Y – Tương quan Số trận Chạm trán vs Bàn thắng theo Đối thủ (Line and Clustered Column Chart)
 
-1. Tại khung **Visualizations**, chọn visual **Scatter chart** (Biểu đồ phân tán 4 góc phần tư).
+1. Tại khung **Visualizations**, chọn visual **Line and clustered column chart** (Biểu đồ kết hợp Cột cụm và Đường với 2 trục Y độc lập).
 2. Kích thước & Vị trí:
-   * Size: `Width = 925 px`, `Height = 385 px`.
-   * Position: `Horizontal = 975 px`, `Vertical = 300 px`.
+   * **Size:** `Width = 925 px`, `Height = 385 px`.
+   * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
 3. Kéo thả trường dữ liệu:
-   * **Values:** Mở bảng **`Opponent Club`**, kéo **`[Club Name]`**.
-   * **X-axis:** Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng ghi được).
-   * **Y-axis:** Kéo thước đo **`[Measures].[Yellow Cards]`** (Thẻ phạt nhận phải trong trận đấu).
-   * **Size:** Kéo thước đo **`[Measures].[Distinct Matches Played]`** (Số trận đối đầu).
-   * **Legend:** Mở bảng `DIM Competition`, kéo `[Competition Name]`.
+   * **X-axis:** Mở bảng **`Opponent Club`**, kéo **`[Club Name]`**.
+   * **Column y-axis (Trục Y trái - Cột):** Kéo thước đo **`[Measures].[Distinct Matches Played]`** (Số trận chạm trán).
+   * **Line y-axis (Trục Y phải - Đường):** Kéo thước đo **`[Measures].[Goals]`** (Số bàn thắng ghi được).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
    * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
-   * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Số thẻ vàng nhận phải`**
    * `Distinct Matches Played` $\rightarrow$ Đổi tên thành: **`Số trận đối đầu`**
-   * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
-5. **Kẻ đường Xu hướng & Trung vị (Thẻ Analytics - Kính lúp):**
-   * **Trend line:** Bật **On**, màu Xám than `#64748B`, nét đứt (Dashed).
-   * **X-Axis Constant Line (Median Bàn thắng):** Bật On, nhập giá trị trung vị bàn thắng (ví dụ: khoảng 4 bàn), nét đứt, nhãn `Median Bàn thắng`.
-   * **Y-Axis Constant Line (Median Thẻ vàng):** Bật On, nhập giá trị trung vị thẻ vàng (ví dụ: khoảng 5 thẻ), nét đứt, nhãn `Median Thẻ vàng`.
-6. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Ma trận Khắc chế Đối thủ: Bàn thắng vs Thẻ phạt Chạm trán`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **X-axis:** Title bật **On**, nhập `Tổng số bàn thắng ghi vào đối thủ`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1565C0`.
-   * **Y-axis:** Title bật **On**, nhập `Số thẻ vàng trong các cuộc chạm trán`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#DC2626`.
-   * **Legend:** Vị trí `BottomCenter`, Cỡ chữ **`12 pt`**.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+   * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
+5. **Cấu hình Bộ lọc Top 10 Đối thủ (Filters on this visual):**
+   * Tại khung **Filters on this visual**, mở mục `CLB Đối thủ` (hoặc `Club Name`).
+   * Chọn Filter type: **Top N**, nhập **`10`**.
+   * Ô **By value**: Kéo thước đo **`[Measures].[Goals]`** vào.
+   * Nhấp nút **Apply filter** (Tập trung hiển thị 10 đối thủ bị chọc thủng lưới nhiều nhất).
+6. **Định dạng hiển thị chi tiết (Tab Format visual):**
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Tương quan Số trận Chạm trán vs Bàn thắng theo Đối thủ`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **Columns (Màu cột):** Đặt màu Cột xanh dương `#3B82F6`.
+   * **Lines (Màu đường):** Đặt màu Đường đỏ cam rực lửa `#EF4444`, Stroke width: `3 px`.
+   * **Markers (Điểm đánh dấu trên đường):** Bật **On**, Shape: Tròn (Circle), Size: `6`, Màu nền `#DC2626`.
+   * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
+   * **X-axis (CLB Đối thủ):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
+   * **Y-axis (Cột - Trục Y trái):** Title bật **On**, nhập `Số trận đối đầu`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#2563EB`.
+   * **Secondary y-axis (Đường - Trục Y phải):** Title bật **On**, nhập `Bàn thắng ghi được`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#DC2626`.
+   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA 4 GÓC PHẦN TƯ KHẮC CHẾ ĐỐI ĐẦU:**
-> * **Góc I (Trên - Phải): TRẬN CẦU RỰC LỬA / DERBY CĂNG THẲNG:** Bàn thắng nhiều VÀ thẻ phạt cũng rất nhiều. Đây là các trận cầu đỉnh cao có tính chất tranh chấp quyết liệt (như Real Madrid vs Barcelona, Man City vs Man United).
-> * **Góc II (Trên - Trái): ĐỐI THỦ KỴ RƠ / KHẮC NGHIỆT:** Ghi được ít bàn thắng nhưng phải nhận rất nhiều thẻ vàng. Đây là các đối thủ có lối đá phòng ngự chặt chém khiến CLB chủ quản ức chế phạm lỗi.
-> * **Góc IV (Dưới - Phải): "CON MỒI" ƯA THÍCH (Favorite Opponent):** Bàn thắng dồi dào nhưng nhận rất ít thẻ vàng. Lối chơi áp đảo hoàn toàn, chiến thắng dễ dàng.
-> * **Góc III (Dưới - Trái): CHẠM TRÁN THÔNG THƯỜNG / ÍT VA CHẠM:** Số trận ít, bàn thắng và thẻ phạt đều ở mức thấp.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA COMBO CHART 2 TRỤC Y:**
+> * Cột (Trục Y trái) thể hiện số lần hai đội chạm trán trong lịch sử; Đường (Trục Y phải) thể hiện số bàn thắng nã vào lưới đối thủ.
+> * Giúp ban huấn luyện và phân tích viên phát hiện ngay những đối thủ có **cột rất thấp nhưng đường vút lên cao** — tức số trận gặp gỡ ít nhưng hiệu suất ghi bàn cực kỳ hủy diệt (trung bình 2-3 bàn/trận).
+> * Ngược lại, những đối thủ có **cột cao ngất nhưng đường nằm thấp** là những "khúc xương khó nuốt", đá nhiều trận nhưng rất khó xuyên thủng mành lưới.
 
 ---
 
-### Bước 7 – Ô 3 (Dưới - Trái): Clustered Column Chart – Lịch sử Bàn thắng Ghi vào Lưới Đối thủ theo Mùa giải & Tháng
+### Bước 7 – Ô 3 (Dưới - Trái): Area Chart – Biến thiên Bàn thắng Đối đầu theo Tháng qua các Mùa giải (Biểu đồ Vùng xếp chồng)
 
-1. Tại khung **Visualizations**, chọn visual **Clustered column chart** (Biểu đồ cột cụm theo chuỗi thời gian).
+1. Tại khung **Visualizations**, chọn visual **Area chart** (Biểu đồ Vùng diện tích).
 2. Kích thước & Vị trí:
-   * Size: `Width = 925 px`, `Height = 385 px`.
-   * Position: `Horizontal = 20 px`, `Vertical = 695 px`.
+   * **Size:** `Width = 925 px`, `Height = 385 px`.
+   * **Position:** `Horizontal = 20 px`, `Vertical = 695 px`.
 3. Kéo thả trường dữ liệu:
-   * **X-axis:** Kéo phân cấp `DIM Time [Season]` $\rightarrow$ `DIM Time [Month]` (hỗ trợ Drill-down từ Mùa giải xuống từng Tháng).
-   * **Y-axis:** Kéo `[Measures].[Goals]`.
-   * **Legend:** Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`**.
+   * **X-axis:** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Month]`** (Tháng 1 đến Tháng 12).
+   * **Y-axis:** Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng ghi được).
+   * **Legend:** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
    * `Month` $\rightarrow$ Đổi tên thành: **`Tháng`**
+   * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
    * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
-   * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
-5. **Bộ lọc Top 5 Đối thủ lớn nhất:**
-   * Tại khung Filters on this visual $\rightarrow$ chọn `Club Name` (của Opponent Club) $\rightarrow$ chọn **Top N** = `5`, By value kéo `Goals` $\rightarrow$ nhấp **Apply filter** (giúp biểu đồ hiển thị thoáng mắt, tập trung vào 5 kỳ phùng địch thủ lớn nhất).
-6. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Lịch sử Bàn thắng Ghi vào Lưới các Kỳ phùng Địch thủ theo Mùa giải & Tháng`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **X-axis (Mùa giải / Tháng):** Cỡ chữ **`12 pt`**, màu `#334155`.
-   * **Y-axis:** Cỡ chữ **`12 pt`**, màu `#1565C0`.
-   * **Data labels:** Bật **On**, Cỡ chữ **`12 pt` Bold**.
-   * **Legend:** Vị trí `TopCenter`, Cỡ chữ **`12 pt`**.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+5. **Định dạng hiển thị chi tiết (Tab Format visual):**
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Biến thiên Bàn thắng Đối đầu theo Tháng qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **X-axis (Tháng):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
+   * **Y-axis:** Title bật **On**, nhập `Tổng số bàn thắng`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
+   * **Lines & Colors:** Các dải màu mùa giải trong suốt tinh tế (Transparency `40% - 60%`), tạo hiệu ứng vùng màu xếp lớp uốn lượn đẹp mắt.
+   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
+
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA BIỂU ĐỒ VÙNG (AREA CHART):**
+> * Khắc họa rõ nét nhịp điệu phong độ và tính chu kỳ của các giải đấu bóng đá châu Âu theo các tháng trong năm (khởi động vào tháng 8-9, duy trì ổn định qua mùa đông tháng 11-12, và bùng nổ bàn thắng ở giai đoạn nước rút quyết định tháng 3-4-5).
+> * Việc xếp chồng các diện tích mùa giải giúp so sánh trực tiếp sản lượng bàn thắng giữa các mùa giải xem mùa nào có hỏa lực bùng nổ hơn vào cùng một thời điểm trong năm.
 
 ---
 
