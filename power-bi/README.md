@@ -27,6 +27,6 @@ Thư mục này chứa toàn bộ tài liệu hướng dẫn chi tiết quy trì
 ---
 
 ## Điểm nhấn kỹ thuật nổi bật
-1. **Kết nối trực tiếp SSAS Cube (Live Connection):** Khai thác toàn bộ các thước đo tính toán độc lập tự chủ (`QoQ Goals Growth`, `Mins Per Goal`, `Goal Contributions`) và hệ thống phân cấp thời gian (`Year` -> `Quarter` -> `Month` -> `Day`).
+1. **Kết nối trực tiếp SSAS Cube (Live Connection):** Khai thác toàn bộ các thước đo tính toán độc lập tự chủ (`QoQ Goals Growth`, `Avg Minutes Played`, `Goal Contributions`, `Distinct Matches Played`, `Stadium Capacity Cleaned`) và hệ thống phân cấp thời gian (`Year` -> `Quarter` -> `Month` -> `Day`).
 2. **Kỹ thuật Drill-down và Cross-Filtering:** Toàn bộ các visual tương tác đồng bộ tức thời khi người dùng nhấp chọn mùa giải, giải đấu hoặc vị trí thi đấu.
 3. **Thiết kế báo cáo đa chiều chuẩn doanh nghiệp:** Kết hợp hài hòa giữa thẻ chỉ số KPI tổng quan, biểu đồ xu hướng thời gian và bảng ma trận chi tiết dòng.

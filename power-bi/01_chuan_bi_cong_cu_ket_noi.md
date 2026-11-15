@@ -6,7 +6,7 @@ Tài liệu này hướng dẫn chi tiết quy trình chuẩn bị môi trườn
 
 ## 4.1.1 Chuẩn bị và kết nối công cụ Power BI Desktop
 
-Power BI Desktop là công cụ phân tích và trực quan hóa dữ liệu kinh doanh của Microsoft, hỗ trợ kết nối trực tiếp (Live Connection) tới khối đa chiều SQL Server Analysis Services (**SSAS Cube: `[DW Football Transfermarkt]`**) để khai thác toàn bộ cấu trúc các chiều phân tích (`DIM_Player`, `DIM_Club`, `DIM_Competition`, `DIM_Game`, `DIM_Time`) và các Calculated Measures (như `QoQ Goals Growth`, `Mins Per Goal`, `Goal Contributions`) đã được xây dựng từ các chương trước.
+Power BI Desktop là công cụ phân tích và trực quan hóa dữ liệu kinh doanh của Microsoft, hỗ trợ kết nối trực tiếp (Live Connection) tới khối đa chiều SQL Server Analysis Services (**SSAS Cube: `[DW Football Transfermarkt]`**) để khai thác toàn bộ cấu trúc các chiều phân tích (`DIM_Player`, `DIM_Club`, `DIM_Competition`, `DIM_Game`, `DIM_Time`) và các Calculated Measures (như `QoQ Goals Growth`, `Avg Minutes Played`, `Goal Contributions`, `Distinct Matches Played`, `Stadium Capacity Cleaned`) đã được xây dựng từ các chương trước.
 
 ### Bước 1: Cài đặt phần mềm Power BI Desktop
 1. Trên thanh tác vụ Windows (Taskbar) hoặc nhấn phím `Windows`, mở ứng dụng **Microsoft Store**.

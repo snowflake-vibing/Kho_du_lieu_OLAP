@@ -111,8 +111,8 @@ Bố cục không gian tổng thể của trang báo biểu được quy định
   * *Góc III (Bottom-Right):* **Nhạc trưởng Kiến thiết** (Low Goals, High Assists - De Bruyne).
   * *Góc IV (Bottom-Left):* **Cầu thủ Hỗ trợ / Dự bị xoay tua**.
 
-### 5.2. Thước đo tỷ suất chuẩn hóa `Mins Per Goal`
-* Thước đo $R = \frac{\text{Minutes Played}}{\text{Goals}}$ khử hoàn toàn **sai số về thời lượng ra sân (Exposure Time Bias)**, đánh giá công bằng hiệu quả của cầu thủ đá chính lẫn cầu thủ dự bị bùng nổ.
+### 5.2. Thước đo tỷ suất chuẩn hóa thời lượng `Avg Minutes Played`
+* Thước đo tính thời lượng thi đấu trung bình mỗi lượt ra sân $\text{Avg Minutes} = \frac{\text{Minutes Played}}{\text{Appearances}}$ (đã có sẵn trong Cube) giúp đánh giá độ bền thể lực và tần suất được ban huấn luyện tin tưởng đá trọn 90 phút. Khử sai lệch đánh giá giữa cầu thủ thường xuyên đá chính và cầu thủ vào sân thay người ở cuối trận.
 
 ### 5.3. Bản đồ Phân tầng Đa cấp (Hierarchical Treemap Drill-down) thay thế Decomposition Tree
 * **Khắc phục giới hạn kỹ thuật:** Trên kết nối **Live Connection tới SSAS Multidimensional (MDX)**, visual AI *Decomposition Tree* thường phát sinh lỗi hệ thống (*"Something's wrong with the visual"*) do tầng phiên dịch DAX-MDX không hỗ trợ thuật toán chia nhánh tự động.

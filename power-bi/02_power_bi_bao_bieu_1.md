@@ -14,7 +14,7 @@ Báo biểu được thiết kế theo chuẩn **Dashboard Doanh nghiệp & Nghi
      * *Tổng Bàn Thắng (`Total Goals`):* Thước đo hỏa lực tấn công tổng thể.
      * *Tổng Kiến Tạo (`Total Assists`):* Thước đo năng lực sáng tạo và hỗ trợ đồng đội.
      * *Tổng Đóng Góp Bàn Thắng (`Goal Contributions = Goals + Assists`):* Tổng hỏa lực tạo đột biến trực tiếp.
-     * *Hiệu Suất Số Phút / Bàn Thắng (`Mins Per Goal`):* Chỉ số định lượng thời gian trung bình để cầu thủ khai hỏa (dưới 120 phút/bàn là đẳng cấp ngôi sao hàng đầu thế giới).
+     * *Thời Lượng Thi Đấu Trung Bình (`Avg Minutes Played`):* Thời lượng trung bình mỗi lượt ra sân của cầu thủ (đo lường độ bền thể lực và tính ổn định trong đội hình chính, trung bình toàn giải đạt ~64.4 phút/trận).
   2. **Biểu đồ Thanh Phân cấp (Top 10 Chân sút ghi bàn nhiều nhất Châu Âu):** Biểu đồ thanh ngang với chiều cao lớn và độ rộng mở rộng, phân tách trục danh mục (Navy Blue) và trục định lượng (Forest Green), hiển thị trọn vẹn họ tên 10 chân sút xuất sắc nhất giải mà không bao giờ bị cắt cụt.
   3. **Biểu đồ Nâng cao 1: Ma trận 4 Góc phần tư Hiệu quả Tấn công (Scatter / Bubble Quadrant Plot):** 
      * Trực quan hóa tương quan 2 chiều giữa `Assists` (Trục X) và `Goals` (Trục Y), kích thước bong bóng theo `Minutes Played`, phân loại màu theo `Main Position`.
@@ -55,7 +55,7 @@ Tuân thủ nghiêm ngặt **Quy tắc Bố cục Phân tầng**: Phần trên c
 | [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 1 - PHÂN TÍCH HIỆU SUẤT GHI BÀN & KIẾN TẠO CẦU THỦ CHÂU ÂU (Font: 20pt Bold)   |
 | Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Bàn Thắng]  | [Card 2: Tổng Kiến Tạo]   | [Card 3: Tổng Đóng Góp G+A] | [Card 4: Mins / Bàn Thắng]        |
+| [Card 1: Tổng Bàn Thắng]  | [Card 2: Tổng Kiến Tạo]   | [Card 3: Tổng Đóng Góp G+A] | [Card 4: Thời Lượng TB / Trận]    |
 | Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold          | Callout: 35pt Bold                |
 | (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)          |
 +---------------------------+---------------------------+-----------------------------+-----------------------------------+
@@ -155,11 +155,11 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
    * Tab **General** -> **Effects**: Nền Pastel Amber `#FFFBEB`, Viền `#FCD34D`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 970 px`, `Vertical = 95 px`).
 
-4. **Card 4: Hiệu suất Số phút / Bàn thắng (Mins Per Goal)**:
-   * Thêm visual **Card**, kéo thước đo `[Measures].[Avg Minutes Played]` (hoặc thước đo tính toán `[Mins Per Goal]`) vào ô **Fields**.
+4. **Card 4: Thời lượng Thi đấu Trung bình Mỗi trận (Avg Minutes Played)**:
+   * Thêm visual **Card**, kéo thước đo **`[Measures].[Avg Minutes Played]`** vào ô **Fields** (thước đo tính trung bình số phút thi đấu mỗi lượt ra sân, có sẵn 100% trong Cube).
    * **Phần đặt tên (Rename for this visual):** Nhấp chuột phải vào trường $\rightarrow$ Đổi tên thành: **`Số phút TB / trận`**.
-   * Tab **General** -> **Title**: Bật **On**, nhập `HIỆU SUẤT THỜI LƯỢNG (MINS/BÀN)`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#5B21B6`.
-   * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`, Display units: `None`. **Category label**: Tắt **Off**.
+   * Tab **General** -> **Title**: Bật **On**, nhập `THỜI LƯỢNG THI ĐẤU TRUNG BÌNH`, Font `Segoe UI`, Cỡ chữ **`18 pt`**, In đậm (**Bold**), Căn giữa (**Center**), màu chữ `#5B21B6`.
+   * Tab **Format visual** -> **Callout value**: Font `Segoe UI`, Cỡ chữ **`35 pt`**, In đậm (**Bold**), màu đen tuyền `#0F172A`, Display units: `None` (hiển thị con số thực tế `64.36` hoặc ~64 phút). **Category label**: Tắt **Off**.
    * Tab **General** -> **Effects**: Nền Pastel Purple `#FAF5FF`, Viền `#D8B4FE`, Bo góc **`10 px`**.
    * **Properties:** Size (`Width = 455 px`, `Height = 95 px`), Position (`Horizontal = 1445 px`, `Vertical = 95 px`).
 
