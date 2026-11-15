@@ -25,7 +25,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Stacked Bar Chart (Vàng + Đỏ)** | So sánh tổng lượng thẻ phạt và cơ cấu mức độ nghiêm trọng (thẻ vàng cảnh cáo vs thẻ đỏ trực tiếp/gián tiếp) giữa các CLB hàng đầu. |
-| **Clustered Column Chart (Kỷ luật Giải đấu)** | So sánh trực tiếp mức độ răn đe kỷ luật (Thẻ đỏ & Thẻ vàng) giữa các Giải đấu châu Âu (`Competition Name`), làm rõ sự khác biệt về văn hóa trọng tài và tính chất va chạm. |
+| **Combo Chart 2 Trục Y (Kỷ luật Giải đấu)** | Đối soát song song giữa Thẻ Vàng (Cột - Trục Y trái) và Thẻ Đỏ (Đường - Trục Y phải) giữa các Giải đấu châu Âu (`Competition Name`), loại bỏ triệt để hiện tượng cột thẻ đỏ bị lùn tịt do lệch thang đo (3,000 vs 50). |
 | **Combo Chart 2 Trục Y (Dual Axis)** | Đặt tải trọng thời lượng (Cột - Trục Y trái) và số thẻ phạt (Đường - Trục Y phải) trên cùng một trục danh mục độ tuổi (`Age`), giải quyết bài toán so sánh 2 đại lượng khác thang đo (Khử Exposure Bias). |
 | **Donut Chart (Tỷ trọng Thẻ đỏ theo Vị trí)** | Trực quan hóa tỷ trọng thẻ đỏ theo từng vị trí chuyên môn trên sân (`Sub Position`), nhận diện mắt xích rủi ro kỷ luật chiến thuật cao nhất toàn đội hình. |
 
@@ -51,9 +51,9 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Slicer 1: Mùa giải]          | [Slicer 2: Giải đấu]       | [Slicer 3: Quốc gia]       | [Slicer 4: Vị trí thi đấu]        |
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | BIỂU ĐỒ CỘT CỤM KỶ LUẬT (Title: 18pt)]     |
-| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Bản đồ Răn đe Kỷ luật theo Giải đấu Châu Âu                   |
-| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Giải đấu (12pt), Y: Thẻ đỏ (Đỏ) & Thẻ vàng (Vàng) (12pt)   |
+| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | COMBO CHART 2 TRỤC Y (Title: 18pt)]        |
+| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Bản đồ Răn đe Kỷ luật: Thẻ Vàng [Cột Y1] vs Thẻ Đỏ [Đường Y2] |
+| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Giải đấu (12pt), Cột: Vàng (12pt), Đường: Đỏ (12pt)         |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BIỂU ĐỒ VÀNH KHĂN DONUT (Title: 18pt)]     |
@@ -186,21 +186,20 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Clustered Column Chart – Bản đồ Răn đe Kỷ luật giữa các Giải đấu Châu Âu (Mức độ Khốc liệt)
+### Bước 6 – Ô 2 (Trên - Phải): Combo Chart 2 Trục Y – Bản đồ Răn đe Kỷ luật: Thẻ Vàng (Cột) vs Thẻ Đỏ (Đường) giữa các Giải đấu
 
-1. Tại khung **Visualizations**, chọn visual **Clustered column chart** (Biểu đồ cột cụm so sánh song song).
+1. Tại khung **Visualizations**, chọn visual **Line and clustered column chart** (Biểu đồ Cột cụm và Đường với 2 trục Y độc lập).
 2. Kích thước & Vị trí:
    * **Size:** `Width = 925 px`, `Height = 385 px`.
    * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu:
-   * **X-axis:** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`**.
-   * **Y-axis:** Kéo đồng thời 2 thước đo:
-     1. `[Measures].[Red Cards]` (Thẻ đỏ - Cột đỏ cảnh báo).
-     2. `[Measures].[Yellow Cards]` (Thẻ vàng - Cột vàng hổ phách).
+3. Kéo thả trường dữ liệu (Khử hoàn toàn lỗi lùn tịt cột thẻ đỏ bằng thang đo kép 2 trục Y):
+   * **X-axis:** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`** (Tên giải đấu).
+   * **Column y-axis (Trục Y trái - Cột):** Kéo thước đo **`[Measures].[Yellow Cards]`** (Khối lượng thẻ vàng cảnh cáo - Cột vàng).
+   * **Line y-axis (Trục Y phải - Đường):** Kéo thước đo **`[Measures].[Red Cards]`** (Độ răn đe thẻ đỏ truất quyền thi đấu - Đường đỏ).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
    * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
-   * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
+   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng cảnh cáo`**
+   * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ truất quyền`**
 5. **Cấu hình Bộ lọc Top 8 Giải đấu lớn nhất (Filters on this visual):**
    * Tại khung **Filters on this visual**, mở mục `Giải đấu` (hoặc `Competition Name`).
    * Chọn Filter type: **Top N**, nhập **`8`** (hoặc `10`).
@@ -208,18 +207,18 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
    * Nhấp nút **Apply filter** (Tập trung hiển thị 8 giải đấu hàng đầu: La Liga, Serie A, Premier League, Bundesliga, Ligue 1, Liga Portugal, Süper Lig, Eredivisie).
 6. **Định dạng hiển thị chi tiết (Tab Format visual):**
    * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bản đồ Răn đe Kỷ luật giữa các Giải đấu Châu Âu`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
-   * **Columns (Màu cột chuẩn ngữ nghĩa kỷ luật):**
-     * `Thẻ đỏ`: Màu Đỏ rực cảnh báo **`#DC2626`** (hoặc `#B91C1C`).
-     * `Thẻ vàng`: Màu Vàng hổ phách **`#F59E0B`**.
+   * **Columns (Màu cột thẻ vàng):** Đặt màu Cột Vàng Hổ Phách rực rỡ **`#F59E0B`**.
+   * **Lines (Màu đường thẻ đỏ cảnh báo):** Đặt màu Đường Đỏ Tươi cảnh báo **`#DC2626`**, Stroke width: **`3 px`**.
+   * **Markers (Điểm đánh dấu trên đường thẻ đỏ):** Bật **On**, Shape: Tròn (Circle), Size: `7`, Màu nền đỏ đậm `#B91C1C`.
    * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
    * **X-axis (Giải đấu):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
-   * **Y-axis (Số thẻ):** Title bật **On**, nhập `Số lượng thẻ phạt`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
-   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+   * **Y-axis (Cột - Trục Y trái):** Title bật **On**, nhập `Số thẻ vàng`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#D97706`.
+   * **Secondary y-axis (Đường - Trục Y phải):** Title bật **On**, nhập `Số thẻ đỏ`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#DC2626`.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA BIỂU ĐỒ KỶ LUẬT GIẢI ĐẤU:**
-> * **Khác biệt 100% với Báo biểu 1 & 2:** Xóa bỏ hoàn toàn biểu đồ Scatter phân tán lặp lại, thay bằng biểu đồ so sánh thể chế trọng tài giữa các nền bóng đá lớn.
-> * **Phát hiện nghiệp vụ chấn động:** La Liga dẫn đầu toàn châu Âu về số thẻ phạt với **`135 thẻ đỏ`** (gấp gần 3 lần Ngoại hạng Anh chỉ có `46 thẻ đỏ`). Người xem thấy rõ sự tương phản giữa lối bắt rắn, phạt nặng tay của trọng tài Tây Ban Nha/Pháp so với triết lý ưu tiên trận đấu tiếp diễn (play-on) của trọng tài Anh.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & NÂNG CẤP THẨM MỸ HOÀN HẢO:**
+> * **Giải quyết triệt để lỗi lệch thang đo (Scale Disparity):** Số liệu thực tế cho thấy Thẻ Vàng dao động từ 1,500 – 3,686 thẻ, trong khi Thẻ Đỏ chỉ từ 46 – 135 thẻ. Việc tách 2 trục Y độc lập giúp đường Thẻ Đỏ bay bổng uốn lượn sắc sảo, không còn bị bẹp dí, lùn tịt sát đáy trục X như biểu đồ cột cụm thông thường!
+> * **Phát hiện nghiệp vụ chấn động:** La Liga và Ligue 1 nổi bật với đường Thẻ Đỏ vọt đỉnh (135 và 113 thẻ đỏ), trong khi Premier League dù nhận tới 3,038 thẻ vàng nhưng đường Thẻ Đỏ lại lao dốc chạm đáy (chỉ 46 thẻ đỏ - tỷ lệ rút thẻ đỏ thấp nhất châu Âu). Điều này phản ánh rõ nét triết lý bóng đá va chạm tốc độ cao nhưng trọng tài rất hạn chế truất quyền thi đấu của người Anh.
 
 ---
 
