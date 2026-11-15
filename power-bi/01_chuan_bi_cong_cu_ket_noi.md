@@ -33,7 +33,7 @@ Power BI Desktop là công cụ phân tích và trực quan hóa dữ liệu kin
 1. Cửa sổ **Navigator** hiển thị danh sách các khối Cube có trong Database SSAS đã chọn.
 2. Tích chọn khối Cube phân tích chính: **`[DW Football Transfermarkt]`**.
 3. Khung bên phải sẽ hiển thị toàn bộ cây đối tượng của kho dữ liệu bóng đá:
-   * **Measures (Thước đo):** `Goals`, `Assists`, `Goal Contributions`, `Minutes Played`, `Yellow Cards`, `Red Cards`, `Is Starter`, `Stadium Seats`, `QoQ Goals Growth`, v.v.
+   * **Measures (Thước đo):** `Goals`, `Assists`, `Goal Contributions`, `Minutes Played`, `Yellow Cards`, `Red Cards`, `Distinct Matches Played`, `FACT Player Match Perf Count`, `QoQ Goals Growth`, v.v.
    * **DIM Player:** `Player Name`, `Age`, `Main Position`, `Sub Position`, `Foot`, `Height In Cm`, `Country Of Citizenship`.
    * **DIM Club:** `Club Name`, `Stadium Name`, `Stadium Seats`, `Coach Name`, `Squad Size`.
    * **DIM Competition:** `Competition Name`, `Country Name`, `Competition Type`.
