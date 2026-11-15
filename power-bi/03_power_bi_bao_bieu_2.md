@@ -20,7 +20,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 
 ### 1.1. Câu hỏi nghiệp vụ độc lập
 1. **Ai là "con mồi" ưa thích nhất của từng CLB hàng đầu châu Âu?** Khi người dùng chọn một CLB (ví dụ: *Real Madrid* hoặc *Manchester City*), báo biểu sẽ chỉ ra ngay những đối thủ (`Opponent Club`) bị CLB này chọc thủng lưới nhiều lần nhất.
-2. **Tương quan giữa Số trận Chạm trán & Bàn thắng Ghi được đối đầu?** Sử dụng Combo Chart 2 trục Y để đối chiếu giữa Số trận đối đầu (`Distinct Matches Played` - Cột) và Bàn thắng ghi được (`Goals` - Đường) trên từng đối thủ (`Opponent Club [Club Name]`), nhận diện ngay những đối thủ có hiệu suất "mưa bàn thắng" (số trận ít nhưng bàn thắng nhiều) so với các đối thủ giằng co căng thẳng.
+2. **"Chảo lửa Thánh địa" nào bùng nổ nhiều bàn thắng nhất châu Âu?** Sử dụng Combo Chart 2 trục Y để đối chiếu giữa Số trận tổ chức (`Distinct Matches Played` - Cột) và Bàn thắng ghi được (`Goals` - Đường) trên từng Sân vận động (`DIM Game [Stadium]`), nhận diện ngay những thánh địa có hỏa lực hủy diệt (hiệu suất bàn thắng/trận cao nhất như Etihad, Allianz Arena, Bernabéu, San Siro).
 3. **Biến thiên bàn thắng đối đầu theo chu kỳ các tháng trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi phân bố bàn thắng theo từng tháng (`Month`) qua các mùa giải (`Season`), nhận diện thời điểm bùng nổ bàn thắng đối đầu đỉnh cao trong năm.
 4. **Bảng danh mục cặp đấu đối đầu kinh điển (Head-to-Head Matchup Table):** Liệt kê chi tiết các cặp đấu có nhiều bàn thắng nhất giữa CLB chủ quản và CLB đối thủ, tích hợp thanh dữ liệu trực quan (Data Bars) và số thẻ phạt, triệt tiêu 100% ô trống NULL.
 
@@ -28,7 +28,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Biểu đồ Cột ngang Top 10 Đối thủ** | Xếp hạng các đối thủ bị ghi nhiều bàn nhất (`Opponent Club` by `Goals`), nhận diện đối thủ kỵ rơ và đối thủ dễ chịu của CLB. |
-| **Combo Chart 2 Trục Y Tương quan Đối đầu** | Đối soát tương quan trực quan giữa Số trận đối đầu (`Distinct Matches Played` - Cột Y1) và Bàn thắng ghi được (`Goals` - Đường Y2) trên từng CLB đối thủ (`Opponent Club`). Nhận diện ngay những đối thủ có hiệu suất hủy diệt. |
+| **Combo Chart 2 Trục Y Chảo lửa Sân Vận Động** | Đối soát tương quan trực quan giữa Số trận tổ chức (`Distinct Matches Played` - Cột Y1) và Bàn thắng ghi được (`Goals` - Đường Y2) trên từng Sân vận động (`DIM Game [Stadium]`). Khai thác độc lập chiều Sân bãi, hoàn toàn không trùng lặp với Ô 1. |
 | **Area Chart (Biểu đồ Vùng xếp chồng)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
 | **Bảng Danh mục Cặp đấu Đối đầu (Table + Data Bars)** | Bảng phẳng liệt kê các cặp đấu chạm trán thực tế giữa `DIM Club` và `Opponent Club`, hiển thị Bàn thắng (`Goals`) kèm thanh dữ liệu **Data Bars** và Thẻ phạt (`Yellow Cards`). Tự động lọc sạch 100% các ô NULL, không bị loãng dữ liệu. |
 
@@ -55,8 +55,8 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
 | [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ CỘT THANH NGANG (18pt)]     | [Ô 2: TRÊN - PHẢI | COMBO CHART 2 TRỤC Y (Title: 18pt)]        |
-| Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Tương quan Số trận [Cột Y1] vs Bàn thắng [Đường Y2]           |
-| Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: CLB Đối thủ (12pt), Cột: Số trận (12pt), Đường: Bàn thắng   |
+| Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Chảo lửa Sân vận động: Số trận [Cột Y1] vs Bàn thắng [Đường Y2]|
+| Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: Sân vận động (12pt), Cột: Số trận (12pt), Đường: Bàn thắng  |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | BẢNG CẶP ĐẤU ĐỐI ĐẦU TABLE (18pt)]     |
@@ -192,39 +192,40 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Combo Chart 2 Trục Y – Tương quan Số trận Chạm trán vs Bàn thắng Ghi được (Line and Clustered Column Chart)
+### Bước 6 – Ô 2 (Trên - Phải): Combo Chart 2 Trục Y – Chảo lửa Thánh địa: Số trận Tổ chức vs Bàn thắng Ghi được (Line and Clustered Column Chart)
 
 1. Tại khung **Visualizations**, chọn visual **Line and clustered column chart** (Biểu đồ kết hợp Cột cụm và Đường với 2 trục Y độc lập).
 2. Kích thước & Vị trí:
    * **Size:** `Width = 925 px`, `Height = 385 px`.
    * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu (Lưu ý: 100% trục Y đều dùng Thước đo Measure có icon Máy tính 🧮):
-   * **X-axis:** Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`** (Tên CLB Đối thủ).
-   * **Column y-axis (Trục Y trái - Cột):** Kéo thước đo **`[Measures].[Distinct Matches Played]`** (Tổng số trận đối đầu).
-   * **Line y-axis (Trục Y phải - Đường):** Kéo thước đo **`[Measures].[Goals]`** (Số bàn thắng ghi được).
+3. Kéo thả trường dữ liệu (Tuyệt đối không trùng lặp với Ô 1, sử dụng chiều `DIM Game` độc lập và 100% Thước đo chuẩn 🧮):
+   * **X-axis (Trục hoành):** Mở bảng **`DIM Game`**, kéo thuộc tính **`[Stadium]`** (Tên Sân vận động / Thánh địa thi đấu).
+   * **Column y-axis (Trục Y trái - Cột):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Distinct Matches Played]`** (Tổng số trận diễn ra trên sân này).
+   * **Line y-axis (Trục Y phải - Đường):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Goals]`** (Tổng số bàn thắng bùng nổ trên sân này).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
-   * `Distinct Matches Played` $\rightarrow$ Đổi tên thành: **`Số trận đối đầu`**
+   * `Stadium` $\rightarrow$ Đổi tên thành: **`Sân vận động`**
+   * `Distinct Matches Played` $\rightarrow$ Đổi tên thành: **`Số trận tổ chức`**
    * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
-5. **Cấu hình Bộ lọc Top 10 CLB Đối thủ (Filters on this visual):**
-   * Tại khung **Filters on this visual**, mở mục `CLB Đối thủ` (hoặc `Club Name`).
+5. **Cấu hình Bộ lọc Top 10 Chảo lửa bùng nổ nhất (Filters on this visual):**
+   * Tại khung **Filters on this visual**, mở mục `Sân vận động` (hoặc `Stadium`).
    * Chọn Filter type: **Top N**, nhập **`10`**.
    * Ô **By value**: Kéo thước đo **`[Measures].[Goals]`** vào.
-   * Nhấp nút **Apply filter** (Tập trung hiển thị 10 đối thủ bị chọc thủng lưới nhiều nhất).
+   * Nhấp nút **Apply filter** (Tập trung hiển thị 10 thánh địa có nhiều bàn thắng nhất châu Âu: *Giuseppe Meazza, Olimpico di Roma, Etihad Stadium, Allianz Arena, Emirates Stadium, Anfield, Parc des Princes, Santiago Bernabéu...*).
 6. **Định dạng hiển thị chi tiết (Tab Format visual):**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Tương quan Số trận Chạm trán vs Bàn thắng Ghi được`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Chảo lửa Thánh địa: Số trận Tổ chức vs Bàn thắng Ghi được`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
    * **Columns (Màu cột số trận):** Đặt màu Cột xanh dương hiện đại `#2563EB`.
    * **Lines (Màu đường bàn thắng):** Đặt màu Đường đỏ cam rực lửa `#EF4444`, Stroke width: `3 px`.
    * **Markers (Điểm đánh dấu trên đường):** Bật **On**, Shape: Tròn (Circle), Size: `6`, Màu nền `#DC2626`.
    * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
-   * **X-axis (Tên CLB Đối thủ):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
-   * **Y-axis (Cột - Trục Y trái):** Title bật **On**, nhập `Số trận đối đầu`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#2563EB`.
+   * **X-axis (Tên Sân vận động):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
+   * **Y-axis (Cột - Trục Y trái):** Title bật **On**, nhập `Số trận tổ chức`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#2563EB`.
    * **Secondary y-axis (Đường - Trục Y phải):** Title bật **On**, nhập `Bàn thắng ghi được`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#DC2626`.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA COMBO CHART 2 TRỤC Y:**
-> * **Giải quyết bài toán hiệu suất ghi bàn đối đầu:** So sánh trực quan giữa số trận chạm trán (Cột) và số bàn thắng (Đường). Nhận diện ngay những đối thủ có tỷ lệ "mưa bàn thắng" hủy diệt (ví dụ số trận ít nhưng bàn thắng vọt cao) so với các cặp đấu giằng co ít bàn thắng.
-> * **Tương thích tuyệt đối 100% với SSAS Live Connection:** Cả hai trục Y đều dùng Thước đo chuẩn (`[Measures].[Distinct Matches Played]` và `[Measures].[Goals]`), triệt tiêu hoàn toàn lỗi *Discourage implicit measures* của Power BI.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & TRIỆT TIÊU TRÙNG LẶP 100%:**
+> * **Không trùng lặp với Ô 1:** Ô 1 phân tích theo **CLB Đối thủ** (`Opponent Club [Club Name]`), còn Ô 2 khai thác độc lập chiều **Thánh địa Sân bãi** (`DIM Game [Stadium]`).
+> * **Giải quyết bài toán "Thánh địa hủy diệt":** Cho thấy sự chênh lệch hiệu suất bàn thắng/trận giữa các sân. Ví dụ: *Etihad Stadium* (49 trận nhưng nổ tới 182 bàn - trung bình 3.71 bàn/trận) và *Allianz Arena* (45 trận nổ 164 bàn - 3.64 bàn/trận) thể hiện rõ hỏa lực hủy diệt của Man City và Bayern Munich tại sân nhà, trong khi *Giuseppe Meazza* (98 trận nổ 263 bàn - 2.68 bàn/trận) mang tính thực dụng của bóng đá Ý.
+> * **Tương thích tuyệt đối 100% với SSAS Live Connection:** Cả hai trục Y đều là Thước đo Measure chuẩn (`Distinct Matches Played` và `Goals`), triệt tiêu hoàn toàn lỗi *Discourage implicit measures* của Power BI.
 
 ---
 
