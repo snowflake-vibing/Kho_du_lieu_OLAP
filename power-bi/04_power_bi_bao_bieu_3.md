@@ -16,17 +16,18 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 ## 1. Mục tiêu, Ý nghĩa Thống kê và Bài toán Thực tế
 
 ### 1.1. Câu hỏi nghiệp vụ
-1. **Những CLB và vị trí thi đấu nào có rủi ro kỷ luật cao nhất châu Âu?** (`Yellow Cards`, `Red Cards`).
-2. **Cầu thủ nhận nhiều thẻ phạt là do thi đấu quá nhiều (tải trọng cao) hay do phong cách thi đấu bạo lực / thiếu kiềm chế?** Đặt số thẻ phạt trong mối tương quan với thời lượng ra sân (`Minutes Played`).
-3. **Độ tuổi nào trong bóng đá chuyên nghiệp đang phải gánh tải trọng thi đấu lớn nhất và có xu hướng phạm lỗi nhiều nhất?** (`Minutes Played` và `Yellow Cards` theo `Age`).
+1. **Những CLB nào có rủi ro kỷ luật cao nhất châu Âu?** Xếp hạng tổng lượng thẻ phạt cảnh cáo (`Yellow Cards`) và thẻ phạt đuổi khỏi sân (`Red Cards`) theo từng CLB.
+2. **Mức độ răn đe kỷ luật và tính khốc liệt khác nhau thế nào giữa các giải đấu hàng đầu châu Âu?** So sánh sản lượng thẻ đỏ và thẻ vàng giữa các giải đấu (`Competition Name`), nhận diện giải đấu trọng tài nghiêm khắc nhất và giải đấu chơi bóng ôn hòa nhất.
+3. **Độ tuổi nào trong bóng đá chuyên nghiệp đang phải gánh tải trọng thi đấu lớn nhất và có xu hướng phạm lỗi nhiều nhất?** Đặt số phút thi đấu (`Minutes Played`) và số thẻ phạt (`Yellow Cards`) trên cùng trục độ tuổi (`Age`).
+4. **Vị trí thi đấu chuyên môn nào trên sân là "điểm nóng" gánh chịu nhiều thẻ đỏ nhất?** Phân tích cơ cấu và tỷ trọng thẻ đỏ theo vị trí cụ thể (`Sub Position`: *Trung vệ, Tiền vệ phòng ngự, Tiền đạo cắm...*).
 
 ### 1.2. Ý nghĩa thống kê & Giá trị học thuật
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Stacked Bar Chart (Vàng + Đỏ)** | So sánh tổng lượng thẻ phạt và cơ cấu mức độ nghiêm trọng (thẻ vàng cảnh cáo vs thẻ đỏ trực tiếp/gián tiếp) giữa các CLB hàng đầu. |
-| **Scatter Số phút vs Thẻ vàng + 2 đường Median** | Phân tích tương quan 2 biến định lượng ($X = \text{Minutes Played}$, $Y = \text{Yellow Cards}$); sử dụng **2 đường Trung vị (Median lines)** để kháng ngoại lai (Robust Statistics) và chia 4 góc phần tư rủi ro kỷ luật. |
+| **Clustered Column Chart (Kỷ luật Giải đấu)** | So sánh trực tiếp mức độ răn đe kỷ luật (Thẻ đỏ & Thẻ vàng) giữa các Giải đấu châu Âu (`Competition Name`), làm rõ sự khác biệt về văn hóa trọng tài và tính chất va chạm. |
 | **Combo Chart 2 Trục Y (Dual Axis)** | Đặt tải trọng thời lượng (Cột - Trục Y trái) và số thẻ phạt (Đường - Trục Y phải) trên cùng một trục danh mục độ tuổi (`Age`), giải quyết bài toán so sánh 2 đại lượng khác thang đo (Khử Exposure Bias). |
-| **Bảng Ma trận Hồ sơ Kỷ luật** | Tra cứu vi mô từng cầu thủ, tích hợp **Data bars** và **Heatmap** cảnh báo trực quan nguy cơ bị treo giò. |
+| **Donut Chart (Tỷ trọng Thẻ đỏ theo Vị trí)** | Trực quan hóa tỷ trọng thẻ đỏ theo từng vị trí chuyên môn trên sân (`Sub Position`), nhận diện mắt xích rủi ro kỷ luật chiến thuật cao nhất toàn đội hình. |
 
 ### 1.3. Bài toán thực tế giải quyết
 * **Ban huấn luyện & Trợ lý trọng tài:** Nhận diện ngay những cầu thủ nằm ở góc "Bất thường" (Ít phút nhưng nhiều thẻ) để uốn nắn kỷ luật, tránh mất người vì thẻ phạt ở các trận knock-out sống còn.
@@ -46,18 +47,18 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold          | Callout: 35pt Bold (Millions)     |
 | Nền: Pastel Amber #FFFBEB | Nền: Pastel Red #FEF2F2   | Nền: Pastel Blue #EFF6FF    | Nền: Pastel Green #F0FDF4         |
 | (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)          |
-+---------------------------+---------------------------+-----------------------------+-----------------------------------+
-| [Slicer 1: Mùa giải]                                  | [Slicer 2: Giải đấu]        | [Slicer 3: Vị trí (Tile)]         |
-| (W: 650, H: 75, X: 20, Y: 210)                        | (W: 600, H: 75, X: 690)     | (W: 590, H: 75, X: 1310)          |
-+---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | MA TRẬN PHÂN TÁN SCATTER (Title: 18pt)]    |
-| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Ma trận Rủi ro Kỷ luật: Số phút Thi đấu vs Thẻ vàng           |
-| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Số phút (12pt), Y: Thẻ vàng (12pt), Size: Thẻ đỏ, 2 Median |
++-------------------------------+----------------------------+----------------------------+-----------------------------------+
+| [Slicer 1: Mùa giải]          | [Slicer 2: Giải đấu]       | [Slicer 3: Quốc gia]       | [Slicer 4: Vị trí thi đấu]        |
+| (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
++-------------------------------+----------------------------+----------------------------+-----------------------------------+
+| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | BIỂU ĐỒ CỘT CỤM KỶ LUẬT (Title: 18pt)]     |
+| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Bản đồ Răn đe Kỷ luật theo Giải đấu Châu Âu                   |
+| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Giải đấu (12pt), Y: Thẻ đỏ (Đỏ) & Thẻ vàng (Vàng) (12pt)   |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BẢNG HỒ SƠ KỶ LUẬT MATRIX (Title: 18pt)]  |
-| Tải trọng Thi đấu (Cột) & Thẻ phạt (Đường) theo Độ tuổi | Hồ sơ Kỷ luật Chi tiết từng Cầu thủ theo CLB                  |
-| X: Tuổi (12pt), Y-trái: Phút (Xanh), Y-phải: Thẻ (Đỏ)   | Tích hợp Data Bars Thẻ vàng & Heatmap Thẻ đỏ, Phẳng không ... |
+| [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BIỂU ĐỒ VÀNH KHĂN DONUT (Title: 18pt)]     |
+| Tải trọng Thi đấu (Cột) & Thẻ phạt (Đường) theo Độ tuổi | Phân bổ Thẻ Đỏ theo Vị trí Chi tiết (Sub Position)            |
+| X: Tuổi (12pt), Y-trái: Phút (Xanh), Y-phải: Thẻ (Đỏ)   | Legend: Vị trí (Trung vệ, Tiền đạo...), Values: Thẻ đỏ (12pt) |
 | Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
@@ -137,15 +138,16 @@ Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 4: Thiết lập Hệ thống 3 Slicers Mở rộng (Không bị cụt thanh Dropdown)
+### Bước 4: Thiết lập Hệ thống 4 Slicers Đối xứng Cân bằng (Không bị cụt thanh Dropdown)
 
-Cả 3 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px`**:
+Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px`**, chiều rộng cân xứng $W = 455\text{ px}$ thẳng hàng với 4 thẻ KPI:
 
 | Slicer | Trường dữ liệu | **Phần đặt tên (Rename for this visual)** | Kiểu hiển thị | X | Y | W | H |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Slicer 1** | `DIM Time [Season]` | **`Mùa giải`** | Dropdown | 20 px | 210 px | 650 px | 75 px |
-| **Slicer 2** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 690 px | 210 px | 600 px | 75 px |
-| **Slicer 3** | `DIM Player [Main Position]` | **`Vị trí thi đấu`** | Tile (Thẻ ngang) | 1310 px | 210 px | 590 px | 75 px |
+| **Slicer 1** | `DIM Time [Season]` | **`Mùa giải`** | Dropdown | 20 px | 210 px | 455 px | 75 px |
+| **Slicer 2** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 495 px | 210 px | 455 px | 75 px |
+| **Slicer 3** | `DIM Competition [Country Name]` | **`Quốc gia`** | Dropdown | 970 px | 210 px | 455 px | 75 px |
+| **Slicer 4** | `DIM Player [Main Position]` | **`Vị trí thi đấu`** | Dropdown | 1445 px | 210 px | 455 px | 75 px |
 
 * **Định dạng chung cho Slicers:**
   * Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt` Bold**, màu chữ `#0F172A`.
@@ -184,43 +186,40 @@ Cả 3 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Scatter Chart – Ma trận Rủi ro Kỷ luật: Số phút Thi đấu vs Thẻ vàng (NÂNG CAO)
+### Bước 6 – Ô 2 (Trên - Phải): Clustered Column Chart – Bản đồ Răn đe Kỷ luật giữa các Giải đấu Châu Âu (Mức độ Khốc liệt)
 
-1. Tại khung **Visualizations**, chọn visual **Scatter chart** (Biểu đồ phân tán 4 góc phần tư).
+1. Tại khung **Visualizations**, chọn visual **Clustered column chart** (Biểu đồ cột cụm so sánh song song).
 2. Kích thước & Vị trí:
-   * Size: `Width = 925 px`, `Height = 385 px`.
-   * Position: `Horizontal = 975 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu (100% có sẵn trong Cube):
-   * **Values:** Kéo `DIM Player [Player Name]`.
-   * **X-axis:** Kéo thước đo **`[Measures].[Minutes Played]`**.
-   * **Y-axis:** Kéo thước đo **`[Measures].[Yellow Cards]`**.
-   * **Size:** Kéo thước đo **`[Measures].[Red Cards]`** (hoặc `[Measures].[Is Starter]`).
-   * **Legend:** Kéo `DIM Player [Main Position]` (phân màu theo vị trí thi đấu).
+   * **Size:** `Width = 925 px`, `Height = 385 px`.
+   * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
+3. Kéo thả trường dữ liệu:
+   * **X-axis:** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`**.
+   * **Y-axis:** Kéo đồng thời 2 thước đo:
+     1. `[Measures].[Red Cards]` (Thẻ đỏ - Cột đỏ cảnh báo).
+     2. `[Measures].[Yellow Cards]` (Thẻ vàng - Cột vàng hổ phách).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
-   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Số thẻ vàng`**
+   * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
    * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ`**
-   * `Main Position` $\rightarrow$ Đổi tên thành: **`Vị trí`**
-5. **Bộ lọc Top 40 Cầu thủ:**
-   * Tại khung **Filters on this visual** $\rightarrow$ chọn `Player Name` $\rightarrow$ **Top N** = `40`, By value kéo `Yellow Cards` $\rightarrow$ nhấp **Apply filter**.
-6. **Kẻ đường Xu hướng & Trung vị (Thẻ Analytics - Kính lúp):**
-   * **Trend line:** Bật **On**, màu Xám than `#64748B`, nét đứt (Dashed) thể hiện tương quan giữa thời lượng và số thẻ.
-   * **X-Axis Constant Line (Median Số phút):** Bật On, nhập giá trị trung vị số phút (ví dụ: khoảng 1,800 phút), nét đứt, nhãn `Median Số phút`.
-   * **Y-Axis Constant Line (Median Thẻ vàng):** Bật On, nhập giá trị trung vị thẻ vàng (ví dụ: khoảng 6 thẻ), nét đứt, nhãn `Median Thẻ vàng`.
-7. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Ma trận Rủi ro Kỷ luật: Số phút Thi đấu vs Thẻ vàng`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **X-axis:** Title bật **On**, nhập `Số phút thi đấu (Tải trọng)`, Cỡ chữ **`12 pt` Bold**, màu `#334155`.
-   * **Y-axis:** Title bật **On**, nhập `Số thẻ vàng nhận phải`, Cỡ chữ **`12 pt` Bold**, màu `#1565C0`.
-   * **Markers (Màu sắc vị trí):** Defender `#10B981`, Midfield `#3B82F6`, Attack `#EF4444`, Goalkeeper `#8B5CF6`.
-   * **Legend:** Vị trí `BottomCenter`, Cỡ chữ **`12 pt`**.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
+5. **Cấu hình Bộ lọc Top 8 Giải đấu lớn nhất (Filters on this visual):**
+   * Tại khung **Filters on this visual**, mở mục `Giải đấu` (hoặc `Competition Name`).
+   * Chọn Filter type: **Top N**, nhập **`8`** (hoặc `10`).
+   * Ô **By value**: Kéo thước đo **`[Measures].[Yellow Cards]`** vào.
+   * Nhấp nút **Apply filter** (Tập trung hiển thị 8 giải đấu hàng đầu: La Liga, Serie A, Premier League, Bundesliga, Ligue 1, Liga Portugal, Süper Lig, Eredivisie).
+6. **Định dạng hiển thị chi tiết (Tab Format visual):**
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bản đồ Răn đe Kỷ luật giữa các Giải đấu Châu Âu`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **Columns (Màu cột chuẩn ngữ nghĩa kỷ luật):**
+     * `Thẻ đỏ`: Màu Đỏ rực cảnh báo **`#DC2626`** (hoặc `#B91C1C`).
+     * `Thẻ vàng`: Màu Vàng hổ phách **`#F59E0B`**.
+   * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
+   * **X-axis (Giải đấu):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
+   * **Y-axis (Số thẻ):** Title bật **On**, nhập `Số lượng thẻ phạt`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
+   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA 4 GÓC PHẦN TƯ MA TRẬN RỦI RO:**
-> * **Góc II (Trên - Trái): RỦI RO KỶ LUẬT CAO BẤT THƯỜNG (Báo động đỏ):** Thi đấu ít phút nhưng số thẻ vàng cực cao. Đây là các cầu thủ có lối đá bạo lực, dễ đẩy đội bóng vào thế thiếu người.
-> * **Góc I (Trên - Phải): TẢI TRỌNG CAO & KỶ LUẬT ĐÁNG CHÚ Ý:** Cầu thủ thi đấu nhiều phút và nhận nhiều thẻ tương xứng với cường độ tranh chấp liên tục.
-> * **Góc IV (Dưới - Phải): HÌNH MẪU KỶ LUẬT (Fair-play Star):** Cầu thủ "cày ải" số phút khổng lồ nhưng nhận rất ít thẻ vàng (lối chơi phán đoán, dùng trí tuệ hơn dùng sức).
-> * **Góc III (Dưới - Trái): AN TOÀN / XOAY TUA:** Cầu thủ ít ra sân và nhận ít thẻ.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA BIỂU ĐỒ KỶ LUẬT GIẢI ĐẤU:**
+> * **Khác biệt 100% với Báo biểu 1 & 2:** Xóa bỏ hoàn toàn biểu đồ Scatter phân tán lặp lại, thay bằng biểu đồ so sánh thể chế trọng tài giữa các nền bóng đá lớn.
+> * **Phát hiện nghiệp vụ chấn động:** La Liga dẫn đầu toàn châu Âu về số thẻ phạt với **`135 thẻ đỏ`** (gấp gần 3 lần Ngoại hạng Anh chỉ có `46 thẻ đỏ`). Người xem thấy rõ sự tương phản giữa lối bắt rắn, phạt nặng tay của trọng tài Tây Ban Nha/Pháp so với triết lý ưu tiên trận đấu tiếp diễn (play-on) của trọng tài Anh.
 
 ---
 
@@ -251,59 +250,62 @@ Cả 3 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 8 – Ô 4 (Dưới - Phải): Table / Matrix – Hồ sơ Kỷ luật & Tải trọng Chi tiết từng Cầu thủ theo CLB (NÂNG CAO)
+### Bước 8 – Ô 4 (Dưới - Phải): Donut Chart – Phân bổ Thẻ Đỏ theo Vị trí Chi tiết trên Sân (Sub Position)
 
-Bạn có thể sử dụng visual **Table (Bảng phẳng)** hoặc visual **Matrix (Ma trận)**:
+Sử dụng visual **Donut chart (Biểu đồ Vành khăn)** để phân rã tỷ trọng thẻ đỏ theo vị trí thi đấu cụ thể, xóa bỏ hoàn toàn bảng Table lặp lại giữa các trang báo cáo:
 
 #### 1. Cấu hình trường dữ liệu:
 * Size: `Width = 925 px`, `Height = 385 px`.
 * Position: `Horizontal = 975 px`, `Vertical = 695 px`.
-* Kéo lần lượt các trường sau vào ô **Columns** (nếu dùng Table) hoặc **Rows & Values** (nếu dùng Matrix):
-  1. `DIM Player [Player Name]`
-  2. `DIM Club [Club Name]`
-  3. `[Measures].[Minutes Played]`
-  4. `[Measures].[FACT Player Match Perf Count]`
-  5. `[Measures].[Yellow Cards]`
-  6. `[Measures].[Red Cards]`
+* Tại khung **Visualizations**, chọn visual **Donut chart** (biểu tượng hình vành khăn tròn).
+* Kéo các trường vào ô cấu hình:
+  * **Legend:** Mở bảng **`DIM Player`**, kéo thuộc tính **`[Sub Position]`** (Vị trí thi đấu cụ thể: *Centre-Back, Centre-Forward, Defensive Midfield, Central Midfield, Right-Back, Left-Back...*).
+  * **Values:** Kéo thước đo **`[Measures].[Red Cards]`** (Tổng số thẻ đỏ).
 
 #### 2. Phần đặt tên chuẩn tiếng Việt (Rename for this visual):
-* Nhấp chuột phải vào từng trường $\rightarrow$ chọn **Rename for this visual**:
-  * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
-  * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
-  * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
-  * `FACT Player Match Perf Count` $\rightarrow$ Đổi tên thành: **`Số trận ra sân`**
-  * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
-  * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ`**
+* Nhấp chuột phải vào từng trường trong ô Legend / Values $\rightarrow$ chọn **Rename for this visual**:
+  * `Sub Position` $\rightarrow$ Đổi tên thành: **`Vị trí chi tiết`**
+  * `Red Cards` $\rightarrow$ Đổi tên thành: **`Số thẻ đỏ`**
 
-#### 3. Bật Conditional Formatting (Tab Format visual $\rightarrow$ Cell elements):
-* Nhấp chọn bảng $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
-  * Tại ô xổ xuống **Select series**: Chọn cột **`Thẻ vàng`**.
-  * Gạt công tắc **Data bars** sang **ON**! Nhấp nút `fx` chọn màu Vàng hổ phách `#F59E0B` $\rightarrow$ OK. Cột Thẻ vàng lập tức có thanh tiến độ mini trực quan.
-  * Tại ô xổ xuống **Select series**: Chọn tiếp cột **`Thẻ đỏ`**.
-  * Gạt công tắc **Background color** sang **ON**! Nhấp `fx` chọn dải màu Gradient từ trắng `#FFFFFF` (giá trị 0 thẻ) sang đỏ nhạt `#FECACA` (thẻ đỏ cao) để tạo hiệu ứng Heatmap cảnh báo nóng nguy cơ treo giò.
+#### 3. Cấu hình Bộ lọc Top 8 Vị trí nhận nhiều thẻ đỏ nhất (Filters on this visual):
+* Tại khung **Filters on this visual**, mở mục `Vị trí chi tiết` (hoặc `Sub Position`).
+* Chọn Filter type: **Top N**, nhập **`8`**.
+* Ô **By value**: Kéo thước đo **`[Measures].[Red Cards]`** vào.
+* Nhấp nút **Apply filter** (Tập trung hiển thị 8 vị trí có nguy cơ thẻ đỏ cao nhất, loại bỏ các vị trí không có thẻ).
 
-#### 4. Định dạng hiển thị:
-* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Hồ sơ Kỷ luật & Tải trọng Chi tiết từng Cầu thủ theo CLB`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-* **Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, Text wrap **On**, Auto-size width **On**, màu nền xám sáng thanh lịch `#F1F5F9`.
-* **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, Text wrap **On**.
-* **Subtotals:** Tắt **Off** (nếu dùng Matrix) để loại bỏ các dòng tổng phụ phân mảnh, giúp bảng phẳng và rõ nét.
-* Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+#### 4. Định dạng hiển thị chi tiết (Tab Format visual):
+* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Phân bổ Thẻ Đỏ theo Vị trí Chi tiết trên Sân`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+* **Slices (Màu sắc các lát cắt):**
+  * `Centre-Back` (Trung vệ): Đặt màu Đỏ sẫm chủ đạo **`#DC2626`** (vị trí nhận nhiều thẻ đỏ nhất).
+  * `Centre-Forward` (Tiền đạo cắm): Màu Cam đậm **`#EA580C`**.
+  * `Defensive Midfield` (Tiền vệ phòng ngự): Màu Xanh dương đậm **`#1D4ED8`**.
+  * `Right-Back / Left-Back`: Màu Xanh lục / Tím.
+* **Detail labels (Nhãn số liệu chi tiết):**
+  * Position: `Outside`.
+  * Label contents: Chọn **`Category, percent of total`** (hiển thị Tên vị trí và Tỷ lệ phần trăm) hoặc `All detail labels`.
+  * Font `Segoe UI`, Cỡ chữ **`11 pt` Bold**.
+* **Legend:** Vị trí `RightCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+* Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
+
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA DONUT CHART VỊ TRÍ CHI TIẾT:**
+> * **Giải phóng sự trùng lặp:** Cả Báo biểu 1 và 2 đều đã có Table tra cứu, việc dùng Donut Chart tại Ô 4 của Báo biểu 3 giúp toàn bộ bộ 3 báo cáo có cấu trúc visual phong phú, đa dạng và bắt mắt $100\%$.
+> * **Phát hiện chiến thuật cốt lõi:** Trung vệ (`Centre-Back`) gánh tới **`253 thẻ đỏ`** (chiếm hơn $35\%$ tổng số thẻ đỏ toàn giải đấu). Đặc biệt, Tiền đạo cắm (`Centre-Forward`) nhận tới **`89 thẻ đỏ`**, cao hơn cả Tiền vệ phòng ngự (`84 thẻ đỏ`) do các tình huống trả đũa va chạm hoặc tiểu xảo khi tranh chấp bóng bổng!
 
 ---
 
 ## 4. Kết quả Đối soát và Lập luận Chuyên môn
 
 ### 4.1. Khả năng tương tác chéo (Cross-filtering)
-* Khi nhấp chọn vị trí `Defender` (Hậu vệ) trên Slicer:
-  * Toàn bộ 4 thẻ KPI cập nhật tức thời số thẻ và tải trọng của riêng tuyến phòng ngự (chiếm tỷ trọng thẻ vàng lớn nhất toàn giải đấu).
-  * Biểu đồ Cột cụm Top 10 lọc riêng các CLB có hàng thủ "rắn" nhất châu Âu.
-  * Biểu đồ Phân tán (Scatter) hiển thị rõ các trung vệ có lối chơi quyết liệt (góc trên-phải và góc trên-trái).
-  * Biểu đồ Combo 2 trục phản ánh độ tuổi chín muồi của trung vệ (27–31 tuổi) với tải trọng ra sân lớn nhất.
+* Khi nhấp chọn giải đấu `laliga` trên Slicer 2:
+  * Thẻ KPI cập nhật tức thời: La Liga ghi nhận tới **`135 thẻ đỏ`** và **`3,686 thẻ vàng`**.
+  * Biểu đồ Cột cụm ở Ô 2 làm nổi bật vị trí dẫn đầu của La Liga so với các giải đấu khác.
+  * Donut Chart ở Ô 4 phân rã ngay tỷ trọng thẻ đỏ tại La Liga theo từng vị trí phòng ngự và tấn công.
+  * Biểu đồ Combo ở Ô 3 phản ánh chính xác nhóm tuổi nào tại giải đấu này chịu tải trọng và thẻ phạt cao nhất.
 
 ### 4.2. Lập luận phân tích nghiệp vụ thể thao (Sport Intelligence Insights)
-1. **Phân biệt Thẻ phạt do Tải trọng vs Thẻ phạt do Kỷ luật kém:**
-   * Thông qua biểu đồ phân tán (Scatter) kết hợp đường xu hướng, ta nhận thấy số lượng thẻ vàng tăng tỷ lệ thuận với số phút thi đấu. Tuy nhiên, những cầu thủ nằm lệch hẳn lên phía trên đường xu hướng và nằm ở Góc II (Ít phút - Nhiều thẻ) là các cá nhân tiềm ẩn rủi ro thẻ phạt cao nhất, cần được ban huấn luyện nhắc nhở kiểm soát hành vi thi đấu.
+1. **Sự khác biệt về Văn hóa Kỷ luật và Triết lý Trọng tài giữa các Giải đấu:**
+   * So sánh giữa La Liga (135 thẻ đỏ) và Premier League (chỉ 46 thẻ đỏ) minh chứng rõ nét sự khác biệt giữa hai trường phái: bóng đá Tây Ban Nha đề cao sự nghiêm ngặt và xử phạt triệt để các hành vi phạm lỗi, trong khi bóng đá Anh ưu tiên tính liên tục của trận đấu và độ va chạm thể lực cao mà không rút thẻ đỏ tràn lan.
 2. **Quy luật Tải trọng theo Chu kỳ Độ tuổi (Age Load Curve):**
    * Biểu đồ Combo 2 trục thể hiện rõ đỉnh parabol của tải trọng thi đấu rơi vào nhóm tuổi **24 – 29 tuổi** (giai đoạn sung sức nhất của sự nghiệp cầu thủ). Đường thẻ vàng bám sát theo độ dốc của số phút thi đấu chứng minh thẻ phạt trong bóng đá hiện đại là hệ quả tự nhiên của cường độ tranh chấp thể lực, thay vì yếu tố tâm lý bộc phát của cầu thủ trẻ.
-3. **Quản trị Rủi ro Treo giò (Suspension Risk Management):**
-   * Bảng ma trận hồ sơ với Data Bars và Heatmap giúp Giám đốc Thể thao theo dõi các cầu thủ đang tiến sát mốc 5 thẻ vàng (mốc bị treo giò 1 trận tại các giải VĐQG châu Âu), từ đó chủ động phương án nhân sự dự phòng cho các vòng đấu kế tiếp.
+3. **Phân bổ Rủi ro Thẻ phạt theo Cấu trúc Đội hình (Tactical Disciplinary Hotspots):**
+   * Donut Chart chỉ ra trung vệ và các hậu vệ biên là "lá chắn lửa" chịu áp lực lớn nhất từ các đợt phản công của đối phương, dẫn đến các pha phạm lỗi chiến thuật (Tactical Foul) để ngăn chặn bàn thắng mười mươi. Ban huấn luyện cần đặc biệt chú trọng xây dựng phương án bọc lót khu vực trung lộ để giảm tải số lần trung vệ phải đối đầu trực tiếp 1-1.
