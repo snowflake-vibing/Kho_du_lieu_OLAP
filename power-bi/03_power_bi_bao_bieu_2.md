@@ -22,7 +22,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 1. **Ai là "con mồi" ưa thích nhất của từng CLB hàng đầu châu Âu?** Khi người dùng chọn một CLB (ví dụ: *Real Madrid* hoặc *Manchester City*), báo biểu sẽ chỉ ra ngay những đối thủ (`Opponent Club`) bị CLB này chọc thủng lưới nhiều lần nhất.
 2. **Tương quan giữa số trận chạm trán và số bàn thắng ghi được?** Sử dụng Combo Chart 2 trục Y để đối chiếu trực quan giữa số trận đối đầu (`Distinct Matches Played`) và số bàn thắng (`Goals`), nhận diện ngay những đối thủ có hiệu suất bị chọc thủng lưới cao nhất (số trận ít nhưng phải nhận cơn mưa bàn thắng).
 3. **Biến thiên bàn thắng đối đầu theo chu kỳ các tháng trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi phân bố bàn thắng theo từng tháng (`Month`) qua các mùa giải (`Season`), nhận diện thời điểm bùng nổ bàn thắng đối đầu đỉnh cao trong năm.
-4. **Bản đồ đối đầu chéo toàn diện (Head-to-Head Cross Matrix):** Tạo bảng ma trận nhiệt giao cắt giữa toàn bộ các CLB trong giải đấu để tra cứu thành tích đối đầu song phương.
+4. **Bảng danh mục cặp đấu đối đầu kinh điển (Head-to-Head Matchup Table):** Liệt kê chi tiết các cặp đấu có nhiều bàn thắng nhất giữa CLB chủ quản và CLB đối thủ, tích hợp thanh dữ liệu trực quan (Data Bars) và số thẻ phạt, triệt tiêu 100% ô trống NULL.
 
 ### 1.2. Ý nghĩa thống kê & Giá trị học thuật
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
@@ -30,7 +30,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | **Biểu đồ Cột ngang Top 10 Đối thủ** | Xếp hạng các đối thủ bị ghi nhiều bàn nhất (`Opponent Club` by `Goals`), nhận diện đối thủ kỵ rơ và đối thủ dễ chịu của CLB. |
 | **Combo Chart 2 Trục Y (Line & Clustered Column)** | Đối soát tương quan trực quan giữa Số trận đối đầu (Cột - Trục Y trái) và Bàn thắng ghi được (Đường - Trục Y phải) trên từng đối thủ. Nhận diện ngay đối thủ có hiệu suất ghi bàn hủy diệt. |
 | **Area Chart (Biểu đồ Vùng xếp chồng)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
-| **Ma trận Đối đầu Chéo (Cross Heatmap)** | Bảng ma trận $N \times N$ giữa `DIM Club` (Dòng) và `Opponent Club` (Cột), tích hợp dải màu **Heatmap Gradient** chuẩn mực trong phân tích thể thao chuyên nghiệp. |
+| **Bảng Danh mục Cặp đấu Đối đầu (Table + Data Bars)** | Bảng phẳng liệt kê các cặp đấu chạm trán thực tế giữa `DIM Club` và `Opponent Club`, hiển thị Bàn thắng (`Goals`) kèm thanh dữ liệu **Data Bars** và Thẻ phạt (`Yellow Cards`). Tự động lọc sạch 100% các ô NULL, không bị loãng dữ liệu. |
 
 ### 1.3. Bài toán thực tế giải quyết
 * **Ban huấn luyện & Chuyên gia phân tích đối thủ:** Đánh giá điểm mạnh/điểm yếu lịch sử khi chuẩn bị chiến thuật đối đầu với một đối thủ cụ thể tại vòng đấu tiếp theo.
@@ -59,9 +59,9 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: CLB Đối thủ, Cột: Số trận (12pt), Đường: Bàn thắng (12pt)  |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | MA TRẬN ĐỐI ĐẦU CHÉO HEATMAP (18pt)]       |
-| Biến thiên Bàn thắng theo Tháng qua các Mùa giải         | Ma trận Đối đầu Trực tiếp Song phương (H2H Cross Matrix)      |
-| X: Tháng (12pt), Y: Bàn thắng, Legend: Mùa giải         | Dòng: CLB Chủ quản, Cột: CLB Đối thủ, Giá trị: Bàn thắng      |
+| [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | BẢNG CẶP ĐẤU ĐỐI ĐẦU TABLE (18pt)]     |
+| Biến thiên Bàn thắng theo Tháng qua các Mùa giải         | Bảng Danh mục Cặp đấu Kinh điển: Bàn thắng & Thẻ phạt          |
+| X: Tháng (12pt), Y: Bàn thắng, Legend: Mùa giải         | Cột: CLB Chủ quản, CLB Đối thủ, Bàn thắng (Data Bars), Thẻ phạt|
 | Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
@@ -257,40 +257,51 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 8 – Ô 4 (Dưới - Phải): Matrix – Ma trận Đối đầu Trực tiếp Song phương (Head-to-Head Cross Heatmap)
+### Bước 8 – Ô 4 (Dưới - Phải): Table – Bảng Danh mục Cặp đấu Đối đầu Kinh điển (Head-to-Head Matchup Table + Data Bars)
 
-Sử dụng visual **Matrix (Ma trận đa chiều)** để tạo bảng đối đầu chéo kinh điển:
+Sử dụng visual **Table (Bảng phẳng danh mục)** thay thế cho bảng ma trận 2 chiều, giúp loại bỏ hoàn toàn các ô trống NULL và hiển thị trực diện các cặp đấu có hỏa lực mạnh nhất:
 
 #### 1. Cấu hình trường dữ liệu:
 * Size: `Width = 925 px`, `Height = 385 px`.
 * Position: `Horizontal = 975 px`, `Vertical = 695 px`.
-* Kéo các trường vào các ô cấu hình:
-  * **Rows (Hàng dọc):** Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`**.
-  * **Columns (Cột ngang):** Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`**.
-  * **Values (Giá trị ô):** Kéo thước đo **`[Measures].[Goals]`**.
+* Tại khung **Visualizations**, chọn visual **Table** (biểu tượng bảng danh sách phẳng).
+* Kéo các trường vào ô **Columns**:
+  1. Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`**.
+  2. Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`**.
+  3. Kéo thước đo **`[Measures].[Goals]`**.
+  4. Kéo thước đo **`[Measures].[Yellow Cards]`**.
 
 #### 2. Phần đặt tên chuẩn tiếng Việt (Rename for this visual):
-* Nhấp chuột phải vào từng trường $\rightarrow$ chọn **Rename for this visual**:
+* Nhấp chuột phải vào từng trường trong ô Columns $\rightarrow$ chọn **Rename for this visual**:
   * `DIM Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Chủ quản`**
   * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
   * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng`**
+  * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
 
-#### 3. Bật Heatmap Gradient đối đầu (Tab Format visual $\rightarrow$ Cell elements):
-* Nhấp chọn bảng Matrix $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
-  * Tại ô xổ xuống **Select series**: Chọn `Bàn thắng` (hoặc `Goals`).
-  * Gạt công tắc **Background color** sang **ON**!
-  * Nhấp vào nút **`fx`**:
-    * **Format style:** Chọn `Gradient`.
-    * **Minimum (Giá trị thấp nhất):** Chọn màu trắng `#FFFFFF` (hoặc xanh nhạt `#EFF6FF`).
-    * **Maximum (Giá trị cao nhất):** Chọn màu Xanh dương đậm `#1D4ED8`.
-    * Nhấp **OK**. Lập tức bảng biến thành **Ma trận nhiệt Heatmap đối đầu chéo**, các ô có số bàn thắng lớn sẽ nổi bật rực rỡ, đường chéo chính (CLB tự đá với chính mình) sẽ tự động rỗng không có màu!
+#### 3. Bật thanh dữ liệu Data Bars trực quan cho cột Bàn thắng (Tab Format visual $\rightarrow$ Cell elements):
+* Nhấp chọn bảng Table $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
+  * Tại ô xổ xuống **Select series**: Chọn trường **`Bàn thắng`** (hoặc `Goals`).
+  * Gạt công tắc **Data bars** sang **ON**!
+  * Nhấp vào nút **`fx`** bên cạnh Data bars:
+    * **Positive bar:** Chọn màu Xanh dương hiện đại **`#2563EB`** (hoặc `#3B82F6`).
+    * **Bar direction:** Chọn `Left to right` (Trái sang phải).
+    * Mục **Show bar only:** Để **Off** (hiển thị cả con số bàn thắng bên cạnh thanh màu).
+    * Nhấp **OK**. Cột Bàn thắng lập tức hiển thị các thanh dữ liệu trực quan sinh động như biểu đồ thanh thu nhỏ!
 
-#### 4. Định dạng hiển thị:
-* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Ma trận Đối đầu Trực tiếp Song phương (Head-to-Head Cross Heatmap)`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-* **Row headers & Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, Text wrap **On**, màu nền xám sáng thanh lịch `#F1F5F9`.
-* **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, Text wrap **On**.
-* **Subtotals:** Tắt **Row subtotals: Off** và **Column subtotals: Off** để ma trận vuông vức, phẳng và chuyên nghiệp.
+#### 4. Sắp xếp thứ tự (Sort Order):
+* Nhấp chuột trực tiếp vào tiêu đề cột **`Bàn thắng`** trên bảng để sắp xếp giảm dần (**Descending** $\downarrow$).
+* Bảng sẽ tự động hiển thị những cặp đấu có nhiều bàn thắng nhất lên đầu (ví dụ: *Celtic vs Hibernian: 19 bàn*, *Fenerbahce vs Istanbulspor: 19 bàn*, *Bayern Munich vs Mainz: 18 bàn*...).
+
+#### 5. Định dạng hiển thị chuẩn mực:
+* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bảng Danh mục Cặp đấu Đối đầu Kinh điển`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+* **Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`, màu nền tiêu đề `#F1F5F9`.
+* **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#1E293B`, xen kẽ màu dòng (Alternate rows) nhạt `#F8FAFC`.
+* **Totals:** Tắt **Totals: Off** (do đây là bảng xếp hạng các cặp đấu đối đầu, không cần dòng tổng cộng ở đáy).
 * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA TABLE CẶP ĐẤU ĐỐI ĐẦU:**
+> * **Sạch sẽ 100% dữ liệu:** Triệt tiêu hoàn toàn nhược điểm của ma trận 2 chiều (vốn sinh ra hàng nghìn ô NULL do các đội khác giải không đá với nhau). Bảng Table chỉ hiển thị những cặp đấu đã thực sự diễn ra trong lịch sử kho dữ liệu (`NON EMPTY`).
+> * **Linh hoạt đa tầng:** Khi không bấm bộ lọc, bảng đóng vai trò là bảng xếp hạng Top các trận cầu mưa bàn thắng toàn châu Âu. Khi người dùng bấm Slicer chọn 1 CLB (như *Real Madrid*), bảng tự động thu gọn lại thành danh sách toàn bộ các đối thủ của riêng Real Madrid kèm thanh Data Bars so sánh hỏa lực.
 
 ---
 
@@ -300,7 +311,7 @@ Sử dụng visual **Matrix (Ma trận đa chiều)** để tạo bảng đối 
 * **Khai thác theo CLB Chủ quản:**
   * Khi nhấp chọn `Real Madrid` trên Slicer: Toàn bộ bảng Ô 1 lập tức hiển thị Top 10 đối thủ bị Real Madrid chọc thủng lưới nhiều nhất: `UD Almería` (12 bàn), `CA Osasuna` (11 bàn), `Cádiz CF` (10 bàn), `Villarreal` (10 bàn), `FC Barcelona` (8 bàn).
   * Khi chuyển sang chọn `Manchester City`: Ô 1 chuyển ngay sang danh sách đối thủ của Man City: `RB Leipzig` (14 bàn), `Bournemouth` (13 bàn), `Fulham` (13 bàn), `Manchester United` (13 bàn).
-  * Ma trận đối đầu chéo ở Ô 4 cho phép người xem nhìn bao quát toàn bộ giải đấu, nhận biết ngay những cặp đấu có "cơn mưa bàn thắng" trong lịch sử.
+  * Bảng danh mục cặp đấu ở Ô 4 cho phép người xem nhìn bao quát danh sách các cặp đấu nhiều bàn thắng nhất, hoặc lọc riêng theo từng CLB để xem trọn vẹn thành tích đối đầu mà không bị gián đoạn bởi các ô trống.
 
 ### 4.2. Lập luận phân tích nghiệp vụ thể thao (Sport Intelligence Insights)
 1. **Giá trị của Chiều đa vai trò (Role-Playing Dimension) trong OLAP:**
