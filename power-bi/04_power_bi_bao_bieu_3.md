@@ -17,7 +17,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 
 ### 1.1. Câu hỏi nghiệp vụ
 1. **Những CLB nào có rủi ro kỷ luật cao nhất châu Âu?** Xếp hạng tổng lượng thẻ phạt cảnh cáo (`Yellow Cards`) và thẻ phạt đuổi khỏi sân (`Red Cards`) theo từng CLB.
-2. **Mức độ răn đe kỷ luật và tính khốc liệt khác nhau thế nào giữa các giải đấu hàng đầu châu Âu?** So sánh sản lượng thẻ đỏ và thẻ vàng giữa các giải đấu (`Competition Name`), nhận diện giải đấu trọng tài nghiêm khắc nhất và giải đấu chơi bóng ôn hòa nhất.
+2. **Biến động thứ hạng về tải trọng thi đấu giữa các giải đấu hàng đầu châu Âu qua các mùa giải?** Sử dụng biểu đồ dải ruy băng xếp hạng (Ribbon Chart) để theo dõi sự dịch chuyển thứ hạng về tổng thời lượng thi đấu (`Minutes Played`) của các giải đấu (`Competition Name`) qua các mùa giải (`Season`), nhận diện giải đấu nào ngày càng gia tăng cường độ bào mòn thể lực.
 3. **Độ tuổi nào trong bóng đá chuyên nghiệp đang phải gánh tải trọng thi đấu lớn nhất và có xu hướng phạm lỗi nhiều nhất?** Đặt số phút thi đấu (`Minutes Played`) và số thẻ phạt (`Yellow Cards`) trên cùng trục độ tuổi (`Age`).
 4. **Vị trí thi đấu chuyên môn nào trên sân là "điểm nóng" gánh chịu nhiều thẻ đỏ nhất?** Phân tích cơ cấu và tỷ trọng thẻ đỏ theo vị trí cụ thể (`Sub Position`: *Trung vệ, Tiền vệ phòng ngự, Tiền đạo cắm...*).
 
@@ -25,7 +25,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Stacked Bar Chart (Vàng + Đỏ)** | So sánh tổng lượng thẻ phạt và cơ cấu mức độ nghiêm trọng (thẻ vàng cảnh cáo vs thẻ đỏ trực tiếp/gián tiếp) giữa các CLB hàng đầu. |
-| **Combo Chart 2 Trục Y (Kỷ luật Giải đấu)** | Đối soát song song giữa Thẻ Vàng (Cột - Trục Y trái) và Thẻ Đỏ (Đường - Trục Y phải) giữa các Giải đấu châu Âu (`Competition Name`), loại bỏ triệt để hiện tượng cột thẻ đỏ bị lùn tịt do lệch thang đo (3,000 vs 50). |
+| **Ribbon Chart (Dải Ruy Băng Xếp Hạng)** | Theo dõi trực quan sự thay đổi thứ hạng (Rank Change) về tải trọng thể lực (`Minutes Played`) của các giải đấu châu Âu qua các mùa giải (`Season`). Khắc họa rõ nét sự biến động về quy mô thi đấu. |
 | **Combo Chart 2 Trục Y (Dual Axis)** | Đặt tải trọng thời lượng (Cột - Trục Y trái) và số thẻ phạt (Đường - Trục Y phải) trên cùng một trục danh mục độ tuổi (`Age`), giải quyết bài toán so sánh 2 đại lượng khác thang đo (Khử Exposure Bias). |
 | **Donut Chart (Tỷ trọng Thẻ đỏ theo Vị trí)** | Trực quan hóa tỷ trọng thẻ đỏ theo từng vị trí chuyên môn trên sân (`Sub Position`), nhận diện mắt xích rủi ro kỷ luật chiến thuật cao nhất toàn đội hình. |
 
@@ -51,9 +51,9 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Slicer 1: Mùa giải]          | [Slicer 2: Giải đấu]       | [Slicer 3: Quốc gia]       | [Slicer 4: Vị trí thi đấu]        |
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | COMBO CHART 2 TRỤC Y (Title: 18pt)]        |
-| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Bản đồ Răn đe Kỷ luật: Thẻ Vàng [Cột Y1] vs Thẻ Đỏ [Đường Y2] |
-| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Giải đấu (12pt), Cột: Vàng (12pt), Đường: Đỏ (12pt)         |
+| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | BIỂU ĐỒ DẢI RUY BĂNG RIBBON (18pt)]  |
+| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Xếp hạng Tải trọng Thi đấu theo Giải đấu qua các Mùa  |
+| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Mùa giải (12pt), Y: Phút cày ải, Legend: Giải đấu   |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BIỂU ĐỒ VÀNH KHĂN DONUT (Title: 18pt)]     |
@@ -186,39 +186,38 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Combo Chart 2 Trục Y – Bản đồ Răn đe Kỷ luật: Thẻ Vàng (Cột) vs Thẻ Đỏ (Đường) giữa các Giải đấu
+### Bước 6 – Ô 2 (Trên - Phải): Ribbon Chart – Xếp hạng Tải trọng Thi đấu của các Giải đấu qua các Mùa giải
 
-1. Tại khung **Visualizations**, chọn visual **Line and clustered column chart** (Biểu đồ Cột cụm và Đường với 2 trục Y độc lập).
+1. Tại khung **Visualizations**, chọn visual **Ribbon chart** (Biểu đồ Dải ruy băng xếp hạng theo thời gian).
 2. Kích thước & Vị trí:
    * **Size:** `Width = 925 px`, `Height = 385 px`.
    * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu (Khử hoàn toàn lỗi lùn tịt cột thẻ đỏ bằng thang đo kép 2 trục Y):
-   * **X-axis:** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`** (Tên giải đấu).
-   * **Column y-axis (Trục Y trái - Cột):** Kéo thước đo **`[Measures].[Yellow Cards]`** (Khối lượng thẻ vàng cảnh cáo - Cột vàng).
-   * **Line y-axis (Trục Y phải - Đường):** Kéo thước đo **`[Measures].[Red Cards]`** (Độ răn đe thẻ đỏ truất quyền thi đấu - Đường đỏ).
+3. Kéo thả trường dữ liệu:
+   * **X-axis (Trục hoành):** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải: *2022/2023* và *2023/2024*).
+   * **Y-axis (Trục tung):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Minutes Played]`** (icon 🧮 - Tổng thời lượng thi đấu).
+   * **Legend (Nhóm dải ruy băng):** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`** (Tên giải đấu).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
    * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng cảnh cáo`**
-   * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ truất quyền`**
-5. **Cấu hình Bộ lọc Top 8 Giải đấu lớn nhất (Filters on this visual):**
+   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Thời lượng thi đấu`**
+5. **Cấu hình Bộ lọc Top 6 Giải đấu hàng đầu (Filters on this visual):**
    * Tại khung **Filters on this visual**, mở mục `Giải đấu` (hoặc `Competition Name`).
-   * Chọn Filter type: **Top N**, nhập **`8`** (hoặc `10`).
-   * Ô **By value**: Kéo thước đo **`[Measures].[Yellow Cards]`** vào.
-   * Nhấp nút **Apply filter** (Tập trung hiển thị 8 giải đấu hàng đầu: La Liga, Serie A, Premier League, Bundesliga, Ligue 1, Liga Portugal, Süper Lig, Eredivisie).
+   * Chọn Filter type: **Top N**, nhập **`6`** (hoặc `7`).
+   * Ô **By value**: Kéo thước đo **`[Measures].[Minutes Played]`** vào.
+   * Nhấp nút **Apply filter** (Tập trung hiển thị 6 giải đấu lớn nhất: *Premier League, Serie A, La Liga, Ligue 1, Süper Lig, Bundesliga* để các dải ruy băng to bản, uốn lượn sắc sảo, không bị rối mắt).
 6. **Định dạng hiển thị chi tiết (Tab Format visual):**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bản đồ Răn đe Kỷ luật giữa các Giải đấu Châu Âu`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
-   * **Columns (Màu cột thẻ vàng):** Đặt màu Cột Vàng Hổ Phách rực rỡ **`#F59E0B`**.
-   * **Lines (Màu đường thẻ đỏ cảnh báo):** Đặt màu Đường Đỏ Tươi cảnh báo **`#DC2626`**, Stroke width: **`3 px`**.
-   * **Markers (Điểm đánh dấu trên đường thẻ đỏ):** Bật **On**, Shape: Tròn (Circle), Size: `7`, Màu nền đỏ đậm `#B91C1C`.
-   * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
-   * **X-axis (Giải đấu):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
-   * **Y-axis (Cột - Trục Y trái):** Title bật **On**, nhập `Số thẻ vàng`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#D97706`.
-   * **Secondary y-axis (Đường - Trục Y phải):** Title bật **On**, nhập `Số thẻ đỏ`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#DC2626`.
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Xếp hạng Tải trọng Thi đấu theo Giải đấu qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **Ribbons:** Bật **Ribbons: On**, Spacing: `0`, Match series color: **On**, Transparency: **`25% - 30%`** để tạo hiệu ứng chuyển động mượt mà.
+   * **Data labels:** Bật **On**, Display units: **`Millions`** (hoặc `Thousands`), Cỡ chữ **`10 pt` Bold**.
+   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`11 pt`**.
+   * **X-axis (Mùa giải):** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`.
+   * **Y-axis (Thời lượng):** Title bật **On**, nhập `Tổng số phút thi đấu`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & NÂNG CẤP THẨM MỸ HOÀN HẢO:**
-> * **Giải quyết triệt để lỗi lệch thang đo (Scale Disparity):** Số liệu thực tế cho thấy Thẻ Vàng dao động từ 1,500 – 3,686 thẻ, trong khi Thẻ Đỏ chỉ từ 46 – 135 thẻ. Việc tách 2 trục Y độc lập giúp đường Thẻ Đỏ bay bổng uốn lượn sắc sảo, không còn bị bẹp dí, lùn tịt sát đáy trục X như biểu đồ cột cụm thông thường!
-> * **Phát hiện nghiệp vụ chấn động:** La Liga và Ligue 1 nổi bật với đường Thẻ Đỏ vọt đỉnh (135 và 113 thẻ đỏ), trong khi Premier League dù nhận tới 3,038 thẻ vàng nhưng đường Thẻ Đỏ lại lao dốc chạm đáy (chỉ 46 thẻ đỏ - tỷ lệ rút thẻ đỏ thấp nhất châu Âu). Điều này phản ánh rõ nét triết lý bóng đá va chạm tốc độ cao nhưng trọng tài rất hạn chế truất quyền thi đấu của người Anh.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & SỰ ĐỘC ĐÁO CỦA RIBBON CHART:**
+> * **Độc nhất vô nhị trong toàn bộ dự án:** Ribbon Chart là dạng biểu đồ duy nhất có khả năng trực quan hóa **sự hoán đổi thứ hạng (Rank Changes)** của các đối tượng qua các mốc thời gian, tạo điểm nhấn kỹ thuật thị giác đỉnh cao cho Báo biểu 3.
+> * **Giải quyết trọn vẹn vế "Tải trọng thể lực":** Khắc họa sự thay đổi vị thế về tải trọng thi đấu giữa các giải đấu hàng đầu châu Âu. Người xem dễ dàng nhận thấy hiện tượng thú vị: Trong khi Premier League và Serie A luôn duy trì vị thế dẫn đầu (>750,000 phút/mùa), thì Ligue 1 có sự tụt dốc rõ rệt từ Top 4 xuống Top 5 do giải đấu nước Pháp cắt giảm quy mô từ 20 xuống 18 đội bóng trong mùa giải 2023/2024!
+> * **Xóa bỏ hoàn toàn sự trùng lặp với Ô 1:** Ô 1 tập trung vào thẻ phạt CLB (Vàng/Đỏ), Ô 2 tập trung vào tải trọng thể lực các giải đấu qua thời gian, mang lại sự đa dạng tuyệt đối về góc nhìn phân tích.
 
 ---
 
