@@ -17,7 +17,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 
 ### 1.1. Câu hỏi nghiệp vụ
 1. **Những CLB nào có rủi ro kỷ luật cao nhất châu Âu?** Xếp hạng tổng lượng thẻ phạt cảnh cáo (`Yellow Cards`) và thẻ phạt đuổi khỏi sân (`Red Cards`) theo từng CLB.
-2. **Biến động thứ hạng về tải trọng thi đấu giữa các giải đấu hàng đầu châu Âu qua các mùa giải?** Sử dụng biểu đồ dải ruy băng xếp hạng (Ribbon Chart) để theo dõi sự dịch chuyển thứ hạng về tổng thời lượng thi đấu (`Minutes Played`) của các giải đấu (`Competition Name`) qua các mùa giải (`Season`), nhận diện giải đấu nào ngày càng gia tăng cường độ bào mòn thể lực.
+2. **Biến động thứ hạng về đóng góp bàn thắng của các CLB hàng đầu châu Âu qua các mùa giải?** Sử dụng biểu đồ dải ruy băng xếp hạng (Ribbon Chart) để theo dõi sự dịch chuyển thứ hạng về tổng đóng góp bàn thắng (`Goal Contributions = Goals + Assists`) của các CLB (`Club Name`) qua các mùa giải (`Season`), nhận diện những đội bóng bứt phá ngoạn mục hoặc sa sút phong độ tấn công qua từng mùa.
 3. **Độ tuổi nào trong bóng đá chuyên nghiệp đang phải gánh tải trọng thi đấu lớn nhất và có xu hướng phạm lỗi nhiều nhất?** Đặt số phút thi đấu (`Minutes Played`) và số thẻ phạt (`Yellow Cards`) trên cùng trục độ tuổi (`Age`).
 4. **Vị trí thi đấu chuyên môn nào trên sân là "điểm nóng" gánh chịu nhiều thẻ đỏ nhất?** Phân tích cơ cấu và tỷ trọng thẻ đỏ theo vị trí cụ thể (`Sub Position`: *Trung vệ, Tiền vệ phòng ngự, Tiền đạo cắm...*).
 
@@ -25,7 +25,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
 | **Stacked Bar Chart (Vàng + Đỏ)** | So sánh tổng lượng thẻ phạt và cơ cấu mức độ nghiêm trọng (thẻ vàng cảnh cáo vs thẻ đỏ trực tiếp/gián tiếp) giữa các CLB hàng đầu. |
-| **Ribbon Chart (Dải Ruy Băng Xếp Hạng)** | Theo dõi trực quan sự thay đổi thứ hạng (Rank Change) về tải trọng thể lực (`Minutes Played`) của các giải đấu châu Âu qua các mùa giải (`Season`). Khắc họa rõ nét sự biến động về quy mô thi đấu. |
+| **Ribbon Chart (Dải Ruy Băng Xếp Hạng)** | Theo dõi trực quan sự thay đổi thứ hạng (Rank Change) về tổng đóng góp bàn thắng (`Goal Contributions`) của các CLB hàng đầu châu Âu (`Club Name`) qua các mùa giải (`Season`). Khắc họa rõ nét sự trỗi dậy hay sa sút hỏa lực tấn công của từng đội bóng và tương tác mượt mà khi lọc theo từng Giải đấu. |
 | **Combo Chart 2 Trục Y (Dual Axis)** | Đặt tải trọng thời lượng (Cột - Trục Y trái) và số thẻ phạt (Đường - Trục Y phải) trên cùng một trục danh mục độ tuổi (`Age`), giải quyết bài toán so sánh 2 đại lượng khác thang đo (Khử Exposure Bias). |
 | **Donut Chart (Tỷ trọng Thẻ đỏ theo Vị trí)** | Trực quan hóa tỷ trọng thẻ đỏ theo từng vị trí chuyên môn trên sân (`Sub Position`), nhận diện mắt xích rủi ro kỷ luật chiến thuật cao nhất toàn đội hình. |
 
@@ -52,8 +52,8 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
 | [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | BIỂU ĐỒ DẢI RUY BĂNG RIBBON (18pt)]  |
-| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Xếp hạng Tải trọng Thi đấu theo Giải đấu qua các Mùa  |
-| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Mùa giải (12pt), Y: Phút cày ải, Legend: Giải đấu   |
+| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Xếp hạng Đóng góp Bàn thắng (G+A) theo CLB qua các Mùa|
+| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Mùa giải (12pt), Y: Đóng góp G+A, Legend: CLB       |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 | [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BIỂU ĐỒ VÀNH KHĂN DONUT (Title: 18pt)]     |
@@ -186,7 +186,7 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Ribbon Chart – Xếp hạng Tải trọng Thi đấu của các Giải đấu qua các Mùa giải
+### Bước 6 – Ô 2 (Trên - Phải): Ribbon Chart – Xếp hạng Đóng góp Bàn thắng (Goal Contributions) của các CLB qua các Mùa giải
 
 1. Tại khung **Visualizations**, chọn visual **Ribbon chart** (Biểu đồ Dải ruy băng xếp hạng theo thời gian).
 2. Kích thước & Vị trí:
@@ -194,30 +194,31 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
    * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
 3. Kéo thả trường dữ liệu:
    * **X-axis (Trục hoành):** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải: *2022/2023* và *2023/2024*).
-   * **Y-axis (Trục tung):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Minutes Played]`** (icon 🧮 - Tổng thời lượng thi đấu).
-   * **Legend (Nhóm dải ruy băng):** Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`** (Tên giải đấu).
+   * **Y-axis (Trục tung):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng đóng góp bàn thắng = Bàn thắng + Kiến tạo).
+   * **Legend (Nhóm dải ruy băng):** Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** (Tên Câu lạc bộ).
 4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
    * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
-   * `Competition Name` $\rightarrow$ Đổi tên thành: **`Giải đấu`**
-   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Thời lượng thi đấu`**
-5. **Cấu hình Bộ lọc Top 6 Giải đấu hàng đầu (Filters on this visual):**
-   * Tại khung **Filters on this visual**, mở mục `Giải đấu` (hoặc `Competition Name`).
-   * Chọn Filter type: **Top N**, nhập **`6`** (hoặc `7`).
-   * Ô **By value**: Kéo thước đo **`[Measures].[Minutes Played]`** vào.
-   * Nhấp nút **Apply filter** (Tập trung hiển thị 6 giải đấu lớn nhất: *Premier League, Serie A, La Liga, Ligue 1, Süper Lig, Bundesliga* để các dải ruy băng to bản, uốn lượn sắc sảo, không bị rối mắt).
+   * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
+   * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Đóng góp G+A`**
+5. **Cấu hình Bộ lọc Top 8 CLB hàng đầu (Filters on this visual):**
+   * Tại khung **Filters on this visual**, mở mục `Câu lạc bộ` (hoặc `Club Name`).
+   * Chọn Filter type: **Top N**, nhập **`8`** (hoặc `6`).
+   * Ô **By value**: Kéo thước đo **`[Measures].[Goal Contributions]`** vào.
+   * Nhấp nút **Apply filter** (Tập trung hiển thị 8 CLB có tổng đóng góp bàn thắng cao nhất: *Manchester City, Bayern Munich, PSV Eindhoven, Real Madrid, Bayer 04 Leverkusen, Feyenoord Rotterdam, SL Benfica, Paris Saint-Germain* để các dải ruy băng to bản, uốn lượn sắc sảo, không bị rối mắt).
 6. **Định dạng hiển thị chi tiết (Tab Format visual):**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Xếp hạng Tải trọng Thi đấu theo Giải đấu qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Xếp hạng Đóng góp Bàn thắng (G+A) theo CLB qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
    * **Ribbons:** Bật **Ribbons: On**, Spacing: `0`, Match series color: **On**, Transparency: **`25% - 30%`** để tạo hiệu ứng chuyển động mượt mà.
-   * **Data labels:** Bật **On**, Display units: **`Millions`** (hoặc `Thousands`), Cỡ chữ **`10 pt` Bold**.
+   * **Data labels:** Bật **On**, Display units: **`None`** (hiển thị chính xác số nguyên đóng góp bàn thắng của từng CLB), Cỡ chữ **`10 pt` Bold**.
    * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`11 pt`**.
    * **X-axis (Mùa giải):** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`.
-   * **Y-axis (Thời lượng):** Title bật **On**, nhập `Tổng số phút thi đấu`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
+   * **Y-axis (Đóng góp G+A):** Title bật **On**, nhập `Tổng đóng góp bàn thắng (G+A)`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
 > **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & SỰ ĐỘC ĐÁO CỦA RIBBON CHART:**
-> * **Độc nhất vô nhị trong toàn bộ dự án:** Ribbon Chart là dạng biểu đồ duy nhất có khả năng trực quan hóa **sự hoán đổi thứ hạng (Rank Changes)** của các đối tượng qua các mốc thời gian, tạo điểm nhấn kỹ thuật thị giác đỉnh cao cho Báo biểu 3.
-> * **Giải quyết trọn vẹn vế "Tải trọng thể lực":** Khắc họa sự thay đổi vị thế về tải trọng thi đấu giữa các giải đấu hàng đầu châu Âu. Người xem dễ dàng nhận thấy hiện tượng thú vị: Trong khi Premier League và Serie A luôn duy trì vị thế dẫn đầu (>750,000 phút/mùa), thì Ligue 1 có sự tụt dốc rõ rệt từ Top 4 xuống Top 5 do giải đấu nước Pháp cắt giảm quy mô từ 20 xuống 18 đội bóng trong mùa giải 2023/2024!
-> * **Xóa bỏ hoàn toàn sự trùng lặp với Ô 1:** Ô 1 tập trung vào thẻ phạt CLB (Vàng/Đỏ), Ô 2 tập trung vào tải trọng thể lực các giải đấu qua thời gian, mang lại sự đa dạng tuyệt đối về góc nhìn phân tích.
+> * **Độc nhất vô nhị trong toàn bộ dự án:** Ribbon Chart trực quan hóa **sự hoán đổi thứ hạng (Rank Changes)** của các CLB qua từng mùa giải, làm nổi bật ngay những màn bứt phá hoặc tụt hạng ngoạn mục về hỏa lực tấn công.
+> * **Phát hiện điểm nhấn thực tế từ Cube:** Nhìn vào 8 CLB dẫn đầu châu Âu, người xem thấy ngay cú lội ngược dòng ngoạn mục của **Bayer 04 Leverkusen** (vọt từ hạng 8 với **`137` G+A** mùa `2022/2023` lên chiếm ngôi đầu **`224` G+A** mùa `2023/2024`), sự thăng tiến của **PSV Eindhoven** (`180` $\rightarrow$ `216`) và **Real Madrid** (`179` $\rightarrow$ `206`), đối lập với đà giảm của **SL Benfica** (`194` $\rightarrow$ `164`).
+> * **Tương tác đa chiều thông minh với Slicer Giải đấu:** Khi người dùng chọn một giải đấu cụ thể trên Slicer 2 (như `laliga`), biểu đồ không bị co thành 1 dải đơn lẻ mà lập tức chuyển thành bảng xếp hạng cuộc đua G+A giữa các CLB thuộc chính giải đấu đó.
+> * **Bổ sung góc nhìn cho Ô 1:** Ô 1 xếp hạng rủi ro thẻ phạt CLB (Kỷ luật), còn Ô 2 theo dõi biến động thứ hạng đóng góp bàn thắng CLB qua thời gian, tạo sự đối chiếu toàn diện giữa **Hiệu suất tấn công** và **Giá phải trả về Kỷ luật**.
 
 ---
 
@@ -296,7 +297,7 @@ Sử dụng visual **Donut chart (Biểu đồ Vành khăn)** để phân rã t�
 ### 4.1. Khả năng tương tác chéo (Cross-filtering)
 * Khi nhấp chọn giải đấu `laliga` trên Slicer 2:
   * Thẻ KPI cập nhật tức thời: La Liga ghi nhận tới **`135 thẻ đỏ`** và **`3,686 thẻ vàng`**.
-  * Biểu đồ Cột cụm ở Ô 2 làm nổi bật vị trí dẫn đầu của La Liga so với các giải đấu khác.
+  * Biểu đồ Ribbon Chart ở Ô 2 lập tức thu hẹp về các CLB tại La Liga, làm nổi bật vị thế dẫn đầu của `Real Madrid` (`133` $\rightarrow$ `155` G+A) và cú bứt phá của `Girona FC` (vọt từ `101` lên `150` G+A để vượt qua `FC Barcelona` `134` và `Atlético de Madrid` `118`).
   * Donut Chart ở Ô 4 phân rã ngay tỷ trọng thẻ đỏ tại La Liga theo từng vị trí phòng ngự và tấn công.
   * Biểu đồ Combo ở Ô 3 phản ánh chính xác nhóm tuổi nào tại giải đấu này chịu tải trọng và thẻ phạt cao nhất.
 
