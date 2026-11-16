@@ -1,12 +1,15 @@
-# 4.2.2 Báo biểu 2: Phân tích Đối đầu Trực tiếp và Lịch sử Chạm trán giữa các Câu lạc bộ (Head-to-Head & Opponent Club Analytics)
+# 4.2.2 Báo biểu 2: Hồ sơ Chiến thuật & Trinh sát Kẻ mạnh (Scouting Elite Clubs & Top Offensive Threats)
 
 Tài liệu này hướng dẫn chi tiết quy trình thiết kế hoàn chỉnh **Báo biểu 2 (Executive Dashboard 2)** trên phần mềm **Power BI Desktop**, kết nối trực tiếp (Live Connection) với khối dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`.
 
 > [!IMPORTANT]
-> **ĐỈNH CAO OLAP - KHAI THÁC CHIỀU ĐA VAI TRÒ (ROLE-PLAYING DIMENSION):** Báo biểu 2 giải quyết trực tiếp bài toán kinh điển **Truy vấn 10** trong tài liệu Kho dữ liệu (`docs/15_queries.md`): *Phân tích lịch sử đối đầu giữa CLB chủ quản (`DIM Club`) và CLB đối thủ (`Opponent Club`)*.
-> * Việc đưa cặp chiều đa vai trò **`DIM Club` vs `Opponent Club`** lên giao diện phân tích thể hiện tư duy kiến trúc OLAP chuẩn mực, giúp giảng viên đánh giá xuất sắc năng lực khai thác kho dữ liệu.
-> * Khác biệt hoàn toàn $100\%$ với Báo biểu 1 (Hỏa lực cá nhân cầu thủ) và Báo biểu 3 (Kỷ luật & Tải trọng), Báo biểu 2 tập trung vào **Lịch sử chạm trán, Bản đồ khắc chế đối thủ và Ma trận Derby đối đầu chéo**.
-> * Toàn bộ các trường dữ liệu và thước đo **đã có sẵn $100\%$ trong Cube SSAS**, không cần viết thêm mã, kéo thả là hiển thị dữ liệu tức thì.
+> **MỤC TIÊU NGHIỆP VỤ - TRINH SÁT & BẮT BÀI ĐỐI THỦ (TACTICAL SCOUTING & OPPOSITION ANALYSIS):**
+> * Báo biểu 2 giải quyết bài toán cốt lõi của ban huấn luyện và chuyên gia phân tích trước mỗi trận đấu: **"Tra cứu xem kẻ nào đang mạnh nhất, đối thủ sở hữu những họng pháo nào nguy hiểm nhất để lên phương án dè chừng (bắt chết, phong tỏa) hoặc học hỏi bài bản tấn công!"**
+> * Khai thác sâu các đặc tính chiến thuật của cầu thủ trong **`DIM Player`**:
+>   * **`Sub Position` (Vị trí thi đấu chi tiết):** Xác định mũi nhọn là Trung phong cắm (`Centre-Forward`), Tiền đạo dạt biên (`Left Winger` / `Right Winger`) hay Tiền vệ công (`Attacking Midfield`) để phòng ngự đúng hướng đánh.
+>   * **`Foot` (Chân thuận):** Nhận diện các "kèo trái ma thuật" (`left`) hay thuận chân phải (`right`) để hậu vệ biên biết đường be góc sút, cấm ngoặt bóng vào trung lộ.
+>   * **`Height In Cm` (Chiều cao):** Đo lường nguy cơ không chiến (tiền đạo cao 1m90+ như Haaland, Luuk de Jong) để bố trí trung vệ to cao chống bóng bổng và phạt góc.
+> * Kết hợp với bức tranh vĩ mô: Xếp hạng các CLB hỏa lực mạnh nhất châu Âu (`DIM Club [Club Name]`), các chảo lửa nổ nhiều bàn nhất (`DIM Game [Stadium]`) và nhịp điệu phong độ theo thời gian.
 
 Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md):
 * **Canvas:** Độ phân giải **Full HD 1920 x 1080 px (16:9)**, màu nền xám khói `#F8FAFC`.
@@ -19,23 +22,23 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 ## 1. Mục tiêu, Ý nghĩa Thống kê và Bài toán Thực tế
 
 ### 1.1. Câu hỏi nghiệp vụ độc lập
-1. **Ai là "con mồi" ưa thích nhất của từng CLB hàng đầu châu Âu?** Khi người dùng chọn một CLB (ví dụ: *Real Madrid* hoặc *Manchester City*), báo biểu sẽ chỉ ra ngay những đối thủ (`Opponent Club`) bị CLB này chọc thủng lưới nhiều lần nhất.
-2. **"Chảo lửa Thánh địa" nào bùng nổ nhiều bàn thắng nhất châu Âu?** Sử dụng Combo Chart 2 trục Y để đối chiếu giữa Số trận tổ chức (`Distinct Matches Played` - Cột) và Bàn thắng ghi được (`Goals` - Đường) trên từng Sân vận động (`DIM Game [Stadium]`), nhận diện ngay những thánh địa có hỏa lực hủy diệt (hiệu suất bàn thắng/trận cao nhất như Etihad, Allianz Arena, Bernabéu, San Siro).
-3. **Biến thiên bàn thắng đối đầu theo chu kỳ các tháng trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi phân bố bàn thắng theo từng tháng (`Month`) qua các mùa giải (`Season`), nhận diện thời điểm bùng nổ bàn thắng đối đầu đỉnh cao trong năm.
-4. **Bảng danh mục cặp đấu đối đầu kinh điển (Head-to-Head Matchup Table):** Liệt kê chi tiết các cặp đấu có nhiều bàn thắng nhất giữa CLB chủ quản và CLB đối thủ, tích hợp thanh dữ liệu trực quan (Data Bars) và số thẻ phạt, triệt tiêu 100% ô trống NULL.
+1. **Đội bóng nào đang sở hữu hỏa lực tấn công hủy diệt nhất châu Âu?** Xếp hạng Top 10 CLB ghi nhiều bàn thắng nhất (`DIM Club [Club Name]` by `[Measures].[Goals]`), nhận diện những cỗ máy tấn công đáng sợ nhất cần phải dè chừng (Man City, Bayern Munich, Real Madrid, PSV...).
+2. **"Chảo lửa Thánh địa" nào bùng nổ nhiều bàn thắng nhất?** Sử dụng Combo Chart 2 trục Y để đối chiếu giữa Số trận tổ chức (`Distinct Matches Played` - Cột) và Bàn thắng ghi được (`Goals` - Đường) trên từng Sân vận động (`DIM Game [Stadium]`), nhận diện các "tử địa" có hiệu suất bàn thắng/trận cao nhất (Etihad, Allianz Arena, San Siro...).
+3. **Kẻ mạnh bùng nổ phong độ vào giai đoạn nào trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi biến thiên bàn thắng theo dòng thời gian liên tục (`Season` $\rightarrow$ `Month`), nhận biết nhịp điệu chu kỳ thăng hoa của các đội bóng lớn.
+4. **Hồ sơ chiến thuật của các sát thủ nguy hiểm nhất (Tactical Scouting Table):** Bảng danh sách chi tiết tra cứu từng ngòi nổ: Tên cầu thủ (`Player Name`), CLB, Vị trí (`Sub Position`), Chân thuận (`Foot`), Chiều cao (`Height In Cm`) và Sát thương hỏa lực (`Goals`, `Goal Contributions` kèm Data Bars).
 
 ### 1.2. Ý nghĩa thống kê & Giá trị học thuật
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
 | :--- | :--- |
-| **Biểu đồ Cột ngang Top 10 Đối thủ** | Xếp hạng các đối thủ bị ghi nhiều bàn nhất (`Opponent Club` by `Goals`), nhận diện đối thủ kỵ rơ và đối thủ dễ chịu của CLB. |
-| **Combo Chart 2 Trục Y Chảo lửa Sân Vận Động** | Đối soát tương quan trực quan giữa Số trận tổ chức (`Distinct Matches Played` - Cột Y1) và Bàn thắng ghi được (`Goals` - Đường Y2) trên từng Sân vận động (`DIM Game [Stadium]`). Khai thác độc lập chiều Sân bãi, hoàn toàn không trùng lặp với Ô 1. |
-| **Area Chart (Biểu đồ Vùng xếp chồng)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
-| **Bảng Danh mục Cặp đấu Đối đầu (Table + Data Bars)** | Bảng phẳng liệt kê các cặp đấu chạm trán thực tế giữa `DIM Club` và `Opponent Club`, hiển thị Bàn thắng (`Goals`) kèm thanh dữ liệu **Data Bars** và Thẻ phạt (`Yellow Cards`). Tự động lọc sạch 100% các ô NULL, không bị loãng dữ liệu. |
+| **Biểu đồ Cột ngang Top 10 CLB Hỏa lực** | Xếp hạng các CLB ghi bàn nhiều nhất châu Âu (`DIM Club` by `Goals`), nhận diện sức mạnh tấn công tổng lực của các đội bóng dẫn đầu. |
+| **Combo Chart 2 Trục Y Chảo lửa Sân Vận Động** | Đối soát tương quan trực quan giữa Số trận tổ chức (`Distinct Matches Played` - Cột Y1) và Bàn thắng ghi được (`Goals` - Đường Y2) trên từng Sân vận động (`DIM Game [Stadium]`). |
+| **Area Chart (Biểu đồ Vùng dòng thời gian)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
+| **Bảng Trinh sát Đặc tính Chiến thuật (Table + Data Bars)** | Bảng tra cứu từng mũi nhọn nguy hiểm, tích hợp đầy đủ Vị trí (`Sub Position`), Chân thuận (`Foot`), Chiều cao (`Height In Cm`) và Điểm sát thương (`Goal Contributions`), phục vụ trực tiếp công tác bắt bài chiến thuật. |
 
 ### 1.3. Bài toán thực tế giải quyết
-* **Ban huấn luyện & Chuyên gia phân tích đối thủ:** Đánh giá điểm mạnh/điểm yếu lịch sử khi chuẩn bị chiến thuật đối đầu với một đối thủ cụ thể tại vòng đấu tiếp theo.
-* **Bộ phận Truyền thông & Nhà đài:** Khai thác số liệu đối đầu lịch sử để làm phóng sự hâm nóng trước thềm các trận Derby (El Clásico, Derby Manchester, Derby London...).
-* **Cổ động viên & Người hâm mộ:** Tra cứu nhanh thành tích đối đầu giữa hai đội bóng bất kỳ qua các mùa giải.
+* **Ban huấn luyện & Trợ lý phân tích chiến thuật:** "Bắt bài" đối thủ trước trận đấu — nhận diện ngòi nổ nguy hiểm nhất, biết rõ chân thuận để be góc sút, chiều cao để phòng ngự bóng bổng.
+* **Bộ phận Chuyển nhượng & Tuyển trạch:** Nghiên cứu và học hỏi mô hình vận hành của các đội bóng mạnh nhất châu Âu.
+* **Cổ động viên & Truyền thông:** Tra cứu sức mạnh và các thông số độc đáo của các ngôi sao hàng đầu.
 
 ---
 
@@ -43,7 +46,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 
 ```
 +-------------------------------------------------------------------------------------------------------------------------+
-| [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 2 - PHÂN TÍCH ĐỐI ĐẦU TRỰC TIẾP GIỮA CÁC CLB (Font: 20pt Bold, Center)        |
+| [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 2 - TRINH SÁT & BẮT BÀI CÁC MŨI NHỌN NGUY HIỂM (Font: 20pt Bold, Center)       |
 | Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
 | [Card 1: Distinct Matches]    | [Card 2: Total Goals]       | [Card 3: Total Assists]     | [Card 4: Goal Contributions]       |
@@ -55,13 +58,13 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
 | [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ CỘT THANH NGANG (18pt)]     | [Ô 2: TRÊN - PHẢI | COMBO CHART 2 TRỤC Y (Title: 18pt)]        |
-| Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất            | Chảo lửa Sân vận động: Số trận [Cột Y1] vs Bàn thắng [Đường Y2]|
-| Y: CLB Đối thủ (12pt Navy), X: Bàn thắng (12pt Green)   | X: Sân vận động (12pt), Cột: Số trận (12pt), Đường: Bàn thắng  |
+| Top 10 CLB Có Hỏa Lực Tấn Công Mạnh Nhất                | Chảo lửa Sân vận động: Số trận [Cột Y1] vs Bàn thắng [Đường Y2]|
+| Y: CLB Chủ quản (12pt), X: Bàn thắng (12pt Green)       | X: Sân vận động (12pt), Cột: Số trận (12pt), Đường: Bàn thắng  |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | BẢNG CẶP ĐẤU ĐỐI ĐẦU TABLE (18pt)]     |
-| Biến thiên Bàn thắng theo Tháng qua các Mùa giải         | Bảng Danh mục Cặp đấu Kinh điển: Bàn thắng & Thẻ phạt          |
-| X: Tháng (12pt), Y: Bàn thắng, Legend: Mùa giải         | Cột: CLB Chủ quản, CLB Đối thủ, Bàn thắng (Data Bars), Thẻ phạt|
+| [Ô 3: DƯỚI - TRÁI | BIỂU ĐỒ VÙNG DIỆN TÍCH AREA (18pt)] | [Ô 4: DƯỚI - PHẢI | BẢNG TRINH SÁT MŨI NHỌN NGUY HIỂM (18pt)]|
+| Biến thiên Bàn thắng theo Dòng Thời gian (24 Tháng)     | Bảng Tra Cứu: Cầu thủ, Vị trí, Chân thuận, Chiều cao, G+A     |
+| X: Season -> Month (↓↓), Y: Bàn thắng                   | Cột: Cầu thủ, CLB, Vị trí (Sub Position), Chân, Chiều cao, G+A|
 | Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
@@ -73,7 +76,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 ### Bước 1: Khởi tạo Trang Báo cáo và Cấu hình Canvas
 1. Tại thanh quản lý trang ở mép dưới Power BI Desktop, nhấp vào biểu tượng dấu cộng `+` để thêm một trang mới.
 2. Nhấp đúp chuột vào tên trang vừa tạo và **đặt tên trang chính thức**:
-   * **Tên trang:** `Đối đầu CLB & Đối thủ` (hoặc `Báo biểu 2`).
+   * **Tên trang:** `Hồ sơ Chiến thuật & Kẻ mạnh` (hoặc `Báo biểu 2`).
 3. Nhấp chuột vào khoảng trống Canvas để mở bảng **Format report page**:
    * **Canvas settings** $\rightarrow$ **Type:** Chọn `Custom`, thiết lập `Width = 1920 px`, `Height = 1080 px`.
    * **Canvas background:** Chọn màu xám khói hiện đại **`#F8FAFC`**, thiết lập **Transparency = `0%`**.
@@ -83,7 +86,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 ### Bước 2: Thiết lập Hero Banner Tiêu đề Trang (Tầng trên)
 1. Trên thanh tác vụ **Insert**, nhấp chọn **Text box**.
 2. Nhập nội dung tiêu đề chuẩn mực:
-   `BÁO BIỂU 2: PHÂN TÍCH ĐỐI ĐẦU TRỰC TIẾP & LỊCH SỬ CHẠM TRÁN GIỮA CÁC CÂU LẠC BỘ`
+   `BÁO BIỂU 2: HỒ SƠ CHIẾN THUẬT & TRINH SÁT CÁC MŨI NHỌN NGUY HIỂM NHẤT`
 3. Bôi đen toàn bộ văn bản và định dạng:
    * Font chữ: `Segoe UI`, Cỡ chữ: **`20 pt`**, In đậm (**Bold**), Căn giữa (**Center**), Màu chữ: Xanh than đậm `#0F172A`.
 4. Tab **General** $\rightarrow$ **Effects**:
@@ -165,30 +168,32 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 5 – Ô 1 (Trên - Trái): Clustered Bar Chart – Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất
+### Bước 5 – Ô 1 (Trên - Trái): Clustered Bar Chart – Top 10 CLB Có Hỏa Lực Tấn Công Mạnh Nhất Châu Âu
 
 1. Tại khung **Visualizations**, chọn visual **Clustered bar chart** (Biểu đồ thanh ngang).
 2. Kích thước & Vị trí:
    * Size: `Width = 925 px`, `Height = 385 px`.
    * Position: `Horizontal = 20 px`, `Vertical = 300 px`.
 3. Kéo thả trường dữ liệu:
-   * **Y-axis:** Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`** vào ô này.
-   * **X-axis:** Kéo thước đo **`[Measures].[Goals]`**.
-   * **Tooltips:** Kéo `[Measures].[Distinct Matches Played]`, `[Measures].[Yellow Cards]`.
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
-   * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi vào đối thủ`**
-   * `Distinct Matches Played` $\rightarrow$ Đổi tên thành: **`Số trận đối đầu`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Số thẻ vàng`**
-5. **Bộ lọc Top 10 Đối thủ:**
-   * Tại khung **Filters on this visual** $\rightarrow$ chọn trường `Club Name` (của Opponent Club) $\rightarrow$ chọn mục **Top N** $\rightarrow$ nhập `10` $\rightarrow$ tại ô **By value** kéo `Goals` $\rightarrow$ nhấp **Apply filter**.
+   * **Y-axis:** Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** vào ô này (nhận diện những cỗ máy tấn công nguy hiểm nhất).
+   * **X-axis:** Kéo thước đo **`[Measures].[Goals]`** (Tổng số bàn thắng hủy diệt đã ghi được).
+   * **Tooltips:** Kéo `[Measures].[Assists]`, `[Measures].[Goal Contributions]`.
+4. **Phần đặt tên (Rename for this visual):**
+   * `DIM Club [Club Name]` $\rightarrow$ Đổi tên: **`Club Name`** (hoặc `CLB Tấn công`)
+   * `Goals` $\rightarrow$ Đổi tên: **`Goals`** (hoặc `Bàn thắng ghi được`)
+5. **Bộ lọc Top 10 CLB Mạnh nhất (Filters on this visual):**
+   * Tại khung **Filters on this visual** $\rightarrow$ chọn trường `Club Name` $\rightarrow$ chọn mục **Top N** $\rightarrow$ nhập `10` $\rightarrow$ tại ô **By value** kéo `Goals` $\rightarrow$ nhấp **Apply filter**.
+   * *(Kết quả hiển thị chính xác các cỗ máy ghi bàn hàng đầu: Manchester City 245 bàn, Bayern Munich 225 bàn, PSV Eindhoven 219 bàn, Real Madrid 210 bàn, Feyenoord 200 bàn, Arsenal 199 bàn, Liverpool 198 bàn, PSG 198 bàn...)*.
 6. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Top 10 Đối thủ bị Chọc thủng Lưới Nhiều Nhất`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **Bars:** Màu Xanh dương hoàng gia **`#2563EB`**.
-   * **Y-axis (Tên đối thủ):** Cỡ chữ **`12 pt`**, màu sắc: **Xanh Navy đậm `#0D47A1`**, *Maximum width* đặt `35%` để hiển thị trọn vẹn tên CLB đối thủ.
-   * **X-axis (Bàn thắng):** Cỡ chữ **`12 pt`**, màu sắc: **Xanh lục Forest Green `#1B5E20`**.
-   * **Data labels:** Bật **On**, Cỡ chữ **`12 pt` Bold**.
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Top 10 CLB Có Hỏa Lực Tấn Công Mạnh Nhất`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **Bars:** Màu Xanh dương hoàng gia **`#2563EB`** (hoặc đa sắc theo theme).
+   * **Y-axis (Tên CLB):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu sắc: **Xanh Navy đậm `#0D47A1`**, *Maximum width* đặt `35%` để hiển thị trọn vẹn tên CLB không bị dấu ba chấm `...`.
+   * **X-axis (Bàn thắng):** Cỡ chữ **`12 pt`**, màu sắc: **Xanh lục `#1B5E20`**.
+   * **Data labels:** Bật **On**, Cỡ chữ **`11 pt` Bold**.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+
+> **Ý NGHĨA NGHIỆP VỤ CỦA Ô 1:**
+> * Định danh ngay những "ông kẹ" sở hữu hàng công khủng khiếp nhất toàn châu Âu. Giúp ban huấn luyện nhận diện các bài bản tấn công vượt trội để học hỏi và đề phòng khi chạm trán.
 
 ---
 
@@ -265,51 +270,58 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 8 – Ô 4 (Dưới - Phải): Table – Bảng Danh mục Cặp đấu Đối đầu Kinh điển (Head-to-Head Matchup Table + Data Bars)
+### Bước 8 – Ô 4 (Dưới - Phải): Table – Bảng Trinh Sát Đặc Tính Chiến Thuật Của Các Mũi Nhọn Nguy Hiểm Nhất (Tactical Player Scouting Table)
 
-Sử dụng visual **Table (Bảng phẳng danh mục)** thay thế cho bảng ma trận 2 chiều, giúp loại bỏ hoàn toàn các ô trống NULL và hiển thị trực diện các cặp đấu có hỏa lực mạnh nhất:
+Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất để ban huấn luyện lên phương án phòng ngự (be hướng sút chân thuận, chống bóng bổng) hoặc học hỏi bài bản tấn công:
 
 #### 1. Cấu hình trường dữ liệu:
 * Size: `Width = 925 px`, `Height = 385 px`.
 * Position: `Horizontal = 975 px`, `Vertical = 695 px`.
 * Tại khung **Visualizations**, chọn visual **Table** (biểu tượng bảng danh sách phẳng).
 * Kéo các trường vào ô **Columns**:
-  1. Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`**.
-  2. Mở bảng **`Opponent Club`**, kéo thuộc tính **`[Club Name]`**.
-  3. Kéo thước đo **`[Measures].[Goals]`**.
-  4. Kéo thước đo **`[Measures].[Yellow Cards]`**.
+  1. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Player Name]`** (Tên ngôi sao / mũi nhọn nguy hiểm).
+  2. Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** (CLB chủ quản).
+  3. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Sub Position]`** (Vị trí thi đấu: *Centre-Forward, Left Winger, Right Winger...*).
+  4. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Foot]`** (Chân thuận: *Left, Right, Both* $\rightarrow$ giúp hậu vệ biết đường be góc sút chân thuận).
+  5. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Height In Cm]`** (Chiều cao $\rightarrow$ đo lường nguy cơ không chiến bóng bổng).
+  6. Kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng sát thương G+A).
+  7. Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng).
+
+*(Lưu ý: Nếu anh muốn giữ nguyên bảng danh mục Cặp đấu CLB như hiện tại thì kéo: `DIM Club [Club Name]`, `Opponent Club [Club Name]`, `[Measures].[Goal Contributions]` và `[Measures].[Yellow Cards]`)*.
 
 #### 2. Phần đặt tên nhãn cột (Rename for this visual):
 * Nhấp chuột phải vào từng trường trong ô Columns $\rightarrow$ chọn **Rename for this visual**:
-  * `DIM Club [Club Name]` $\rightarrow$ Đổi tên: **`Club Name`** (hoặc Tiếng Việt: `CLB Chủ quản`)
-  * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên: **`Opponent Club`** (hoặc Tiếng Việt: `CLB Đối thủ` - tránh bị trùng tên `Club Name`)
-  * `Goals` (hoặc `Goal Contributions`) $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `Bàn thắng`)
-  * `Yellow Cards` $\rightarrow$ Đổi tên: **`Yellow Cards`** (hoặc `Thẻ vàng`)
+  * `Player Name` $\rightarrow$ Đổi tên: **`Player Name`** (hoặc `Tên cầu thủ`)
+  * `DIM Club [Club Name]` $\rightarrow$ Đổi tên: **`Club Name`** (hoặc `CLB`)
+  * `Sub Position` $\rightarrow$ Đổi tên: **`Position`** (hoặc `Vị trí`)
+  * `Foot` $\rightarrow$ Đổi tên: **`Foot`** (hoặc `Chân thuận`)
+  * `Height In Cm` $\rightarrow$ Đổi tên: **`Height`** (hoặc `Chiều cao`)
+  * `Goal Contributions` $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `G+A`)
+  * `Goals` $\rightarrow$ Đổi tên: **`Goals`** (hoặc `Bàn thắng`)
 
-#### 3. Bật thanh dữ liệu Data Bars trực quan cho cột Bàn thắng (Tab Format visual $\rightarrow$ Cell elements):
+#### 3. Bật thanh dữ liệu Data Bars trực quan cho cột Goal Contributions (Tab Format visual $\rightarrow$ Cell elements):
 * Nhấp chọn bảng Table $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
-  * Tại ô xổ xuống **Select series**: Chọn trường **`Bàn thắng`** (hoặc `Goals`).
+  * Tại ô xổ xuống **Select series**: Chọn trường **`Goal Contributions`**.
   * Gạt công tắc **Data bars** sang **ON**!
   * Nhấp vào nút **`fx`** bên cạnh Data bars:
     * **Positive bar:** Chọn màu Xanh dương hiện đại **`#2563EB`** (hoặc `#3B82F6`).
     * **Bar direction:** Chọn `Left to right` (Trái sang phải).
-    * Mục **Show bar only:** Để **Off** (hiển thị cả con số bàn thắng bên cạnh thanh màu).
-    * Nhấp **OK**. Cột Bàn thắng lập tức hiển thị các thanh dữ liệu trực quan sinh động như biểu đồ thanh thu nhỏ!
+    * Mục **Show bar only:** Để **Off** (hiển thị cả con số bên cạnh thanh màu).
+    * Nhấp **OK**. Cột Goal Contributions lập tức hiển thị các thanh dữ liệu trực quan sinh động như biểu đồ thanh thu nhỏ!
 
 #### 4. Sắp xếp thứ tự (Sort Order):
-* Nhấp chuột trực tiếp vào tiêu đề cột **`Bàn thắng`** trên bảng để sắp xếp giảm dần (**Descending** $\downarrow$).
-* Bảng sẽ tự động hiển thị những cặp đấu có nhiều bàn thắng nhất lên đầu (ví dụ: *Celtic vs Hibernian: 19 bàn*, *Fenerbahce vs Istanbulspor: 19 bàn*, *Bayern Munich vs Mainz: 18 bàn*...).
+* Nhấp chuột trực tiếp vào tiêu đề cột **`Goal Contributions`** (hoặc `Goals`) trên bảng để sắp xếp giảm dần (**Descending** $\downarrow$).
+* Bảng sẽ tự động hiển thị những cỗ máy hủy diệt nguy hiểm nhất lên đầu: *Erling Haaland (Centre-Forward, chân trái, 195cm, 95 G+A), Harry Kane (Centre-Forward, chân phải, 188cm, 92 G+A), Kylian Mbappé (Centre-Forward, 180cm, 87 G+A), Mohamed Salah (Right Winger, chân trái, 175cm, 78 G+A)...*
 
 #### 5. Định dạng hiển thị chuẩn mực:
-* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bảng Danh mục Cặp đấu Đối đầu Kinh điển`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bảng Trinh Sát Đặc Tính Chiến Thuật của các Mũi Nhọn Nguy Hiểm`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
 * **Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`, màu nền tiêu đề `#F1F5F9`.
 * **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#1E293B`, xen kẽ màu dòng (Alternate rows) nhạt `#F8FAFC`.
-* **Totals:** Tắt **Totals: Off** (do đây là bảng xếp hạng các cặp đấu đối đầu, không cần dòng tổng cộng ở đáy).
+* **Totals:** Tắt **Totals: Off** (bảng danh sách tra cứu cá nhân không cần dòng tổng cộng ở đáy).
 * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA TABLE CẶP ĐẤU ĐỐI ĐẦU:**
-> * **Sạch sẽ 100% dữ liệu:** Triệt tiêu hoàn toàn nhược điểm của ma trận 2 chiều (vốn sinh ra hàng nghìn ô NULL do các đội khác giải không đá với nhau). Bảng Table chỉ hiển thị những cặp đấu đã thực sự diễn ra trong lịch sử kho dữ liệu (`NON EMPTY`).
-> * **Linh hoạt đa tầng:** Khi không bấm bộ lọc, bảng đóng vai trò là bảng xếp hạng Top các trận cầu mưa bàn thắng toàn châu Âu. Khi người dùng bấm Slicer chọn 1 CLB (như *Real Madrid*), bảng tự động thu gọn lại thành danh sách toàn bộ các đối thủ của riêng Real Madrid kèm thanh Data Bars so sánh hỏa lực.
+> **Ý NGHĨA CHIẾN THUẬT CỦA BẢNG TRINH SÁT:**
+> * Cung cấp đầy đủ chân dung nhận dạng của kẻ mạnh: Tên, Vị trí khoét vào cánh nào, Thuận chân nào để be góc, Cao bao nhiêu để chống bóng bổng. Ban huấn luyện nhìn vào bảng này là có ngay phương án phong tỏa toàn diện trước trận đấu!
 
 ---
 
