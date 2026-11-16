@@ -229,31 +229,39 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ---
 
-### Bước 7 – Ô 3 (Dưới - Trái): Area Chart – Biến thiên Bàn thắng Đối đầu theo Tháng qua các Mùa giải (Biểu đồ Vùng xếp chồng)
+### Bước 7 – Ô 3 (Dưới - Trái): Area Chart – Biến thiên Bàn thắng Đối đầu theo Dòng Thời gian Tuyến tính (Biểu đồ Vùng diện tích liên tục)
 
 1. Tại khung **Visualizations**, chọn visual **Area chart** (Biểu đồ Vùng diện tích).
 2. Kích thước & Vị trí:
    * **Size:** `Width = 925 px`, `Height = 385 px`.
    * **Position:** `Horizontal = 20 px`, `Vertical = 695 px`.
-3. Kéo thả trường dữ liệu:
-   * **X-axis:** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Month]`** (Tháng 1 đến Tháng 12).
+3. Kéo thả trường dữ liệu (Khử hoàn toàn lỗi đứt nét chấm bi do khóa ghép SSAS):
+   * **X-axis (Trục hoành):** Kéo lần lượt 2 trường theo thứ tự từ trên xuống:
+     1. Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải - cấp trên).
+     2. Mở bảng **`DIM Time`**, kéo thuộc tính **`[Month]`** (Tháng - cấp dưới).
    * **Y-axis:** Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng ghi được).
-   * **Legend:** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải).
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
+   * **Legend:** **Để trống hoàn toàn** (Không kéo gì vào Legend để tránh bị chia cắt các điểm dữ liệu thành các chấm rời rạc).
+4. **Kích hoạt chế độ mở rộng phân cấp liền mạch (BƯỚC QUAN TRỌNG NHẤT):**
+   * Nhấp chọn biểu đồ Area Chart vừa tạo.
+   * Nhìn lên thanh công cụ điều hướng ở góc trên cùng bên phải visual (hoặc góc trên), nhấp vào biểu tượng **hai mũi tên phân nhánh chĩa xuống: `↓↓` (Expand all down one level in the hierarchy - Mở rộng phân cấp)**.
+   * **Kết quả:** Trục X sẽ tự động dàn phẳng thành dòng thời gian liên tục 24 tháng: `2022/2023 (Tháng 1 -> 12)` nối tiếp sang `2023/2024 (Tháng 1 -> 12)`. Đường diện tích uốn lượn liền mạch 100%, không bị đứt đoạn hay lặp lại số tháng!
+5. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
    * `Month` $\rightarrow$ Đổi tên thành: **`Tháng`**
    * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
    * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng ghi được`**
-5. **Định dạng hiển thị chi tiết (Tab Format visual):**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Biến thiên Bàn thắng Đối đầu theo Tháng qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
-   * **X-axis (Tháng):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
+6. **Định dạng hiển thị chi tiết (Tab Format visual):**
+   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Biến thiên Bàn thắng Đối đầu theo Dòng Thời gian`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+   * **X-axis (Thời gian):** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#334155`.
    * **Y-axis:** Title bật **On**, nhập `Tổng số bàn thắng`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
-   * **Lines & Colors:** Các dải màu mùa giải trong suốt tinh tế (Transparency `40% - 60%`), tạo hiệu ứng vùng màu xếp lớp uốn lượn đẹp mắt.
-   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
+   * **Lines & Colors:** 
+     * **Lines:** Màu Xanh Navy đậm hiện đại **`#2563EB`**, Stroke width: **`3 px`**.
+     * **Shaded area (Vùng phủ bóng):** Bật **On**, Transparency: **`50% - 60%`** để tạo độ chuyển màu tinh tế.
+     * **Markers (Điểm đánh dấu):** Bật **On**, Shape: Tròn, Size: `5`, màu `#1D4ED8`.
    * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
 
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA BIỂU ĐỒ VÙNG (AREA CHART):**
-> * Khắc họa rõ nét nhịp điệu phong độ và tính chu kỳ của các giải đấu bóng đá châu Âu theo các tháng trong năm (khởi động vào tháng 8-9, duy trì ổn định qua mùa đông tháng 11-12, và bùng nổ bàn thắng ở giai đoạn nước rút quyết định tháng 3-4-5).
-> * Việc xếp chồng các diện tích mùa giải giúp so sánh trực tiếp sản lượng bàn thắng giữa các mùa giải xem mùa nào có hỏa lực bùng nổ hơn vào cùng một thời điểm trong năm.
+> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA BIỂU ĐỒ VÙNG TUYẾN TÍNH:**
+> * **Giải quyết triệt để lỗi kỹ thuật SSAS:** Khóa của `Month` trong Cube SSAS là khóa ghép `(Month, Quarter, Year)`. Khi đưa cả `Season` và `Month` vào X-axis rồi bấm `↓↓`, trục thời gian trở nên liền mạch tuyệt đối, triệt tiêu hoàn toàn hiện tượng hiển thị các chấm rời rạc không nối dòng.
+> * **Khắc họa nhịp điệu thi đấu thực tế:** Khắc họa rõ nét nhịp điệu phong độ và tính chu kỳ của các giải đấu bóng đá châu Âu: khởi động vào tháng 8-9, duy trì ổn định qua mùa đông tháng 11-12, bùng nổ bàn thắng ở giai đoạn nước rút quyết định tháng 3-4-5 và trũng xuống chạm đáy vào kỳ nghỉ hè tháng 6-7.
 
 ---
 
