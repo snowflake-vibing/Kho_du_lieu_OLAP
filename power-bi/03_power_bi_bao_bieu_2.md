@@ -8,7 +8,8 @@ Tài liệu này hướng dẫn chi tiết quy trình thiết kế hoàn chỉnh
 > * Khai thác sâu các đặc tính chiến thuật của cầu thủ trong **`DIM Player`**:
 >   * **`Sub Position` (Vị trí thi đấu chi tiết):** Xác định mũi nhọn là Trung phong cắm (`Centre-Forward`), Tiền đạo dạt biên (`Left Winger` / `Right Winger`) hay Tiền vệ công (`Attacking Midfield`) để phòng ngự đúng hướng đánh.
 >   * **`Foot` (Chân thuận):** Nhận diện các "kèo trái ma thuật" (`left`) hay thuận chân phải (`right`) để hậu vệ biên biết đường be góc sút, cấm ngoặt bóng vào trung lộ.
->   * **`Height In Cm` (Chiều cao):** Đo lường nguy cơ không chiến (tiền đạo cao 1m90+ như Haaland, Luuk de Jong) để bố trí trung vệ to cao chống bóng bổng và phạt góc.
+>   * **`Country Of Citizenship` (Quốc tịch):** Nhận diện trường phái bóng đá (Bắc Âu thể lực càn lướt, Nam Mỹ kỹ thuật ma thuật, Tây Âu chiến thuật hiện đại) và gốc gác đào tạo của mũi nhọn.
+>   * **`Age` (Độ tuổi):** Đánh giá độ tuổi sung mãn đỉnh cao (Peak 24 - 28 tuổi: Haaland 26, Mbappé 28, Vinicius 26) hay kinh nghiệm dày dạn (33 - 38 tuổi: Salah 34, Lewandowski 38, Griezmann 35) để lên phương án đua thể lực hoặc bắt bài độ tinh quái.
 > * Kết hợp với bức tranh vĩ mô: Xếp hạng các CLB hỏa lực mạnh nhất châu Âu (`DIM Club [Club Name]`), các chảo lửa nổ nhiều bàn nhất (`DIM Game [Stadium]`) và nhịp điệu phong độ theo thời gian.
 
 Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md):
@@ -25,7 +26,7 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 1. **Đội bóng nào đang sở hữu hỏa lực tấn công hủy diệt nhất châu Âu?** Xếp hạng Top 10 CLB ghi nhiều bàn thắng nhất (`DIM Club [Club Name]` by `[Measures].[Goals]`), nhận diện những cỗ máy tấn công đáng sợ nhất cần phải dè chừng (Man City, Bayern Munich, Real Madrid, PSV...).
 2. **"Chảo lửa Thánh địa" nào bùng nổ nhiều bàn thắng nhất?** Sử dụng Combo Chart 2 trục Y để đối chiếu giữa Số trận tổ chức (`Distinct Matches Played` - Cột) và Bàn thắng ghi được (`Goals` - Đường) trên từng Sân vận động (`DIM Game [Stadium]`), nhận diện các "tử địa" có hiệu suất bàn thắng/trận cao nhất (Etihad, Allianz Arena, San Siro...).
 3. **Kẻ mạnh bùng nổ phong độ vào giai đoạn nào trong mùa giải?** Biểu đồ vùng (Area Chart) theo dõi biến thiên bàn thắng theo dòng thời gian liên tục (`Season` $\rightarrow$ `Month`), nhận biết nhịp điệu chu kỳ thăng hoa của các đội bóng lớn.
-4. **Hồ sơ chiến thuật của các sát thủ nguy hiểm nhất (Tactical Scouting Table):** Bảng danh sách chi tiết tra cứu từng ngòi nổ: Tên cầu thủ (`Player Name`), CLB, Vị trí (`Sub Position`), Chân thuận (`Foot`), Chiều cao (`Height In Cm`) và Sát thương hỏa lực (`Goals`, `Goal Contributions` kèm Data Bars).
+4. **Hồ sơ chiến thuật của các sát thủ nguy hiểm nhất (Tactical Scouting Table):** Bảng danh sách chi tiết tra cứu từng ngòi nổ: Tên cầu thủ (`Player Name`), CLB, Quốc tịch (`Country Of Citizenship`), Vị trí (`Sub Position`), Chân thuận (`Foot`), Độ tuổi (`Age`), Bàn thắng (`Goals`), Kiến tạo (`Assists`) và Sát thương hỏa lực (`Goal Contributions` kèm Data Bars).
 
 ### 1.2. Ý nghĩa thống kê & Giá trị học thuật
 | Thành phần trực quan | Vấn đề thống kê được giải quyết |
@@ -33,10 +34,10 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | **Biểu đồ Cột ngang Top 10 CLB Hỏa lực** | Xếp hạng các CLB ghi bàn nhiều nhất châu Âu (`DIM Club` by `Goals`), nhận diện sức mạnh tấn công tổng lực của các đội bóng dẫn đầu. |
 | **Combo Chart 2 Trục Y Chảo lửa Sân Vận Động** | Đối soát tương quan trực quan giữa Số trận tổ chức (`Distinct Matches Played` - Cột Y1) và Bàn thắng ghi được (`Goals` - Đường Y2) trên từng Sân vận động (`DIM Game [Stadium]`). |
 | **Area Chart (Biểu đồ Vùng dòng thời gian)** | Theo dõi biến thiên bàn thắng theo chu kỳ các Tháng trong năm phân lớp theo Mùa giải (`Season`). Phản ánh rõ phong độ đối đầu bùng nổ vào giai đoạn nước rút hay đầu mùa. |
-| **Bảng Trinh sát Đặc tính Chiến thuật (Table + Data Bars)** | Bảng tra cứu từng mũi nhọn nguy hiểm, tích hợp đầy đủ Vị trí (`Sub Position`), Chân thuận (`Foot`), Chiều cao (`Height In Cm`) và Điểm sát thương (`Goal Contributions`), phục vụ trực tiếp công tác bắt bài chiến thuật. |
+| **Bảng Trinh sát Đặc tính Chiến thuật (Table + Data Bars)** | Bảng tra cứu từng mũi nhọn nguy hiểm, tích hợp Quốc tịch (`Country Of Citizenship`), Vị trí (`Sub Position`), Chân thuận (`Foot`), Tuổi (`Age`), Bàn thắng (`Goals`), Kiến tạo (`Assists`) và Điểm sát thương (`Goal Contributions`), phục vụ trực tiếp công tác bắt bài chiến thuật. |
 
 ### 1.3. Bài toán thực tế giải quyết
-* **Ban huấn luyện & Trợ lý phân tích chiến thuật:** "Bắt bài" đối thủ trước trận đấu — nhận diện ngòi nổ nguy hiểm nhất, biết rõ chân thuận để be góc sút, chiều cao để phòng ngự bóng bổng.
+* **Ban huấn luyện & Trợ lý phân tích chiến thuật:** "Bắt bài" đối thủ trước trận đấu — nhận diện ngòi nổ nguy hiểm nhất, biết rõ chân thuận để be góc sút, độ tuổi để đua tốc độ hay đề phòng kinh nghiệm.
 * **Bộ phận Chuyển nhượng & Tuyển trạch:** Nghiên cứu và học hỏi mô hình vận hành của các đội bóng mạnh nhất châu Âu.
 * **Cổ động viên & Truyền thông:** Tra cứu sức mạnh và các thông số độc đáo của các ngôi sao hàng đầu.
 
@@ -272,7 +273,7 @@ Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao 
 
 ### Bước 8 – Ô 4 (Dưới - Phải): Table – Bảng Trinh Sát Đặc Tính Chiến Thuật Của Các Mũi Nhọn Nguy Hiểm Nhất (Tactical Player Scouting Table)
 
-Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất để ban huấn luyện lên phương án phòng ngự (be hướng sút chân thuận, chống bóng bổng) hoặc học hỏi bài bản tấn công:
+Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất để ban huấn luyện lên phương án phòng ngự (be hướng sút chân thuận, bắt bài độ tinh quái) hoặc học hỏi bài bản tấn công:
 
 #### 1. Cấu hình trường dữ liệu:
 * Size: `Width = 925 px`, `Height = 385 px`.
@@ -281,23 +282,25 @@ Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất 
 * Kéo các trường vào ô **Columns**:
   1. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Player Name]`** (Tên ngôi sao / mũi nhọn nguy hiểm).
   2. Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** (CLB chủ quản).
-  3. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Sub Position]`** (Vị trí thi đấu: *Centre-Forward, Left Winger, Right Winger...*).
-  4. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Foot]`** (Chân thuận: *Left, Right, Both* $\rightarrow$ giúp hậu vệ biết đường be góc sút chân thuận).
-  5. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Height In Cm]`** (Chiều cao $\rightarrow$ đo lường nguy cơ không chiến bóng bổng).
-  6. Kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng sát thương G+A).
-  7. Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng).
-
-*(Lưu ý: Nếu anh muốn giữ nguyên bảng danh mục Cặp đấu CLB như hiện tại thì kéo: `DIM Club [Club Name]`, `Opponent Club [Club Name]`, `[Measures].[Goal Contributions]` và `[Measures].[Yellow Cards]`)*.
+  3. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Country Of Citizenship]`** (Quốc tịch / Nationality).
+  4. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Sub Position]`** (Vị trí thi đấu: *Centre-Forward, Left Winger, Right Winger...*).
+  5. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Foot]`** (Chân thuận: *Left, Right, Both* $\rightarrow$ giúp hậu vệ biết đường be góc sút chân thuận).
+  6. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Age]`** (Độ tuổi $\rightarrow$ đánh giá độ sung sức hay kinh nghiệm).
+  7. Kéo thước đo **`[Measures].[Goals]`** (Bàn thắng ghi được).
+  8. Kéo thước đo **`[Measures].[Assists]`** (Pha kiến tạo).
+  9. Kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng sát thương G+A).
 
 #### 2. Phần đặt tên nhãn cột (Rename for this visual):
 * Nhấp chuột phải vào từng trường trong ô Columns $\rightarrow$ chọn **Rename for this visual**:
   * `Player Name` $\rightarrow$ Đổi tên: **`Player Name`** (hoặc `Tên cầu thủ`)
   * `DIM Club [Club Name]` $\rightarrow$ Đổi tên: **`Club Name`** (hoặc `CLB`)
+  * `Country Of Citizenship` $\rightarrow$ Đổi tên: **`Nationality`** (hoặc `Quốc tịch`)
   * `Sub Position` $\rightarrow$ Đổi tên: **`Position`** (hoặc `Vị trí`)
   * `Foot` $\rightarrow$ Đổi tên: **`Foot`** (hoặc `Chân thuận`)
-  * `Height In Cm` $\rightarrow$ Đổi tên: **`Height`** (hoặc `Chiều cao`)
-  * `Goal Contributions` $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `G+A`)
+  * `Age` $\rightarrow$ Đổi tên: **`Age`** (hoặc `Tuổi`)
   * `Goals` $\rightarrow$ Đổi tên: **`Goals`** (hoặc `Bàn thắng`)
+  * `Assists` $\rightarrow$ Đổi tên: **`Assists`** (hoặc `Kiến tạo`)
+  * `Goal Contributions` $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `G+A`)
 
 #### 3. Bật thanh dữ liệu Data Bars trực quan cho cột Goal Contributions (Tab Format visual $\rightarrow$ Cell elements):
 * Nhấp chọn bảng Table $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
@@ -311,7 +314,12 @@ Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất 
 
 #### 4. Sắp xếp thứ tự (Sort Order):
 * Nhấp chuột trực tiếp vào tiêu đề cột **`Goal Contributions`** (hoặc `Goals`) trên bảng để sắp xếp giảm dần (**Descending** $\downarrow$).
-* Bảng sẽ tự động hiển thị những cỗ máy hủy diệt nguy hiểm nhất lên đầu: *Erling Haaland (Centre-Forward, chân trái, 195cm, 95 G+A), Harry Kane (Centre-Forward, chân phải, 188cm, 92 G+A), Kylian Mbappé (Centre-Forward, 180cm, 87 G+A), Mohamed Salah (Right Winger, chân trái, 175cm, 78 G+A)...*
+* Bảng sẽ tự động hiển thị những cỗ máy hủy diệt nguy hiểm nhất lên đầu:
+  * *Erling Haaland (Man City - Norway - Centre-Forward, Chân trái, 26 tuổi: 81 Bàn, 14 Kiến tạo $\rightarrow$ 95 G+A)*
+  * *Kylian Mbappé (PSG - France - Centre-Forward, Chân phải, 28 tuổi: 71 Bàn, 16 Kiến tạo $\rightarrow$ 87 G+A)*
+  * *Mohamed Salah (Liverpool - Egypt - Right Winger, Chân trái, 34 tuổi: 50 Bàn, 28 Kiến tạo $\rightarrow$ 78 G+A)*
+  * *Luuk de Jong (PSV - Netherlands - Centre-Forward, Chân phải, 36 tuổi: 48 Bàn, 21 Kiến tạo $\rightarrow$ 69 G+A)*
+  * *Mauro Icardi (Galatasaray - Argentina - Centre-Forward, Chân phải, 33 tuổi: 50 Bàn, 18 Kiến tạo $\rightarrow$ 68 G+A)...*
 
 #### 5. Định dạng hiển thị chuẩn mực:
 * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Bảng Trinh Sát Đặc Tính Chiến Thuật của các Mũi Nhọn Nguy Hiểm`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
@@ -321,7 +329,7 @@ Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất 
 * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 > **Ý NGHĨA CHIẾN THUẬT CỦA BẢNG TRINH SÁT:**
-> * Cung cấp đầy đủ chân dung nhận dạng của kẻ mạnh: Tên, Vị trí khoét vào cánh nào, Thuận chân nào để be góc, Cao bao nhiêu để chống bóng bổng. Ban huấn luyện nhìn vào bảng này là có ngay phương án phong tỏa toàn diện trước trận đấu!
+> * Cung cấp đầy đủ chân dung nhận dạng của kẻ mạnh: Tên, Quốc tịch (trường phái đào tạo), Vị trí khoét vào cánh nào, Thuận chân nào để be góc sút, Độ tuổi để tính toán đua thể lực hay kinh nghiệm, cùng chỉ số Bàn thắng và Kiến tạo bóc tách rõ vai trò sát thủ hay ngòi nổ làm bóng. Ban huấn luyện nhìn vào bảng này là có ngay phương án phong tỏa toàn diện trước trận đấu!
 
 ---
 
@@ -329,14 +337,16 @@ Bảng trinh sát trực diện chân dung các "sát thủ" nguy hiểm nhất 
 
 ### 4.1. Khả năng tương tác chéo (Cross-filtering)
 * **Khai thác theo CLB Chủ quản:**
-  * Khi nhấp chọn `Real Madrid` trên Slicer: Toàn bộ bảng Ô 1 lập tức hiển thị Top 10 đối thủ bị Real Madrid chọc thủng lưới nhiều nhất: `UD Almería` (12 bàn), `CA Osasuna` (11 bàn), `Cádiz CF` (10 bàn), `Villarreal` (10 bàn), `FC Barcelona` (8 bàn).
-  * Khi chuyển sang chọn `Manchester City`: Ô 1 chuyển ngay sang danh sách đối thủ của Man City: `RB Leipzig` (14 bàn), `Bournemouth` (13 bàn), `Fulham` (13 bàn), `Manchester United` (13 bàn).
-  * Bảng danh mục cặp đấu ở Ô 4 cho phép người xem nhìn bao quát danh sách các cặp đấu nhiều bàn thắng nhất, hoặc lọc riêng theo từng CLB để xem trọn vẹn thành tích đối đầu mà không bị gián đoạn bởi các ô trống.
+  * Khi nhấp chọn một CLB trên Ô 1 (ví dụ: `Manchester City`): Toàn bộ bảng Table Ô 4 tự động lọc ra dàn họng pháo của Man City đứng đầu là Erling Haaland (95 G+A), Phil Foden (53 G+A), Julián Álvarez...
+  * Khi nhấp chọn `Real Madrid`: Ô 4 lọc ngay Vinicius Junior (64 G+A), Rodrygo (45 G+A), Jude Bellingham (41 G+A)...
+  * Khi nhấp chọn `FC Barcelona`: Ô 4 hiển thị Robert Lewandowski (67 G+A), Raphinha (42 G+A), Ferran Torres...
+* **Khai thác theo Vị trí và Mùa giải:**
+  * Kết hợp Slicer `Sub Position` (ví dụ: chỉ chọn `Centre-Forward` hoặc `Right Winger`) để khoanh vùng trinh sát các mũi nhọn ở từng hành lang tác chiến cụ thể.
 
 ### 4.2. Lập luận phân tích nghiệp vụ thể thao (Sport Intelligence Insights)
-1. **Giá trị của Chiều đa vai trò (Role-Playing Dimension) trong OLAP:**
-   * Việc một bảng sự kiện (`FACT_Player_Match_Perf`) liên kết đồng thời tới 2 khóa ngoại của cùng một chiều CLB (`Club_SK` và `Opponent_Club_SK`) cho phép thực hiện các phép chiếu ma trận chéo (Cross-tabulation). Đây là điểm sáng kiến trúc OLAP nâng cao, giải quyết trọn vẹn bài toán quan hệ song phương giữa hai thực thể cùng loại mà mô hình quan hệ thông thường xử lý rất phức tạp.
-2. **Quy luật "Kỵ rơ" trong Thể thao đỉnh cao:**
-   * Thông qua ma trận khắc chế ở Ô 2, người xem nhận thấy rõ có những đối thủ tuy đứng thứ hạng thấp hơn trên bảng tổng sắp nhưng lại nằm ở Góc II (Ít bàn thắng - Nhiều thẻ vàng) của CLB lớn. Điều này phản ánh tính chất chiến thuật "khắc tinh" đặc thù trong bóng đá, nơi các đội bóng chơi rắn và chủ động phá lối chơi của đối thủ mạnh.
-3. **Cường độ Cạnh tranh của các Trận Derby (Derby Match Intensity):**
-   * Các cuộc đối đầu truyền kiếp (như El Clásico hay Derby Manchester) luôn nằm ở Góc I (Góc có cả số bàn thắng lẫn số thẻ phạt cao nhất). Cường độ thi đấu và sự căng thẳng tâm lý đẩy tỷ lệ thẻ phạt trong các trận đấu này cao hơn **`45%`** so với các vòng đấu thông thường.
+1. **Phân hóa vai trò mũi nhọn (Poacher vs Playmaker Striker):**
+   * Thông qua việc đặt song song `Goals` và `Assists`, người phân tích thấy rõ sự khác biệt giữa mẫu sát thủ vòng cấm thuần túy (Haaland 81 bàn / 14 kiến tạo, tỷ lệ bàn thắng chiếm 85%) và mẫu tiền đạo toàn năng tham gia sâu vào lối chơi (Salah 50 bàn / 28 kiến tạo, Pedro Gonçalves 32 bàn / 29 kiến tạo).
+2. **Khắc chế chiến thuật qua Chân thuận (`Foot`) và Vị trí (`Sub Position`):**
+   * Việc nhận diện các tiền đạo cánh nghịch chân (như Mohamed Salah - Right Winger thuận chân trái, Vinicius Junior - Left Winger thuận chân phải) giúp hậu vệ biên đối phương chủ động be góc phía trong để chặn các pha ngoặt bóng dứt điểm.
+3. **Chiến lược phân bổ thể lực theo Độ tuổi (`Age`):**
+   * Dàn cầu thủ độ tuổi đỉnh cao (24 - 28 tuổi) duy trì cường độ hoạt động liên tục ở các giải đấu lớn, trong khi các cựu binh (34 - 38 tuổi) đòi hỏi ban huấn luyện đối phương phải cảnh giác cao độ trong các pha cố định và khoảnh khắc sơ hở của hàng thủ.
