@@ -46,10 +46,10 @@ Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md
 | [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 2 - PHÂN TÍCH ĐỐI ĐẦU TRỰC TIẾP GIỮA CÁC CLB (Font: 20pt Bold, Center)        |
 | Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
 +-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Trận Chạm Trán] | [Card 2: Tổng Bàn Thắng]   | [Card 3: Tổng Thẻ Vàng]    | [Card 4: Tổng Phút Đối Đầu]       |
-| Callout: 35pt Bold            | Callout: 35pt Bold         | Callout: 35pt Bold         | Callout: 35pt Bold (Millions)     |
-| Nền: Pastel Blue #EFF6FF      | Nền: Pastel Green #F0FDF4  | Nền: Pastel Amber #FFFBEB  | Nền: Pastel Purple #FAF5FF        |
-| (W: 455, H: 95, X: 20)        | (W: 455, H: 95, X: 495)    | (W: 455, H: 95, X: 970)    | (W: 455, H: 95, X: 1445)          |
+| [Card 1: Distinct Matches]    | [Card 2: Total Goals]       | [Card 3: Total Assists]     | [Card 4: Goal Contributions]       |
+| Callout: 35pt Bold (6,965)    | Callout: 35pt Bold (19.17K) | Callout: 35pt Bold (14.74K) | Callout: 35pt Bold (33.91K)        |
+| Nền: Pastel Blue #EFF6FF      | Nền: Pastel Green #F0FDF4   | Nền: Pastel Amber #FFFBEB   | Nền: Pastel Purple #FAF5FF         |
+| (W: 455, H: 95, X: 20)        | (W: 455, H: 95, X: 495)     | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)           |
 +-------------------------------+----------------------------+----------------------------+-----------------------------------+
 | [Slicer 1: Giải đấu]          | [Slicer 2: CLB Chủ quản]   | [Slicer 3: Mùa giải]       | [Slicer 4: Tháng thi đấu]         |
 | (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
@@ -119,23 +119,23 @@ Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều 
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Green **`#F0FDF4`**, Viền `#86EFAC`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 495 px`, `Y = 95 px`.
 
-#### 3. Card 3: Tổng số Thẻ Vàng Đối đầu (Total Yellow Cards in Head-to-Head)
+#### 3. Card 3: Tổng số Pha Kiến tạo Đối đầu (Total Assists)
 * Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Yellow Cards]`** vào ô **Fields** (thể hiện tính quyết liệt của các cuộc chạm trán).
+* Kéo thước đo **`[Measures].[Assists]`** vào ô **Fields** (nhận diện những chuyên gia dọn cỗ / ngòi nổ chuyền bóng nguy hiểm nhất của các đội).
 * **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Số thẻ vàng`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG THẺ VÀNG ĐỐI ĐẦU`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#92400E`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
+  * Tùy chọn Tiếng Anh: **`Total Assists`** (hoặc Tiếng Việt: **`Tổng kiến tạo`**).
+* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG KIẾN TẠO ĐỐI ĐẦU (ASSISTS)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#92400E`.
+* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`, Display units chọn **`Auto`** (hiển thị `14.74K`). **Category label**: Tắt **Off**.
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Amber **`#FFFBEB`**, Viền `#FCD34D`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 970 px`, `Y = 95 px`.
 
-#### 4. Card 4: Tổng Thời lượng Thi đấu Đối đầu (Total Minutes Played)
+#### 4. Card 4: Tổng Điểm Sát thương Đóng góp Bàn thắng (Total Goal Contributions = Goals + Assists)
 * Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Minutes Played]`** vào ô **Fields**.
+* Kéo thước đo **`[Measures].[Goal Contributions]`** vào ô **Fields** (thước đo tổng hỏa lực thực tế của các ngôi sao tấn công khi chạm trán đối thủ).
 * **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Tổng số phút`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG THỜI LƯỢNG THI ĐẤU ĐỐI ĐẦU`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#5B21B6`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`, Display units chọn **`Millions`** (hoặc `Auto`). **Category label**: Tắt **Off**.
+  * Tùy chọn Tiếng Anh: **`Goal Contributions`** (hoặc Tiếng Việt: **`Tổng đóng góp G+A`**).
+* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG ĐÓNG GÓP HỎA LỰC (G+A)`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#5B21B6`.
+* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`, Display units chọn **`Auto`** (hiển thị `33.91K`). **Category label**: Tắt **Off**.
 * Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Purple **`#FAF5FF`**, Viền `#D8B4FE`, Bo góc `10 px`.
 * **Properties:** `W = 455 px`, `H = 95 px`, `X = 1445 px`, `Y = 95 px`.
 
@@ -279,12 +279,12 @@ Sử dụng visual **Table (Bảng phẳng danh mục)** thay thế cho bảng m
   3. Kéo thước đo **`[Measures].[Goals]`**.
   4. Kéo thước đo **`[Measures].[Yellow Cards]`**.
 
-#### 2. Phần đặt tên chuẩn tiếng Việt (Rename for this visual):
+#### 2. Phần đặt tên nhãn cột (Rename for this visual):
 * Nhấp chuột phải vào từng trường trong ô Columns $\rightarrow$ chọn **Rename for this visual**:
-  * `DIM Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Chủ quản`**
-  * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên thành: **`CLB Đối thủ`**
-  * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng`**
-  * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
+  * `DIM Club [Club Name]` $\rightarrow$ Đổi tên: **`Club Name`** (hoặc Tiếng Việt: `CLB Chủ quản`)
+  * `Opponent Club [Club Name]` $\rightarrow$ Đổi tên: **`Opponent Club`** (hoặc Tiếng Việt: `CLB Đối thủ` - tránh bị trùng tên `Club Name`)
+  * `Goals` (hoặc `Goal Contributions`) $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `Bàn thắng`)
+  * `Yellow Cards` $\rightarrow$ Đổi tên: **`Yellow Cards`** (hoặc `Thẻ vàng`)
 
 #### 3. Bật thanh dữ liệu Data Bars trực quan cho cột Bàn thắng (Tab Format visual $\rightarrow$ Cell elements):
 * Nhấp chọn bảng Table $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Cell elements**:
