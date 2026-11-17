@@ -738,6 +738,17 @@ CREATE MEMBER CURRENTCUBE.[Measures].[Pct Of England Goals]
     [Measures].[Goals] / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
 ), 
 FORMAT_STRING = "0.00%", 
+VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf'; 
+
+-- Thước đo cho Báo biểu 1: Tổng số Huấn luyện viên trưởng
+CREATE MEMBER CURRENTCUBE.[Measures].[Total Coaches]
+ AS DISTINCTCOUNT(
+    EXCEPT(
+        EXISTING [DIM Club].[Coach Name].[Coach Name].MEMBERS,
+        { [DIM Club].[Coach Name].[Unknown Coach] }
+    )
+), 
+FORMAT_STRING = "#,##0", 
 VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf'; </Text>
         </Command>
       </Commands>
