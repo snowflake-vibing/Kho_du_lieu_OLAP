@@ -24,7 +24,10 @@ Báo biểu được thiết kế theo chuẩn **Dashboard Doanh nghiệp & Nghi
        * *Góc III (Bottom-Right) - Nhạc trưởng kiến tạo (Master Playmakers):* Kiến tạo dồi dào, điều tiết nhịp độ tấn công (Kevin De Bruyne, Bruno Fernandes).
        * *Góc IV (Bottom-Left) - Cầu thủ hỗ trợ / Luân phiên thi đấu (Rotational Squad).*
   4. **Biểu đồ Nâng cao 2: Bản đồ Phân tầng Đa cấp (Hierarchical Treemap Drill-down):** Phân tích cơ cấu đóng góp bàn thắng (Part-to-Whole Composition) phân cấp đa tầng từ Giải đấu (`Competition Name`) -> Vị trí thi đấu (`Main Position`) -> Câu lạc bộ (`Club Name`), hỗ trợ tính năng khoan sâu (Drill-down) trực quan, tương thích tuyệt đối 100% với Live Connection tới SSAS Multidimensional Cube (loại bỏ hoàn toàn lỗi AI query của Decomposition Tree).
-  5. **Bảng Ma trận Tra cứu Đa cấp Tích hợp Mini Data Bars (Executive Matrix):** Trải rộng toàn bộ nửa dưới dashboard, tích hợp thanh đo dữ liệu trực quan (**Data Bars**) ngay trong ô số liệu, định dạng xen kẽ dòng Zebra Striping, hiển thị rõ ràng thông tin chi tiết của từng cầu thủ theo CLB mà không có bất kỳ dấu ba chấm (`...`) nào.
+  5. **Báo cáo Phân nhóm & Tổng hợp Đa cấp (Grouping and Totals Matrix Visual - Đạt chuẩn 100% Yêu cầu Đồ án):**
+     * Đáp ứng trọn vẹn yêu cầu tiên quyết của đồ án môn học: *"Mỗi công cụ thực hiện tối thiểu 3 report, trong đó có 1 report dạng Grouping and Totals"*.
+     * Cấu trúc phân nhóm phân cấp 3 tầng (3-Level Hierarchical Grouping): **Giải đấu (`Competition Name`) $\rightarrow$ Câu lạc bộ (`Club Name`) $\rightarrow$ Cầu thủ (`Player Name`)**.
+     * Kích hoạt đầy đủ các dòng **Tổng phụ (Subtotals)** cho từng Câu lạc bộ và từng Giải đấu, cùng dòng **Tổng cộng toàn cục (Grand Total)** ở đáy bảng, tích hợp thanh tiến độ trực quan **Data Bars** trong cột đóng góp bàn thắng.
   6. **Hệ thống Lọc Thông minh (Smart Slicers):** Mùa giải (`Season`), Giải đấu (`Competition Name`), Vị trí thi đấu (`Main Position`).
 
 ---
@@ -67,10 +70,11 @@ Tuân thủ nghiêm ngặt **Quy tắc Bố cục Phân tầng**: Phần trên c
 | Trục Y (Navy Blue #0D47A1), Trục X (Forest Green #1B5E20)| 2 Đường phân chia Trung vị (Median Reference Lines)           |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | BẢN ĐỒ PHÂN TẦNG TREEMAP (18pt)]     | [Ô 4: DƯỚI - PHẢI | BẢNG MA TRẬN ĐA CẤP (MATRIX - 18pt)]      |
-| Bản đồ phân tầng tỷ trọng Đóng góp Bàn thắng (Treemap)    | Bảng tra cứu phong độ chi tiết từng Cầu thủ theo CLB          |
-| Phân cấp Drill-down: Giải đấu -> Vị trí -> CLB            | Tích hợp Mini Data Bars & Heatmap, Stepped Layout = Off       |
-| Tọa độ: X = 20 px, Y = 695 px | W = 1233 px, H = 385 px | Tọa độ: X = 1276 px, Y = 695 px | W = 624 px, H = 385 px      |
+| [Ô 3: DƯỚI - TRÁI | BẢN ĐỒ PHÂN TẦNG TREEMAP (18pt)]     | [Ô 4: DƯỚI - PHẢI | GROUPING & TOTALS MATRIX (18pt)]           |
+| Bản đồ phân tầng tỷ trọng Đóng góp Bàn thắng (Treemap)    | Báo cáo Phân nhóm & Tổng hợp Đa cấp (Grouping & Totals)       |
+| Phân cấp Drill-down: Giải đấu -> Vị trí -> CLB            | Phân cấp: Giải đấu -> CLB -> Cầu thủ                          |
+| Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px   | Subtotals: ON (Tổng CLB & Giải) | Grand Total: ON (Tổng toàn) |
+|                                                           | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
 +---------------------------------------------------------+---------------------------------------------------------------+
 ```
 
@@ -277,60 +281,69 @@ Tạo 4 thẻ Card đặt thẳng hàng ngang tại `Vertical = 95 px`, chiều 
 
 ---
 
-### Bước 9: Tạo Bảng Tra cứu Phong độ Đóng góp Chi tiết Cầu thủ (Ô 4: Dưới - Phải)
-Tại ô này, bạn có 2 cách thực hiện (Khuyến nghị **Cách 1 dùng Table** phẳng 100% cực nhanh, hoặc **Cách 2 dùng Matrix** chuẩn OLAP):
+### Bước 9: Thiết lập Báo cáo Phân nhóm & Tổng hợp Đa cấp (Grouping and Totals Matrix Visual) (Ô 4: Dưới - Phải)
 
-#### CÁCH 1 (KHUYẾN NGHỊ - CỰC NHANH & DỄ): Sử dụng visual Bảng phẳng (Table)
-1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Table** (Bảng dữ liệu phẳng, biểu tượng lưới bảng đơn giản nằm ngay bên trái Matrix).
-2. Thiết lập kích thước: `Width = 624 px` (hoặc mở rộng `850 px`), `Height = 385 px`, `X = 1276 px`, `Y = 695 px`.
-3. Kéo thả tất cả các trường vào duy nhất 1 ô **Columns**:
-   1. `DIM Player [Player Name]`
-   2. `DIM Player [Main Position]`
-   3. `DIM Club [Club Name]`
-   4. `FACT Player Match Perf [Minutes Played]`
-   5. `FACT Player Match Perf [Goals]`
-   6. `FACT Player Match Perf [Assists]`
-   7. `FACT Player Match Perf [Goal Contributions]`
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * Nhấp chuột phải vào từng trường trong ô Columns (hoặc Values) $\rightarrow$ chọn **Rename for this visual**:
-     * `Player Name` $\rightarrow$ Đổi tên thành: **`Cầu thủ`**
-     * `Main Position` $\rightarrow$ Đổi tên thành: **`Vị trí`**
-     * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
-     * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Số phút thi đấu`**
-     * `Goals` $\rightarrow$ Đổi tên thành: **`Bàn thắng`**
-     * `Assists` $\rightarrow$ Đổi tên thành: **`Kiến tạo`**
-     * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Tổng G+A`**
-5. *Ưu điểm:* Bảng tự động hiển thị từng cột phẳng riêng biệt song song, không bao giờ bị ẩn cột hay phải nhấp mở rộng.
+> [!IMPORTANT]
+> **TIÊU CHÍ CHẤM ĐIỂM BẮT BUỘC - BÁO CÁO GROUPING & TOTALS:**
+> * Đây là thành phần đáp ứng trực tiếp yêu cầu đề bài: *"Mỗi công cụ thực hiện tối thiểu 3 report, trong đó có 1 report dạng Grouping and Totals"*.
+> * Visual **Matrix** được cấu hình phân nhóm 3 tầng tự nhiên: **Giải đấu (`Competition Name`) $\rightarrow$ Câu lạc bộ (`Club Name`) $\rightarrow$ Cầu thủ (`Player Name`)**.
+> * Kích hoạt đầy đủ các dòng **Subtotals** (tính tổng số bàn thắng, kiến tạo cho từng CLB và từng Giải đấu) và dòng **Grand Total** (tổng cộng toàn bộ châu Âu) ở đáy ma trận.
 
-#### CÁCH 2: Nếu giữ visual Ma trận đa cấp (Matrix)
-1. Giữ visual **Matrix**:
-   * **Rows:** Kéo `DIM Player [Player Name]`, `DIM Player [Main Position]`, `DIM Club [Club Name]`.
-   * **Values:** Kéo `[Measures].[Minutes Played]`, `[Measures].[Goals]`, `[Measures].[Assists]`, `[Measures].[Goal Contributions]`.
-2. **Cách bung toàn bộ các cột ra hiển thị (không bị ẩn):**
-   * Nhấp chọn vào bảng Matrix trên trang Canvas.
-   * Nhìn lên góc trên (thanh công cụ nhỏ màu xám xuất hiện ở mép trên bảng): Nhấp 2 lần vào biểu tượng **mũi tên phân nhánh (⑂)** có tên là *"Expand all down one level in the hierarchy"*. Lập tức bảng sẽ bung trọn vẹn cả 3 cột `Cầu thủ`, `Vị trí` và `Câu lạc bộ` thành các cột độc lập!
-   * Trong tab **Format visual** -> **Row headers** -> **Options** -> đảm bảo tắt **Stepped layout: Off** để các cột không bị thụt lề dồn vào 1 cột.
-   * **Subtotals:** Tắt **Row subtotals: Off** và **Column subtotals: Off** để bảng phẳng và gọn.
+#### 1. Thêm visual Matrix và Cấu hình trường dữ liệu:
+1. Tại khung **Visualizations**, nhấp chọn biểu tượng **Matrix** (Ma trận phân cấp, nằm ngay bên cạnh biểu tượng Table).
+2. Kích thước & Tọa độ: `Width = 925 px`, `Height = 385 px`, `Horizontal = 975 px`, `Vertical = 695 px`.
+3. Kéo thả các trường dữ liệu:
+   * **Rows (Phân nhóm đa cấp - Grouping):** Kéo lần lượt 3 trường theo đúng thứ tự phân tầng từ lớn xuống nhỏ:
+     1. Mở bảng **`DIM Competition`**, kéo thuộc tính **`[Competition Name]`** (Cấp 1: Phân nhóm Giải đấu).
+     2. Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** (Cấp 2: Phân nhóm Câu lạc bộ).
+     3. Mở bảng **`DIM Player`**, kéo thuộc tính **`[Player Name]`** (Cấp 3: Chi tiết Cầu thủ).
+   * **Values (Các chỉ số tổng hợp định lượng - Totals):** Kéo các thước đo Measure chuẩn từ Cube:
+     1. Kéo thước đo **`[Measures].[Goals]`** (Số bàn thắng ghi được).
+     2. Kéo thước đo **`[Measures].[Assists]`** (Số pha kiến tạo).
+     3. Kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng đóng góp G+A).
+     4. Kéo thước đo **`[Measures].[Minutes Played]`** (Tổng thời lượng thi đấu).
 
----
+#### 2. Kích hoạt Tính năng Phân nhóm và Tổng hợp (Grouping & Totals):
+1. **Bật Dòng Tổng phụ (Subtotals):**
+   * Nhấp chọn Matrix $\rightarrow$ vào tab **Format visual (Cọ vẽ)** $\rightarrow$ cuộn xuống mục **Subtotals**:
+   * Tại mục **Row subtotals**: Gạt công tắc sang **ON**!
+   * *Ý nghĩa:* Tự động sinh ra các dòng tổng phụ in đậm cho từng Câu lạc bộ và từng Giải đấu (ví dụ: dòng tổng bàn thắng của `Manchester City`, dòng tổng bàn thắng của `Premier League`).
+2. **Bật Dòng Tổng cộng toàn cục (Grand Total):**
+   * Trong mục Subtotals, cuộn xuống phần **Grand total**: Bật **Row grand total: ON**!
+   * *Ý nghĩa:* Hiển thị dòng tổng kết toàn bộ số liệu của tất cả các giải đấu ở đáy bảng.
+3. **Điều hướng hiển thị phân nhóm:**
+   * **Cách bung toàn bộ phân cấp (Expand all):** Nhấp chọn bảng Matrix, nhìn lên thanh công cụ nhỏ ở góc trên bên phải visual, nhấp 2 lần vào biểu tượng **mũi tên phân nhánh `⑂` (Expand all down one level in the hierarchy)** để bung trọn vẹn cả 3 cấp Giải đấu $\rightarrow$ CLB $\rightarrow$ Cầu thủ.
+   * **Tùy chọn Bố cục Bậc thang (Stepped Layout):**
+     * Vào tab **Format visual** $\rightarrow$ **Row headers** $\rightarrow$ mở rộng mục **Options**:
+       * *Nếu để Stepped layout = ON:* Bảng hiển thị dạng cây gập mở (Tree view) cực kỳ gọn gàng với các dấu cộng `+ / -` để người dùng chủ động bấm bung xem chi tiết từng đội.
+       * *Nếu để Stepped layout = OFF:* Bảng tự động dàn phẳng thành 3 cột độc lập riêng biệt (`Giải đấu`, `Câu lạc bộ`, `Cầu thủ`) kèm các dòng Subtotal xen kẽ.
 
-#### HƯỚNG DẪN BẬT MINI DATA BARS & HEATMAP (Tab Format visual -> Cell elements):
-*Trong giao diện Power BI Desktop mới, tính năng tô màu ô nằm tại mục **Cell elements**:*
-1. Nhấp chọn bảng (Table hoặc Matrix).
-2. Chuyển sang tab **Format visual** (biểu tượng Cọ vẽ) -> cuộn xuống tìm mục **Cell elements** (Phần tử ô):
-   * **Tạo thanh tiến độ Mini Data Bars cho cột Bàn thắng:**
-     * Tại mục **Select series** (Chọn chuỗi): Nhấp chọn cột `Goals` (hoặc `Bàn thắng`).
-     * Gạt công tắc **Data bars** sang **ON**! (Cột Bàn thắng lập tức xuất hiện thanh đo mini trực quan).
-     * Nhấp vào nút **`fx`** bên cạnh Data bars nếu muốn chọn màu thanh: chọn màu Xanh dương `#3B82F6` -> nhấp **OK**.
-   * **Tạo nền nhiệt Heatmap cho cột Tổng G+A:**
-     * Tại mục **Select series**: Chuyển sang chọn cột `Goal Contributions` (hoặc `Tổng G+A`).
-     * Gạt công tắc **Background color** sang **ON**!
-     * Nhấp vào nút **`fx`** bên cạnh Background color: chọn Format style là *Gradient*, màu từ trắng `#FFFFFF` sang vàng cam nhạt `#FEF3C7` -> nhấp **OK**.
+#### 3. Đổi tên nhãn cột hiển thị (Rename for this visual):
+* Nhấp chuột phải vào từng trường trong ô Rows / Values $\rightarrow$ chọn **Rename for this visual**:
+  * `Competition Name` $\rightarrow$ Đổi tên: **`Competition`** (hoặc `Giải đấu`)
+  * `Club Name` $\rightarrow$ Đổi tên: **`Club`** (hoặc `Câu lạc bộ`)
+  * `Player Name` $\rightarrow$ Đổi tên: **`Player`** (hoặc `Cầu thủ`)
+  * `Goals` $\rightarrow$ Đổi tên: **`Goals`** (hoặc `Bàn thắng`)
+  * `Assists` $\rightarrow$ Đổi tên: **`Assists`** (hoặc `Kiến tạo`)
+  * `Goal Contributions` $\rightarrow$ Đổi tên: **`Goal Contributions`** (hoặc `Tổng G+A`)
+  * `Minutes Played` $\rightarrow$ Đổi tên: **`Minutes Played`** (hoặc `Số phút`)
 
-3. **Định dạng chung:**
-   * **Title:** Bật **On**, nhập `Bảng tra cứu phong độ & đóng góp chi tiết từng cầu thủ theo câu lạc bộ`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **Values / Column headers:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, Text wrap **On**.
-   * Tab **General** -> **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+#### 4. Bật thanh dữ liệu Data Bars trực quan (Tab Format visual $\rightarrow$ Cell elements):
+* Vào tab **Format visual** $\rightarrow$ **Cell elements**:
+  * Tại ô **Select series**: Chọn `Goal Contributions` (hoặc `Goals`).
+  * Gạt công tắc **Data bars** sang **ON**!
+  * Nhấp nút **`fx`** bên cạnh Data bars:
+    * **Positive bar:** Chọn màu Xanh dương hiện đại **`#2563EB`**.
+    * **Bar direction:** Chọn `Left to right`.
+    * **Show bar only:** Để **Off** (hiển thị cả con số bên cạnh thanh).
+    * Nhấp **OK**.
+
+#### 5. Định dạng hiển thị chuẩn mực:
+* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Báo cáo Phân nhóm & Tổng hợp Hiệu suất Tấn công Đa cấp (Grouping & Totals)`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
+* **Row headers & Column headers:** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`, màu nền tiêu đề `#F1F5F9`.
+* **Values:** Font `Segoe UI`, Cỡ chữ **`12 pt`**, màu `#1E293B`.
+* **Subtotals formatting:** In đậm (**Bold**), màu nền dòng Subtotal xám nhạt `#E2E8F0` để phân biệt rõ ràng với các dòng chi tiết.
+* Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
 
