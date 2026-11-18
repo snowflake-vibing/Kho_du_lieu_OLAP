@@ -713,8 +713,12 @@ VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
 
 -- Thước đo cho Query 11: Đếm số trận đấu duy nhất
 CREATE MEMBER CURRENTCUBE.[Measures].[Distinct Matches Played]
- AS DISTINCTCOUNT(
-    EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
+ AS IIF(
+    IsEmpty([Measures].[FACT Player Match Perf Count]) OR [Measures].[FACT Player Match Perf Count] = 0,
+    NULL,
+    DISTINCTCOUNT(
+        EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
+    )
 ), 
 FORMAT_STRING = "#,##0", 
 VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf'; 
@@ -742,10 +746,14 @@ VISIBLE = 1 ,  ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
 
 -- Thước đo cho Báo biểu 1: Tổng số Huấn luyện viên trưởng
 CREATE MEMBER CURRENTCUBE.[Measures].[Total Coaches]
- AS DISTINCTCOUNT(
-    EXCEPT(
-        EXISTING [DIM Club].[Coach Name].[Coach Name].MEMBERS,
-        { [DIM Club].[Coach Name].[Unknown Coach] }
+ AS IIF(
+    IsEmpty([Measures].[FACT Player Match Perf Count]) OR [Measures].[FACT Player Match Perf Count] = 0,
+    NULL,
+    DISTINCTCOUNT(
+        EXCEPT(
+            EXISTING [DIM Club].[Coach Name].[Coach Name].MEMBERS,
+            { [DIM Club].[Coach Name].[Unknown Coach] }
+        )
     )
 ), 
 FORMAT_STRING = "#,##0", 
