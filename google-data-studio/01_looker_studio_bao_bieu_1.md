@@ -9,11 +9,11 @@
 ## 1. Mục tiêu Nghiệp vụ và Điểm nhấn Học thuật
 
 * **Đạt chuẩn 100% Tiêu chí Đồ án (Grouping and Totals Report):** Báo biểu 1 được thiết kế chuyên biệt để đáp ứng yêu cầu: *"Mỗi công cụ thực hiện tối thiểu 3 report, trong đó có 1 report dạng Grouping and Totals"*.
-* **Khai thác toàn bộ các trường dữ liệu MỚI 100%**: Sử dụng **`Coach_Name`** (Huấn luyện viên trưởng: Pep Guardiola, Xabi Alonso, Arteta...), **`Competition_Type`** (Cúp Châu Âu `international_cup` vs Giải Quốc nội `domestic_league`), **`Competition_Country`** (Quốc gia giải đấu), **`Quarter`** (Quý thi đấu) và thẻ chỉ số **`Total Coaches`** (`175` HLV), loại bỏ hoàn toàn cảm giác lặp lại các cột cũ ở Báo biểu 2 và 3.
+* **Khai thác toàn bộ các trường dữ liệu MỚI 100%**: Sử dụng **`Coach_Name`** (Huấn luyện viên trưởng: Pep Guardiola, Xabi Alonso, Arteta...), **`Competition_Type`** (Cúp Châu Âu `international_cup` vs Giải Quốc nội `domestic_league`), **`Competition_Country`** (Quốc gia giải đấu), **`Match_Round`** (Vòng đấu / Giai đoạn thi đấu từ `DIM_Game`), **`Quarter`** (Quý thi đấu) và thẻ chỉ số **`Total Coaches`** (`175` HLV), loại bỏ hoàn toàn cảm giác lặp lại các cột cũ ở Báo biểu 2 và 3.
 * **Cặp đôi tương tác hoàn hảo giữa Đồ họa Phân cấp (Chart) và Bảng Ma trận (Pivot Table):**
-  1. **Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp (Hierarchical Stacked Bar Chart with Drill-down):** Phân tầng cấu trúc giải đấu (`Competition_Type` $\rightarrow$ `Competition_Country` $\rightarrow$ `Competition_Name`), kích hoạt tính năng **Khoan sâu (Drill-down)** và tự động hiển thị **Nhãn dữ liệu (Data labels)** trên từng phân đoạn.
+  1. **Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp có Drill-down 4 Tầng (Hierarchical Stacked Bar Chart):** Phân tầng cấu trúc giải đấu và vòng đấu 4 cấp (`Competition_Type` $\rightarrow$ `Competition_Country` $\rightarrow$ `Competition_Name` $\rightarrow$ `Match_Round`), kích hoạt tính năng **Khoan sâu (Drill-down)** và tự động hiển thị **Nhãn dữ liệu (Data labels)** trên từng phân đoạn.
   2. **Visual 2 (Bên Phải) – Bảng Ma trận Phân nhóm & Tổng hợp theo HLV Trưởng (Grouping & Totals Pivot Table):** Phân nhóm 3 tầng `Huấn luyện viên trưởng` (`Coach_Name`) $\rightarrow$ `Câu lạc bộ` (`Club_Name`) $\rightarrow$ `Cầu thủ ghi bàn` (`Player_Name`), kích hoạt dòng **Tổng phụ (Subtotals)** cho từng HLV và dòng **Tổng cộng (Grand Total)** ở đáy bảng.
-* **Tính năng Tương tác Chéo (Cross-filtering):** Khi người xem nhấp chọn một giải đấu trên biểu đồ thanh bên trái (ví dụ `Premier League`), bảng Ma trận bên phải lập tức tự động lọc và bung ra toàn bộ các HLV đang cầm quân tại giải đấu đó kèm dàn học trò của họ.
+* **Tính năng Tương tác Chéo (Cross-filtering):** Khi người xem nhấp chọn một giải đấu hoặc vòng đấu trên biểu đồ thanh bên trái (ví dụ `uefa-champions-league` $\rightarrow$ `Final`), bảng Ma trận bên phải lập tức tự động lọc và bung ra các HLV cầm quân tại trận chung kết kèm dàn học trò của họ.
 
 ---
 
@@ -35,9 +35,9 @@
 +-------------------------------------------------------+-----------------------------------------------------------------+
 | [VISUAL 1: THANH XẾP CHỒNG PHÂN CẤP CÓ DRILL-DOWN]    | [VISUAL 2: PIVOT TABLE HUẤN LUYỆN VIÊN TRƯỞNG (18pt Bold)]      |
 | Biểu đồ Thanh ngang Phân cấp (Stacked Bar with Drill)  | Phân nhóm: Huấn luyện viên trưởng -> Câu lạc bộ -> Cầu thủ      |
-| Trục Y: Competition_Type -> Country -> Competition    | Rows: Coach_Name -> Club_Name -> Player_Name                    |
+| Trục Y: Competition_Type -> Country -> Competition -> Round | Rows: Coach_Name -> Club_Name -> Player_Name               |
 | Trục X: Goals (Xanh dương) + Assists (Xanh Cyan)      | Metrics: Goals, Assists, Goal_Contributions (Bar), Matches      |
-| Drill-down: BẬT ON (Khoan sâu Cúp -> Nước -> Giải)    | Subtotals: Bật ON (Dòng Tổng HLV) | Grand Total: Bật ON         |
+| Drill-down 4 cấp: Cúp -> Quốc gia -> Giải -> Vòng đấu | Subtotals: Bật ON (Dòng Tổng HLV) | Grand Total: Bật ON         |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 760 px| Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 760 px         |
 +-------------------------------------------------------+-----------------------------------------------------------------+
 ```
@@ -82,16 +82,17 @@ Menu **Thêm bộ điều khiển (Add a control)** $\rightarrow$ hàng `Y = 210
 
 ---
 
-### Bước 5: Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp Cấu trúc Giải đấu (Stacked Bar Chart with Drill-down)
+### Bước 5: Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp Cấu trúc Giải đấu & Vòng đấu (Stacked Bar Chart with 4-Level Drill-down)
 
 1. Menu **Thêm biểu đồ** $\rightarrow$ chọn **Biểu đồ thanh xếp chồng (Stacked bar chart)** (hoặc Biểu đồ cột xếp chồng).
 2. Tọa độ & Kích thước: `X = 20 px`, `Y = 300 px`, `Width = 925 px`, `Height = 760 px`.
 3. **Thiết lập dữ liệu (Setup):**
-   * **Phương diện (Dimension):** Kéo lần lượt 3 cấp phân loại:
+   * **Phương diện (Dimension):** Kéo lần lượt 4 cấp phân loại:
      1. `Competition_Type` (Cấp 1: Phân loại giải - *domestic_league vs international_cup*).
      2. `Competition_Country` (Cấp 2: Quốc gia giải đấu).
      3. `Competition_Name` (Cấp 3: Tên giải đấu cụ thể).
-   * **Khoan sâu (Drill-down):** Gạt công tắc sang **BẬT (ON)**! (Cho phép người dùng bấm vào thanh giải để khoan sâu từ Cúp xuống Quốc gia rồi xuống Giải đấu).
+     4. `Match_Round` (Cấp 4: Vòng đấu / Chặng thi đấu từ `DIM_Game` - *Group Stage, last 16, Quarter-Finals, Semi-Finals, Final hoặc Matchday 1..38*).
+   * **Khoan sâu (Drill-down):** Gạt công tắc sang **BẬT (ON)**! (Cho phép người dùng bấm vào thanh giải để khoan sâu từ Cúp $\rightarrow$ Quốc gia $\rightarrow$ Giải đấu $\rightarrow$ Vòng đấu).
    * **Chỉ số (Metrics):** Kéo 2 thước đo:
      1. `Goals` (SUM, Đổi tên: `Bàn thắng`).
      2. `Assists` (SUM, Đổi tên: `Kiến tạo`).
@@ -101,8 +102,8 @@ Menu **Thêm bộ điều khiển (Add a control)** $\rightarrow$ hàng `Y = 210
      * Chuỗi 1 (`Goals`): Xanh dương đậm `#2563EB`.
      * Chuỗi 2 (`Assists`): Xanh Cyan ngọc `#06B6D4`.
    * **Bật Nhãn dữ liệu (Show data labels):** Gạt sang **ON** để hiển thị rõ ràng giá trị số trên từng thanh.
-   * **Tương tác chéo:** Tích chọn **Áp dụng bộ lọc (Cross-filtering)** (Nhấp vào một thanh sẽ lọc toàn bộ trang và bảng HLV bên phải).
-   * Tiêu đề biểu đồ: `Phân bổ Hỏa lực Tấn công theo Cấu trúc Giải đấu (Tournament Hierarchy Drill-down)`.
+   * **Tương tác chéo:** Tích chọn **Áp dụng bộ lọc (Cross-filtering)** (Nhấp vào một thanh/vòng đấu sẽ lọc toàn bộ trang và bảng HLV bên phải).
+   * Tiêu đề biểu đồ: `Phân bổ Hỏa lực Tấn công theo Cấu trúc Giải đấu & Vòng đấu (Tournament Hierarchy & Match Round Drill-down)`.
    * Cỡ chữ tiêu đề: **`18 pt` Bold**, Màu `#0F172A`, Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
