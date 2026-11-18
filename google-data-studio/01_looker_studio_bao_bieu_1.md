@@ -10,10 +10,10 @@
 
 * **Đạt chuẩn 100% Tiêu chí Đồ án (Grouping and Totals Report):** Báo biểu 1 được thiết kế chuyên biệt để đáp ứng yêu cầu: *"Mỗi công cụ thực hiện tối thiểu 3 report, trong đó có 1 report dạng Grouping and Totals"*.
 * **Khai thác toàn bộ các trường dữ liệu MỚI 100%**: Sử dụng **`Coach_Name`** (Huấn luyện viên trưởng: Pep Guardiola, Xabi Alonso, Arteta...), **`Competition_Type`** (Cúp Châu Âu `international_cup` vs Giải Quốc nội `domestic_league`), **`Competition_Country`** (Quốc gia giải đấu), **`Quarter`** (Quý thi đấu) và thẻ chỉ số **`Total Coaches`** (`175` HLV), loại bỏ hoàn toàn cảm giác lặp lại các cột cũ ở Báo biểu 2 và 3.
-* **Cấu trúc 2 Bảng Tổng hợp Đa cấp (Dual Pivot Tables with Subtotals & Totals):** Toàn bộ phần thân trang được cấu thành bởi **2 Bảng tổng hợp phân cấp (Pivot Tables)** đặt song song đối xứng:
-  1. **Visual 1 (Bên Trái) – Grouping Cấu trúc Giải đấu:** Phân nhóm 3 tầng `Loại giải` (`Competition_Type`) $\rightarrow$ `Quốc gia` (`Competition_Country`) $\rightarrow$ `Tên giải đấu` (`Competition_Name`).
-  2. **Visual 2 (Bên Phải) – Grouping theo Huấn luyện viên trưởng:** Phân nhóm 3 tầng `Huấn luyện viên trưởng` (`Coach_Name`) $\rightarrow$ `Câu lạc bộ` (`Club_Name`) $\rightarrow$ `Cầu thủ ghi bàn` (`Player_Name`).
-* **Tính năng Tổng hợp:** Cả 2 bảng đều kích hoạt đầy đủ dòng **Tổng phụ (Subtotals)** cho từng cấp nhóm và dòng **Tổng cộng (Grand Total)** ở đáy bảng, kèm tính năng tương tác chéo (Cross-filtering) mượt mà.
+* **Cặp đôi tương tác hoàn hảo giữa Đồ họa Phân cấp (Chart) và Bảng Ma trận (Pivot Table):**
+  1. **Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp (Hierarchical Stacked Bar Chart with Drill-down):** Phân tầng cấu trúc giải đấu (`Competition_Type` $\rightarrow$ `Competition_Country` $\rightarrow$ `Competition_Name`), kích hoạt tính năng **Khoan sâu (Drill-down)** và tự động hiển thị **Nhãn dữ liệu (Data labels)** trên từng phân đoạn.
+  2. **Visual 2 (Bên Phải) – Bảng Ma trận Phân nhóm & Tổng hợp theo HLV Trưởng (Grouping & Totals Pivot Table):** Phân nhóm 3 tầng `Huấn luyện viên trưởng` (`Coach_Name`) $\rightarrow$ `Câu lạc bộ` (`Club_Name`) $\rightarrow$ `Cầu thủ ghi bàn` (`Player_Name`), kích hoạt dòng **Tổng phụ (Subtotals)** cho từng HLV và dòng **Tổng cộng (Grand Total)** ở đáy bảng.
+* **Tính năng Tương tác Chéo (Cross-filtering):** Khi người xem nhấp chọn một giải đấu trên biểu đồ thanh bên trái (ví dụ `Premier League`), bảng Ma trận bên phải lập tức tự động lọc và bung ra toàn bộ các HLV đang cầm quân tại giải đấu đó kèm dàn học trò của họ.
 
 ---
 
@@ -33,11 +33,11 @@
 | Season (Dropdown)         | Competition_Type (Drop)   | Competition_Country (Drop)| Quarter (Dropdown)                |
 | (W: 455, H: 75, X: 20)    | (W: 455, H: 75, X: 495)   | (W: 455, H: 75, X: 970)   | (W: 455, H: 75, X: 1445)          |
 +-------------------------------------------------------+-----------------------------------------------------------------+
-| [VISUAL 1: PIVOT TABLE CẤU TRÚC GIẢI ĐẤU (18pt Bold)] | [VISUAL 2: PIVOT TABLE HUẤN LUYỆN VIÊN TRƯỞNG (18pt Bold)]      |
-| Phân nhóm: Loại giải -> Quốc gia -> Tên giải đấu      | Phân nhóm: Huấn luyện viên trưởng -> Câu lạc bộ -> Cầu thủ      |
-| Rows: Competition_Type -> Country -> Competition_Name | Rows: Coach_Name -> Club_Name -> Player_Name                    |
-| Metrics: Số trận, Bàn thắng, Kiến tạo, Tổng G+A (Bar) | Metrics: Bàn thắng, Kiến tạo, Tổng G+A (Bar), Số trận           |
-| Subtotals: Bật ON | Grand Total: Bật ON               | Subtotals: Bật ON (Dòng Tổng HLV) | Grand Total: Bật ON         |
+| [VISUAL 1: THANH XẾP CHỒNG PHÂN CẤP CÓ DRILL-DOWN]    | [VISUAL 2: PIVOT TABLE HUẤN LUYỆN VIÊN TRƯỞNG (18pt Bold)]      |
+| Biểu đồ Thanh ngang Phân cấp (Stacked Bar with Drill)  | Phân nhóm: Huấn luyện viên trưởng -> Câu lạc bộ -> Cầu thủ      |
+| Trục Y: Competition_Type -> Country -> Competition    | Rows: Coach_Name -> Club_Name -> Player_Name                    |
+| Trục X: Goals (Xanh dương) + Assists (Xanh Cyan)      | Metrics: Goals, Assists, Goal_Contributions (Bar), Matches      |
+| Drill-down: BẬT ON (Khoan sâu Cúp -> Nước -> Giải)    | Subtotals: Bật ON (Dòng Tổng HLV) | Grand Total: Bật ON         |
 | Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 760 px| Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 760 px         |
 +-------------------------------------------------------+-----------------------------------------------------------------+
 ```
@@ -82,32 +82,32 @@ Menu **Thêm bộ điều khiển (Add a control)** $\rightarrow$ hàng `Y = 210
 
 ---
 
-### Bước 5: Visual 1 (Bên Trái) – Pivot Table Phân nhóm Cấu trúc Giải đấu (Loại giải $\rightarrow$ Quốc gia $\rightarrow$ Tên giải)
+### Bước 5: Visual 1 (Bên Trái) – Biểu đồ Thanh Xếp chồng Phân cấp Cấu trúc Giải đấu (Stacked Bar Chart with Drill-down)
 
-1. Menu **Thêm biểu đồ** $\rightarrow$ chọn **Bảng tổng hợp có tổng phụ (Pivot table with subtotals)**.
+1. Menu **Thêm biểu đồ** $\rightarrow$ chọn **Biểu đồ thanh xếp chồng (Stacked bar chart)** (hoặc Biểu đồ cột xếp chồng).
 2. Tọa độ & Kích thước: `X = 20 px`, `Y = 300 px`, `Width = 925 px`, `Height = 760 px`.
 3. **Thiết lập dữ liệu (Setup):**
-   * **Phương diện hàng (Row Dimensions - Grouping):** Kéo lần lượt 3 trường:
+   * **Phương diện (Dimension):** Kéo lần lượt 3 cấp phân loại:
      1. `Competition_Type` (Cấp 1: Phân loại giải - *domestic_league vs international_cup*).
      2. `Competition_Country` (Cấp 2: Quốc gia giải đấu).
      3. `Competition_Name` (Cấp 3: Tên giải đấu cụ thể).
-   * **Phương diện cột:** Để trống.
-   * **Chỉ số (Metrics - Totals):** Kéo các thước đo:
-     1. `Appearance_ID` (COUNT_DISTINCT, Đổi tên: `Số trận`).
-     2. `Goals` (SUM, Đổi tên: `Bàn thắng`).
-     3. `Assists` (SUM, Đổi tên: `Kiến tạo`).
-     4. `Goal_Contributions` (SUM, Đổi tên: `Tổng G+A`).
-4. **Kích hoạt Grouping & Totals trong thẻ Kiểu (Style):**
-   * **Bật Dòng Tổng phụ (Show subtotals):** Gạt sang **ON**! (Tự động hiển thị dòng tổng số bàn thắng, kiến tạo cho từng Loại giải và từng Quốc gia).
-   * **Bật Dòng Tổng cộng toàn bộ (Show grand total / Summary row):** Gạt sang **ON**! (Hiển thị dòng Tổng cộng toàn bộ châu Âu ở đáy bảng).
-   * **Thanh dữ liệu trực quan:** Tại cột `Goal_Contributions`, chọn định dạng hiển thị là **Thanh (Bar)** màu xanh dương `#2563EB`.
-   * **Tương tác chéo:** Tích chọn **Áp dụng bộ lọc (Cross-filtering)**.
-   * Tiêu đề bảng: `Báo cáo Phân nhóm Cấu trúc Giải đấu & Hỏa lực (Tournament Hierarchy)`.
-   * Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+   * **Khoan sâu (Drill-down):** Gạt công tắc sang **BẬT (ON)**! (Cho phép người dùng bấm vào thanh giải để khoan sâu từ Cúp xuống Quốc gia rồi xuống Giải đấu).
+   * **Chỉ số (Metrics):** Kéo 2 thước đo:
+     1. `Goals` (SUM, Đổi tên: `Bàn thắng`).
+     2. `Assists` (SUM, Đổi tên: `Kiến tạo`).
+   * **Sắp xếp (Sort):** Sắp xếp theo `Goals` Giảm dần (Descending).
+4. **Định dạng hiển thị trong thẻ Kiểu (Style):**
+   * **Chuỗi màu:**
+     * Chuỗi 1 (`Goals`): Xanh dương đậm `#2563EB`.
+     * Chuỗi 2 (`Assists`): Xanh Cyan ngọc `#06B6D4`.
+   * **Bật Nhãn dữ liệu (Show data labels):** Gạt sang **ON** để hiển thị rõ ràng giá trị số trên từng thanh.
+   * **Tương tác chéo:** Tích chọn **Áp dụng bộ lọc (Cross-filtering)** (Nhấp vào một thanh sẽ lọc toàn bộ trang và bảng HLV bên phải).
+   * Tiêu đề biểu đồ: `Phân bổ Hỏa lực Tấn công theo Cấu trúc Giải đấu (Tournament Hierarchy Drill-down)`.
+   * Cỡ chữ tiêu đề: **`18 pt` Bold**, Màu `#0F172A`, Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
 
-### Bước 6: Visual 2 (Bên Phải) – Pivot Table Phân nhóm theo Huấn Luyện Viên Trưởng (HLV $\rightarrow$ CLB $\rightarrow$ Cầu thủ)
+### Bước 6: Visual 2 (Bên Phải) – Bảng Ma trận Phân nhóm theo Huấn Luyện Viên Trưởng (HLV $\rightarrow$ CLB $\rightarrow$ Cầu thủ)
 
 1. Menu **Thêm biểu đồ** $\rightarrow$ chọn **Bảng tổng hợp có tổng phụ (Pivot table with subtotals)**.
 2. Tọa độ & Kích thước: `X = 975 px`, `Y = 300 px`, `Width = 925 px`, `Height = 760 px`.
@@ -121,19 +121,20 @@ Menu **Thêm bộ điều khiển (Add a control)** $\rightarrow$ hàng `Y = 210
      1. `Goals` (SUM, Đổi tên: `Bàn thắng`).
      2. `Assists` (SUM, Đổi tên: `Kiến tạo`).
      3. `Goal_Contributions` (SUM, Đổi tên: `Tổng G+A`).
-     4. `Appearance_ID` (COUNT_DISTINCT, Đổi tên: `Số trận cầm quân`).
+     4. `Appearance_ID` (COUNT_DISTINCT, Đổi tên: `Số trận`).
 4. **Kích hoạt Grouping & Totals trong thẻ Kiểu (Style):**
    * **Bật Dòng Tổng phụ (Show subtotals):** Gạt sang **ON**! (Tự động hiển thị dòng tổng cho từng Huấn luyện viên trưởng).
-   * **Bật Dòng Tổng cộng toàn bộ (Show grand total):** Gạt sang **ON**!
+   * **Bật Dòng Tổng cộng toàn bộ (Show grand total):** Gạt sang **ON**! (Dòng tổng cộng toàn diện ở đáy bảng).
    * **Thanh dữ liệu trực quan:** Tại cột `Goal_Contributions`, chọn định dạng **Thanh (Bar)** màu xanh dương `#2563EB`.
    * **Tương tác chéo:** Tích chọn **Áp dụng bộ lọc (Cross-filtering)**.
    * Tiêu đề: `Báo cáo Phân nhóm Hiệu suất Tấn công theo Huấn Luyện Viên Trưởng (Head Coach Analytics)`.
-   * Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+   * Cỡ chữ tiêu đề: **`18 pt` Bold**, Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
 
 ---
 
 ## 4. Kết quả Nghiệm thu và Tương tác Chéo
 
-1. **Khẳng định tính chất Grouping & Totals:** Cả 2 visual đều là bảng phân nhóm đa tầng có tính năng gập mở, có đầy đủ các dòng Subtotals in đậm rõ ràng và dòng Grand Total ở đáy trang.
-2. **Khả năng tương tác chéo (Cross-filtering):** Khi người xem nhấp vào giải đấu `Premier League` ở bảng bên trái, bảng bên phải lập tức tự động lọc và hiển thị ngay các Huấn luyện viên đang cầm quân tại Ngoại Hạng Anh (*Pep Guardiola, Mikel Arteta, Jürgen Klopp...*) cùng thành tích và dàn học trò của họ.
-3. **Tuyệt đối không trùng lặp:** Khai thác toàn diện các góc nhìn mới về cấu trúc giải đấu (`Competition_Type`, `Competition_Country`) và nhà cầm quân (`Coach_Name`, `Total Coaches = 175`).
+1. **Đáp ứng hoàn hảo chuẩn mực Grouping & Totals:** Bảng Ma trận HLV Visual 2 sở hữu tính năng phân nhóm đa cấp độ sâu 3 tầng, hiển thị đầy đủ dòng Subtotals cho từng nhà cầm quân và Grand Total ở đáy trang.
+2. **Trải nghiệm trực quan cân đối, không trùng lặp dạng hiển thị:** Bên trái là đồ họa trực quan (Stacked Bar Chart with Drill-down) giúp quan sát tỷ trọng và khoan sâu cấu trúc giải; bên phải là bảng dữ liệu chi tiết đa cấp (Grouping & Totals Matrix), tạo nên cặp đôi thị giác cân bằng, sinh động.
+3. **Khả năng tương tác chéo (Cross-filtering):** Khi người xem nhấp vào giải đấu `Premier League` ở biểu đồ bên trái, bảng bên phải lập tức tự động lọc và hiển thị ngay các Huấn luyện viên đang cầm quân tại Ngoại Hạng Anh (*Pep Guardiola, Mikel Arteta, Arne Slot...*) cùng thành tích và dàn học trò của họ.
+4. **Bộ trường dữ liệu hoàn toàn mới lạ:** Khai thác triệt để `Coach_Name`, `Total Coaches = 175`, `Competition_Type`, `Competition_Country`, `Quarter`, hoàn toàn độc lập và không tái sử dụng cụm thông tin của Báo biểu 2 và Báo biểu 3.
