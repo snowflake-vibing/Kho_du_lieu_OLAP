@@ -2,7 +2,7 @@
 
 ### 4.2.1 Báo biểu 1
 
-**Nội dung:** Thống kê tổng hợp quy mô tổ chức thi đấu, số lượng huấn luyện viên và hiệu suất tấn công gồm Bàn thắng và Kiến tạo theo cấu trúc phân cấp giải đấu từ Loại giải đấu, Quốc gia, Tên giải đấu đến Vòng đấu, kết hợp theo tiến trình thời gian từ Năm, Quý, Tháng đến Ngày và tương quan với tổng thời lượng thi đấu trên sân.
+**Nội dung:** Thống kê tổng hợp quy mô tổ chức thi đấu, số lượng huấn luyện viên, hiệu suất tấn công gồm Bàn thắng và Kiến tạo theo cấu trúc phân cấp giải đấu từ Loại giải đấu, Quốc gia, Tên giải đấu đến Vòng đấu, kết hợp tiến trình thời gian từ Năm, Quý, Tháng đến Ngày, đồng thời xây dựng ma trận phân nhóm tổng hợp từ Giải đấu, Câu lạc bộ đến từng Cầu thủ kèm các chỉ số thi đấu và thẻ phạt.
 
 **Bước 1:** Tại màn hình làm việc chính của phần mềm Power BI Desktop, trên thanh công cụ Home, nhấp chuột vào mục **Get data**.
 
@@ -24,11 +24,11 @@
 
 *Hình 4.14. Text box tiêu đề của Báo biểu 1*
 
-**Bước 6:** Kéo thả 4 thẻ chỉ số tổng quan dạng **Card** đặt thành một hàng ngang ngay dưới tiêu đề, lần lượt gán các thước đo từ nhóm `FACT Player Match Perf` vào ô **Fields**:
-* ● Card 1: Kéo thước đo **`Distinct Matches Played`** để hiển thị tổng số trận đấu.
-* ● Card 2: Kéo thước đo **`Total Coaches`** để hiển thị tổng số huấn luyện viên.
-* ● Card 3: Kéo thước đo **`Goals`** để hiển thị tổng số bàn thắng.
-* ● Card 4: Kéo thước đo **`Assists`** để hiển thị tổng số pha kiến tạo.
+**Bước 6:** Kéo thả 4 thẻ chỉ số tổng quan dạng **Card** đặt thành một hàng ngang ngay dưới tiêu đề, lần lượt gán các thước đo từ nhóm `FACT Player Match Perf` vào ô **Fields** và đặt Title tương ứng:
+* ● Card 1: Kéo thước đo **`Distinct Matches Played`**, đặt Title là `Matches Played`.
+* ● Card 2: Kéo thước đo **`Total Coaches`**, đặt Title là `Total Coaches`.
+* ● Card 3: Kéo thước đo **`Goals`**, đặt Title là `Goals`.
+* ● Card 4: Kéo thước đo **`Assists`**, đặt Title là `Assists`.
 
 *Hình 4.15. Cấu hình và kết quả hàng thẻ Card KPI của Báo biểu 1*
 
@@ -40,25 +40,34 @@
 
 *Hình 4.16. Cấu hình hàng Slicer bộ lọc tương tác của Báo biểu 1*
 
-**Bước 8:** Kéo thả một biểu đồ thanh ngang **Clustered bar chart** vào khu vực bên trái trang báo cáo và thiết lập các trường dữ liệu:
+**Bước 8:** Kéo thả một biểu đồ thanh ngang **Clustered bar chart** vào góc trên bên trái trang báo cáo và thiết lập các thông số:
 * ● Tại mục **Y-axis**, kéo lần lượt 4 thuộc tính theo thứ tự phân cấp: `DIM Competition.Competition Type`, `DIM Competition.Country Name`, `DIM Competition.Competition Name` và `DIM Game.Round` để hỗ trợ khoan sâu dữ liệu Drill Down qua 4 cấp độ.
 * ● Tại mục **X-axis**, kéo 2 thước đo **`Goals`** và **`Assists`** từ `FACT Player Match Perf`.
-* ● Bật **Data labels** để hiển thị trực tiếp số bàn thắng và kiến tạo trên từng thanh biểu đồ.
+* ● Sắp xếp giảm dần theo `Goals`, bật **Data labels** để hiển thị trực tiếp số liệu trên từng thanh và đặt Title là **`Thông tin ghi bàn theo giải đấu & vòng đấu`**.
 
 *Hình 4.17. Cấu hình các trục dữ liệu cho Clustered bar chart phân cấp giải đấu*
 
 *Hình 4.18. Kết quả biểu đồ Clustered bar chart của Báo biểu 1*
 
-**Bước 9:** Kéo thả một biểu đồ kết hợp **Line and stacked column chart** vào khu vực bên phải trang báo cáo và thiết lập các trường dữ liệu:
+**Bước 9:** Kéo thả một biểu đồ kết hợp **Line and stacked column chart** vào góc dưới bên trái trang báo cáo và thiết lập các thông số:
 * ● Tại mục **X-axis**, kéo lần lượt phân cấp thời gian từ `DIM Time`: `Year`, `Quarter`, `Month` và `Day`.
 * ● Tại mục **Column y-axis**, kéo 2 thước đo **`Goals`** và **`Assists`**.
 * ● Tại mục **Line y-axis**, kéo thước đo **`Minutes Played`** để biểu diễn tổng thời lượng thi đấu.
-* ● Mở rộng mục Format visual, bật **Secondary y-axis** để tách riêng thang đo thời lượng phút thi đấu với thang đo bàn thắng và kiến tạo.
+* ● Bật **Secondary y-axis** để tách riêng thang đo thời lượng phút thi đấu với thang đo bàn thắng và kiến tạo, đặt Title là **`Thông tin thi đấu và ghi bàn theo thời gian`**.
 
 *Hình 4.19. Cấu hình Line and stacked column chart chuỗi thời gian*
 
 *Hình 4.20. Kết quả biểu đồ kết hợp chuỗi thời gian của Báo biểu 1*
 
-**Bước 10:** Điều chỉnh lại vị trí, kích thước và căn lề các biểu đồ cho cân đối trên trang báo cáo, kiểm thử tính năng lọc chéo Cross-filtering giữa các bộ lọc Slicer và các biểu đồ.
+**Bước 10:** Kéo thả một bảng ma trận **Matrix** vào toàn bộ khu vực cột bên phải trang báo cáo để lập báo cáo dạng phân nhóm và tổng hợp Grouping and Totals:
+* ● Tại mục **Rows**, kéo lần lượt 3 cấp phân nhóm: **`DIM Competition.Competition Name`**, **`DIM Club.Club Name`** và **`DIM Player.Player Name`**.
+* ● Tại mục **Values**, kéo lần lượt 4 thước đo từ `FACT Player Match Perf`: **`Distinct Matches Played`**, **`Minutes Played`**, **`Red Cards`** và **`Yellow Cards`**.
+* ● Kích hoạt dòng **Row subtotals** và **Column grand totals** trong Format visual để tự động tính tổng theo từng giải đấu, từng câu lạc bộ và tổng toàn bảng, đặt Title là **`Ma trận phân nhóm theo giải đấu, câu lạc bộ và người chơi`**.
 
-*Hình 4.21. Kết quả hoàn chỉnh của Báo biểu 1*
+*Hình 4.21. Cấu hình Rows và Values cho bảng Matrix phân nhóm*
+
+*Hình 4.22. Kết quả bảng Matrix phân nhóm của Báo biểu 1*
+
+**Bước 11:** Điều chỉnh lại vị trí, kích thước và căn lề các biểu đồ cho cân đối trên trang báo cáo, kiểm thử tính năng lọc chéo Cross-filtering giữa các bộ lọc Slicer, biểu đồ giải đấu, chuỗi thời gian và bảng ma trận phân nhóm.
+
+*Hình 4.23. Kết quả hoàn chỉnh của Báo biểu 1*
