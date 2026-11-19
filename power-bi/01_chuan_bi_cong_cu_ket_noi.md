@@ -46,101 +46,41 @@ Power BI Desktop là công cụ phân tích và trực quan hóa dữ liệu kin
 
 ## 4.1.2 Chuẩn bị và trích xuất dữ liệu cho Google Data Studio (Looker Studio)
 
-Google Data Studio (nay là Looker Studio) là nền tảng báo cáo trực tuyến trên nền web của Google. Do hoạt động trên đám mây, Looker Studio cần kết nối dữ liệu thông qua tệp tin `.csv` được trích xuất từ cơ sở dữ liệu kho hoặc kết nối Cloud SQL.
+Google Data Studio (nay là **Looker Studio**) là nền tảng báo cáo trực tuyến trên đám mây của Google (`https://lookerstudio.google.com/`). Vì chạy trên cloud nên Looker Studio **không thể kết nối trực tiếp vào SQL Server `localhost`** trên máy cá nhân. Để tách biệt hoàn toàn với kho dữ liệu SSAS (`DW_Football_Transfermarkt`) và loại bỏ thao tác ghép bảng phức tạp trên web, dự án sử dụng một **Database SQL Server riêng biệt** là **`DW_Football_LookerStudio`** được khởi tạo từ script [setup_dw_football_looker_studio.sql](file:///d:/Kho_du_lieu_OLAP/warehouse-database/setup_dw_football_looker_studio.sql).
 
-### Bước 1: Kết nối SQL Server Database Engine
-1. Mở phần mềm **SQL Server Management Studio (SSMS)**.
-2. Trong cửa sổ **Connect to Server**:
-   * **Server type:** Chọn `Database Engine`.
-   * **Server name:** Chọn hoặc nhập tên máy chủ SQL Server cục bộ.
-   * **Authentication:** Chọn `Windows Authentication`.
-3. Nhấp nút **Connect**.
+### Bước 1: Khởi tạo (hoặc làm mới) Database riêng `DW_Football_LookerStudio`
+1. Mở phần mềm **SQL Server Management Studio (SSMS)** và kết nối tới `localhost` (Windows Authentication).
+2. Mở tệp [setup_dw_football_looker_studio.sql](file:///d:/Kho_du_lieu_OLAP/warehouse-database/setup_dw_football_looker_studio.sql) (hoặc chạy bằng `sqlcmd -S localhost -E -C -f 65001 -i warehouse-database\setup_dw_football_looker_studio.sql`) để tạo Database **`DW_Football_LookerStudio`** gồm 3 bảng chuẩn hóa sẵn cho Looker Studio:
+   * **`dbo.Looker_Football_Flat`** (`210,747` dòng): Bảng phẳng đầy đủ từng lượt ra sân, đã `JOIN` sẵn 5 bảng Dimension + `Opponent_Club_Name`, chuẩn hóa lại cờ `Is_Starter`/`Is_Home_Game` về `0/1` và tính sẵn các cột `Club_Country`, `Match_Venue`, `Lineup_Role`, `Appearances`.
+   * **`dbo.Looker_Player_Season_Summary`** (`13,493` dòng): Bảng tổng hợp theo Cầu thủ × CLB × Giải đấu × Mùa giải (nhẹ, tiện đưa lên Google Sheets).
+   * **`dbo.Looker_Club_Matchup_Summary`** (`6,827` dòng): Bảng tổng hợp đối đầu CLB × Đối thủ × Mùa giải.
 
 ---
 
-### Bước 2: Soạn thảo và thực thi câu lệnh SQL trích xuất dữ liệu bóng đá phẳng
-1. Trên thanh công cụ của SSMS, nhấp nút **New Query** (hoặc nhấn tổ hợp phím `Ctrl + N`).
-2. Tại hộp thoại chọn cơ sở dữ liệu ở góc trên bên trái, chọn đúng Database kho dữ liệu: `DW_Football`.
-3. Viết câu lệnh truy vấn `SELECT` kết hợp bảng Fact `FACT_Player_Match_Perf` và các bảng Dimension bằng mệnh đề `INNER JOIN` để tạo bảng dữ liệu phân tích bóng đá phẳng chứa đầy đủ các thuộc tính và thước đo:
+### Bước 2: Truy vấn dữ liệu từ `DW_Football_LookerStudio`
+1. Trong SSMS, mở **New Query** (`Ctrl + N`), chọn Database **`DW_Football_LookerStudio`**.
+2. Chạy câu lệnh đơn giản lấy toàn bộ bảng phẳng đã chuẩn bị sẵn:
 
 ```sql
--- ==============================================================================
--- TRÍCH XUẤT DỮ LIỆU PHẲNG PHỤC VỤ LẬP BÁO BIỂU LOOKER STUDIO
--- CSDL: DW_Football | Kho dữ liệu Bóng đá Châu Âu
--- ==============================================================================
-SELECT 
-    F.Appearance_ID,
-    -- Thông tin Cầu thủ
-    P.Player_ID,
-    P.Player_Name,
-    P.Age,
-    P.Main_Position,
-    P.Sub_Position,
-    P.Foot,
-    P.Height_In_Cm,
-    P.Country_Of_Citizenship AS Player_Country,
-    -- Thông tin Câu lạc bộ
-    C.Club_ID,
-    C.Club_Name,
-    C.Stadium_Name,
-    C.Stadium_Seats,
-    C.Coach_Name,
-    C.Squad_Size,
-    -- Thông tin Giải đấu
-    Comp.Competition_ID,
-    Comp.Competition_Name,
-    Comp.Country_Name AS Competition_Country,
-    Comp.Competition_Type,
-    -- Thông tin Thời gian
-    T.Time_ID,
-    T.Full_Date,
-    T.Year,
-    T.Quarter,
-    T.Month,
-    T.Day,
-    T.Season,
-    -- Thước đo hiệu suất thi đấu
-    F.Minutes_Played,
-    F.Goals,
-    F.Assists,
-    F.Goal_Contributions,
-    F.Yellow_Cards,
-    F.Red_Cards,
-    F.Is_Starter,
-    F.Is_Home_Game
-FROM FACT_Player_Match_Perf F
-INNER JOIN DIM_Player P ON F.Player_ID = P.Player_ID
-INNER JOIN DIM_Club C ON F.Club_ID = C.Club_ID
-INNER JOIN DIM_Competition Comp ON F.Competition_ID = Comp.Competition_ID
-INNER JOIN DIM_Time T ON F.Time_ID = T.Time_ID;
+SELECT * FROM dbo.Looker_Football_Flat;
 ```
 
-4. Nhấp nút **Execute** (hoặc nhấn phím `F5`) để thực thi câu lệnh truy vấn.
+*(Nếu cần xuất lại nhanh bằng Python giữ chuẩn UTF-8 cho tên cầu thủ châu Âu và tiếng Việt không dấu/có dấu, có thể đọc trực tiếp từ bảng `DW_Football_LookerStudio.dbo.Looker_Football_Flat` ra tệp `D:\Kho_du_lieu_OLAP\football\cleaned_data\Football_Report_Data.csv`.)*
 
 ---
 
-### Bước 3: Lưu kết quả truy vấn dưới định dạng tệp CSV
-1. Khi câu lệnh thực thi xong, kết quả hiển thị tại khung **Results** ở phía dưới.
-2. Nhấp chuột phải vào ô góc trên cùng bên trái của lưới kết quả (ô vuông giao giữa tiêu đề dòng và tiêu đề cột).
-3. Trong menu ngữ cảnh xuất hiện, nhấp chuột chọn **Save Results As...**.
-4. Trong hộp thoại lưu tệp:
-   * **Save in:** Chọn thư mục lưu trữ (ví dụ: `D:\Kho_du_lieu_OLAP\football\cleaned_data\`).
-   * **File name:** Đặt tên tệp dữ liệu: `Football_Report_Data.csv`.
-   * **Save as type:** Đảm bảo chọn định dạng **CSV (Comma delimited) (*.csv)**.
-5. Nhấp nút **Save** để hoàn tất việc xuất tệp.
-6. Mở thư mục chứa tệp, kiểm tra dữ liệu để đảm bảo file sạch và không bị lỗi ký tự.
+### Bước 3: Kiểm tra tệp CSV đầu ra
+* Tệp dữ liệu đã được xuất sẵn tại: `D:\Kho_du_lieu_OLAP\football\cleaned_data\Football_Report_Data.csv` (chuẩn **UTF-8**, `210,747` dòng dữ liệu, nằm dưới giới hạn `100 MB` của trình tải lên Looker Studio).
 
 ---
 
 ### Bước 4: Tải dữ liệu lên Google Data Studio (Looker Studio)
-1. Khởi động trình duyệt web (Google Chrome hoặc Microsoft Edge), truy cập vào đường dẫn:
-   `https://lookerstudio.google.com/`
+1. Khởi động trình duyệt web (Google Chrome hoặc Microsoft Edge), truy cập: `https://lookerstudio.google.com/`.
 2. Đăng nhập bằng tài khoản Google.
-3. Tại giao diện trang chủ của Looker Studio, nhấp chuột vào nút **Báo cáo trống** (Blank Report) có biểu tượng dấu cộng `+`.
-4. Hộp thoại **Thêm dữ liệu vào báo cáo** (Add data to report) tự động xuất hiện:
-   * Trong danh sách các trình kết nối của Google (Google Connectors), tìm và nhấp chọn **Tải tệp lên** (File Upload).
-   * Nhấp chuột vào nút **Nhấp để tải lên** (Click to upload) và điều hướng đến tệp `.csv` vừa xuất ở Bước 3 (`Football_Report_Data.csv`).
-   * Chờ hệ thống tải lên và xử lý tệp cho đến khi trạng thái chuyển sang màu xanh **Đã tải lên** (Uploaded).
-5. Nhấp nút **Thêm** (Add) ở góc dưới cùng bên phải.
-6. Khi hộp thoại xác nhận quyền hiển thị, nhấp chọn **Thêm vào báo cáo** (Add to Report) để hoàn tất.
-7. Giao diện thiết kế của Looker Studio xuất hiện sẵn sàng cho việc thiết kế các báo biểu trực quan hóa bóng đá.
+3. Tại giao diện trang chủ, nhấp nút **+ Create** (Tạo) $\rightarrow$ **Report** (hoặc **Blank Report / Báo cáo trống**).
+4. Hộp thoại **Add data to report** (Thêm dữ liệu vào báo cáo) tự động hiện ra:
+   * Trong danh sách **Google Connectors**, tìm và chọn **File Upload** (Tải tệp lên).
+   * Nhấp **Click to upload files** (Nhấp để tải tệp lên) và chọn tệp `D:\Kho_du_lieu_OLAP\football\cleaned_data\Football_Report_Data.csv`.
+   * Đợi trạng thái chuyển sang màu xanh **Uploaded** (Đã tải lên) *(thường mất 15–30 giây vì file ~74 MB)*.
+5. Nhấp nút **Add** (Thêm) ở góc dưới bên phải $\rightarrow$ chọn **Add to report** (Thêm vào báo cáo).
+6. Giao diện thiết kế Looker Studio mở ra với bảng nguồn **`Football_Report_Data.csv`** sẵn sàng ở cột **Data** bên phải.
