@@ -1,310 +1,142 @@
-# 4.2.3 Báo biểu 3: Kỷ luật Thẻ phạt, Cường độ Thi đấu và Tải trọng Cầu thủ (Discipline & Match Load Analytics)
+# 4.2.3 Báo biểu 3: Báo biểu Kỷ luật Thẻ phạt, Cường độ Thi đấu & Tải trọng Cầu thủ
 
-Tài liệu này hướng dẫn chi tiết quy trình thiết kế hoàn chỉnh **Báo biểu 3 (Executive Dashboard 3)** trên phần mềm **Power BI Desktop**, kết nối trực tiếp (Live Connection) với khối dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`.
+Tài liệu này hướng dẫn chi tiết quy trình thiết lập **Báo biểu 3** trên phần mềm **Power BI Desktop**, kết nối trực tiếp [Connect Live] tới khối cơ sở dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`.
 
-> [!IMPORTANT]
-> **TIÊU CHÍ THIẾT KẾ THỰC TẾ & ĐỘC LẬP TỰ CHỦ:** Toàn bộ báo biểu được xây dựng **$100\%$ dựa trên các Thước đo (Measures) và Chiều phân tích (Dimensions) ĐÃ CÓ SẴN** trong khối SSAS Cube hiện tại. Không yêu cầu can thiệp hay sửa đổi CSDL/Cube, không sử dụng các bộ lọc dòng Measure gây lỗi rỗng (BLANK), đảm bảo người dùng kéo thả là hiển thị số liệu chính xác ngay lập tức.
-
-Báo biểu tuân thủ đầy đủ bộ quy chuẩn [**`rule.md`**](../rule.md):
-* **Canvas:** Độ phân giải **Full HD 1920 x 1080 px (16:9)**, màu nền xám khói `#F8FAFC`.
-* **Phân cấp Typography (Visual Hierarchy):** Title Banner **`20 pt` Bold**, Tiêu đề từng Visual **`18 pt` Bold**, Callout Value thẻ KPI **`35 pt` Bold** (cực kỳ nổi bật), Nhãn dữ liệu & Trục tọa độ **`12 pt`**.
-* **Bộ lọc Slicers rộng rãi:** Chiều cao mở rộng **`H = 75 px`**, hiển thị trọn vẹn cả tiêu đề, khung xổ Dropdown và các nút chọn Tile, triệt tiêu hoàn toàn lỗi bị cụt thanh cuộn.
-* **Chuẩn hóa nhãn hiển thị (Rename for this visual):** Từng trường dữ liệu đều có hướng dẫn đổi tên tiếng Việt ngắn gọn, chuyên nghiệp, xóa bỏ hoàn toàn dấu ba chấm (`...`).
+> [!NOTE]
+> **NỘI DUNG VÀ MỤC TIÊU NGHIỆP VỤ BÁO BIỂU 3:**
+> Giám sát toàn diện tình hình kỷ luật sân cỏ [Thẻ vàng, Thẻ đỏ], phân tích mức độ quyết liệt của các CLB, cơ cấu thẻ đỏ theo vị trí thi đấu chi tiết [Sub Position], tương quan giữa độ tuổi cầu thủ với thời lượng ra sân và số thẻ phạt, cùng xu hướng tích lũy đóng góp bàn thắng [Goal Contributions] của các CLB qua các mùa giải.
 
 ---
 
-## 1. Mục tiêu, Ý nghĩa Thống kê và Bài toán Thực tế
+## 1. Thông tin chung & Thiết lập Môi trường Kết nối
 
-### 1.1. Câu hỏi nghiệp vụ
-1. **Những CLB nào có rủi ro kỷ luật cao nhất châu Âu?** Xếp hạng tổng lượng thẻ phạt cảnh cáo (`Yellow Cards`) và thẻ phạt đuổi khỏi sân (`Red Cards`) theo từng CLB.
-2. **Biến động thứ hạng về đóng góp bàn thắng của các CLB hàng đầu châu Âu qua các mùa giải?** Sử dụng biểu đồ dải ruy băng xếp hạng (Ribbon Chart) để theo dõi sự dịch chuyển thứ hạng về tổng đóng góp bàn thắng (`Goal Contributions = Goals + Assists`) của các CLB (`Club Name`) qua các mùa giải (`Season`), nhận diện những đội bóng bứt phá ngoạn mục hoặc sa sút phong độ tấn công qua từng mùa.
-3. **Độ tuổi nào trong bóng đá chuyên nghiệp đang phải gánh tải trọng thi đấu lớn nhất và có xu hướng phạm lỗi nhiều nhất?** Đặt số phút thi đấu (`Minutes Played`) và số thẻ phạt (`Yellow Cards`) trên cùng trục độ tuổi (`Age`).
-4. **Vị trí thi đấu chuyên môn nào trên sân là "điểm nóng" gánh chịu nhiều thẻ đỏ nhất?** Phân tích cơ cấu và tỷ trọng thẻ đỏ theo vị trí cụ thể (`Sub Position`: *Trung vệ, Tiền vệ phòng ngự, Tiền đạo cắm...*).
-
-### 1.2. Ý nghĩa thống kê & Giá trị học thuật
-| Thành phần trực quan | Vấn đề thống kê được giải quyết |
-| :--- | :--- |
-| **Stacked Bar Chart (Vàng + Đỏ)** | So sánh tổng lượng thẻ phạt và cơ cấu mức độ nghiêm trọng (thẻ vàng cảnh cáo vs thẻ đỏ trực tiếp/gián tiếp) giữa các CLB hàng đầu. |
-| **Ribbon Chart (Dải Ruy Băng Xếp Hạng)** | Theo dõi trực quan sự thay đổi thứ hạng (Rank Change) về tổng đóng góp bàn thắng (`Goal Contributions`) của các CLB hàng đầu châu Âu (`Club Name`) qua các mùa giải (`Season`). Khắc họa rõ nét sự trỗi dậy hay sa sút hỏa lực tấn công của từng đội bóng và tương tác mượt mà khi lọc theo từng Giải đấu. |
-| **Combo Chart 2 Trục Y (Dual Axis)** | Đặt tải trọng thời lượng (Cột - Trục Y trái) và số thẻ phạt (Đường - Trục Y phải) trên cùng một trục danh mục độ tuổi (`Age`), giải quyết bài toán so sánh 2 đại lượng khác thang đo (Khử Exposure Bias). |
-| **Donut Chart (Tỷ trọng Thẻ đỏ theo Vị trí)** | Trực quan hóa tỷ trọng thẻ đỏ theo từng vị trí chuyên môn trên sân (`Sub Position`), nhận diện mắt xích rủi ro kỷ luật chiến thuật cao nhất toàn đội hình. |
-
-### 1.3. Bài toán thực tế giải quyết
-* **Ban huấn luyện & Trợ lý trọng tài:** Nhận diện ngay những cầu thủ nằm ở góc "Bất thường" (Ít phút nhưng nhiều thẻ) để uốn nắn kỷ luật, tránh mất người vì thẻ phạt ở các trận knock-out sống còn.
-* **Bộ phận Y tế & Thể lực CLB:** Xác định nhóm tuổi chịu tải trọng cao nhất để phân bổ kế hoạch hồi phục cơ bắp và xoay tua đội hình (Squad Rotation) hợp lý.
-* **Ban điều hành CLB:** Dự báo nguy cơ bị ban tổ chức giải phạt tài chính hoặc án treo giò tập thể do vi phạm quy chế kỷ luật giải đấu.
+* **Công cụ thực hiện:** Microsoft Power BI Desktop.
+* **Phương thức kết nối:** Connect live trực tiếp từ SSAS.
+* **Server Name:** `localhost` [hoặc tên máy tính `DESKTOP-9B88R8P`].
+* **Database Catalog:** `SSAS_Football_Transfermarkt`.
+* **Cube OLAP:** `DW Football Transfermarkt`.
+* **Cấu hình Canvas:** Kích thước Custom `1920 x 1080 px` [chuẩn Full HD 16:9], Canvas Background màu sáng `#F8FAFC`.
 
 ---
 
-## 2. Sơ đồ Bố cục Pixel-Perfect (Canvas Full HD 1920 x 1080)
+## 2. Danh mục Thành phần Trực quan trên Báo biểu 3
 
-```
-+-------------------------------------------------------------------------------------------------------------------------+
-| [Visual 0] HERO BANNER TIÊU ĐỀ: BÁO BIỂU 3 - KỶ LUẬT THẺ PHẠT & TẢI TRỌNG THI ĐẤU (Font: 20pt Bold, Center)           |
-| Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
-+-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Thẻ Vàng]   | [Card 2: Tổng Thẻ Đỏ]     | [Card 3: Tổng Lượt Ra Sân]| [Card 4: Tổng Số Phút]            |
-| Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold          | Callout: 35pt Bold (Millions)     |
-| Nền: Pastel Amber #FFFBEB | Nền: Pastel Red #FEF2F2   | Nền: Pastel Blue #EFF6FF    | Nền: Pastel Green #F0FDF4         |
-| (W: 455, H: 95, X: 20)    | (W: 455, H: 95, X: 495)   | (W: 455, H: 95, X: 970)     | (W: 455, H: 95, X: 1445)          |
-+-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Slicer 1: Mùa giải]          | [Slicer 2: Giải đấu]       | [Slicer 3: Quốc gia]       | [Slicer 4: Vị trí thi đấu]        |
-| (W: 455, H: 75, X: 20, Y: 210)| (W: 455, H: 75, X: 495)    | (W: 455, H: 75, X: 970)    | (W: 455, H: 75, X: 1445)          |
-+-------------------------------+----------------------------+----------------------------+-----------------------------------+
-| [Ô 1: TRÊN - TRÁI | BIỂU ĐỒ THANH XẾP CHỒNG (18pt)]     | [Ô 2: TRÊN - PHẢI | BIỂU ĐỒ DẢI RUY BĂNG RIBBON (18pt)]  |
-| Top 10 CLB nhận Nhiều Thẻ Phạt Nhất (Thẻ Vàng & Thẻ Đỏ) | Xếp hạng Đóng góp Bàn thắng (G+A) theo CLB qua các Mùa|
-| Y: CLB (12pt Navy), X: Thẻ (12pt), Màu Vàng/Đỏ ngữ nghĩa| X: Mùa giải (12pt), Y: Đóng góp G+A, Legend: CLB       |
-| Tọa độ: X = 20 px, Y = 300 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 300 px | W = 925 px, H = 385 px       |
-+---------------------------------------------------------+---------------------------------------------------------------+
-| [Ô 3: DƯỚI - TRÁI | COMBO CHART 2 TRỤC Y (18pt)]        | [Ô 4: DƯỚI - PHẢI | BIỂU ĐỒ VÀNH KHĂN DONUT (Title: 18pt)]     |
-| Tải trọng Thi đấu (Cột) & Thẻ phạt (Đường) theo Độ tuổi | Phân bổ Thẻ Đỏ theo Vị trí Chi tiết (Sub Position)            |
-| X: Tuổi (12pt), Y-trái: Phút (Xanh), Y-phải: Thẻ (Đỏ)   | Legend: Vị trí (Trung vệ, Tiền đạo...), Values: Thẻ đỏ (12pt) |
-| Tọa độ: X = 20 px, Y = 695 px | W = 925 px, H = 385 px  | Tọa độ: X = 975 px, Y = 695 px | W = 925 px, H = 385 px       |
-+---------------------------------------------------------+---------------------------------------------------------------+
-```
+Báo biểu 3 tích hợp 13 visual trực quan phân tích kỷ luật và thể lực:
+
+| STT | Tên thành phần Visual | Loại trực quan | Thuộc tính / Độ đo ánh xạ | Vai trò nghiệp vụ |
+| :---: | :--- | :--- | :--- | :--- |
+| **1** | Banner Tiêu đề | TextBox | Tiêu đề báo biểu 3 | Định danh nghiệp vụ Dashboard |
+| **2** | Card Tổng thẻ vàng | Card | `Yellow Cards` | Tổng số thẻ vàng bị phạt |
+| **3** | Card Tổng thẻ đỏ | Card | `Red Cards` | Tổng số thẻ đỏ bị truất quyền thi đấu |
+| **4** | Card Tổng lượt ra sân | Card | `FACT Player Match Perf Count` | Tổng số lượt cầu thủ thi đấu |
+| **5** | Card Tổng thời lượng | Card | `Minutes Played` | Tổng thời lượng thi đấu trên sân |
+| **6** | Slicer Cầu thủ | Slicer [Dropdown] | `DIM Player.Player Name` | Lọc theo cá nhân cầu thủ |
+| **7** | Slicer Tên giải đấu | Slicer [Dropdown] | `DIM Competition.Competition Name` | Lọc theo giải đấu cụ thể |
+| **8** | Slicer Mùa giải | Slicer [Dropdown] | `DIM Time.Season` | Lọc theo mùa bóng |
+| **9** | Slicer Vị trí chi tiết | Slicer [Dropdown] | `DIM Player.Sub Position` | Lọc theo vị trí thi đấu chi tiết |
+| **10** | Biểu đồ Thẻ phạt theo CLB | Clustered Bar Chart | Y: `Club Name`<br>X: `Yellow Cards`, `Red Cards` | So sánh kỷ luật giữa các CLB |
+| **11** | Biểu đồ Vùng xếp chồng G+A | Stacked Area Chart | X: `Season`, `Month`<br>Y: `Goal Contributions`<br>Series: `Club Name` | Tích lũy đóng góp bàn thắng theo thời gian |
+| **12** | Biểu đồ Phút & Thẻ theo tuổi | Line & Clustered Column Combo Chart | X: `Age`<br>Column Y: `Minutes Played`<br>Line Y: `Yellow Cards` | Tương quan tải trọng và rủi ro thẻ phạt |
+| **13** | Biểu đồ Cơ cấu Thẻ đỏ | Donut Chart | Category: `Sub Position`<br>Y: `Red Cards` | Tỷ trọng thẻ đỏ theo vị trí chiến thuật |
 
 ---
 
-## 3. Hướng dẫn Từng Bước Thiết lập Chi tiết trên Power BI Desktop
+## 3. Quy trình Thiết lập Chi tiết Từng bước trên Power BI
 
-### Bước 1: Khởi tạo Trang Báo cáo và Cấu hình Canvas
-1. Tại thanh quản lý trang ở mép dưới Power BI Desktop, nhấp vào biểu tượng dấu cộng `+` để thêm một trang mới.
-2. Nhấp đúp chuột vào tên trang vừa tạo và **đặt tên trang chính thức**:
-   * **Tên trang:** `Kỷ luật & Tải trọng Thi đấu` (hoặc `Báo biểu 3`).
-3. Nhấp chuột vào khoảng trống Canvas để mở bảng **Format report page**:
-   * **Canvas settings** $\rightarrow$ **Type:** Chọn `Custom`, thiết lập `Width = 1920 px`, `Height = 1080 px`.
-   * **Canvas background:** Chọn màu xám khói hiện đại **`#F8FAFC`**, thiết lập **Transparency = `0%`**.
+### Bước 1: Tạo trang báo cáo mới và Cấu hình Canvas
+1. Nhấp vào dấu cộng [+] để tạo trang mới và đổi tên thành **Báo biểu 3**.
+2. Tại bảng Format page ở khung bên phải, chọn **Canvas settings** $\rightarrow$ Type chọn **Custom** $\rightarrow$ Width `1920 px`, Height `1080 px`.
+
+*Hình 4.24. Khởi tạo trang report Báo biểu 3 và cấu hình Canvas chuẩn 1920x1080*
 
 ---
 
-### Bước 2: Thiết lập Hero Banner Tiêu đề Trang (Tầng trên)
-1. Trên thanh tác vụ **Insert**, nhấp chọn **Text box**.
-2. Nhập nội dung tiêu đề chuẩn mực:
-   `BÁO BIỂU 3: KỶ LUẬT THẺ PHẠT, CƯỜNG ĐỘ THI ĐẤU & TẢI TRỌNG CẦU THỦ`
-3. Bôi đen toàn bộ văn bản và định dạng:
-   * Font chữ: `Segoe UI`, Cỡ chữ: **`20 pt`**, In đậm (**Bold**), Căn giữa (**Center**), Màu chữ: Xanh than đậm `#0F172A`.
-4. Tab **General** $\rightarrow$ **Effects**:
-   * **Background:** Nền trắng `#FFFFFF`.
-   * **Visual border:** Bật **On**, màu viền `#CBD5E1`, Bo góc (**Rounded corners**): **`10 px`**.
-5. Tab **General** $\rightarrow$ **Properties**:
-   * Size: `Width = 1880 px`, `Height = 55 px`.
-   * Position: `Horizontal = 20 px`, `Vertical = 15 px`.
+### Bước 2: Tạo Banner Tiêu đề cho Báo biểu 3
+1. Chọn thẻ **Insert** $\rightarrow$ chọn **Text box**, đặt tại vị trí `x = 10 px`, `y = 10 px` với kích thước `Width = 1880 px`, `Height = 70 px`.
+2. Nhập nội dung: **`BÁO BIỂU: KỶ LUẬT THẺ PHẠT, CƯỜNG ĐỘ THI ĐẤU & TẢI TRỌNG CẦU THỦ`**.
+3. Định dạng chữ in hoa đậm, font Segoe UI / Arial, cỡ `18 pt`, màu xanh tím than `#1B365D`, căn giữa.
+
+*Hình 4.25. Tạo Text box tiêu đề cho Báo biểu 3*
 
 ---
 
-### Bước 3: Thiết lập Khối 4 Thẻ KPI Tinh hoa (Dùng 100% Thước đo có sẵn trong Cube)
+### Bước 3: Tạo và cấu hình hàng thẻ chỉ số KPI Kỷ luật & Thể lực [Cards Row]
+Kéo thả 4 visual dạng **Card** vào hàng trên cùng [tọa độ `y = 90 px`, chiều cao `Height = 90 px`, chiều rộng `Width = 455 px`]:
+1. **Card 1 [Tổng thẻ vàng]:** Kéo `FACT Player Match Perf.Yellow Cards` vào ô **Values**. Đổi tên hiển thị thành `Tổng thẻ vàng`. Vị trí: `x = 20 px`.
+2. **Card 2 [Tổng thẻ đỏ]:** Kéo `FACT Player Match Perf.Red Cards` vào ô **Values**. Đổi tên hiển thị thành `Tổng thẻ đỏ`. Vị trí: `x = 495 px`.
+3. **Card 3 [Tổng lượt ra sân]:** Kéo `FACT Player Match Perf.FACT Player Match Perf Count` vào ô **Values**. Đổi tên hiển thị thành `Tổng lượt ra sân`. Vị trí: `x = 970 px`.
+4. **Card 4 [Tổng thời lượng]:** Kéo `FACT Player Match Perf.Minutes Played` vào ô **Values**. Đổi tên hiển thị thành `Tổng thời lượng thi đấu`. Vị trí: `x = 1445 px`.
 
-Cả 4 thẻ Card đều đặt thẳng hàng tại `Vertical = 95 px`, chiều cao `Height = 95 px`, chiều rộng `Width = 455 px`:
-
-#### 1. Card 1: Tổng số Thẻ Vàng Toàn giải (Total Yellow Cards)
-* Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Yellow Cards]`** vào ô **Fields** (có sẵn 100% trong Cube).
-* **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Tổng thẻ vàng`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG THẺ VÀNG TOÀN GIẢI`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa (**Center**), màu chữ `#92400E`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
-* Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Amber **`#FFFBEB`**, Viền `#FCD34D`, Bo góc `10 px`.
-* **Properties:** `W = 455 px`, `H = 95 px`, `X = 20 px`, `Y = 95 px`.
-
-#### 2. Card 2: Tổng số Thẻ Đỏ Toàn giải (Total Red Cards)
-* Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Red Cards]`** vào ô **Fields** (có sẵn 100% trong Cube).
-* **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Tổng thẻ đỏ`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG THẺ ĐỎ TOÀN GIẢI`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#991B1B`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
-* Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Red **`#FEF2F2`**, Viền `#FCA5A5`, Bo góc `10 px`.
-* **Properties:** `W = 455 px`, `H = 95 px`, `X = 495 px`, `Y = 95 px`.
-
-#### 3. Card 3: Tổng Lượt Cầu thủ Thi đấu (Total Appearances)
-* Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[FACT Player Match Perf Count]`** vào ô **Fields** (tổng số lượt ra sân thi đấu của các cầu thủ toàn giải).
-* **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Tổng lượt ra sân`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG LƯỢT CẦU THỦ RA SÂN`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#1E3A8A`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`. **Category label**: Tắt **Off**.
-* Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Blue **`#EFF6FF`**, Viền `#93C5FD`, Bo góc `10 px`.
-* **Properties:** `W = 455 px`, `H = 95 px`, `X = 970 px`, `Y = 95 px`.
-
-#### 4. Card 4: Tổng Số Phút Thi đấu (Total Minutes Played)
-* Thêm visual **Card**.
-* Kéo thước đo **`[Measures].[Minutes Played]`** vào ô **Fields** (có sẵn 100% trong Cube).
-* **Phần đặt tên (Rename for this visual):**
-  * Đổi tên trường thành: **`Tổng số phút`**.
-* Tab **General** $\rightarrow$ **Title**: Bật **On**, nhập `TỔNG SỐ PHÚT THI ĐẤU`, Font `Segoe UI`, Cỡ chữ **`15 pt - 18 pt` Bold**, Căn giữa, màu chữ `#065F46`.
-* Tab **Format visual** $\rightarrow$ **Callout value**: Cỡ chữ **`35 pt` Bold**, màu đen tuyền `#0F172A`, mục **Display units** chọn **`Millions`** (hoặc `Auto`). **Category label**: Tắt **Off**.
-* Tab **General** $\rightarrow$ **Effects**: Background nền Pastel Green **`#F0FDF4`**, Viền `#86EFAC`, Bo góc `10 px`.
-* **Properties:** `W = 455 px`, `H = 95 px`, `X = 1445 px`, `Y = 95 px`.
+*Hình 4.26. Cấu hình và kết quả 4 thẻ Card KPI Báo biểu 3*
 
 ---
 
-### Bước 4: Thiết lập Hệ thống 4 Slicers Đối xứng Cân bằng (Không bị cụt thanh Dropdown)
+### Bước 4: Tạo và cấu hình hàng bộ lọc tương tác [Slicers Row]
+Kéo thả 4 visual dạng **Slicer** vào hàng thứ hai [tọa độ `y = 200 px`, chiều cao `Height = 75 px`, chiều rộng `Width = 455 px`]:
+1. **Slicer 1 [Cầu thủ]:** Kéo `DIM Player.Player Name` vào ô **Field**, định dạng Dropdown. Vị trí: `x = 20 px`.
+2. **Slicer 2 [Giải đấu]:** Kéo `DIM Competition.Competition Name` vào ô **Field**, định dạng Dropdown. Vị trí: `x = 495 px`.
+3. **Slicer 3 [Mùa giải]:** Kéo `DIM Time.Season` vào ô **Field**, định dạng Dropdown. Vị trí: `x = 969 px`.
+4. **Slicer 4 [Vị trí chi tiết]:** Kéo `DIM Player.Sub Position` vào ô **Field**, định dạng Dropdown. Vị trí: `x = 1445 px`.
 
-Cả 4 bộ lọc đều được đặt tại `Vertical = 210 px`, chiều cao mở rộng **`Height = 75 px`**, chiều rộng cân xứng $W = 455\text{ px}$ thẳng hàng với 4 thẻ KPI:
-
-| Slicer | Trường dữ liệu | **Phần đặt tên (Rename for this visual)** | Kiểu hiển thị | X | Y | W | H |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Slicer 1** | `DIM Time [Season]` | **`Mùa giải`** | Dropdown | 20 px | 210 px | 455 px | 75 px |
-| **Slicer 2** | `DIM Competition [Competition Name]` | **`Giải đấu`** | Dropdown | 495 px | 210 px | 455 px | 75 px |
-| **Slicer 3** | `DIM Competition [Country Name]` | **`Quốc gia`** | Dropdown | 970 px | 210 px | 455 px | 75 px |
-| **Slicer 4** | `DIM Player [Main Position]` | **`Vị trí thi đấu`** | Dropdown | 1445 px | 210 px | 455 px | 75 px |
-
-* **Định dạng chung cho Slicers:**
-  * Slicer header: Font `Segoe UI`, Cỡ chữ **`15 pt` Bold**, màu chữ `#0F172A`.
-  * Values: Font `Segoe UI`, Cỡ chữ **`12 pt`**.
-  * Effects: Nền trắng `#FFFFFF`, Viền mỏng `#CBD5E1`, Bo góc `8 px`.
+*Hình 4.27. Cấu hình hàng Slicer bộ lọc cho Báo biểu 3*
 
 ---
 
-### Bước 5 – Ô 1 (Trên - Trái): Stacked Bar Chart – Top 10 CLB nhận nhiều Thẻ phạt nhất (Thẻ Vàng & Thẻ Đỏ)
+### Bước 5: Tạo Biểu đồ Thẻ phạt theo CLB [Clustered Bar Chart]
+1. Chọn biểu tượng **Clustered bar chart** và đặt tại vị trí `x = 20 px`, `y = 300 px`, `Width = 925 px`, `Height = 385 px`.
+2. Cấu hình các trục:
+   * **Trục tung [Y-axis]:** Kéo `DIM Club.Club Name`.
+   * **Trục hoành [X-axis]:** Kéo `FACT Player Match Perf.Yellow Cards` và `FACT Player Match Perf.Red Cards`.
+3. Sắp xếp giảm dần theo số thẻ vàng. Biểu đồ giúp so sánh mức độ quyết liệt trong lối chơi và kỷ luật sân cỏ giữa các câu lạc bộ.
 
-1. Tại khung **Visualizations**, chọn visual **Stacked bar chart** (Biểu đồ thanh ngang xếp chồng).
-2. Kích thước & Vị trí:
-   * Size: `Width = 925 px`, `Height = 385 px`.
-   * Position: `Horizontal = 20 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu:
-   * **Y-axis:** Kéo `DIM Club [Club Name]`.
-   * **X-axis:** Kéo đồng thời 2 thước đo:
-     1. `[Measures].[Yellow Cards]`
-     2. `[Measures].[Red Cards]`
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Thẻ vàng`**
-   * `Red Cards` $\rightarrow$ Đổi tên thành: **`Thẻ đỏ`**
-5. **Bộ lọc Top 10 CLB:**
-   * Tại khung **Filters on this visual** $\rightarrow$ chọn `Club Name` $\rightarrow$ chọn mục **Top N** $\rightarrow$ nhập `10` $\rightarrow$ tại ô **By value** kéo thả thước đo `Yellow Cards` $\rightarrow$ nhấp **Apply filter**.
-6. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Top 10 CLB nhận Nhiều Thẻ Phạt Nhất Châu Âu`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **Bars (Màu sắc chuẩn ngữ nghĩa thể thao):**
-     * `Thẻ vàng`: Màu Vàng hổ phách **`#F59E0B`**.
-     * `Thẻ đỏ`: Màu Đỏ cảnh báo **`#DC2626`**.
-   * **Y-axis (Tên CLB):** Cỡ chữ **`12 pt`**, màu sắc: **Xanh Navy đậm `#0D47A1`**, *Maximum width* đặt `35%` để tên CLB dài không bị co rút.
-   * **X-axis (Số lượng thẻ):** Cỡ chữ **`12 pt`**, màu sắc: **Xanh lục Forest Green `#1B5E20`**.
-   * **Data labels:** Bật **On**, Cỡ chữ **`12 pt` Bold**.
-   * **Legend:** Vị trí `TopCenter`, Cỡ chữ **`12 pt`**.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+*Hình 4.28. Cấu hình và kết quả Clustered bar chart kỷ luật thẻ phạt CLB*
 
 ---
 
-### Bước 6 – Ô 2 (Trên - Phải): Ribbon Chart – Xếp hạng Đóng góp Bàn thắng (Goal Contributions) của các CLB qua các Mùa giải
+### Bước 6: Tạo Biểu đồ Vùng xếp chồng G+A theo CLB [Stacked Area Chart]
+1. Chọn biểu tượng **Stacked area chart** [biểu đồ vùng xếp chồng] và đặt tại vị trí `x = 975 px`, `y = 300 px`, `Width = 925 px`, `Height = 385 px`.
+2. Cấu hình các trục:
+   * **Trục hoành [X-axis]:** Kéo `DIM Time.Season` và `DIM Time.Month`.
+   * **Trục tung [Y-axis]:** Kéo `FACT Player Match Perf.Goal Contributions`.
+   * **Chuỗi phân loại [Legend / Series]:** Kéo `DIM Club.Club Name`.
+3. Thể hiện sự đóng góp thị phần bàn thắng và kiến tạo tích lũy của từng đội bóng trong bức tranh tổng thể qua các tháng.
 
-1. Tại khung **Visualizations**, chọn visual **Ribbon chart** (Biểu đồ Dải ruy băng xếp hạng theo thời gian).
-2. Kích thước & Vị trí:
-   * **Size:** `Width = 925 px`, `Height = 385 px`.
-   * **Position:** `Horizontal = 975 px`, `Vertical = 300 px`.
-3. Kéo thả trường dữ liệu:
-   * **X-axis (Trục hoành):** Mở bảng **`DIM Time`**, kéo thuộc tính **`[Season]`** (Mùa giải: *2022/2023* và *2023/2024*).
-   * **Y-axis (Trục tung):** Mở thư mục **`Measures`**, kéo thước đo **`[Measures].[Goal Contributions]`** (Tổng đóng góp bàn thắng = Bàn thắng + Kiến tạo).
-   * **Legend (Nhóm dải ruy băng):** Mở bảng **`DIM Club`**, kéo thuộc tính **`[Club Name]`** (Tên Câu lạc bộ).
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Season` $\rightarrow$ Đổi tên thành: **`Mùa giải`**
-   * `Club Name` $\rightarrow$ Đổi tên thành: **`Câu lạc bộ`**
-   * `Goal Contributions` $\rightarrow$ Đổi tên thành: **`Đóng góp G+A`**
-5. **Cấu hình Bộ lọc Top 8 CLB hàng đầu (Filters on this visual):**
-   * Tại khung **Filters on this visual**, mở mục `Câu lạc bộ` (hoặc `Club Name`).
-   * Chọn Filter type: **Top N**, nhập **`8`** (hoặc `6`).
-   * Ô **By value**: Kéo thước đo **`[Measures].[Goal Contributions]`** vào.
-   * Nhấp nút **Apply filter** (Tập trung hiển thị 8 CLB có tổng đóng góp bàn thắng cao nhất: *Manchester City, Bayern Munich, PSV Eindhoven, Real Madrid, Bayer 04 Leverkusen, Feyenoord Rotterdam, SL Benfica, Paris Saint-Germain* để các dải ruy băng to bản, uốn lượn sắc sảo, không bị rối mắt).
-6. **Định dạng hiển thị chi tiết (Tab Format visual):**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Xếp hạng Đóng góp Bàn thắng (G+A) theo CLB qua các Mùa giải`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
-   * **Ribbons:** Bật **Ribbons: On**, Spacing: `0`, Match series color: **On**, Transparency: **`25% - 30%`** để tạo hiệu ứng chuyển động mượt mà.
-   * **Data labels:** Bật **On**, Display units: **`None`** (hiển thị chính xác số nguyên đóng góp bàn thắng của từng CLB), Cỡ chữ **`10 pt` Bold**.
-   * **Legend:** Vị trí `TopCenter`, Font `Segoe UI`, Cỡ chữ **`11 pt`**.
-   * **X-axis (Mùa giải):** Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#0F172A`.
-   * **Y-axis (Đóng góp G+A):** Title bật **On**, nhập `Tổng đóng góp bàn thắng (G+A)`, Font `Segoe UI Bold`, Cỡ chữ **`12 pt`**, màu `#1E3A8A`.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
-
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ & SỰ ĐỘC ĐÁO CỦA RIBBON CHART:**
-> * **Độc nhất vô nhị trong toàn bộ dự án:** Ribbon Chart trực quan hóa **sự hoán đổi thứ hạng (Rank Changes)** của các CLB qua từng mùa giải, làm nổi bật ngay những màn bứt phá hoặc tụt hạng ngoạn mục về hỏa lực tấn công.
-> * **Phát hiện điểm nhấn thực tế từ Cube:** Nhìn vào 8 CLB dẫn đầu châu Âu, người xem thấy ngay cú lội ngược dòng ngoạn mục của **Bayer 04 Leverkusen** (vọt từ hạng 8 với **`137` G+A** mùa `2022/2023` lên chiếm ngôi đầu **`224` G+A** mùa `2023/2024`), sự thăng tiến của **PSV Eindhoven** (`180` $\rightarrow$ `216`) và **Real Madrid** (`179` $\rightarrow$ `206`), đối lập với đà giảm của **SL Benfica** (`194` $\rightarrow$ `164`).
-> * **Tương tác đa chiều thông minh với Slicer Giải đấu:** Khi người dùng chọn một giải đấu cụ thể trên Slicer 2 (như `laliga`), biểu đồ không bị co thành 1 dải đơn lẻ mà lập tức chuyển thành bảng xếp hạng cuộc đua G+A giữa các CLB thuộc chính giải đấu đó.
-> * **Bổ sung góc nhìn cho Ô 1:** Ô 1 xếp hạng rủi ro thẻ phạt CLB (Kỷ luật), còn Ô 2 theo dõi biến động thứ hạng đóng góp bàn thắng CLB qua thời gian, tạo sự đối chiếu toàn diện giữa **Hiệu suất tấn công** và **Giá phải trả về Kỷ luật**.
+*Hình 4.29. Cấu hình và kết quả Stacked area chart tích lũy đóng góp bàn thắng*
 
 ---
 
-### Bước 7 – Ô 3 (Dưới - Trái): Combo Chart 2 Trục Y – Tải trọng Thi đấu (Cột) vs Thẻ vàng (Đường) theo Độ tuổi (NÂNG CAO)
+### Bước 7: Tạo Biểu đồ Phút thi đấu và Thẻ vàng theo Độ tuổi [Combo Chart]
+1. Chọn biểu tượng **Line and clustered column chart** và đặt tại góc dưới bên trái [vị trí `x = 21 px`, `y = 696 px`, `Width = 930 px`, `Height = 385 px`].
+2. Cấu hình các trục:
+   * **Trục hoành [X-axis]:** Kéo `DIM Player.Age`.
+   * **Cột đo lường [Column y-axis]:** Kéo `FACT Player Match Perf.Minutes Played`.
+   * **Đường biểu diễn [Line y-axis]:** Kéo `FACT Player Match Perf.Yellow Cards`.
+3. Giúp phát hiện mối tương quan: Lứa tuổi nào gánh khối lượng thi đấu nặng nhất và lứa tuổi nào có rủi ro nhận thẻ cao nhất.
 
-1. Tại khung **Visualizations**, chọn visual **Line and clustered column chart** (Biểu đồ kết hợp Cột & Đường 2 trục Y độc lập).
-2. Kích thước & Vị trí:
-   * Size: `Width = 925 px`, `Height = 385 px`.
-   * Position: `Horizontal = 20 px`, `Vertical = 695 px`.
-3. Kéo thả trường dữ liệu:
-   * **X-axis:** Kéo `DIM Player [Age]`.
-   * **Column y-axis (Trục Y bên trái):** Kéo `[Measures].[Minutes Played]`.
-   * **Line y-axis (Trục Y bên phải):** Kéo `[Measures].[Yellow Cards]`.
-4. **Phần đặt tên chuẩn tiếng Việt (Rename for this visual):**
-   * `Age` $\rightarrow$ Đổi tên thành: **`Độ tuổi`**
-   * `Minutes Played` $\rightarrow$ Đổi tên thành: **`Tổng số phút thi đấu`**
-   * `Yellow Cards` $\rightarrow$ Đổi tên thành: **`Tổng số thẻ vàng`**
-5. **Định dạng hiển thị:**
-   * Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Tương quan Tải trọng Thi đấu (Cột) và Thẻ vàng (Đường) theo Độ tuổi`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**).
-   * **X-axis (Độ tuổi):** Cỡ chữ **`12 pt`**, màu sắc `#334155`, mục **Type** chọn **`Categorical`** để hiển thị rõ ràng từng độ tuổi (từ 17 đến 40).
-   * **Y-axis bên trái (Số phút - Cột):** Cỡ chữ **`12 pt`**, màu **Xanh lục Forest Green `#1B5E20`**.
-   * **Secondary y-axis bên phải (Số thẻ - Đường):** Bật **On**, Cỡ chữ **`12 pt`**, màu **Đỏ rực `#DC2626`** (phân biệt màu riêng biệt tuyệt đối giữa 2 trục Y).
-   * **Columns (Màu cột tải trọng):** Màu Xanh lá mạ **`#22C55E`** (hoặc Xanh dương `#3B82F6`).
-   * **Lines (Đường thẻ phạt):** Màu Đỏ **`#DC2626`**, Stroke width: `3 px`, Markers: Bật **On**.
-   * **Data labels:** Bật **On** (chọn áp dụng cho Line), Cỡ chữ **`12 pt` Bold**.
-   * **Legend:** Vị trí `TopCenter`, Cỡ chữ **`12 pt`**.
-   * Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+*Hình 4.30. Cấu hình và kết quả biểu đồ thể lực và thẻ vàng theo độ tuổi*
 
 ---
 
-### Bước 8 – Ô 4 (Dưới - Phải): Donut Chart – Phân bổ Thẻ Đỏ theo Vị trí Chi tiết trên Sân (Sub Position)
+### Bước 8: Tạo Biểu đồ Cơ cấu Thẻ đỏ theo Vị trí thi đấu [Donut Chart]
+1. Chọn biểu tượng **Donut chart** [biểu đồ vành khuyên] và đặt tại góc dưới bên phải [vị trí `x = 976 px`, `y = 696 px`, `Width = 924 px`, `Height = 385 px`].
+2. Cấu hình các vùng:
+   * **Phân loại [Legend / Category]:** Kéo `DIM Player.Sub Position`.
+   * **Giá trị [Values]:** Kéo `FACT Player Match Perf.Red Cards`.
+3. Vào Format visual $\rightarrow$ Data labels $\rightarrow$ Label contents chọn **Category, percent of total** để hiển thị trực tiếp tỷ trọng phần trăm thẻ đỏ của từng vị trí.
 
-Sử dụng visual **Donut chart (Biểu đồ Vành khăn)** để phân rã tỷ trọng thẻ đỏ theo vị trí thi đấu cụ thể, xóa bỏ hoàn toàn bảng Table lặp lại giữa các trang báo cáo:
-
-#### 1. Cấu hình trường dữ liệu:
-* Size: `Width = 925 px`, `Height = 385 px`.
-* Position: `Horizontal = 975 px`, `Vertical = 695 px`.
-* Tại khung **Visualizations**, chọn visual **Donut chart** (biểu tượng hình vành khăn tròn).
-* Kéo các trường vào ô cấu hình:
-  * **Legend:** Mở bảng **`DIM Player`**, kéo thuộc tính **`[Sub Position]`** (Vị trí thi đấu cụ thể: *Centre-Back, Centre-Forward, Defensive Midfield, Central Midfield, Right-Back, Left-Back...*).
-  * **Values:** Kéo thước đo **`[Measures].[Red Cards]`** (Tổng số thẻ đỏ).
-
-#### 2. Phần đặt tên chuẩn tiếng Việt (Rename for this visual):
-* Nhấp chuột phải vào từng trường trong ô Legend / Values $\rightarrow$ chọn **Rename for this visual**:
-  * `Sub Position` $\rightarrow$ Đổi tên thành: **`Vị trí chi tiết`**
-  * `Red Cards` $\rightarrow$ Đổi tên thành: **`Số thẻ đỏ`**
-
-#### 3. Cấu hình Bộ lọc Top 8 Vị trí nhận nhiều thẻ đỏ nhất (Filters on this visual):
-* Tại khung **Filters on this visual**, mở mục `Vị trí chi tiết` (hoặc `Sub Position`).
-* Chọn Filter type: **Top N**, nhập **`8`**.
-* Ô **By value**: Kéo thước đo **`[Measures].[Red Cards]`** vào.
-* Nhấp nút **Apply filter** (Tập trung hiển thị 8 vị trí có nguy cơ thẻ đỏ cao nhất, loại bỏ các vị trí không có thẻ).
-
-#### 4. Định dạng hiển thị chi tiết (Tab Format visual):
-* Tab **Format visual** $\rightarrow$ **Title**: Bật **On**, nhập `Phân bổ Thẻ Đỏ theo Vị trí Chi tiết trên Sân`, Font `Segoe UI`, Cỡ chữ **`18 pt` Bold**, Căn giữa (**Center**), màu chữ `#0F172A`.
-* **Slices (Màu sắc các lát cắt):**
-  * `Centre-Back` (Trung vệ): Đặt màu Đỏ sẫm chủ đạo **`#DC2626`** (vị trí nhận nhiều thẻ đỏ nhất).
-  * `Centre-Forward` (Tiền đạo cắm): Màu Cam đậm **`#EA580C`**.
-  * `Defensive Midfield` (Tiền vệ phòng ngự): Màu Xanh dương đậm **`#1D4ED8`**.
-  * `Right-Back / Left-Back`: Màu Xanh lục / Tím.
-* **Detail labels (Nhãn số liệu chi tiết):**
-  * Position: `Outside`.
-  * Label contents: Chọn **`Category, percent of total`** (hiển thị Tên vị trí và Tỷ lệ phần trăm) hoặc `All detail labels`.
-  * Font `Segoe UI`, Cỡ chữ **`11 pt` Bold**.
-* **Legend:** Vị trí `RightCenter`, Font `Segoe UI`, Cỡ chữ **`12 pt`**.
-* Tab **General** $\rightarrow$ **Effects**: Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc **`10 px`**.
-
-> **Ý NGHĨA PHÂN TÍCH NGHIỆP VỤ CỦA DONUT CHART VỊ TRÍ CHI TIẾT:**
-> * **Giải phóng sự trùng lặp:** Cả Báo biểu 1 và 2 đều đã có Table tra cứu, việc dùng Donut Chart tại Ô 4 của Báo biểu 3 giúp toàn bộ bộ 3 báo cáo có cấu trúc visual phong phú, đa dạng và bắt mắt $100\%$.
-> * **Phát hiện chiến thuật cốt lõi:** Trung vệ (`Centre-Back`) gánh tới **`253 thẻ đỏ`** (chiếm hơn $35\%$ tổng số thẻ đỏ toàn giải đấu). Đặc biệt, Tiền đạo cắm (`Centre-Forward`) nhận tới **`89 thẻ đỏ`**, cao hơn cả Tiền vệ phòng ngự (`84 thẻ đỏ`) do các tình huống trả đũa va chạm hoặc tiểu xảo khi tranh chấp bóng bổng!
+*Hình 4.31. Cấu hình và kết quả Donut chart cơ cấu thẻ đỏ theo vị trí thi đấu*
 
 ---
 
-## 4. Kết quả Đối soát và Lập luận Chuyên môn
+### Bước 9: Hoàn thiện bố cục và Kiểm thử tương tác
+Căn chỉnh các visual cân đối và kiểm thử lọc chéo: Khi lọc `Sub Position` = `Centre-Back` [Trung vệ], biểu đồ theo độ tuổi lập tức phản ánh khối lượng phút thi đấu và thẻ phạt của riêng các trung vệ, đồng thời biểu đồ CLB làm rõ đội bóng nào có hàng thủ nhận nhiều thẻ phạt nhất.
 
-### 4.1. Khả năng tương tác chéo (Cross-filtering)
-* Khi nhấp chọn giải đấu `laliga` trên Slicer 2:
-  * Thẻ KPI cập nhật tức thời: La Liga ghi nhận tới **`135 thẻ đỏ`** và **`3,686 thẻ vàng`**.
-  * Biểu đồ Ribbon Chart ở Ô 2 lập tức thu hẹp về các CLB tại La Liga, làm nổi bật vị thế dẫn đầu của `Real Madrid` (`133` $\rightarrow$ `155` G+A) và cú bứt phá của `Girona FC` (vọt từ `101` lên `150` G+A để vượt qua `FC Barcelona` `134` và `Atlético de Madrid` `118`).
-  * Donut Chart ở Ô 4 phân rã ngay tỷ trọng thẻ đỏ tại La Liga theo từng vị trí phòng ngự và tấn công.
-  * Biểu đồ Combo ở Ô 3 phản ánh chính xác nhóm tuổi nào tại giải đấu này chịu tải trọng và thẻ phạt cao nhất.
+*Hình 4.32. Kết quả giao diện hoàn chỉnh của Báo biểu 3 trên Power BI Desktop*
 
-### 4.2. Lập luận phân tích nghiệp vụ thể thao (Sport Intelligence Insights)
-1. **Sự khác biệt về Văn hóa Kỷ luật và Triết lý Trọng tài giữa các Giải đấu:**
-   * So sánh giữa La Liga (135 thẻ đỏ) và Premier League (chỉ 46 thẻ đỏ) minh chứng rõ nét sự khác biệt giữa hai trường phái: bóng đá Tây Ban Nha đề cao sự nghiêm ngặt và xử phạt triệt để các hành vi phạm lỗi, trong khi bóng đá Anh ưu tiên tính liên tục của trận đấu và độ va chạm thể lực cao mà không rút thẻ đỏ tràn lan.
-2. **Quy luật Tải trọng theo Chu kỳ Độ tuổi (Age Load Curve):**
-   * Biểu đồ Combo 2 trục thể hiện rõ đỉnh parabol của tải trọng thi đấu rơi vào nhóm tuổi **24 – 29 tuổi** (giai đoạn sung sức nhất của sự nghiệp cầu thủ). Đường thẻ vàng bám sát theo độ dốc của số phút thi đấu chứng minh thẻ phạt trong bóng đá hiện đại là hệ quả tự nhiên của cường độ tranh chấp thể lực, thay vì yếu tố tâm lý bộc phát của cầu thủ trẻ.
-3. **Phân bổ Rủi ro Thẻ phạt theo Cấu trúc Đội hình (Tactical Disciplinary Hotspots):**
-   * Donut Chart chỉ ra trung vệ và các hậu vệ biên là "lá chắn lửa" chịu áp lực lớn nhất từ các đợt phản công của đối phương, dẫn đến các pha phạm lỗi chiến thuật (Tactical Foul) để ngăn chặn bàn thắng mười mươi. Ban huấn luyện cần đặc biệt chú trọng xây dựng phương án bọc lót khu vực trung lộ để giảm tải số lần trung vệ phải đối đầu trực tiếp 1-1.
+---
+
+## 4. Phân tích Kết quả và Nhận xét Nghiệp vụ Báo biểu 3
+
+1. **Rủi ro thẻ đỏ theo vị trí chiến thuật:** Biểu đồ Donut chỉ ra thẻ đỏ tập trung chủ yếu ở hai vị trí trọng yếu nơi hàng thủ: Trung vệ [Centre-Back] và Tiền vệ phòng ngự [Defensive Midfield] do thường xuyên phải thực hiện các pha phạm lỗi chiến thuật ngăn chặn bàn thắng.
+2. **Quy luật thể lực và tâm lý theo độ tuổi:** Giai đoạn 24 đến 29 tuổi gánh tải trọng thi đấu lớn nhất [Minutes Played đạt đỉnh] và nhận số lượng thẻ vàng nhiều nhất. Tuy nhiên, tỷ lệ thẻ phạt trên số phút ra sân của các cầu thủ trẻ dưới 21 tuổi lại cao hơn do sự non nớt và nóng vội trong các pha tranh chấp.
+3. **Mối liên hệ giữa kỷ luật và thành tích:** Biểu đồ Stacked Area chứng minh các câu lạc bộ duy trì được tỷ lệ đóng góp bàn thắng ổn định qua từng tháng đều là những đội bóng giữ được kỷ luật fair-play và bảo toàn được lực lượng qua các giai đoạn căng thẳng của mùa giải.

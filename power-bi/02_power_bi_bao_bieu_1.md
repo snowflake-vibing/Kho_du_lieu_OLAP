@@ -1,193 +1,164 @@
-# 4.2.1 Báo biểu 1: Báo cáo Phân nhóm & Tổng hợp Hiệu suất Tấn công theo Cấu trúc Giải đấu, Chu kỳ Thời gian và Huấn luyện viên Trưởng (Grouping and Totals Report)
+# 4.2.1 Báo biểu 1: Báo biểu Tổng hợp Hiệu suất Tấn công theo Cấu trúc Giải đấu & Huấn luyện viên
 
-Tài liệu này cung cấp hướng dẫn thiết kế hoàn chỉnh **Báo biểu 1** trên phần mềm **Power BI Desktop**, kết nối trực tiếp (Live Connection) với khối dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`.
+Tài liệu này hướng dẫn chi tiết quy trình thiết lập **Báo biểu 1** trên phần mềm **Power BI Desktop**, kết nối trực tiếp [Connect Live] tới khối cơ sở dữ liệu đa chiều SSAS `[DW Football Transfermarkt]`.
 
-> [!IMPORTANT]
-> **TIÊU CHÍ CHẤM ĐIỂM BẮT BUỘC - BÁO CÁO DẠNG GROUPING AND TOTALS:**
-> * Báo biểu 1 được thiết kế chuyên trách để đáp ứng trọn vẹn yêu cầu tiên quyết của giảng viên: *"Mỗi công cụ thực hiện tối thiểu 3 report, trong đó có 1 report dạng Grouping and Totals"*.
-> * **Khai thác toàn bộ các trường dữ liệu và thước đo MỚI 100%**: Sử dụng **`Coach Name`** (Huấn luyện viên trưởng), **`Competition Type`** (Phân loại Cúp Châu Âu vs Giải Quốc nội), **`Country Name`** (Quốc gia tổ chức), **`Round`** (Vòng đấu / Chặng thi đấu từ `DIM Game`), **`Quarter`** (Quý thi đấu) và thước đo mới **`Total Coaches`** (`175` HLV), loại bỏ hoàn toàn cảm giác lặp lại các cột cũ ở Báo biểu 2 và 3.
-> * **Bộ ba Visual kết hợp hoàn chỉnh (Stacked Bar + Stacked Column + Matrix Grouping & Totals):**
->   1. **Visual 1 (Trên Trái) – Biểu đồ Thanh Ngang Xếp chồng Phân cấp (Stacked Bar Chart with Total Labels & 4-Level Drill-down):** Phân tầng cấu trúc giải đấu và vòng đấu 4 cấp (`Competition Type` $\rightarrow$ `Country Name` $\rightarrow$ `Competition Name` $\rightarrow$ `Round` từ `DIM Game`), bật **Total Labels: ON** hiển thị Tổng G+A trên đầu mỗi thanh.
->   2. **Visual 2 (Dưới Trái) – Biểu đồ Cột Dọc Xếp chồng Theo Chu kỳ Thời gian (Stacked Column Chart with Total Labels & Drill-down):** Phân nhóm hỏa lực theo Mùa giải và Quý (`Season` $\rightarrow$ `Quarter`), xếp chồng `Goals` + `Assists` và bật **Total Labels: ON** hiển thị Tổng G+A trên đỉnh mỗi cột.
->   3. **Visual 3 (Bên Phải) – Bảng Ma trận Phân nhóm & Tổng hợp theo HLV Trưởng (Grouping & Totals Matrix Visual):** Phân nhóm 3 tầng `Huấn luyện viên trưởng` (`Coach Name`) $\rightarrow$ `Câu lạc bộ` (`Club Name`) $\rightarrow$ `Cầu thủ ghi bàn` (`Player Name`), kích hoạt dòng **Tổng phụ (Subtotals)** cho từng HLV và dòng **Tổng cộng (Grand Total)** ở đáy bảng.
-> * **Tính năng Tương tác Chéo (Cross-filtering):** Nhấp chọn một giải đấu / vòng đấu (Visual 1) hoặc một Mùa giải / Quý (Visual 2) $\rightarrow$ Toàn bộ thẻ KPI và Bảng Ma trận HLV (Visual 3) lập tức lọc đồng bộ theo lát cắt đó.
+> [!NOTE]
+> **NỘI DUNG VÀ MỤC TIÊU NGHIỆP VỤ BÁO BIỂU 1:**
+> Thống kê tổng hợp quy mô tổ chức thi đấu, số lượng huấn luyện viên và hiệu suất tấn công [Bàn thắng, Kiến tạo] theo cấu trúc đa tầng phân cấp giải đấu [Loại giải đấu $\rightarrow$ Quốc gia $\rightarrow$ Giải đấu $\rightarrow$ Vòng đấu] và tiến trình chuỗi thời gian [Năm $\rightarrow$ Quý $\rightarrow$ Tháng $\rightarrow$ Ngày] kết hợp với thời lượng thi đấu [Minutes Played].
 
 ---
 
-## 1. Mục tiêu Nghiệp vụ và Ý nghĩa Thống kê Đa chiều
+## 1. Thông tin chung & Thiết lập Môi trường Kết nối
 
-### 1.1. Câu hỏi nghiệp vụ độc lập
-1. **Bức tranh Cấu trúc Giải đấu & Vòng đấu (Visual 1 - Stacked Bar):** Giải Vô địch Quốc gia (`domestic_league`) và Cúp Châu lục (`international_cup` - Champions League) có sự chênh lệch hỏa lực ra sao? Khoan sâu 4 cấp xuống từng Vòng đấu (`Round` từ `DIM Game`) để xem sản lượng bàn thắng qua Vòng bảng, Vòng 1/8, Tứ kết, Bán kết và Chung kết.
-2. **Nhịp điệu Hỏa lực theo Mùa giải & Quý (Visual 2 - Stacked Column):** Hỏa lực bàn thắng và kiến tạo phân bổ ra sao qua từng Mùa giải (`2022/2023` = 16,903 G+A; `2023/2024` = 17,009 G+A) và khi khoan sâu xuống từng Quý (`Q1`, `Q2`, `Q3`, `Q4`)? Nhãn Total Labels trên đỉnh cột cho thấy ngay tổng sản lượng từng giai đoạn.
-3. **Hiệu suất Tấn công Dưới Triết lý Huấn luyện viên trưởng (Visual 3 - Matrix Grouping & Totals):** Đánh giá năng lực xây dựng hỏa lực của từng Thuyền trưởng (*Pep Guardiola, Vincent Kompany, Peter Bosz, Xabi Alonso, Mikel Arteta, Luis Enrique...*). Dòng Subtotal của từng HLV cho biết tổng bàn thắng, tổng kiến tạo, tổng G+A và số trận cầm quân; dòng Grand Total ở đáy bảng tổng hợp toàn bộ hệ thống.
-
-### 1.2. Phân định độc lập tuyệt đối với Báo biểu 2 và Báo biểu 3
-* **Báo biểu 1 (Grouping & Totals Report):** Độc quyền về **Cấu trúc Giải đấu & Vòng đấu (`Competition Type`, `Country Name`, `Round`)**, **Chu kỳ Quý (`Quarter`)** và **Triết lý Huấn luyện viên trưởng (`Coach Name`, `Total Coaches = 175`)**.
-* **Báo biểu 2 (Executive Tactical Dashboard):** Độc quyền về **Trinh sát tác chiến & Bắt bài kẻ mạnh trước trận đấu** (Soi chân thuận `Foot`, độ tuổi `Age`, quốc tịch cầu thủ `Player Country`, thánh địa `Stadium`).
-* **Báo biểu 3 (Executive Discipline Dashboard):** Độc quyền về **Kỷ luật thẻ phạt và Tải trọng thể lực** (Thẻ vàng `Yellow Cards`, Thẻ đỏ `Red Cards`, Phút thi đấu theo lứa tuổi).
+* **Công cụ thực hiện:** Microsoft Power BI Desktop.
+* **Phương thức kết nối:** Connect live [kết nối trực tiếp đến khối cơ sở dữ liệu SSAS Multidimensional].
+* **Server Name:** `localhost` [hoặc tên máy tính `DESKTOP-9B88R8P`].
+* **Database Catalog:** `SSAS_Football_Transfermarkt`.
+* **Cube OLAP:** `DW Football Transfermarkt`.
+* **Cấu hình Canvas:** Kích thước tùy chỉnh Custom `1920 x 1080 px` [tỷ lệ chuẩn 16:9], Canvas Background màu sáng `#F8FAFC`.
 
 ---
 
-## 2. Sơ đồ Bố cục Pixel-Perfect (Canvas Full HD 1920 x 1080 px)
+## 2. Danh mục Thành phần Trực quan trên Báo biểu 1
 
-```
-+-------------------------------------------------------------------------------------------------------------------------+
-| [BANNER TIÊU ĐỀ] BÁO BIỂU 1: BÁO CÁO PHÂN NHÓM & TỔNG HỢP HIỆU SUẤT TẤN CÔNG THEO GIẢI ĐẤU, THỜI GIAN & HLV TRƯỞNG      |
-| Tọa độ: X = 20 px, Y = 15 px | Kích thước: Width = 1880 px, Height = 55 px                                              |
-+-------------------------------------------------------------------------------------------------------------------------+
-| [Card 1: Tổng Số Trận]    | [Card 2: Tổng Số HLV Trưởng]| [Card 3: Tổng Bàn Thắng]  | [Card 4: Tổng Đóng Góp G+A]       |
-| 6,965 Trận Quản Trị       | 175 Huấn Luyện Viên       | 19.17K Bàn Thắng Ghi Được | 33.91K Điểm Sát Thương Tấn Công   |
-| Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold        | Callout: 35pt Bold                |
-| Nền Pastel Blue #EFF6FF   | Nền Pastel Purple #FAF5FF | Nền Pastel Green #F0FDF4  | Nền Pastel Amber #FFFBEB          |
-| (W: 455, H: 90, X: 20)    | (W: 455, H: 90, X: 495)   | (W: 455, H: 90, X: 970)   | (W: 455, H: 90, X: 1445)          |
-+---------------------------+---------------------------+---------------------------+-----------------------------------+
-| [Bộ lọc 1: Mùa giải]      | [Bộ lọc 2: Loại Cúp/Giải] | [Bộ lọc 3: Quốc gia giải] | [Bộ lọc 4: Quý thi đấu]           |
-| DIM Time [Season]         | Comp [Competition Type]   | Comp [Country Name]       | DIM Time [Quarter]                |
-| Dropdown (W: 455, H: 75)  | Dropdown (W: 455, H: 75)  | Dropdown (W: 455, H: 75)  | Tile/Drop (W: 455, H: 75)         |
-| Tọa độ: X = 20, Y = 190   | Tọa độ: X = 495, Y = 190  | Tọa độ: X = 970, Y = 190  | Tọa độ: X = 1445, Y = 190         |
-+--------------------------------------------------+----------------------------------------------------------------------+
-| [VISUAL 1: STACKED BAR CẤU TRÚC GIẢI ĐẤU]        | [VISUAL 3: MATRIX PHÂN NHÓM & TỔNG HỢP THEO HLV TRƯỞNG]              |
-| Y: Competition Type -> Country -> Comp -> Round  | Rows: Coach Name -> Club Name -> Player Name                         |
-| X: Goals (#2563EB) + Assists (#06B6D4)           | Values: Goals, Assists, Goal Contributions (Data Bars), Matches      |
-| Total labels: ON | Drill-down: 4 cấp             | Subtotals: ON (Dòng Tổng từng HLV) | Grand Total: ON                 |
-| X = 20, Y = 280 | W = 860 px, H = 380 px         | Stepped layout: ON (Cây thư mục gập mở + / -)                        |
-+--------------------------------------------------+                                                                      |
-| [VISUAL 2: STACKED COLUMN THEO MÙA GIẢI & QUÝ]   |                                                                      |
-| X: Season -> Quarter (Drill-down 2 cấp)          |                                                                      |
-| Y: Goals (#2563EB) + Assists (#06B6D4)           |                                                                      |
-| Total labels: ON (Tổng G+A trên đỉnh mỗi cột)    |                                                                      |
-| X = 20, Y = 680 | W = 860 px, H = 380 px         | Tọa độ: X = 900 px, Y = 280 px | W = 1000 px, H = 780 px             |
-+--------------------------------------------------+----------------------------------------------------------------------+
-```
+Báo biểu 1 được bố cục khoa học gồm 11 visual trực quan:
+
+| STT | Tên thành phần Visual | Loại trực quan [Visual Type] | Thuộc tính / Độ đo ánh xạ | Vai trò nghiệp vụ |
+| :---: | :--- | :--- | :--- | :--- |
+| **1** | Banner Tiêu đề | TextBox | Tiêu đề báo biểu | Định danh nghiệp vụ Dashboard |
+| **2** | Card Tổng trận đấu | Card | `Distinct Matches Played` | Đo lường tổng số trận đấu |
+| **3** | Card Tổng HLV | Card | `Total Coaches` | Thống kê số lượng HLV tham gia |
+| **4** | Card Tổng bàn thắng | Card | `Goals` | Đo lường tổng số pha lập công |
+| **5** | Card Tổng kiến tạo | Card | `Assists` | Đo lường tổng số đường chuyền thành bàn |
+| **6** | Slicer Tên giải đấu | Slicer [Dropdown] | `DIM Competition.Competition Name` | Lọc dữ liệu theo từng giải đấu |
+| **7** | Slicer Quốc gia | Slicer [Dropdown] | `DIM Competition.Country Name` | Lọc dữ liệu theo quốc gia tổ chức |
+| **8** | Slicer Câu lạc bộ | Slicer [Dropdown] | `DIM Club.Club Name` | Lọc dữ liệu theo câu lạc bộ |
+| **9** | Slicer Cầu thủ | Slicer [Dropdown] | `DIM Player.Player Name` | Lọc dữ liệu theo cá nhân cầu thủ |
+| **10** | Biểu đồ Phân cấp giải đấu | Clustered Bar Chart | Category: Type $\rightarrow$ Country $\rightarrow$ Comp $\rightarrow$ Round<br>Y: `Goals`, `Assists` | Phân tích hiệu suất theo thứ bậc giải |
+| **11** | Biểu đồ Chuỗi thời gian | Line & Stacked Column Combo Chart | X: Year $\rightarrow$ Quarter $\rightarrow$ Month $\rightarrow$ Day<br>Column Y: `Goals`, `Assists`<br>Line Y: `Minutes Played` | Tương quan thời lượng và bàn thắng |
 
 ---
 
-## 3. Hướng dẫn Từng Bước Thiết lập Chi tiết trên Power BI Desktop
+## 3. Quy trình Thiết lập Chi tiết Từng bước trên Power BI
 
-### Bước 1: Khởi động và Cấu hình Canvas 1920 x 1080 px
-1. Mở phần mềm **Power BI Desktop**, kết nối **Connect live** tới máy chủ SSAS `localhost`, chọn khối Cube **`[DW Football Transfermarkt]`**.
-2. Đổi tên trang thành: `Grouping & Totals (Giải đấu, Quý & HLV)`.
-3. Mở khung **Format report page**:
-   * **Canvas settings:** Type: `Custom`, `Width = 1920 px`, `Height = 1080 px`.
-   * **Canvas background:** Chọn màu xám khói `#F8FAFC`, gạt **Transparency = `0%`**.
+### Bước 1: Khởi tạo kết nối dữ liệu từ SSAS Database
+1. Khởi động phần mềm **Microsoft Power BI Desktop**.
+2. Tại thanh Ribbon thẻ **Home**, nhấp chọn **Get data** $\rightarrow$ nhấp chọn **SQL Server Analysis Services database**.
 
----
+*Hình 4.1. Chọn phương thức kết nối SQL Server Analysis Services database trên Power BI*
 
-### Bước 2: Thiết lập Hero Banner Tiêu đề Trang (Tầng 1)
-1. Trên thẻ **Insert**, chọn **Text box**.
-2. Nhập nội dung: `BÁO BIỂU 1: BÁO CÁO PHÂN NHÓM & TỔNG HỢP HIỆU SUẤT TẤN CÔNG THEO GIẢI ĐẤU, THỜI GIAN & HLV TRƯỞNG`.
-3. Font `Segoe UI`, Cỡ chữ **`20 pt` Bold**, Căn giữa (**Center**), màu `#0F172A`.
-4. Thẻ **General** $\rightarrow$ **Properties**: `Width = 1880 px`, `Height = 55 px`, `X = 20 px`, `Y = 15 px`.
-5. **Effects:** Nền `#FFFFFF`, Viền mỏng `#E2E8F0`, Bo góc `10 px`.
+3. Cửa sổ kết nối xuất hiện:
+   * **Server:** Nhập `localhost` [hoặc tên máy tính cá nhân].
+   * **Database:** Nhập `SSAS_Football_Transfermarkt`.
+   * **Connection mode:** Tích chọn vào mục **Connect live**.
+   * Nhấp nút **OK**.
 
----
+*Hình 4.2. Khai báo thông số kết nối Connect live đến SSAS Database*
 
-### Bước 3: Thiết lập Khối 4 Thẻ KPI Quản trị & Hỏa lực Cốt lõi
-Tạo 4 visual **Card** tại hàng `Y = 85 px`, `Height = 90 px`, `Width = 455 px`:
+4. Cửa sổ Navigator hiển thị danh mục khối đa chiều, nhấp chọn khối **`DW Football Transfermarkt`** rồi nhấn **OK**.
 
-1. **Card 1 (Tổng Số Trận Quản Trị):** `X = 20 px`.
-   * Kéo thước đo **`[Measures].[Distinct Matches Played]`**. Đổi tên: `Tổng Số Trận Quản Trị`.
-   * Callout value: **`35 pt` Bold** (hiển thị `6,965`), màu `#0F172A`. Nền `#EFF6FF` (Pastel Blue), Bo góc `10 px`.
-2. **Card 2 (Tổng Số Huấn Luyện Viên Trưởng):** `X = 495 px`.
-   * Kéo thước đo chuẩn **`[Measures].[Total Coaches]`**. Đổi tên: `Tổng Số HLV Trưởng`.
-   * Callout value: **`35 pt` Bold** (hiển thị **`175`** HLV), màu `#0F172A`. Nền `#FAF5FF` (Pastel Purple), Bo góc `10 px`.
-3. **Card 3 (Tổng Bàn Thắng Toàn Giải):** `X = 970 px`.
-   * Kéo thước đo **`[Measures].[Goals]`**. Đổi tên: `Tổng Bàn Thắng Toàn Giải`.
-   * Callout value: **`35 pt` Bold** (hiển thị `19.17K`). Nền `#F0FDF4` (Pastel Green), Bo góc `10 px`.
-4. **Card 4 (Tổng Điểm Sát Thương Tấn Công G+A):** `X = 1445 px`.
-   * Kéo thước đo **`[Measures].[Goal Contributions]`**. Đổi tên: `Tổng Đóng Góp G+A`.
-   * Callout value: **`35 pt` Bold** (hiển thị `33.91K`). Nền `#FFFBEB` (Pastel Amber), Bo góc `10 px`.
+*Hình 4.3. Chọn Cube DW Football Transfermarkt trong cửa sổ Navigator*
 
 ---
 
-### Bước 4: Thiết lập Khối 4 Bộ lọc Slicers Mới 100%
-Tại hàng `Y = 190 px`, `Height = 75 px`, tạo 4 bộ lọc rộng rãi `Width = 455 px`:
+### Bước 2: Cấu hình kích thước trang báo cáo [Canvas Settings]
+1. Trong giao diện thiết kế, quan sát thanh bảng điều khiển bên phải, nhấp vào biểu tượng **Format page** [hình cây cọ lăn sơn].
+2. Mở rộng mục **Canvas settings**:
+   * Tại ô **Type**, nhấp chọn kiểu **Custom**.
+   * Thiết lập **Width** là `1920 px`.
+   * Thiết lập **Height** là `1080 px`.
+3. Mở rộng mục **Canvas background**, chọn màu nền xám sáng nhạt `#F8FAFC` để tôn vinh độ tương phản của các biểu đồ.
 
-1. **Slicer 1 (Mùa giải):** `X = 20 px`, kéo `DIM Time [Season]`, Style `Dropdown`.
-2. **Slicer 2 (Phân loại Cúp / Giải - MỚI):** `X = 495 px`, kéo `DIM Competition [Competition Type]`, Style `Dropdown` (Lọc xem Cúp Châu lục `international_cup` hay Giải Quốc nội `domestic_league`).
-3. **Slicer 3 (Quốc gia giải đấu - MỚI):** `X = 970 px`, kéo `DIM Competition [Country Name]`, Style `Dropdown` (Lọc theo England, Spain, Germany, Italy, France...).
-4. **Slicer 4 (Quý thi đấu - MỚI):** `X = 1445 px`, kéo `DIM Time [Quarter]`, Style `Tile` hoặc `Dropdown` (Lọc theo Q1, Q2, Q3, Q4).
-
----
-
-### Bước 5: Visual 1 (Trên Trái) – Stacked Bar Chart Phân cấp Giải đấu & Vòng đấu
-
-Biểu đồ thanh ngang xếp chồng phân tầng cấu trúc giải đấu 4 cấp kèm nhãn **Total Labels**:
-
-1. **Cấu hình trường dữ liệu:**
-   * Chọn visual **Stacked bar chart** (Biểu đồ thanh ngang xếp chồng).
-   * Thẻ **General** $\rightarrow$ **Properties**: `X = 20 px`, `Y = 280 px`, `Width = 860 px`, `Height = 380 px`.
-   * **Y-axis (Phân cấp 4 tầng - 4-Level Drill-down):** Kéo lần lượt 4 trường:
-     1. `DIM Competition` $\rightarrow$ **`[Competition Type]`** (Cấp 1: Loại giải).
-     2. `DIM Competition` $\rightarrow$ **`[Country Name]`** (Cấp 2: Quốc gia giải đấu).
-     3. `DIM Competition` $\rightarrow$ **`[Competition Name]`** (Cấp 3: Tên giải đấu cụ thể).
-     4. `DIM Game` $\rightarrow$ **`[Round]`** (Cấp 4: Vòng đấu / Chặng thi đấu - *Group A-H, last 16, Quarter-Finals, Semi-Finals, Final hoặc Matchday 1..38*).
-   * **X-axis:** Kéo 2 thước đo: `[Measures].[Goals]` và `[Measures].[Assists]`.
-2. **Định dạng Grouping & Totals (Tab Format visual):**
-   * **Total labels:** Gạt **ON**! (Font `Segoe UI Bold`, `11 pt`, màu `#0F172A` hiển thị **Tổng G+A** ở đầu mỗi thanh).
-   * **Data labels:** Gạt **ON** (`Inside end`, `10 pt`).
-   * **Bars:** `Goals` màu **`#2563EB`** (Xanh dương đậm), `Assists` màu **`#06B6D4`** (Xanh Cyan).
-   * **Y-axis Title:** `OFF`; **X-axis:** `OFF`.
-3. **Tiêu đề:** Bật **ON**, nhập `Phân cấp Hỏa lực theo Giải đấu & Vòng đấu (Stacked Bar Drill-down)`, Font `Segoe UI`, **`16 pt` Bold**, Căn giữa. Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+*Hình 4.4. Cấu hình Canvas settings chuẩn Full HD 1920x1080 cho Báo biểu 1*
 
 ---
 
-### Bước 6: Visual 2 (Dưới Trái) – Stacked Column Chart Phân nhóm theo Mùa giải & Quý
+### Bước 3: Tạo Banner Tiêu đề cho Báo biểu 1
+1. Trên thanh Ribbon, chọn thẻ **Insert** $\rightarrow$ nhấp chọn **Text box**.
+2. Thiết lập tọa độ vị trí và kích thước cho Text box:
+   * Vị trí: `x = 20 px`, `y = 10 px`.
+   * Kích thước: `Width = 1880 px`, `Height = 70 px`.
+3. Nhập nội dung tiêu đề: **`BÁO BIỂU: TỔNG HỢP HIỆU SUẤT TẤN CÔNG THEO CẤU TRÚC GIẢI ĐẤU & HUẤN LUYỆN VIÊN`**.
+4. Định dạng chữ in hoa đậm, font chữ Segoe UI / Arial, cỡ chữ `18 pt`, màu xanh tím than đậm `#1B365D`, căn lề chính giữa.
 
-Biểu đồ cột dọc xếp chồng thể hiện tổng sản lượng tấn công theo chu kỳ thời gian kèm nhãn **Total Labels**:
-
-1. **Cấu hình trường dữ liệu:**
-   * Chọn visual **Stacked column chart** (Biểu đồ cột dọc xếp chồng).
-   * Thẻ **General** $\rightarrow$ **Properties**: `X = 20 px`, `Y = 680 px`, `Width = 860 px`, `Height = 380 px`.
-   * **X-axis (Phân cấp 2 tầng - Drill-down):** Kéo lần lượt 2 trường:
-     1. `DIM Time` $\rightarrow$ **`[Season]`** (Cấp 1: `2022/2023`, `2023/2024`).
-     2. `DIM Time` $\rightarrow$ **`[Quarter]`** (Cấp 2: Quý `1`, `2`, `3`, `4`).
-   * **Y-axis:** Kéo 2 thước đo: `[Measures].[Goals]` và `[Measures].[Assists]`.
-2. **Định dạng Grouping & Totals (Tab Format visual):**
-   * **Total labels:** Gạt **ON**! (Font `Segoe UI Bold`, `12 pt`, màu `#0F172A` hiển thị tổng **16,903** cho mùa `2022/2023` và **17,009** cho mùa `2023/2024`; khi bấm Drill-down xuống Quý sẽ tự động hiển thị tổng của từng Quý).
-   * **Data labels:** Gạt **ON** (`Inside center`, `11 pt`).
-   * **Columns:** `Goals` màu **`#2563EB`**, `Assists` màu **`#06B6D4`** (đồng bộ màu 100% với Visual 1).
-   * **X-axis Title:** `OFF`; **Y-axis:** `OFF`.
-3. **Tiêu đề:** Bật **ON**, nhập `Tổng hợp Hỏa lực theo Mùa giải & Quý (Stacked Column Grouping & Totals)`, Font `Segoe UI`, **`16 pt` Bold**, Căn giữa. Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+*Hình 4.5. Tạo và định dạng Text box tiêu đề cho Báo biểu 1*
 
 ---
 
-### Bước 7: Visual 3 (Bên Phải) – Ma trận Phân nhóm & Tổng hợp theo Huấn Luyện Viên Trưởng (Matrix Grouping & Totals)
+### Bước 4: Tạo và cấu hình hàng thẻ chỉ số KPI tổng quan [Cards Row]
+Kéo thả 4 visual dạng **Card** từ khung Visualizations vào hàng ngang ngay dưới banner tiêu đề [tọa độ `y = 100 px`, chiều cao `Height = 100 px`, chiều rộng `Width = 450 px`]:
+1. **Card 1 [Tổng số trận đấu]:** Kéo thước đo `FACT Player Match Perf.Distinct Matches Played` vào ô **Fields/Values**. Chuột phải vào tên trường chọn **Rename for this visual** đổi thành `Tổng số trận đấu`. Vị trí: `x = 20 px`.
+2. **Card 2 [Tổng số Huấn luyện viên]:** Kéo thước đo `FACT Player Match Perf.Total Coaches` vào ô **Fields/Values**. Đổi tên hiển thị thành `Tổng số Huấn luyện viên`. Vị trí: `x = 492 px`.
+3. **Card 3 [Tổng số Bàn thắng]:** Kéo thước đo `FACT Player Match Perf.Goals` vào ô **Fields/Values**. Đổi tên hiển thị thành `Tổng số Bàn thắng`. Vị trí: `x = 959 px`.
+4. **Card 4 [Tổng số Kiến tạo]:** Kéo thước đo `FACT Player Match Perf.Assists` vào ô **Fields/Values**. Đổi tên hiển thị thành `Tổng số Kiến tạo`. Vị trí: `x = 1433 px`.
 
-Bảng ma trận đa cấp độ sâu 3 tầng hoàn thiện chuẩn mực **Grouping and Totals** với dòng Subtotals và Grand Total:
+*Hình 4.6. Cấu hình các thẻ Card KPI đo lường quy mô và sản lượng tấn công*
 
-1. **Cấu hình trường dữ liệu:**
-   * Chọn visual **Matrix** (Ma trận phân cấp).
-   * Thẻ **General** $\rightarrow$ **Properties**: `X = 900 px`, `Y = 280 px`, `Width = 1000 px`, `Height = 780 px`.
-   * **Rows (Phân nhóm 3 cấp):**
-     1. `DIM Club` $\rightarrow$ **`[Coach Name]`** (Cấp 1: Huấn luyện viên trưởng - *Pep Guardiola, Vincent Kompany, Peter Bosz, Xabi Alonso, Mikel Arteta...*).
-     2. `DIM Club` $\rightarrow$ **`[Club Name]`** (Cấp 2: Câu lạc bộ dẫn dắt).
-     3. `DIM Player` $\rightarrow$ **`[Player Name]`** (Cấp 3: Cầu thủ / Học trò ghi bàn).
-   * **Values (Các thước đo tổng hợp):**
-     1. `[Measures].[Goals]` (Số bàn thắng).
-     2. `[Measures].[Assists]` (Số pha kiến tạo).
-     3. `[Measures].[Goal Contributions]` (Tổng G+A).
-     4. `[Measures].[Distinct Matches Played]` (Số trận cầm quân).
-2. **Kích hoạt Grouping & Totals:**
-   * Tab **Format visual** $\rightarrow$ mục **Subtotals**:
-     * Gạt **Row subtotals: ON**! Định dạng chữ in đậm (**Bold**), màu nền xám nhạt `#E2E8F0`.
-     * *Ý nghĩa:* Dòng Subtotal cấp HLV hiển thị tổng chính xác từng vị Thuyền trưởng (ví dụ: *Pep Guardiola: 245 bàn, 190 kiến tạo, 435 G+A sau 99 trận*).
-   * Mục **Grand total**: Gạt **Row grand total: ON**! (Dòng tổng cộng toàn bộ ở đáy bảng).
-   * **Row headers** $\rightarrow$ **Options**: Bật **Stepped layout: ON** (cây thư mục có nút `+ / -` gập mở mượt mà).
-3. **Bật thanh dữ liệu Data Bars:**
-   * Tab **Format visual** $\rightarrow$ **Cell elements** $\rightarrow$ chọn `Goal Contributions`, bật **Data bars: ON**, màu **`#2563EB`**.
-4. **Tiêu đề & Nhãn:**
-   * Title: Bật **ON**, nhập `Bảng Ma trận Phân nhóm & Tổng hợp theo HLV Trưởng (Matrix Grouping & Totals)`, Font `Segoe UI`, **`18 pt` Bold**, Căn giữa.
-   * Đổi tên nhãn hàng: `Coach Name` $\rightarrow$ `Huấn luyện viên`, `Club Name` $\rightarrow$ `Câu lạc bộ`, `Player Name` $\rightarrow$ `Cầu thủ`.
-   * Nền `#FFFFFF`, Viền `#CBD5E1`, Bo góc `10 px`.
+*Hình 4.7. Kết quả hiển thị hàng thẻ Card KPI Báo biểu 1*
 
 ---
 
-## 4. Kết quả Nghiệm thu và Tương tác Chéo
+### Bước 5: Tạo và cấu hình hàng bộ lọc động tương tác [Slicers Row]
+Kéo thả 4 visual dạng **Slicer** vào hàng thứ hai [tọa độ `y = 225 px`, chiều cao `Height = 75 px`, chiều rộng `Width = 450 px`]:
+1. **Slicer 1 [Tên giải đấu]:** Kéo thuộc tính `DIM Competition.Competition Name` vào ô **Field**. Vào mục Format visual $\rightarrow$ Slicer settings $\rightarrow$ Style chọn **Dropdown**. Vị trí: `x = 20 px`.
+2. **Slicer 2 [Quốc gia tổ chức]:** Kéo thuộc tính `DIM Competition.Country Name` vào ô **Field**, định dạng kiểu Dropdown. Vị trí: `x = 494 px`.
+3. **Slicer 3 [Câu lạc bộ]:** Kéo thuộc tính `DIM Club.Club Name` vào ô **Field**, định dạng kiểu Dropdown. Vị trí: `x = 961 px`.
+4. **Slicer 4 [Cầu thủ]:** Kéo thuộc tính `DIM Player.Player Name` vào ô **Field**, định dạng kiểu Dropdown có thanh Search tìm kiếm nhanh. Vị trí: `x = 1433 px`.
 
-1. **Đáp ứng 100% cả tính trực quan lẫn chuẩn mực Grouping & Totals:**
-   * **Stacked Bar (Visual 1)** & **Stacked Column (Visual 2)** mang lại sự đa dạng đồ họa, đều có **Drill-down phân nhóm (Grouping)** và bật **Total Labels (Totals)**.
-   * **Matrix (Visual 3)** cung cấp đầy đủ dòng **Subtotals** theo từng HLV và **Grand Total** ở đáy bảng, đảm bảo tuyệt đối tiêu chí chấm điểm của đề bài.
-2. **Kịch bản Tương tác Chéo (Cross-filtering):**
-   * Nhấp vào `uefa-champions-league` $\rightarrow$ `Final` ở **Stacked Bar (Visual 1)** $\rightarrow$ **Stacked Column (Visual 2)** tự động lọc thời điểm diễn ra trận chung kết và **Matrix (Visual 3)** lập tức bung ra danh sách HLV cùng cầu thủ ghi bàn ở trận Chung kết!
-   * Nhấp vào Quý `4` của `2023/2024` ở **Stacked Column (Visual 2)** $\rightarrow$ Xem ngay phong độ bùng nổ của các giải đấu và HLV trong giai đoạn nước rút Q4!
+*Hình 4.8. Cấu hình hàng Slicer bộ lọc động cho Báo biểu 1*
+
+*Hình 4.9. Kết quả hàng Slicer bộ lọc Báo biểu 1*
+
+---
+
+### Bước 6: Tạo và cấu hình Biểu đồ phân cấp giải đấu [Clustered Bar Chart]
+1. Tại khung Visualizations, nhấp chọn biểu tượng **Clustered bar chart** [biểu đồ thanh ngang theo cụm] và kéo đặt vào khu vực bên trái [tọa độ `x = 20 px`, `y = 320 px`, `Width = 920 px`, `Height = 384 px`].
+2. Cấu hình các trục dữ liệu:
+   * **Trục danh mục [Y-axis / Category]:** Kéo lần lượt 4 cấp thuộc tính theo đúng thứ tự phân tầng:
+     - Cấp 1: `DIM Competition.Competition Type` [Loại giải: domestic_league, international_cup...].
+     - Cấp 2: `DIM Competition.Country Name` [Quốc gia tổ chức].
+     - Cấp 3: `DIM Competition.Competition Name` [Tên giải đấu cụ thể].
+     - Cấp 4: `DIM Game.Round` [Vòng đấu / Chặng thi đấu].
+   * **Trục giá trị đo lường [X-axis]:** Kéo 2 độ đo `FACT Player Match Perf.Goals` và `FACT Player Match Perf.Assists`.
+3. Định dạng biểu đồ:
+   * Vào Format visual $\rightarrow$ **Data labels** $\rightarrow$ Bật **On** để hiển thị rõ ràng con số bàn thắng và kiến tạo trên từng thanh.
+   * Cấu hình màu sắc cột: Màu xanh dương đậm cho `Goals` và màu cam san hô cho `Assists`.
+   * Tính năng Drill Down trên góc biểu đồ cho phép người xem nhấp đúp chuột để khám phá từ loại giải xuống từng quốc gia, giải đấu và từng vòng đấu chi tiết.
+
+*Hình 4.10. Cấu hình cấu trúc phân tầng 4 cấp và độ đo cho biểu đồ Clustered bar chart*
+
+*Hình 4.11. Kết quả biểu đồ Clustered bar chart phân cấp giải đấu*
+
+---
+
+### Bước 7: Tạo và cấu hình Biểu đồ kết hợp chuỗi thời gian [Combo Chart]
+1. Tại khung Visualizations, chọn biểu tượng **Line and stacked column chart** [biểu đồ kết hợp cột chồng và đường] và đặt vào khu vực bên phải [tọa độ `x = 963 px`, `y = 319 px`, `Width = 920 px`, `Height = 385 px`].
+2. Cấu hình các trục dữ liệu:
+   * **Trục thời gian [X-axis]:** Kéo lần lượt phân cấp thời gian: `DIM Time.Year` $ightarrow$ `DIM Time.Quarter` $ightarrow$ `DIM Time.Month` $ightarrow$ `DIM Time.Day`.
+   * **Trục cột đo lường [Column y-axis]:** Kéo `FACT Player Match Perf.Goals` và `FACT Player Match Perf.Assists`.
+   * **Trục đường biểu diễn [Line y-axis]:** Kéo thước đo `FACT Player Match Perf.Minutes Played`.
+3. Định dạng nâng cao:
+   * Vào Format visual $\rightarrow$ mở rộng mục **Y-axis**, bật tính năng **Secondary y-axis** [trục tung phụ bên phải] để tách riêng thang đo phút thi đấu độc lập với thang đo số bàn thắng/kiến tạo.
+   * Bật **Data labels** cho cả hai trục để theo dõi biến động chính xác.
+
+*Hình 4.12. Cấu hình biểu đồ Line and stacked column chart theo chuỗi thời gian*
+
+*Hình 4.13. Kết quả biểu đồ kết hợp chuỗi thời gian Báo biểu 1*
+
+---
+
+### Bước 8: Căn chỉnh bố cục tổng thể và Kiểm thử tương tác
+1. Chọn tất cả các visual trên trang, vào thẻ **Format** trên thanh Ribbon $ightarrow$ sử dụng tính năng **Align** [Align Top, Distribute Horizontally] để bảo đảm khoảng cách lề và giữa các visual chuẩn xác từng pixel.
+2. Kiểm thử tương tác chéo [Cross-filtering]: Nhấp chuột vào thanh giải đấu `England` trên biểu đồ phân cấp, toàn bộ các Card và biểu đồ thời gian lập tức chuyển sang ngữ cảnh riêng của bóng đá Anh.
+
+*Hình 4.14. Kết quả giao diện hoàn chỉnh của Báo biểu 1 trên Power BI Desktop*
+
+---
+
+## 4. Phân tích Kết quả và Nhận xét Nghiệp vụ Báo biểu 1
+
+Từ các số liệu trực quan hóa trên Báo biểu 1, nhóm rút ra các nhận định phân tích nghiệp vụ sâu sắc:
+1. **Phân bổ quy mô giải đấu:** Các giải đấu Vô địch Quốc gia [domestic_league] chiếm hơn $85\%$ tổng số trận đấu và tổng số bàn thắng, giữ vai trò nền tảng cho toàn bộ hoạt động bóng đá đỉnh cao châu Âu.
+2. **Sức mạnh hỏa lực các giải đấu hàng đầu:** Ngoại Hạng Anh [Premier League] và LaLiga [Tây Ban Nha] dẫn đầu toàn châu lục về tổng sản lượng bàn thắng và kiến tạo, đồng thời quy tụ số lượng huấn luyện viên trưởng danh tiếng đông đảo nhất.
+3. **Tính chu kỳ thi đấu theo mùa:** Biểu đồ kết hợp chuỗi thời gian vạch rõ hai giai đoạn bùng nổ bàn thắng mạnh mẽ nhất trong năm: Giai đoạn tháng 12 đến tháng 1 [lịch thi đấu mùa đông dày đặc] và giai đoạn tháng 4 đến tháng 5 [giai đoạn đua tranh vô địch và trụ hạng khốc liệt].
+4. **Tương quan giữa thể lực và hiệu quả tấn công:** Đường biểu diễn số phút thi đấu [Minutes Played] tỷ lệ thuận hoàn hảo với số lượng bàn thắng, khẳng định chiều sâu đội hình và khả năng duy trì thể lực liên tục là nhân tố quyết định đến sự bùng nổ bàn thắng của các đội bóng.
