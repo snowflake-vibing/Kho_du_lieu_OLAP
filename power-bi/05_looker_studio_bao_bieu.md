@@ -47,9 +47,11 @@ Nếu bạn đã quen Power BI Desktop, hãy nắm **6 điểm khác biệt cố
 
 Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các cột của `Football_Report_Data.csv`):
 
-1. **Kiểm tra & Chuẩn hóa Kiểu dữ liệu Ngày/Tháng/Quý (`Tài nguyên` $\rightarrow$ `Quản lý các nguồn dữ liệu đã thêm` $\rightarrow$ `Chỉnh sửa`):**
-   * Đảm bảo các cột số đo `Goals`, `Assists`, `Goal_Contributions`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards`, `Stadium_Seats`, `Age` đều có kiểu **`Số`** (`123`).
-   * Tệp CSV đã được định dạng sẵn chuẩn Looker Studio (`YYYYMMDD`, `MM`, `DD`), bạn chỉ cần kiểm tra/chuyển các cột thời gian sang đúng nhóm **`Ngày và giờ`** (`📅`):
+1. **Kiểm tra & Chuẩn hóa Kiểu dữ liệu (`Tài nguyên` $\rightarrow$ `Quản lý các nguồn dữ liệu đã thêm` $\rightarrow$ `Chỉnh sửa`):**
+   * **Nhóm Cột Số đo (Giữ kiểu `Số` `123`):** `Goals`, `Assists`, `Goal_Contributions`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards`, `Stadium_Seats`, `Age`, `Height_In_Cm`, `Squad_Size`, `Home_Club_Goals`, `Away_Club_Goals`.
+   * **Nhóm Cột Mã ID (Chuyển toàn bộ sang kiểu `Văn bản` `ABC`):** Vì Looker Studio tự nhận các mã ID toàn số là `Số` (Metric), bạn bấm đổi tất cả các cột sau thành **`Văn bản`** để dùng làm khóa phân nhóm/đếm (`COUNT_DISTINCT` vẫn chạy chuẩn):
+     * `Appearance_ID`, `Player_ID`, `Club_ID`, `Opponent_Club_ID`, `Competition_ID`, `Game_ID`, `Home_Club_ID`, `Away_Club_ID`, `Time_ID`.
+   * **Nhóm Cột Thời gian (Chuyển sang nhóm `Ngày và giờ` `📅`):**
      * `Full_Date` & `Date_Of_Birth`: **`Ngày và giờ` $\rightarrow$ `Ngày`** *(tự nhận dạng từ `20220805`, `19910509`)*.
      * `Year`: **`Ngày và giờ` $\rightarrow$ `Năm`** (`YYYY`).
      * `Quarter`: **`Ngày và giờ` $\rightarrow$ `Quý`** (`Q`).
