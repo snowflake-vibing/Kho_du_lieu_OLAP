@@ -3,7 +3,7 @@
 Tài liệu này hướng dẫn **từng cú nhấp chuột (click-by-click)** bằng **giao diện Tiếng Việt** của **Google Data Studio (Looker Studio)**, giúp bạn chuyển đổi mượt mà từ tư duy Power BI sang nền tảng Web của Google: từ bước **nạp tệp CSV**, **tạo tập dữ liệu**, **căn chỉnh giao diện Full HD**, đến **thiết kế hoàn chỉnh 3 Báo biểu** đồng bộ 100% với Power BI.
 
 > [!NOTE]
-> **Nguồn dữ liệu sử dụng:** Tệp phẳng **`Football_Report_Data.csv`** (`210,747` dòng, ~72.2 MB, chuẩn UTF-8) lưu tại:  
+> **Nguồn dữ liệu sử dụng:** Tệp phẳng **`Football_Report_Data.csv`** (`210,747` dòng, ~64.2 MB, chuẩn UTF-8 — xuất trực tiếp 100% các cột gốc từ `DW_Football_Transfermarkt`, không chứa cột tự chế dư thừa) lưu tại:  
 > [Football_Report_Data.csv](file:///D:/Kho_du_lieu_OLAP/football/cleaned_data/Football_Report_Data.csv) (`D:\Kho_du_lieu_OLAP\football\cleaned_data\Football_Report_Data.csv`)
 >
 > *(Chi tiết 3 báo biểu tách riêng có thể tham khảo thêm tại thư mục [google-data-studio/](file:///d:/Kho_du_lieu_OLAP/google-data-studio/README.md)).*
@@ -108,7 +108,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 
 ### 4.3.1 Báo biểu 1: Báo cáo Phân nhóm & Tổng hợp (Grouping and Totals Report)
 > **Tên trang:** `Báo biểu 1 - Grouping & Totals`  
-> **Mục tiêu:** Đáp ứng tiêu chí *"1 report dạng Grouping and Totals"* với bộ ba visual **Biểu đồ thanh xếp chồng + Biểu đồ cột xếp chồng + Bảng tổng hợp Pivot** và bộ cột mới (`Coach_Name`, `Competition_Type`, `Competition_Country`, `Match_Round`, `Quarter`).
+> **Mục tiêu:** Đáp ứng tiêu chí *"1 report dạng Grouping and Totals"* với bộ ba visual **Biểu đồ thanh xếp chồng + Biểu đồ cột xếp chồng + Bảng tổng hợp Pivot** và bộ cột mới (`Coach_Name`, `Competition_Type`, `Country_Name`, `Round`, `Quarter`).
 
 #### 1. Tạo Banner Tiêu đề & 4 Thẻ điểm KPI (Scorecards) ở đầu trang
 * **Banner Tiêu đề:** Bấm công cụ **`Văn bản`**, vẽ khung tại `X=20, Y=15, Rộng=1880, Cao=55`, nhập:  
@@ -124,14 +124,14 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 Đặt hàng ngang `Y=190, Cao=75, Rộng=455`:
 * **Bộ lọc 1 (`X=20`):** Trường điều khiển = `Season` *(Mùa giải)*.
 * **Bộ lọc 2 (`X=495`):** Trường điều khiển = `Competition_Type` *(Loại giải: Quốc nội vs Cúp Châu lục)*.
-* **Bộ lọc 3 (`X=970`):** Trường điều khiển = `Competition_Country` *(Quốc gia giải đấu)*.
+* **Bộ lọc 3 (`X=970`):** Trường điều khiển = `Country_Name` *(Quốc gia giải đấu)*.
 * **Bộ lọc 4 (`X=1445`):** Trường điều khiển = `Quarter` *(Quý thi đấu Q1–Q4)*.
 
 #### 3. Thiết kế Bộ ba Visual (Thân trang)
 
 1. **Visual 1 (Trên Trái – `Biểu đồ thanh xếp chồng`):** Đặt tại `X=20, Y=280, Rộng=860, Cao=380`.
    * **Tab `Thiết lập`:**
-     * **Phương diện:** Kéo `Competition_Type` $\rightarrow$ gạt công tắc **`Khoan sâu`** sang **BẬT** $\rightarrow$ bấm **`Thêm phương diện`** thêm lần lượt: `Competition_Country` $\rightarrow$ `Competition_Name` $\rightarrow$ `Match_Round`.
+     * **Phương diện:** Kéo `Competition_Type` $\rightarrow$ gạt công tắc **`Khoan sâu`** sang **BẬT** $\rightarrow$ bấm **`Thêm phương diện`** thêm lần lượt: `Country_Name` $\rightarrow$ `Competition_Name` $\rightarrow$ `Round`.
      * **Chỉ số:** Xóa `Record Count`, kéo **`Goals`** (`Tổng`) và **`Assists`** (`Tổng`).
      * **Sắp xếp:** `Goals` $\rightarrow$ **`Giảm dần`**.
      * **Tương tác với biểu đồ:** Tích chọn **`Áp dụng bộ lọc`** *(để bấm vào giải đấu sẽ lọc luôn bảng HLV bên phải)*.
@@ -174,7 +174,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 | **Trên Trái** (`X=20, Y=280`) | **Biểu đồ thanh** *(Bar chart)* — Top 10 CLB Hỏa lực | **Phương diện:** `Club_Name`<br>**Chỉ số:** `Goals` (`Tổng`), `Assists` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần`<br>**Bộ lọc:** `Scorers_Only` | **Số lượng thanh:** `10`<br>Tích **`Hiển thị nhãn dữ liệu`** |
 | **Trên Phải** (`X=975, Y=280`) | **Biểu đồ kết hợp** *(Combo chart)* — Chảo lửa Sân vận động | **Phương diện:** `Stadium_Name`<br>**Chỉ số:** `Distinct Matches`, `Goals` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần` | **Số lượng thanh:** `10`<br>Chuỗi #1 (`Distinct Matches`): **`Thanh`**<br>Chuỗi #2 (`Goals`): **`Đường`**, **Trục:** **`Phải`** |
 | **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng** *(Area chart)* — Biến thiên Bàn thắng | **Phương diện:** `Full_Date` $\rightarrow$ bấm `✏️` chọn **Loại: Ngày và giờ $\rightarrow$ `Năm Tháng`**<br>**Chỉ số:** `Goals` (`Tổng`) | Tích **`Hiển thị điểm`**, màu xanh `#2563EB` |
-| **Dưới Phải** (`X=975, Y=680`) | **Bảng có thanh màu** *(Table with bars)* — Trinh sát Cầu thủ | **Phương diện:** `Player_Name`, `Player_Country`, `Sub_Position`, `Foot`, `Age`<br>**Chỉ số:** `Goals`, `Assists`, `Goal_Contributions`<br>**Sắp xếp:** `Goal_Contributions` `Giảm dần` | Cột `Goal_Contributions` chọn hiển thị **`Thanh`** + **`Hiển thị số`**<br>Tiêu đề bảng nền `#0F172A` chữ trắng |
+| **Dưới Phải** (`X=975, Y=680`) | **Bảng có thanh màu** *(Table with bars)* — Trinh sát Cầu thủ | **Phương diện:** `Player_Name`, `Country_Of_Citizenship`, `Sub_Position`, `Foot`, `Age`<br>**Chỉ số:** `Goals`, `Assists`, `Goal_Contributions`<br>**Sắp xếp:** `Goal_Contributions` `Giảm dần` | Cột `Goal_Contributions` chọn hiển thị **`Thanh`** + **`Hiển thị số`**<br>Tiêu đề bảng nền `#0F172A` chữ trắng |
 
 ---
 
@@ -182,7 +182,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 > **Tên trang:** `Báo biểu 3 - Kỷ luật & Thể lực`
 
 * **4 Thẻ điểm KPI (`Y=85, Cao=90`):** `Yellow_Cards` (`Tổng`), `Red_Cards` (`Tổng`), `Appearance_ID` (`Đếm`, đổi tên `Tổng Lượt Ra Sân` = `210.75K`), `Minutes_Played` (`Tổng` = `13.56M`).
-* **4 Bộ lọc (`Y=190, Cao=75`):** `Season`, `Competition_Name`, `Competition_Country`, `Main_Position`.
+* **4 Bộ lọc (`Y=190, Cao=75`):** `Season`, `Competition_Name`, `Country_Name`, `Main_Position`.
 * **Lưới 2x2 ở thân trang (`Rộng=925, Cao=380` mỗi ô):**
 
 | Vị trí | Loại Biểu đồ | Tab `Thiết lập` (Setup) | Tab `Kiểu` (Style) |
@@ -199,5 +199,5 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 1. Nhấp nút **`Xem`** màu xanh ở góc trên bên phải màn hình để chuyển sang chế độ người dùng cuối.
 2. **Kiểm tra 3 điểm chốt:**
    * Bấm vào thanh `uefa-champions-league` trên Visual 1 (Trang 1) $\rightarrow$ 4 Thẻ điểm KPI và Bảng tổng hợp Pivot HLV phải tự động lọc theo Cúp C1.
-   * Bấm nút mũi tên **`↓` (Khoan sâu)** ở góc trên phải Visual 1 để khoan từ `international_cup` xuống tới `Match_Round` (`Final`, `Semi-Finals`).
+   * Bấm nút mũi tên **`↓` (Khoan sâu)** ở góc trên phải Visual 1 để khoan từ `international_cup` xuống tới `Round` (`Final`, `Semi-Finals`).
    * Bấm nút **`Chia sẻ`** (góc trên phải) $\rightarrow$ chọn **`Tải xuống báo cáo`** (xuất tệp PDF nộp bài) hoặc sao chép đường dẫn chia sẻ trực tuyến cho giảng viên.
