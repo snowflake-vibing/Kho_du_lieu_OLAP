@@ -49,14 +49,11 @@ Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các c�
 
 1. **Kiểm tra & Chuẩn hóa Kiểu dữ liệu (`Tài nguyên` $\rightarrow$ `Quản lý các nguồn dữ liệu đã thêm` $\rightarrow$ `Chỉnh sửa`):**
    * **Nhóm Cột Số đo (Giữ kiểu `Số` `123`):** `Goals`, `Assists`, `Goal_Contributions`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards`, `Stadium_Seats`, `Age`, `Height_In_Cm`, `Squad_Size`, `Home_Club_Goals`, `Away_Club_Goals`.
-   * **Nhóm Cột Mã ID (Chuyển toàn bộ sang kiểu `Văn bản` `ABC`):** Vì Looker Studio tự nhận các mã ID toàn số là `Số` (Metric), bạn bấm đổi tất cả các cột sau thành **`Văn bản`** để dùng làm khóa phân nhóm/đếm (`COUNT_DISTINCT` vẫn chạy chuẩn):
-     * `Appearance_ID`, `Player_ID`, `Club_ID`, `Opponent_Club_ID`, `Competition_ID`, `Game_ID`, `Home_Club_ID`, `Away_Club_ID`, `Time_ID`.
-   * **Nhóm Cột Thời gian (Chuyển sang nhóm `Ngày và giờ` `📅`):**
-     * `Full_Date` & `Date_Of_Birth`: **`Ngày và giờ` $\rightarrow$ `Ngày`** *(tự nhận dạng từ `20220805`, `19910509`)*.
-     * `Year`: **`Ngày và giờ` $\rightarrow$ `Năm`** (`YYYY`).
-     * `Quarter`: **`Ngày và giờ` $\rightarrow$ `Quý`** (`Q`).
-     * `Month`: **`Ngày và giờ` $\rightarrow$ `Tháng`** (`MM`).
-     * `Day`: **`Ngày và giờ` $\rightarrow$ `Ngày trong tháng`** (`DD`).
+   * **Nhóm Cột Mã ID & Thời gian tách lẻ (Chuyển sang kiểu `Văn bản` `ABC`):** Vì Looker Studio tự nhận các cột số nguyên là `Số` (Metric) và **không cho chuyển trực tiếp số lẻ `2022`, `08`, `3` sang `Ngày và giờ`**, bạn đổi tất cả các cột sau sang **`Văn bản`** để dùng làm bộ lọc/phân nhóm mà không bị cộng tổng `SUM`:
+     * Mã ID: `Appearance_ID`, `Player_ID`, `Club_ID`, `Opponent_Club_ID`, `Competition_ID`, `Game_ID`, `Home_Club_ID`, `Away_Club_ID`, `Time_ID`.
+     * Thời gian tách lẻ: `Year`, `Quarter`, `Month`, `Day`.
+   * **Nhóm Cột Ngày chuẩn (Kiểu `Ngày` `📅`):**
+     * `Full_Date` & `Date_Of_Birth`: Đã ở chuẩn `YYYYMMDD` (`20220805`, `19910509`) nên giữ kiểu **`Ngày`** *(khi cần xem theo Năm/Quý/Tháng kiểu thời gian liên tục, chỉ cần kéo `Full_Date` rồi bấm `✏️` chọn `Năm` / `Quý` / `Tháng`)*.
 2. **Tạo Trường tính toán 1 – `Total Coaches` (ra đúng `175` HLV, loại bỏ `'Unknown Coach'`):**
    * Ở đáy cột **Dữ liệu** bên phải cùng, bấm **`+ Thêm trường`** $\rightarrow$ **`Thêm trường được tính`**.
    * **Tên trường:** `Total Coaches`
