@@ -47,16 +47,14 @@ Nếu bạn đã quen Power BI Desktop, hãy nắm **6 điểm khác biệt cố
 
 Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các cột của `Football_Report_Data.csv`):
 
-1. **Kiểm tra kiểu dữ liệu & Chuẩn hóa cột Ngày (`Full_Date`):**
-   * Đảm bảo các cột `Goals`, `Assists`, `Goal_Contributions`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards`, `Stadium_Seats`, `Age` đều có biểu tượng số **`123`**.
-   * Lưu ý: Trình tải CSV của Looker Studio thường nhận cột `Full_Date` (`2022-08-05`) là kiểu chữ (`ABC`) và sẽ báo lỗi nếu bạn đổi kiểu trực tiếp trong danh sách. Để chuyển thành kiểu Ngày chuẩn (`📅`), bạn tạo thêm 1 Trường tính toán:
-     * Bấm **`+ Thêm trường`** $\rightarrow$ **`Thêm trường được tính`**.
-     * **Tên trường:** `Match_Date`
-     * **Công thức:**
-       ```sql
-       PARSE_DATE("%Y-%m-%d", Full_Date)
-       ```
-     * Bấm **`Lưu`** $\rightarrow$ **`Xong`** *(từ giờ dùng `Match_Date` làm trục ngày tháng cho Biểu đồ vùng ở Báo biểu 2)*.
+1. **Kiểm tra & Chuẩn hóa Kiểu dữ liệu Ngày/Tháng/Quý (`Tài nguyên` $\rightarrow$ `Quản lý các nguồn dữ liệu đã thêm` $\rightarrow$ `Chỉnh sửa`):**
+   * Đảm bảo các cột số đo `Goals`, `Assists`, `Goal_Contributions`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards`, `Stadium_Seats`, `Age` đều có kiểu **`Số`** (`123`).
+   * Tệp CSV đã được định dạng sẵn chuẩn Looker Studio (`YYYYMMDD`, `MM`, `DD`), bạn chỉ cần kiểm tra/chuyển các cột thời gian sang đúng nhóm **`Ngày và giờ`** (`📅`):
+     * `Full_Date` & `Date_Of_Birth`: **`Ngày và giờ` $\rightarrow$ `Ngày`** *(tự nhận dạng từ `20220805`, `19910509`)*.
+     * `Year`: **`Ngày và giờ` $\rightarrow$ `Năm`** (`YYYY`).
+     * `Quarter`: **`Ngày và giờ` $\rightarrow$ `Quý`** (`Q`).
+     * `Month`: **`Ngày và giờ` $\rightarrow$ `Tháng`** (`MM`).
+     * `Day`: **`Ngày và giờ` $\rightarrow$ `Ngày trong tháng`** (`DD`).
 2. **Tạo Trường tính toán 1 – `Total Coaches` (ra đúng `175` HLV, loại bỏ `'Unknown Coach'`):**
    * Ở đáy cột **Dữ liệu** bên phải cùng, bấm **`+ Thêm trường`** $\rightarrow$ **`Thêm trường được tính`**.
    * **Tên trường:** `Total Coaches`
@@ -180,7 +178,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 | :--- | :--- | :--- | :--- |
 | **Trên Trái** (`X=20, Y=280`) | **Biểu đồ thanh** *(Bar chart)* — Top 10 CLB Hỏa lực | **Phương diện:** `Club_Name`<br>**Chỉ số:** `Goals` (`Tổng`), `Assists` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần`<br>**Bộ lọc:** `Scorers_Only` | **Số lượng thanh:** `10`<br>Tích **`Hiển thị nhãn dữ liệu`** |
 | **Trên Phải** (`X=975, Y=280`) | **Biểu đồ kết hợp** *(Combo chart)* — Chảo lửa Sân vận động | **Phương diện:** `Stadium_Name`<br>**Chỉ số:** `Distinct Matches`, `Goals` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần` | **Số lượng thanh:** `10`<br>Chuỗi #1 (`Distinct Matches`): **`Thanh`**<br>Chuỗi #2 (`Goals`): **`Đường`**, **Trục:** **`Phải`** |
-| **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng** *(Area chart)* — Biến thiên Bàn thắng | **Phương diện:** `Match_Date` $\rightarrow$ bấm `✏️` chọn **Loại: Ngày và giờ $\rightarrow$ `Năm Tháng`**<br>**Chỉ số:** `Goals` (`Tổng`) | Tích **`Hiển thị điểm`**, màu xanh `#2563EB` |
+| **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng** *(Area chart)* — Biến thiên Bàn thắng | **Phương diện:** `Full_Date` $\rightarrow$ bấm `✏️` chọn **Loại: Ngày và giờ $\rightarrow$ `Năm Tháng`**<br>**Chỉ số:** `Goals` (`Tổng`) | Tích **`Hiển thị điểm`**, màu xanh `#2563EB` |
 | **Dưới Phải** (`X=975, Y=680`) | **Bảng có thanh màu** *(Table with bars)* — Trinh sát Cầu thủ | **Phương diện:** `Player_Name`, `Country_Of_Citizenship`, `Sub_Position`, `Foot`, `Age`<br>**Chỉ số:** `Goals`, `Assists`, `Goal_Contributions`<br>**Sắp xếp:** `Goal_Contributions` `Giảm dần` | Cột `Goal_Contributions` chọn hiển thị **`Thanh`** + **`Hiển thị số`**<br>Tiêu đề bảng nền `#0F172A` chữ trắng |
 
 ---
