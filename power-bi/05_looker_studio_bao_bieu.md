@@ -54,23 +54,24 @@ Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các c�
      * Thời gian tách lẻ: `Year`, `Quarter`, `Month`, `Day`.
    * **Nhóm Cột Ngày chuẩn (Kiểu `Ngày` `📅`):**
      * `Full_Date` & `Date_Of_Birth`: Đã ở chuẩn `YYYYMMDD` (`20220805`, `19910509`) nên giữ kiểu **`Ngày`** *(khi cần xem theo Năm/Quý/Tháng kiểu thời gian liên tục, chỉ cần kéo `Full_Date` rồi bấm `✏️` chọn `Năm` / `Quý` / `Tháng`)*.
-2. **Tạo Trường tính toán 1 – `Total Coaches` (ra đúng `175` HLV, loại bỏ `'Unknown Coach'`):**
-   * Ở đáy cột **Dữ liệu** bên phải cùng, bấm **`+ Thêm trường`** $\rightarrow$ **`Thêm trường được tính`**.
-   * **Tên trường:** `Total Coaches`
-   * **Công thức:**
+2. **Tạo các Trường Tính Toán tương ứng với Calculated Measures trong Cube SSAS (Bấm `+ Thêm trường` $\rightarrow$ `Thêm trường được tính` ở đáy cột `Dữ liệu`):**
+   * **Trường 1 – `Total Coaches`** *(ra đúng `175` HLV trưởng, loại bỏ `'Unknown Coach'`)*:
      ```sql
      COUNT_DISTINCT(CASE WHEN Coach_Name != "Unknown Coach" THEN Coach_Name ELSE NULL END)
      ```
-   * Bấm **`Lưu`** $\rightarrow$ **`Xong`**.
-3. **Tạo Trường tính toán 2 – `Distinct Matches` (ra đúng `6,965` trận đấu):**
-   * Bấm **`+ Thêm trường`** $\rightarrow$ **`Thêm trường được tính`**.
-   * **Tên trường:** `Distinct Matches`
-   * **Công thức:**
+   * **Trường 2 – `Distinct Matches Played`** *(ra đúng `6,965` trận đấu duy nhất)*:
      ```sql
      COUNT_DISTINCT(Game_ID)
      ```
-   * Bấm **`Lưu`** $\rightarrow$ **`Xong`**.
-4. **Tạo Bộ lọc dùng chung `Scorers_Only` (Chỉ lấy cầu thủ ghi bàn `Goals > 0`):**
+   * **Trường 3 – `Avg Minutes Played`** *(ra đúng `64.35` phút trung bình mỗi lượt ra sân)*:
+     ```sql
+     SUM(Minutes_Played) / COUNT(Appearance_ID)
+     ```
+   * **Trường 4 – `Stadium Capacity Cleaned`** *(lấy đúng sức chứa thực tế của sân vận động, tránh bị nhân dồn theo số lượt cầu thủ)*:
+     ```sql
+     MAX(Stadium_Seats)
+     ```
+3. **Tạo Bộ lọc dùng chung `Scorers_Only` (Chỉ lấy cầu thủ ghi bàn `Goals > 0`):**
    * Vào menu **`Tài nguyên`** $\rightarrow$ **`Quản lý bộ lọc`** $\rightarrow$ **`Thêm bộ lọc`**:
    * **Tên:** `Scorers_Only` | Chọn **`Bao gồm`** $\rightarrow$ Trường **`Goals`** $\rightarrow$ Điều kiện **`Lớn hơn (>)`** $\rightarrow$ Giá trị **`0`** $\rightarrow$ **`Lưu`**.
 
@@ -119,7 +120,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
   `BÁO BIỂU 1: BÁO CÁO PHÂN NHÓM & TỔNG HỢP HIỆU SUẤT TẤN CÔNG THEO GIẢI ĐẤU, THỜI GIAN & HLV TRƯỞNG`  
   *(Font `Roboto`, `20 pt Đậm`, Căn giữa, Nền `#FFFFFF`, Viền `#CBD5E1`, Bán kính đường viền `10`).*
 * **4 Thẻ điểm KPI (`Thêm biểu đồ` $\rightarrow$ `Thẻ điểm`):** Đặt hàng ngang `Y=85, Cao=90, Rộng=455`:
-  1. **Thẻ 1 (`X=20`):** Xóa `Record Count` $\rightarrow$ kéo **`Distinct Matches`** vào ô **Chỉ số** $\rightarrow$ bấm `✏️` đổi tên: `Tổng Số Trận Quản Trị` *(hiển thị `6,965`)*. Tab `Kiểu`: Nền `#EFF6FF`, cỡ số `35 pt Đậm`, bỏ tích **`Rút gọn số`**.
+  1. **Thẻ 1 (`X=20`):** Xóa `Record Count` $\rightarrow$ kéo **`Distinct Matches Played`** vào ô **Chỉ số** $\rightarrow$ bấm `✏️` đổi tên: `Tổng Số Trận Quản Trị` *(hiển thị `6,965`)*. Tab `Kiểu`: Nền `#EFF6FF`, cỡ số `35 pt Đậm`, bỏ tích **`Rút gọn số`**.
   2. **Thẻ 2 (`X=495`):** Kéo **`Total Coaches`** vào **Chỉ số** $\rightarrow$ đổi tên: `Tổng Số HLV Trưởng` *(hiển thị `175`)*. Tab `Kiểu`: Nền `#FAF5FF`, cỡ số `35 pt Đậm`.
   3. **Thẻ 3 (`X=970`):** Kéo **`Goals`** (phép tính `Tổng`) $\rightarrow$ đổi tên: `Tổng Bàn Thắng` *(bật **`Rút gọn số`** để hiện `19.17K`)*. Tab `Kiểu`: Nền `#F0FDF4`.
   4. **Thẻ 4 (`X=1445`):** Kéo **`Goal_Contributions`** (`Tổng`) $\rightarrow$ đổi tên: `Tổng Đóng Góp G+A` *(bật **`Rút gọn số`** để hiện `33.91K`)*. Tab `Kiểu`: Nền `#FFFBEB`.
@@ -156,7 +157,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
    * **Tab `Thiết lập`:**
      * **Phương diện hàng:** Kéo lần lượt 3 cấp: `Coach_Name` $\rightarrow$ `Club_Name` $\rightarrow$ `Player_Name`.
      * **Phương diện cột:** Để trống.
-     * **Chỉ số:** Xóa `Record Count`, kéo 4 thước đo: `Goals` (`Tổng`), `Assists` (`Tổng`), `Goal_Contributions` (`Tổng`), `Distinct Matches`.
+     * **Chỉ số:** Xóa `Record Count`, kéo 4 thước đo: `Goals` (`Tổng`), `Assists` (`Tổng`), `Goal_Contributions` (`Tổng`), `Distinct Matches Played`.
      * **Sắp xếp:** Hàng số 1 sắp xếp theo `Goals` **`Giảm dần`** *(để Pep Guardiola, Xabi Alonso, Arteta... lên đầu)*.
    * **Tab `Kiểu` (BƯỚC QUAN TRỌNG NHẤT ĐỂ ĐẠT CHUẨN GROUPING & TOTALS):**
      * Mục **Tổng phụ của hàng** *(Row subtotals)* $\rightarrow$ Tích chọn **`Hiển thị tổng phụ`**!
@@ -169,14 +170,14 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 ### 4.3.2 Báo biểu 2: Hồ sơ Chiến thuật & Trinh sát Kẻ mạnh (Scouting Elite Clubs & Top Threats)
 > **Mẹo tạo trang nhanh:** Bấm **`Trang`** $\rightarrow$ **`Sao chép trang`** từ Trang 1, đổi tên thành `Báo biểu 2 - Trinh sát Chiến thuật`, rồi xóa 3 biểu đồ thân trang đi để giữ nguyên Banner + 4 Thẻ điểm + 4 Bộ lọc!
 
-* **4 Thẻ điểm KPI (`Y=85, Cao=90`):** `Distinct Matches` (`6,965`), `Goals` (`19.17K`), `Assists` (`14.74K`), `Goal_Contributions` (`33.91K`).
+* **4 Thẻ điểm KPI (`Y=85, Cao=90`):** `Distinct Matches Played` (`6,965`), `Goals` (`19.17K`), `Assists` (`14.74K`), `Goal_Contributions` (`33.91K`).
 * **4 Bộ lọc (`Y=190, Cao=75`):** `Season`, `Competition_Name`, `Sub_Position` *(Vị trí chi tiết)*, `Foot` *(Chân thuận: left/right)*.
 * **Lưới 2x2 ở thân trang (`Y=280` trở xuống, mỗi ô `Rộng=925, Cao=380`):**
 
 | Vị trí | Loại Biểu đồ | Tab `Thiết lập` (Setup) | Tab `Kiểu` (Style) |
 | :--- | :--- | :--- | :--- |
 | **Trên Trái** (`X=20, Y=280`) | **Biểu đồ thanh** *(Bar chart)* — Top 10 CLB Hỏa lực | **Phương diện:** `Club_Name`<br>**Chỉ số:** `Goals` (`Tổng`), `Assists` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần`<br>**Bộ lọc:** `Scorers_Only` | **Số lượng thanh:** `10`<br>Tích **`Hiển thị nhãn dữ liệu`** |
-| **Trên Phải** (`X=975, Y=280`) | **Biểu đồ kết hợp** *(Combo chart)* — Chảo lửa Sân vận động | **Phương diện:** `Stadium_Name`<br>**Chỉ số:** `Distinct Matches`, `Goals` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần` | **Số lượng thanh:** `10`<br>Chuỗi #1 (`Distinct Matches`): **`Thanh`**<br>Chuỗi #2 (`Goals`): **`Đường`**, **Trục:** **`Phải`** |
+| **Trên Phải** (`X=975, Y=280`) | **Biểu đồ kết hợp** *(Combo chart)* — Chảo lửa Sân vận động | **Phương diện:** `Stadium_Name`<br>**Chỉ số:** `Distinct Matches Played`, `Goals` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần` | **Số lượng thanh:** `10`<br>Chuỗi #1 (`Distinct Matches Played`): **`Thanh`**<br>Chuỗi #2 (`Goals`): **`Đường`**, **Trục:** **`Phải`** |
 | **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng** *(Area chart)* — Biến thiên Bàn thắng | **Phương diện:** `Full_Date` $\rightarrow$ bấm `✏️` chọn **Loại: Ngày và giờ $\rightarrow$ `Năm Tháng`**<br>**Chỉ số:** `Goals` (`Tổng`) | Tích **`Hiển thị điểm`**, màu xanh `#2563EB` |
 | **Dưới Phải** (`X=975, Y=680`) | **Bảng có thanh màu** *(Table with bars)* — Trinh sát Cầu thủ | **Phương diện:** `Player_Name`, `Country_Of_Citizenship`, `Sub_Position`, `Foot`, `Age`<br>**Chỉ số:** `Goals`, `Assists`, `Goal_Contributions`<br>**Sắp xếp:** `Goal_Contributions` `Giảm dần` | Cột `Goal_Contributions` chọn hiển thị **`Thanh`** + **`Hiển thị số`**<br>Tiêu đề bảng nền `#0F172A` chữ trắng |
 
