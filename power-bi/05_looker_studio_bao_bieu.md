@@ -71,6 +71,10 @@ Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các c�
      ```sql
      MAX(Stadium_Seats)
      ```
+   * **Trường 5 – `Total Appearances`** *(thay thế `Record Count`, ra đúng `210,747` lượt ra sân)*:
+     ```sql
+     COUNT(Appearance_ID)
+     ```
 3. **Tạo Bộ lọc dùng chung `Scorers_Only` (Chỉ lấy cầu thủ ghi bàn `Goals > 0`):**
    * Vào menu **`Tài nguyên`** $\rightarrow$ **`Quản lý bộ lọc`** $\rightarrow$ **`Thêm bộ lọc`**:
    * **Tên:** `Scorers_Only` | Chọn **`Bao gồm`** $\rightarrow$ Trường **`Goals`** $\rightarrow$ Điều kiện **`Lớn hơn (>)`** $\rightarrow$ Giá trị **`0`** $\rightarrow$ **`Lưu`**.
@@ -186,7 +190,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 ### 4.3.3 Báo biểu 3: Kỷ luật Thẻ phạt & Tải trọng Thi đấu (Discipline & Physical Workload)
 > **Tên trang:** `Báo biểu 3 - Kỷ luật & Thể lực`
 
-* **4 Thẻ điểm KPI (`Y=85, Cao=90`):** `Yellow_Cards` (`Tổng`), `Red_Cards` (`Tổng`), `Appearance_ID` (`Đếm`, đổi tên `Tổng Lượt Ra Sân` = `210.75K`), `Minutes_Played` (`Tổng` = `13.56M`).
+* **4 Thẻ điểm KPI (`Y=85, Cao=90`):** `Yellow_Cards` (`Tổng`), `Red_Cards` (`Tổng`), `Total Appearances` (`210.75K`), `Minutes_Played` (`Tổng` = `13.56M`).
 * **4 Bộ lọc (`Y=190, Cao=75`):** `Season`, `Competition_Name`, `Country_Name`, `Main_Position`.
 * **Lưới 2x2 ở thân trang (`Rộng=925, Cao=380` mỗi ô):**
 
