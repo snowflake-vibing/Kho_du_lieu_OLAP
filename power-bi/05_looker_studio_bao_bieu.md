@@ -75,6 +75,10 @@ Nhìn sang cột **`Dữ liệu`** ngoài cùng bên phải (danh sách các c�
      ```sql
      COUNT(Appearance_ID)
      ```
+   * **Trường 6 – `Month_Date`** *(gom ngày lẻ `20220805` thành mốc Tháng kiểu Ngày `📅` thực thụ để vẽ Biểu đồ vùng xếp chồng không bị tách lẻ)*:
+     ```sql
+     PARSE_DATE("%Y%m", SUBSTR(CAST(Full_Date AS TEXT), 1, 6))
+     ```
 3. **Tạo Bộ lọc dùng chung `Scorers_Only` (Chỉ lấy cầu thủ ghi bàn `Goals > 0`):**
    * Vào menu **`Tài nguyên`** $\rightarrow$ **`Quản lý bộ lọc`** $\rightarrow$ **`Thêm bộ lọc`**:
    * **Tên:** `Scorers_Only` | Chọn **`Bao gồm`** $\rightarrow$ Trường **`Goals`** $\rightarrow$ Điều kiện **`Lớn hơn (>)`** $\rightarrow$ Giá trị **`0`** $\rightarrow$ **`Lưu`**.
@@ -182,7 +186,7 @@ Khi chọn bất kỳ biểu đồ nào rồi chuyển sang tab **`Kiểu`**:
 | :--- | :--- | :--- | :--- |
 | **Trên Trái** (`X=20, Y=280`) | **Biểu đồ thanh** *(Bar chart)* — Top 10 CLB Hỏa lực | **Phương diện:** `Club_Name`<br>**Chỉ số:** `Goals` (`Tổng`), `Assists` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần`<br>**Bộ lọc:** `Scorers_Only` | **Số lượng thanh:** `10`<br>Tích **`Hiển thị nhãn dữ liệu`** |
 | **Trên Phải** (`X=975, Y=280`) | **Biểu đồ kết hợp** *(Combo chart)* — Chảo lửa Sân vận động | **Phương diện:** `Stadium_Name`<br>**Chỉ số:** `Distinct Matches Played`, `Goals` (`Tổng`)<br>**Sắp xếp:** `Goals` `Giảm dần` | **Số lượng thanh:** `10`<br>Chuỗi #1 (`Distinct Matches Played`): **`Thanh`**<br>Chuỗi #2 (`Goals`): **`Đường`**, **Trục:** **`Phải`** |
-| **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng** *(Area chart)* — Biến thiên Bàn thắng | **Phương diện:** `Full_Date` $\rightarrow$ bấm `✏️` chọn **Loại: Ngày và giờ $\rightarrow$ `Năm Tháng`**<br>**Chỉ số:** `Goals` (`Tổng`) | Tích **`Hiển thị điểm`**, màu xanh `#2563EB` |
+| **Dưới Trái** (`X=20, Y=680`) | **Biểu đồ vùng xếp chồng** *(Stacked area chart)* — Biến thiên Bàn thắng | **Phương diện – Trục X:** `Month_Date` *(kiểu Ngày `📅` đã gom theo Tháng)*<br>**Phương diện chi tiết:** `Club_Name`<br>**Chỉ số:** `Goal_Contributions` (`Tổng`)<br>**Sắp xếp phân tích:** `Goal_Contributions` `Giảm dần` | **Số lượng chuỗi:** `8`<br>Tích **`Hiển thị điểm`**, Chú giải ở **`Trên cùng`** hoặc **`Dưới cùng`** |
 | **Dưới Phải** (`X=975, Y=680`) | **Bảng có thanh màu** *(Table with bars)* — Trinh sát Cầu thủ | **Phương diện:** `Player_Name`, `Country_Of_Citizenship`, `Sub_Position`, `Foot`, `Age`<br>**Chỉ số:** `Goals`, `Assists`, `Goal_Contributions`<br>**Sắp xếp:** `Goal_Contributions` `Giảm dần` | Cột `Goal_Contributions` chọn hiển thị **`Thanh`** + **`Hiển thị số`**<br>Tiêu đề bảng nền `#0F172A` chữ trắng |
 
 ---
