@@ -1,0 +1,6 @@
+# 6.4 Hướng phát triển
+
+1. **Tăng khả năng kiểm tra khi nạp dữ liệu.** Ghi số dòng nguồn, số dòng nạp thành công, số dòng lỗi và tỷ lệ thiếu khóa ngoại cho từng lần nạp. Đối chiếu vài trận cố định sau khi nạp kho, xử lý cube và xuất CSV. Dùng kết quả làm căn cứ phát hiện sai lệch qua các lần cập nhật.
+2. **Bổ sung ngữ cảnh theo thời điểm trận.** Tính tuổi tại ngày thi đấu, lưu lịch sử khi thuộc tính CLB hoặc cầu thủ thay đổi và mở rộng phạm vi mùa giải khi nguồn có dữ liệu đủ. Các báo biểu so sánh nhiều nhóm có thể bổ sung bàn thắng hoặc thẻ trên 90 phút, kèm tổng số phút làm mẫu số.
+3. **Cải thiện bài toán dự báo thời lượng thi đấu.** Tạo đặc trưng từ các trận trước, như số phút trung bình gần đây, số ngày nghỉ và tỷ lệ thi đấu từ 60 phút. So sánh từng nhóm đặc trưng với baseline trên tập chia theo thời gian. Chọn ngưỡng bằng tập xác thực và giữ riêng kỳ sau để kiểm tra. [Kết quả thí nghiệm hiện tại](../chuong-05-khai-thac-du-lieu/03_so_sanh_ket_qua.md)
+4. **Mở rộng sang phân tích đội hình khi có dữ liệu.** Bổ sung danh sách cầu thủ đăng ký, đội hình xuất phát và thông tin thay người theo trận. Dùng đội hình đã xác nhận làm nhãn cho bài toán dự đoán đá chính, với cả cầu thủ thi đấu và cầu thủ đăng ký nhưng không ra sân.

@@ -9,3 +9,5 @@ Thí nghiệm dùng dữ liệu Transfermarkt trong repo để ước lượng k
 | [03. So sánh kết quả](03_so_sanh_ket_qua.md) | Bảng điểm thực nghiệm trên năm 2024, ma trận nhầm lẫn và cách diễn giải |
 
 Cấu trúc chương tham khảo Chương 5 của báo cáo IS217.Q11 của Lê Nguyễn Thúy An và Phạm Nhật Khoa. Mã và bảng kết quả của chương này sử dụng dữ liệu bóng đá. Chạy các khối Python theo thứ tự từ 01 đến 03 trong cùng một notebook hoặc tiến trình Python.
+
+Xem [Chương 6 – Tổng kết đồ án](../chuong-06-tong-ket/README.md) để đọc kết luận và hướng phát triển của đồ án.
