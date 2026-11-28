@@ -1,102 +1,121 @@
-# HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: DIM_PLAYER (CẦU THỦ)
+# HƯỚNG DẪN CẤU HÌNH DATA FLOW: DIM_PLAYER (CẦU THỦ)
 
 > **Bảng đích:** `[dbo].[DIM_Player]`  
-> **Tệp dữ liệu nguồn:** `cleaned_players.csv` (hoặc `players.csv`)  
-> **Database:** `DW_Football_Analytics`  
-> **Chuẩn độ dài Chuỗi (String Length Standard):** Chỉ sử dụng duy nhất chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), đảm bảo **100% SẠCH WARNING**.
+> **Tệp dữ liệu nguồn:** `cleaned_players.csv` (7.069 dòng, 8 cột)  
+> **Cơ sở dữ liệu:** `DW_Football_Transfermarkt` (`CM_DW_Football`)  
+> **Thay đổi cốt lõi:** Bỏ khối `Data Conversion`, khai báo kiểu ở `FF_Player → Advanced`, bỏ cột `Age` khỏi `DIM_Player`, tách ngày sinh kiểu `DATE` qua `Birth_Date` và giữ `NULL` cho ngày sinh/chiều cao bị thiếu.
 
 ---
 
 ## 1. SƠ ĐỒ LUỒNG DỮ LIỆU (DATA FLOW ARCHITECTURE)
 
-```
-[1. Flat File Source (cleaned_players.csv)]
-       │
-       ▼
-[2. Data Conversion (Ép kiểu DT_I4 & DT_WSTR 100/200)]
-       │
-       ▼
-[3. Derived Column (Tính toán Age & Xử lý NULL Name, Country, Position, Foot, Height)]
-       │
-       ▼
-[4. Conditional Split (Validation kiểm tra toàn bộ 9 cột)]
-       │
-       ▼ (Output: Valid_Player)
-[5. Sort (Sort Ascending theo Player_ID & Distinct loại trùng)]
-       │
-       ▼
-[6. OLE DB Destination (dbo.DIM_Player - Table lock, Fast Load)]
+```text
+[1. Flat File Source (FF_Player: cleaned_players.csv)] ──(Error Output: Redirect row)──► [Ghi lỗi nguồn]
+        │
+        ▼
+[2. Derived Column (Tách phần ngày cho Birth_Date từ date_of_birth)]
+        │
+        ▼
+[3. Conditional Split (Valid_Player / Rejected_Rows)] ──(Rejected_Rows)────────────────► [Ghi lý do từ chối]
+        │ (Valid_Player)
+        ▼
+[4. Sort (player_id ASC + toàn bộ cột nạp, Remove rows with duplicate sort values)]
+        │
+        ▼
+[5. Script Component (Tách nhóm 1 dòng / nhóm nhiều dòng trùng khóa khác nội dung)] ───► [Nhánh rà soát trùng]
+        │ (Nhóm 1 dòng hợp lệ)
+        ▼
+[6. OLE DB Destination (dbo.DIM_Player - Fast Load, Keep nulls, Check constraints)] ───► [Ghi lỗi đích]
 ```
 
 ---
 
-## 2. CHI TIẾT CẤU HÌNH TỪNG KHỐI (BLOCK BY BLOCK CONFIGURATION)
+## 2. CHI TIẾT CẤU HÌNH TỪNG BƯỚC
 
-### Khối 1: `Flat File Source` (Đọc file `cleaned_players.csv`)
-* **Connection Manager**: `FF_Player` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (8 cột): `player_id`, `name`, `date_of_birth`, `country_of_citizenship`, `position`, `sub_position`, `foot`, `height_in_cm`.
-* **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
+### Bước 1: Tạo `Data Flow Task` và `Flat File Connection Manager` (`FF_Player`)
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
+1. Trong Control Flow, kéo **Data Flow Task** vào `Sequence Container: Load Dimensions`, đổi tên thành **`DIM_Player`** và mở tab **Data Flow**.
+2. Kéo **Flat File Source** vào vùng thiết kế, mở **Flat File Source Editor → Connection Manager → New…** để tạo **`FF_Player`**.
+3. Trong tab **General**: chọn `cleaned_players.csv` trong thư mục `ssis_input` (hoặc cấu hình `Expressions → ConnectionString` dùng tham số `InputFolder`), chọn **Delimited**, Code page **65001 (UTF-8)**, Text qualifier **`"`**, bật **Column names in the first data row**.
+4. Trong tab **Columns**: kiểm tra dấu phân cách cột `{Comma}` và dòng `{CR}{LF}`.
 
-| Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
-| :--- | :--- | :--- | :--- | :--- |
-| `player_id` | **`dc_player_id`** | Four-byte signed integer `[DT_I4]` | - | Mã cầu thủ tự nhiên (BK) |
-| `name` | **`dc_player_name`** | Unicode string `[DT_WSTR]` | **200** | Họ và tên cầu thủ |
-| `date_of_birth` | **`dc_date_of_birth`** | Unicode string `[DT_WSTR]` | **100** | Ngày sinh (YYYY-MM-DD) |
-| `country_of_citizenship` | **`dc_country`** | Unicode string `[DT_WSTR]` | **200** | Quốc tịch thi đấu |
-| `position` | **`dc_main_position`** | Unicode string `[DT_WSTR]` | **100** | Vị trí chính (*Goalkeeper, Defender...*) |
-| `sub_position` | **`dc_sub_position`** | Unicode string `[DT_WSTR]` | **100** | Vị trí chi tiết (*Centre-Back...*) |
-| `foot` | **`dc_foot`** | Unicode string `[DT_WSTR]` | **100** | Chân thuận (*Left, Right, Both*) |
-| `height_in_cm` | **`dc_height_in_cm`** | Four-byte signed integer `[DT_I4]` | - | Chiều cao tính bằng cm |
+### Bước 2: Khai báo kiểu dữ liệu ở tab `Advanced` của `FF_Player`
 
-### Khối 3: `Derived Column` (Tính toán thuộc tính & Xử lý NULL)
+Tên cột đầu ra giữ nguyên theo CSV và được dùng trực tiếp ở các thành phần tiếp theo:
 
-* **`der_age`** (`[DT_I4]`):  
-  `ISNULL(dc_date_of_birth) || LEN(TRIM(dc_date_of_birth)) == 0 ? 25 : DATEDIFF("yy", (DT_DBTIMESTAMP)dc_date_of_birth, GETDATE())`
-* **`der_player_name`** (`[DT_WSTR]`, 200):  
-  `ISNULL(dc_player_name) || LEN(TRIM(dc_player_name)) == 0 ? "Unknown Player" : TRIM(dc_player_name)`
-* **`der_country`** (`[DT_WSTR]`, 200):  
-  `ISNULL(dc_country) || LEN(TRIM(dc_country)) == 0 ? "Unknown" : TRIM(dc_country)`
-* **`der_foot`** (`[DT_WSTR]`, 100):  
-  `ISNULL(dc_foot) || LEN(TRIM(dc_foot)) == 0 ? "Unknown" : TRIM(dc_foot)`
-* **`der_height`** (`[DT_I4]`):  
-  `ISNULL(dc_height_in_cm) || dc_height_in_cm < 150 || dc_height_in_cm > 220 ? 175 : dc_height_in_cm`
+| Cột CSV | Kiểu dữ liệu SSIS | Cột đích hoặc cách sử dụng |
+| :--- | :--- | :--- |
+| `player_id` | `DT_I4` | `Player_ID` |
+| `name` | `DT_WSTR (200)` | `Player_Name` |
+| `date_of_birth` | `DT_DBTIMESTAMP` | Đọc chuỗi nguồn có giờ (`YYYY-MM-DD 00:00:00`), lấy phần ngày cho `Date_Of_Birth` |
+| `country_of_citizenship` | `DT_WSTR (200)` | `Country_Of_Citizenship` |
+| `position` | `DT_WSTR (100)` | `Main_Position` |
+| `sub_position` | `DT_WSTR (100)` | `Sub_Position` |
+| `foot` | `DT_WSTR (100)` | `Foot` |
+| `height_in_cm` | `DT_I4` | `Height_In_Cm` |
 
-### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 9 CỘT)
-* **Input Columns**: Đưa ĐẦY ĐỦ 9 CỘT (`dc_player_id`, `der_player_name`, `dc_date_of_birth`, `der_age`, `der_country`, `dc_main_position`, `dc_sub_position`, `der_foot`, `der_height`) vào Input.
-* **Output Name**: `Valid_Player`
-* **Condition Expression**:
-  ```c
-  !ISNULL(dc_player_id) && dc_player_id > 0 &&
-  !ISNULL(der_player_name) && LEN(TRIM(der_player_name)) > 0 &&
-  !ISNULL(dc_date_of_birth) && LEN(TRIM(dc_date_of_birth)) > 0 &&
-  !ISNULL(der_age) && der_age > 0 &&
-  !ISNULL(der_country) && LEN(TRIM(der_country)) > 0 &&
-  !ISNULL(dc_main_position) && LEN(TRIM(dc_main_position)) > 0 &&
-  !ISNULL(dc_sub_position) && LEN(TRIM(dc_sub_position)) > 0 &&
-  !ISNULL(der_foot) && LEN(TRIM(der_foot)) > 0 &&
-  !ISNULL(der_height) && der_height > 0
-  ```
-* **Default Output Name**: `Invalid_Player`
+*(Các mẫu `date_of_birth` từ notebook có dạng `YYYY-MM-DD 00:00:00`; trong Preview kiểm tra ngày có giờ và các ô trống để phần giờ được bỏ ở `Derived Column`).*
 
-### Khối 5: `Sort` (Khử trùng lặp theo Player_ID)
-* **Input Path**: Chọn nhánh **`Valid_Player`**.
-* **Pass Through Columns**: Tick chọn tất cả 9 cột thuộc tính.
-* **Sort Column**: Tick chọn `dc_player_id` (Sort Type: `Ascending`, Sort Order: `1`).
-* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
+### Bước 3: Kiểm tra Preview và cấu hình `Flat File Source`
 
-### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
-* **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
-* **Data Access Mode**: `Table or view - fast load`.
-* **Table**: `[dbo].[DIM_Player]`.
-* **Mappings**:
-  * `dc_player_id` $\rightarrow$ **`Player_ID`** (`int`)
-  * `der_player_name` $\rightarrow$ **`Player_Name`** (`nvarchar(200)`)
-  * `dc_date_of_birth` $\rightarrow$ **`Date_Of_Birth`** (`nvarchar(100)`)
-  * `der_age` $\rightarrow$ **`Age`** (`int`)
-  * `der_country` $\rightarrow$ **`Country_Of_Citizenship`** (`nvarchar(200)`)
-  * `dc_main_position` $\rightarrow$ **`Main_Position`** (`nvarchar(100)`)
-  * `dc_sub_position` $\rightarrow$ **`Sub_Position`** (`nvarchar(100)`)
-  * `der_foot` $\rightarrow$ **`Foot`** (`nvarchar(100)`)
-  * `der_height` $\rightarrow$ **`Height_In_Cm`** (`int`)
+- Chọn **Preview** trong `FF_Player`, kiểm tra đúng số cột, chữ có dấu UTF-8 và các ô trống, rồi bấm **OK**.
+- Trong **Flat File Source Editor**:
+  - Bật **Retain null values from the source as null values in the data flow** và kiểm tra các cột đầu ra ở tab **Columns**. Nếu SSIS yêu cầu đồng bộ metadata, xác nhận và kiểm tra lại ánh xạ.
+  - Vào tab **Error Output**, đặt `Error` và `Truncation` thành **Redirect row** cho các cột cần kiểm soát, nối đầu ra lỗi sang đích ghi lỗi của luồng.
+
+### Bước 4: Lấy phần ngày sinh bằng `Derived Column`
+
+- Nối đầu ra hợp lệ của `Flat File Source` vào **Derived Column**.
+- Thêm cột **`Birth_Date`** ở chế độ **`<add as new column>`** với biểu thức sau (giá trị thiếu đi tiếp dưới dạng `NULL`):
+
+```c
+ISNULL(date_of_birth) ? NULL(DT_DBDATE) : (DT_DBDATE)date_of_birth
+```
+
+*(Không tính `Age` tĩnh và không điền thay các giá trị mặc định cho tên, quốc tịch, chân thuận hay chiều cao).*
+
+### Bước 5: Tách dòng hợp lệ bằng `Conditional Split`
+
+- Nối đầu ra của `Derived Column` vào **Conditional Split**.
+- Thêm dòng **Order 1** với **Output Name**: **`Valid_Player`**, nhập biểu thức:
+
+```c
+!ISNULL(player_id) && player_id > 0
+&& (ISNULL(height_in_cm) || height_in_cm > 0)
+```
+
+- Đặt **Default Output Name** là **`Rejected_Rows`** và nối sang đích ghi lý do kiểm tra.
+
+### Bước 6: Sắp xếp và xử lý dòng lặp (`Sort` + `Script Component`)
+
+1. Nối nhánh `Valid_Player` vào **Sort** (`Sort Input`).
+2. Trong **Sort Editor**: chọn `player_id` làm cột sắp xếp tăng dần (`Ascending`). Để loại dòng lặp hoàn toàn, đưa toàn bộ cột dùng để nạp vào tập khóa sắp xếp, giữ các cột cần thiết ở đầu ra và bật **Remove rows with duplicate sort values**. Kiểm tra tùy chọn so sánh chuỗi của `Sort` để tránh gộp nhầm mã chỉ khác chữ hoa/thường.
+3. Sau `Sort`, dùng **Script Component** kiểu **Transformation** với hai đầu ra không đồng bộ: gom các dòng liên tiếp theo khóa `player_id`, chuyển nhóm một dòng tới đích và nhóm nhiều dòng tới nhánh rà soát; xử lý nhóm cuối khi luồng kết thúc.
+
+### Bước 7: Kết nối `OLE DB Destination` và ánh xạ (`[dbo].[DIM_Player]`)
+
+- Kéo **OLE DB Destination**, nối từ đầu ra hợp lệ của `Script Component`.
+- **Connection Manager**: `CM_DW_Football`.
+- **Data access mode**: `Table or view - fast load`, chọn bảng **`[dbo].[DIM_Player]`**.
+- Bật **Keep nulls** và **Check constraints**.
+- **Mappings (8 cột)**:
+  - `player_id` $\rightarrow$ `Player_ID` (`INT`)
+  - `name` $\rightarrow$ `Player_Name` (`NVARCHAR(200)`)
+  - `Birth_Date` $\rightarrow$ `Date_Of_Birth` (`DATE`)
+  - `country_of_citizenship` $\rightarrow$ `Country_Of_Citizenship` (`NVARCHAR(200)`)
+  - `position` $\rightarrow$ `Main_Position` (`NVARCHAR(100)`)
+  - `sub_position` $\rightarrow$ `Sub_Position` (`NVARCHAR(100)`)
+  - `foot` $\rightarrow$ `Foot` (`NVARCHAR(100)`)
+  - `height_in_cm` $\rightarrow$ `Height_In_Cm` (`INT`)
+- Giữ `NULL` cho ngày sinh hay chiều cao bị thiếu. Vào **Error Output**, chuyển dòng lỗi sang nhánh ghi lỗi rồi bấm **OK**.
+
+---
+
+## 3. ĐỐI SOÁT SAU NẠP
+
+- Tổng số dòng kỳ vọng: **7.069** hồ sơ cầu thủ.
+- Kiểm tra mẫu để xác nhận tên có dấu UTF-8, `Date_Of_Birth` dạng `DATE` và các thuộc tính thiếu giữ `NULL`.
+
+```sql
+SELECT COUNT_BIG(*) AS So_Dong FROM dbo.DIM_Player;
+```

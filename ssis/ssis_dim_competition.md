@@ -1,82 +1,98 @@
-# HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: DIM_COMPETITION (GIẢI ĐẤU)
+# HƯỚNG DẪN CẤU HÌNH DATA FLOW: DIM_COMPETITION (GIẢI ĐẤU)
 
 > **Bảng đích:** `[dbo].[DIM_Competition]`  
-> **Tệp dữ liệu nguồn:** `cleaned_competitions.csv` (hoặc `competitions.csv`)  
-> **Database:** `DW_Football_Analytics`  
-> **Chuẩn độ dài Chuỗi (String Length Standard):** Chỉ sử dụng duy nhất chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), đảm bảo **100% SẠCH WARNING**.
+> **Tệp dữ liệu nguồn:** `cleaned_competitions.csv` (13 dòng, 4 cột)  
+> **Cơ sở dữ liệu:** `DW_Football_Transfermarkt` (`CM_DW_Football`)  
+> **Thay đổi cốt lõi:** Bỏ khối `Data Conversion` và khối `Derived Column`; khai báo kiểu ở `FF_Competition → Advanced`, giữ nguyên `NULL` cho `Country_Name` của các giải quốc tế và giữ nguyên tên cột CSV.
 
 ---
 
 ## 1. SƠ ĐỒ LUỒNG DỮ LIỆU (DATA FLOW ARCHITECTURE)
 
-```
-[1. Flat File Source (competitions.csv)]
-       │
-       ▼
-[2. Data Conversion (Ép kiểu DT_WSTR 100/200)]
-       │
-       ▼
-[3. Derived Column (Chuẩn hóa Competition_Type & Xử lý NULL Country_Name)]
-       │
-       ▼
-[4. Conditional Split (Validation kiểm tra toàn bộ 4 cột)]
-       │
-       ▼ (Output: Valid_Competition)
-[5. Sort (Sort Ascending theo Competition_ID & Distinct loại trùng)]
-       │
-       ▼
-[6. OLE DB Destination (dbo.DIM_Competition - Table lock, Fast Load)]
+```text
+[1. Flat File Source (FF_Competition: cleaned_competitions.csv)] ──(Error Output: Redirect row)──► [Ghi lỗi nguồn]
+        │
+        ▼
+[2. Conditional Split (Valid_Competition / Rejected_Rows)] ──(Rejected_Rows)─────────────────────► [Ghi lý do từ chối]
+        │ (Valid_Competition)
+        ▼
+[3. Sort (competition_id ASC + toàn bộ cột nạp, Remove rows with duplicate sort values)]
+        │
+        ▼
+[4. Script Component (Tách nhóm 1 dòng / nhóm nhiều dòng trùng khóa khác nội dung)] ────────► [Nhánh rà soát trùng]
+        │ (Nhóm 1 dòng hợp lệ)
+        ▼
+[5. OLE DB Destination (dbo.DIM_Competition - Fast Load, Keep nulls, Check constraints)] ────────► [Ghi lỗi đích]
 ```
 
 ---
 
-## 2. CHI TIẾT CẤU HÌNH TỪNG KHỐI (BLOCK BY BLOCK CONFIGURATION)
+## 2. CHI TIẾT CẤU HÌNH TỪNG BƯỚC
 
-### Khối 1: `Flat File Source` (Đọc file `cleaned_competitions.csv`)
-* **Connection Manager**: `FF_Competition` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (4 cột): `competition_id`, `name`, `country_name`, `type`.
-* **Output Column Length**: Đặt **200** cho tất cả các cột chuỗi.
+### Bước 1: Tạo `Data Flow Task` và `Flat File Connection Manager` (`FF_Competition`)
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
+1. Trong Control Flow, kéo **Data Flow Task** vào `Sequence Container: Load Dimensions`, đổi tên thành **`DIM_Competition`** và mở tab **Data Flow**.
+2. Kéo **Flat File Source** vào vùng thiết kế, mở **Flat File Source Editor → Connection Manager → New…** để tạo **`FF_Competition`**.
+3. Trong tab **General**: chọn `cleaned_competitions.csv` trong thư mục `ssis_input` (hoặc cấu hình `Expressions → ConnectionString` dùng tham số `InputFolder`), chọn **Delimited**, Code page **65001 (UTF-8)**, Text qualifier **`"`**, bật **Column names in the first data row**.
+4. Trong tab **Columns**: kiểm tra dấu phân cách cột `{Comma}` và dòng `{CR}{LF}`.
 
-| Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
-| :--- | :--- | :--- | :--- | :--- |
-| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **100** | Mã giải đấu ngắn (BK như `GB1`, `ES1`, `CL`) |
-| `name` | **`dc_name`** | Unicode string `[DT_WSTR]` | **200** | Tên thương hiệu giải đấu |
-| `country_name` | **`dc_country_name`** | Unicode string `[DT_WSTR]` | **200** | Quốc gia đăng cai |
-| `type` | **`dc_type`** | Unicode string `[DT_WSTR]` | **100** | Phân loại (*domestic_league, international_cup*) |
+### Bước 2: Khai báo kiểu dữ liệu ở tab `Advanced` của `FF_Competition`
 
-### Khối 3: `Derived Column` (Chuẩn hóa dữ liệu & Xử lý NULL)
+Tên cột đầu ra giữ nguyên theo CSV và được dùng trực tiếp ở các thành phần tiếp theo:
 
-* **`der_country_name`** (`[DT_WSTR]`, 200):  
-  `ISNULL(dc_country_name) || LEN(TRIM(dc_country_name)) == 0 ? "Europe" : TRIM(dc_country_name)`
-* **`der_competition_type`** (`[DT_WSTR]`, 100):  
-  `ISNULL(dc_type) || LEN(TRIM(dc_type)) == 0 ? "domestic_league" : TRIM(dc_type)`
+| Cột CSV | Kiểu dữ liệu SSIS | Cột đích hoặc cách sử dụng |
+| :--- | :--- | :--- |
+| `competition_id` | `DT_WSTR (100)` | `Competition_ID` |
+| `name` | `DT_WSTR (200)` | `Competition_Name` |
+| `country_name` | `DT_WSTR (200)` | `Country_Name` |
+| `type` | `DT_WSTR (100)` | `Competition_Type` |
 
-### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ 4 CỘT)
-* **Input Columns**: Đưa ĐẦY ĐỦ 4 CỘT (`dc_competition_id`, `dc_name`, `der_country_name`, `der_competition_type`) vào Input.
-* **Output Name**: `Valid_Competition`
-* **Condition Expression**:
-  ```c
-  !ISNULL(dc_competition_id) && LEN(TRIM(dc_competition_id)) > 0 &&
-  !ISNULL(dc_name) && LEN(TRIM(dc_name)) > 0 &&
-  !ISNULL(der_country_name) && LEN(TRIM(der_country_name)) > 0 &&
-  !ISNULL(der_competition_type) && LEN(TRIM(der_competition_type)) > 0
-  ```
-* **Default Output Name**: `Invalid_Competition`
+*(Kiểm tra các mã giải như `GB1` hoặc `CL` được đọc dưới dạng chuỗi; với các giải quốc tế, ô `Country_Name` có thể trống và được giữ `NULL` theo nguồn).*
 
-### Khối 5: `Sort` (Khử trùng lặp theo Competition_ID)
-* **Input Path**: Chọn nhánh **`Valid_Competition`**.
-* **Pass Through Columns**: Tick chọn cả 4 cột.
-* **Sort Column**: Tick chọn `dc_competition_id` (Sort Type: `Ascending`, Sort Order: `1`).
-* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
+### Bước 3: Kiểm tra Preview và cấu hình `Flat File Source`
 
-### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
-* **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics`.
-* **Data Access Mode**: `Table or view - fast load`.
-* **Table**: `[dbo].[DIM_Competition]`.
-* **Mappings**:
-  * `dc_competition_id` $\rightarrow$ **`Competition_ID`** (`nvarchar(100)`)
-  * `dc_name` $\rightarrow$ **`Competition_Name`** (`nvarchar(200)`)
-  * `der_country_name` $\rightarrow$ **`Country_Name`** (`nvarchar(200)`)
-  * `der_competition_type` $\rightarrow$ **`Competition_Type`** (`nvarchar(100)`)
+- Chọn **Preview** trong `FF_Competition`, kiểm tra đúng số cột, chữ có dấu UTF-8 và các ô trống, rồi bấm **OK**.
+- Trong **Flat File Source Editor**:
+  - Bật **Retain null values from the source as null values in the data flow** và kiểm tra các cột đầu ra ở tab **Columns**. Nếu SSIS yêu cầu đồng bộ metadata, xác nhận và kiểm tra lại ánh xạ.
+  - Vào tab **Error Output**, đặt `Error` và `Truncation` thành **Redirect row** cho các cột cần kiểm soát, nối đầu ra lỗi sang đích ghi lỗi của luồng.
+
+### Bước 4: Tách dòng hợp lệ bằng `Conditional Split`
+
+- Nối đầu ra hợp lệ của `Flat File Source` vào **Conditional Split**.
+- Thêm dòng **Order 1** với **Output Name**: **`Valid_Competition`**, nhập biểu thức:
+
+```c
+!ISNULL(competition_id) && LEN(TRIM(competition_id)) > 0
+```
+
+- Đặt **Default Output Name** là **`Rejected_Rows`** và nối sang đích ghi lý do kiểm tra.
+
+### Bước 5: Sắp xếp và xử lý dòng lặp (`Sort` + `Script Component`)
+
+1. Nối nhánh `Valid_Competition` vào **Sort** (`Sort Input`).
+2. Trong **Sort Editor**: chọn `competition_id` làm cột sắp xếp tăng dần (`Ascending`). Để loại dòng lặp hoàn toàn, đưa toàn bộ cột dùng để nạp vào tập khóa sắp xếp, giữ các cột cần thiết ở đầu ra và bật **Remove rows with duplicate sort values**. Kiểm tra tùy chọn so sánh chuỗi của `Sort` để tránh gộp nhầm hai mã chỉ khác chữ hoa và chữ thường.
+3. Sau `Sort`, dùng **Script Component** kiểu **Transformation** với hai đầu ra không đồng bộ: gom các dòng liên tiếp theo khóa `competition_id`, chuyển nhóm một dòng tới đích và nhóm nhiều dòng tới nhánh rà soát; xử lý nhóm cuối khi luồng kết thúc.
+
+### Bước 6: Kết nối `OLE DB Destination` và ánh xạ (`[dbo].[DIM_Competition]`)
+
+- Kéo **OLE DB Destination**, nối từ đầu ra hợp lệ của `Script Component`.
+- **Connection Manager**: `CM_DW_Football`.
+- **Data access mode**: `Table or view - fast load`, chọn bảng **`[dbo].[DIM_Competition]`**.
+- Bật **Keep nulls** và **Check constraints**.
+- **Mappings (4 cột)**:
+  - `competition_id` $\rightarrow$ `Competition_ID` (`NVARCHAR(100)`)
+  - `name` $\rightarrow$ `Competition_Name` (`NVARCHAR(200)`)
+  - `country_name` $\rightarrow$ `Country_Name` (`NVARCHAR(200)`)
+  - `type` $\rightarrow$ `Competition_Type` (`NVARCHAR(100)`)
+- Mở **Error Output**, chuyển dòng lỗi sang nhánh ghi lỗi rồi bấm **OK**.
+
+---
+
+## 3. ĐỐI SOÁT SAU NẠP
+
+- Tổng số dòng kỳ vọng: **13** giải đấu.
+- Kiểm tra mã giải ở dạng chuỗi và `Country_Name` của các giải quốc tế giữ nguyên `NULL` theo nguồn.
+
+```sql
+SELECT COUNT_BIG(*) AS So_Dong FROM dbo.DIM_Competition;
+```

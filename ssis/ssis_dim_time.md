@@ -1,100 +1,127 @@
-# HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: DIM_TIME (THỜI GIAN)
+# HƯỚNG DẪN CẤU HÌNH DATA FLOW: DIM_TIME (NGÀY THI ĐẤU)
 
 > **Bảng đích:** `[dbo].[DIM_Time]`  
-> **Tệp dữ liệu nguồn:** `games.csv` (hoặc `appearances.csv`)  
-> **Database:** `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`)  
-> **Chuẩn độ dài Chuỗi (String Length Standard):** Áp dụng nghiêm ngặt chuẩn **`100`** (`[DT_WSTR, 100]`) cho 100% các cột chuỗi trong `DIM_Time`, đảm bảo **100% SẠCH WARNING**.
+> **Tệp dữ liệu nguồn:** `cleaned_time.csv` (7.280 dòng, 1 cột `date`)  
+> **Cơ sở dữ liệu:** `DW_Football_Transfermarkt` (`CM_DW_Football`)  
+> **Thay đổi cốt lõi:** Bỏ khối `Data Conversion`, bỏ cột `Season` (chuyển sang `DIM_Game`), đọc `date` kiểu `DT_DBDATE`, dùng `Sort` gom 7.280 dòng thành **488** ngày duy nhất và dùng **2 khối `Derived Column`** tính các khóa phụ `Year_Quarter_Key`, `Year_Month_Key`, `Day_Of_Week` (`INT`, Thứ Hai = 1 .. Chủ nhật = 7) và `Is_Weekend`.
 
 ---
 
 ## 1. SƠ ĐỒ LUỒNG DỮ LIỆU (DATA FLOW ARCHITECTURE)
 
 ```text
-[1. Flat File Source (games.csv)]
-       │
-       ▼
-[2. Data Conversion (Ép kiểu dc_date & dc_season 100)]
-       │
-       ▼
-[3. Derived Column (Bóc tách 7 thuộc tính thời gian: Time_ID, Day, Month, Quarter, Year, Is_Weekend, Day_Of_Week)]
-       │
-       ▼
-[4. Conditional Split (Validation kiểm tra toàn bộ thuộc tính thời gian)]
-       │
-       ▼ (Output: Valid_Time)
-[5. Sort (Sort Ascending theo Time_ID & Distinct loại trùng ngày)]
-       │
-       ▼
-[6. OLE DB Destination (dbo.DIM_Time - Table lock, Fast Load)]
+[1. Flat File Source (FF_Time: cleaned_time.csv)] ──(Error Output: Redirect row)──► [Ghi lỗi nguồn]
+        │
+        ▼
+[2. Conditional Split (Valid_Time / Rejected_Rows)] ──(Rejected_Rows)───────────────► [Ghi lý do từ chối]
+        │ (Valid_Time)
+        ▼
+[3. Sort (date ASC, Remove rows with duplicate sort values: 7.280 -> 488 ngày)]
+        │
+        ▼
+[4. Derived Column 1 (Time_ID, Year, Quarter, Month, Day, Day_Of_Week)]
+        │
+        ▼
+[5. Derived Column 2 (Year_Quarter_Key, Year_Month_Key, Is_Weekend)]
+        │
+        ▼
+[6. OLE DB Destination (dbo.DIM_Time - Fast Load, Keep nulls, Check constraints)] ──► [Ghi lỗi đích]
 ```
 
 ---
 
-## 2. CHI TIẾT CẤU HÌNH TỪNG KHỐI (BLOCK BY BLOCK CONFIGURATION)
+## 2. CHI TIẾT CẤU HÌNH TỪNG BƯỚC
 
-### Khối 1: `Flat File Source` (Đọc thuộc tính ngày từ `games.csv`)
-* **Connection Manager**: `FF_Time` (Code page `65001 - UTF-8`).
-* **Selected Columns**: `date`, `season`.
+### Bước 1: Tạo `Data Flow Task` và `Flat File Connection Manager` (`FF_Time`)
 
----
+1. Trong Control Flow, kéo **Data Flow Task** vào `Sequence Container: Load Dimensions`, đổi tên thành **`DIM_Time`** và mở tab **Data Flow**.
+2. Kéo **Flat File Source** vào vùng thiết kế, mở **Flat File Source Editor → Connection Manager → New…** để tạo **`FF_Time`**.
+3. Trong tab **General**: chọn `cleaned_time.csv` trong thư mục `ssis_input` (hoặc cấu hình `Expressions → ConnectionString` dùng tham số `InputFolder`), chọn **Delimited**, Code page **65001 (UTF-8)**, Text qualifier **`"`**, bật **Column names in the first data row**.
+4. Trong tab **Columns**: kiểm tra dấu phân cách cột `{Comma}` và dòng `{CR}{LF}`.
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100)
-* `date` $\rightarrow$ **`dc_date`** (`[DT_WSTR]`, Length: **100**)
-* `season` $\rightarrow$ **`dc_season`** (`[DT_WSTR]`, Length: **100**)
+### Bước 2: Khai báo kiểu dữ liệu ở tab `Advanced` của `FF_Time`
 
----
-
-### Khối 3: `Derived Column` (Bóc tách 7 thuộc tính thời gian - Theo chuẩn IS217)
-*(Lưu ý: `Full_Date` và `Season` được ánh xạ trực tiếp từ `dc_date` và `dc_season` ở khối Destination, không tạo mới ở đây).*
-
-| Derived Column Name | Derived Column | Expression |
+| Cột CSV | Kiểu dữ liệu SSIS | Cột đích hoặc cách sử dụng |
 | :--- | :--- | :--- |
-| **`Time_ID`** | `<add as new column>` | `(YEAR((DT_DATE)dc_date) * 10000) + (MONTH((DT_DATE)dc_date) * 100) + DAY((DT_DATE)dc_date)` |
-| **`Day`** | `<add as new column>` | `DATEPART("dd",(DT_DBTIMESTAMP)dc_date)` |
-| **`Month`** | `<add as new column>` | `DATEPART("mm",(DT_DBTIMESTAMP)dc_date)` |
-| **`Quarter`** | `<add as new column>` | `DATEPART("qq",(DT_DBTIMESTAMP)dc_date)` |
-| **`Year`** | `<add as new column>` | `DATEPART("yy",(DT_DBTIMESTAMP)dc_date)` |
-| **`Is_Weekend`** | `<add as new column>` | `DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 1 \|\| DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 7 ? 1 : 0` |
-| **`Day_Of_Week`** | `<add as new column>` | `(DT_WSTR,50)(DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 1 ? "Sunday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 2 ? "Monday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 3 ? "Tuesday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 4 ? "Wednesday" : DATEPART("dw",(DT_DBTIMESTAMP)dc_date) == 5 ? "Thursday" : "Saturday")` |
+| `date` | `DT_DBDATE` | `Full_Date` và đầu vào để tính các thuộc tính thời gian |
+
+*(Lưu ý: nếu tệp CSV thực tế có thêm cột phụ như `Time_ID`, bỏ chọn cột phụ đó ở tab `Columns` của `Flat File Source` để tránh dư cột đầu vào).*
+
+### Bước 3: Kiểm tra Preview và cấu hình `Flat File Source`
+
+- Chọn **Preview** trong `FF_Time`, kiểm tra đúng cột `date` và định dạng ngày, rồi bấm **OK**.
+- Trong **Flat File Source Editor**:
+  - Bật **Retain null values from the source as null values in the data flow** và kiểm tra cột đầu ra ở tab **Columns**. Nếu SSIS yêu cầu đồng bộ metadata, xác nhận và kiểm tra lại ánh xạ.
+  - Vào tab **Error Output**, đặt `Error` và `Truncation` thành **Redirect row**, nối đầu ra lỗi sang đích ghi lỗi của luồng.
+
+### Bước 4: Tách dòng hợp lệ bằng `Conditional Split`
+
+- Nối đầu ra hợp lệ của `Flat File Source` vào **Conditional Split**.
+- Thêm dòng **Order 1** với **Output Name**: **`Valid_Time`**, nhập biểu thức:
+
+```c
+!ISNULL(date)
+```
+
+- Đặt **Default Output Name** là **`Rejected_Rows`** và nối sang đích ghi lý do kiểm tra.
+
+### Bước 5: Sắp xếp và khử trùng lặp ngày bằng `Sort`
+
+- Nối nhánh `Valid_Time` vào **Sort** (`Sort Input`).
+- Trong **Sort Editor**: chọn `date` làm cột sắp xếp tăng dần (`Ascending`) và bật **Remove rows with duplicate sort values** để giữ một dòng cho mỗi ngày.
+- Đối chiếu số dòng: **7.280** dòng đầu vào được gộp thành **488** ngày duy nhất (tương ứng **6.792** lần lặp được gộp).
+
+### Bước 6: Tạo thuộc tính lịch bằng `Derived Column` thứ nhất
+
+Kéo **Derived Column** nối sau `Sort`, chọn **`<add as new column>`** cho từng thuộc tính:
+
+| Cột mới | Expression |
+| :--- | :--- |
+| `Time_ID` | `YEAR([date]) * 10000 + MONTH([date]) * 100 + DAY([date])` |
+| `Year` | `YEAR([date])` |
+| `Quarter` | `DATEPART("qq", [date])` |
+| `Month` | `MONTH([date])` |
+| `Day` | `DAY([date])` |
+| `Day_Of_Week` | `((DATEDIFF("dd", (DT_DBDATE)"1900-01-01", [date]) % 7 + 7) % 7) + 1` |
+
+*(Công thức `Day_Of_Week` lấy thứ Hai làm ngày `1` và Chủ nhật là ngày `7`, độc lập với thiết lập `DATEFIRST` của SQL Server).*
+
+### Bước 7: Tính khóa sắp xếp và cờ cuối tuần bằng `Derived Column` thứ hai
+
+Kéo **Derived Column** thứ hai nối sau `Derived Column` thứ nhất, sử dụng các cột `Year`, `Quarter`, `Month` và `Day_Of_Week` vừa tạo ở chế độ **`<add as new column>`**:
+
+| Cột mới | Expression |
+| :--- | :--- |
+| `Year_Quarter_Key` | `[Year] * 10 + [Quarter]` |
+| `Year_Month_Key` | `[Year] * 100 + [Month]` |
+| `Is_Weekend` | `[Day_Of_Week] >= 6 ? 1 : 0` |
+
+### Bước 8: Kết nối `OLE DB Destination` và ánh xạ (`[dbo].[DIM_Time]`)
+
+- Kéo **OLE DB Destination**, nối từ `Derived Column` thứ hai.
+- **Connection Manager**: `CM_DW_Football`.
+- **Data access mode**: `Table or view - fast load`, chọn bảng **`[dbo].[DIM_Time]`**.
+- Bật **Keep nulls** và **Check constraints**.
+- **Mappings (10 cột)**:
+  - `date` $\rightarrow$ `Full_Date` (`DATE`)
+  - `Time_ID` $\rightarrow$ `Time_ID` (`INT`)
+  - `Year` $\rightarrow$ `Year` (`INT`)
+  - `Quarter` $\rightarrow$ `Quarter` (`INT`)
+  - `Year_Quarter_Key` $\rightarrow$ `Year_Quarter_Key` (`INT`)
+  - `Month` $\rightarrow$ `Month` (`INT`)
+  - `Year_Month_Key` $\rightarrow$ `Year_Month_Key` (`INT`)
+  - `Day` $\rightarrow$ `Day` (`INT`)
+  - `Day_Of_Week` $\rightarrow$ `Day_Of_Week` (`INT`)
+  - `Is_Weekend` $\rightarrow$ `Is_Weekend` (`INT`)
+- Mở **Error Output**, chuyển dòng lỗi sang nhánh ghi lỗi rồi bấm **OK**.
 
 ---
 
-### Khối 4: `Conditional Split` (Validation kiểm tra TOÀN BỘ CỘT THỜI GIAN)
-* **Input Columns**: Đưa ĐẦY ĐỦ các cột vào Input.
-* **Output Name**: `Valid_Time`
-* **Condition Expression**:
-  ```c
-  !ISNULL(dc_date) && LEN(TRIM(dc_date)) > 0 &&
-  !ISNULL(dc_season) && LEN(TRIM(dc_season)) > 0 &&
-  !ISNULL(Time_ID) && Time_ID > 0 &&
-  !ISNULL(Day) && Day > 0 &&
-  !ISNULL(Month) && Month > 0 &&
-  !ISNULL(Quarter) && Quarter > 0 &&
-  !ISNULL(Year) && Year > 0 &&
-  !ISNULL(Day_Of_Week) && LEN(TRIM(Day_Of_Week)) > 0
-  ```
-* **Default Output Name**: `Invalid_Time`
+## 3. ĐỐI SOÁT SAU NẠP
 
----
+- Tổng số dòng kỳ vọng: **488** ngày duy nhất.
+- Kiểm tra `Time_ID` theo dạng `YYYYMMDD`, `Full_Date` kiểu `DATE` và `Is_Weekend = 1` ở thứ Bảy (`6`) và Chủ nhật (`7`).
 
-### Khối 5: `Sort` (Khử trùng lặp theo Time_ID)
-* **Input Path**: Chọn nhánh **`Valid_Time`**.
-* **Sort Column**: Tick chọn `Time_ID` (Sort Type: `Ascending`, Sort Order: `1`).
-* **Option quan trọng**: Tick chọn **`Remove rows with duplicate sort values`**.
-
----
-
-### Khối 6: `OLE DB Destination` (Nạp dữ liệu vào SQL Server)
-* **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`).
-* **Data Access Mode**: `Table or view - fast load`.
-* **Table**: `[dbo].[DIM_Time]`.
-* **Mappings**:
-  * `Time_ID` *(từ Derived Column)* $\rightarrow$ **`Time_ID`** (`INT`)
-  * `dc_date` *(truyền thẳng từ Data Conversion)* $\rightarrow$ **`Full_Date`** (`NVARCHAR(100)`)
-  * `Day_Of_Week` *(từ Derived Column)* $\rightarrow$ **`Day_Of_Week`** (`NVARCHAR(100)`)
-  * `Day` *(từ Derived Column)* $\rightarrow$ **`Day`** (`INT`)
-  * `Month` *(từ Derived Column)* $\rightarrow$ **`Month`** (`INT`)
-  * `Quarter` *(từ Derived Column)* $\rightarrow$ **`Quarter`** (`INT`)
-  * `Year` *(từ Derived Column)* $\rightarrow$ **`Year`** (`INT`)
-  * `dc_season` *(truyền thẳng từ Data Conversion)* $\rightarrow$ **`Season`** (`NVARCHAR(100)`)
-  * `Is_Weekend` *(từ Derived Column)* $\rightarrow$ **`Is_Weekend`** (`INT`)
+```sql
+SELECT COUNT_BIG(*) AS So_Dong FROM dbo.DIM_Time;
+```

@@ -1,202 +1,200 @@
-# HƯỚNG DẪN CẤU HÌNH KHỐI (BLOCKS) SSIS ETL: FACT_PLAYER_MATCH_PERF (LUỒNG TỐI ƯU 9 KHỐI)
+# HƯỚNG DẪN CẤU HÌNH DATA FLOW: FACT_PLAYER_MATCH_PERF (LƯỢT RA SÂN)
 
 > **Bảng đích:** `[dbo].[FACT_Player_Match_Perf]`  
-> **Tệp dữ liệu nguồn:** `appearances.csv` (hoặc `STG_Appearances` - 1.89 triệu lượt ra sân)  
-> **Database:** `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`)  
-> **Phương pháp ETL:** Pure Data Flow Task (Nạp trực tiếp qua chuỗi **Lookup Transformations** & 1 khối **Derived Column** duy nhất ở cuối luồng).  
-> **Chuẩn độ dài Chuỗi:** Áp dụng nghiêm ngặt chuẩn **`100`** hoặc **`200`** (`[DT_WSTR, 100]` hoặc `[DT_WSTR, 200]`), bảo đảm **100% SẠCH WARNING (0 tam giác vàng)**.
+> **Tệp dữ liệu nguồn:** `cleaned_appearances.csv` (210.747 dòng, 11 cột)  
+> **Cơ sở dữ liệu:** `DW_Football_Transfermarkt` (`CM_DW_Football`)  
+> **Thay đổi cốt lõi:** Bỏ khối `Data Conversion`, khai báo kiểu ở `FF_Appearances → Advanced`, kiểm tra trùng khóa `appearance_id` trước Lookup, chuyển tất cả `Lookup` sang `Redirect rows to no match output`, bổ sung `Lookup Time` và nhánh đối chiếu ngày/mã giải với `DIM_Game`, bỏ `Goal_Contributions` và `Is_Starter`, giữ `Appearance_ID` tự sinh (`IDENTITY`) và nạp mã gốc vào `Source_Appearance_ID`.
 
 ---
 
-## 1. SƠ ĐỒ LUỒNG DỮ LIỆU DATA FLOW (OPTIMIZED 9-BLOCK PIPELINE)
+## 1. SƠ ĐỒ LUỒNG DỮ LIỆU (DATA FLOW ARCHITECTURE)
 
 ```text
-[1. Flat File Source (appearances.csv) / OLE DB Source (STG_Appearances)]
-       │
-       ▼
-[2. Data Conversion (Ép kiểu DT_I4, DT_WSTR 100/200)]
-       │
-       ▼
-[3. Conditional Split (Validation kiểm tra dữ liệu hợp lệ)]
-       │
-       ▼ (Output: Valid_Appearance)
-[4. Lookup Player (Tra cứu DIM_Player lấy Player_ID)]
-       │
-       ▼
-[5. Lookup Club (Tra cứu DIM_Club lấy Club_ID)]
-       │
-       ▼
-[6. Lookup Competition (Tra cứu DIM_Competition lấy Competition_ID)]
-       │
-       ▼
-[7. Lookup Game Info (Tra cứu DIM_Game lấy Home_Club_ID & Away_Club_ID)]
-       │
-       ▼
-[8. Derived Column - Fact Calculations & Time_ID (GOM TOÀN BỘ LOGIC TÍNH TOÁN VÀO 1 KHỐI DUY NHẤT)]
-       │
-       ▼
-[9. OLE DB Destination (dbo.FACT_Player_Match_Perf - Fast Load 50.000 rows/batch, Table Lock)]
+[1. Flat File Source (FF_Appearances: cleaned_appearances.csv)] ──(Error Output)──► [Ghi lỗi nguồn]
+        │
+        ▼
+[2. Conditional Split (Valid_Appearances / Rejected_Rows)] ────(Rejected_Rows)─────► [Ghi lý do từ chối]
+        │ (Valid_Appearances)
+        ▼
+[3. Sort (appearance_id ASC + toàn bộ cột, loại dòng lặp hoàn toàn)]
+        │
+        ▼
+[4. Script Component (Gom theo appearance_id: nhóm 1 dòng / nhiều dòng)] ──────────► [Nhánh rà soát trùng]
+        │ (Nhóm 1 dòng hợp lệ)
+        ▼
+[5. Lookup Player (DIM_Player)] ──────(No Match Output)────────────────────────────► [Ghi lỗi Lookup]
+        │ (Match Output)
+        ▼
+[6. Lookup Club (DIM_Club)] ──────────(No Match Output)────────────────────────────► [Ghi lỗi Lookup]
+        │ (Match Output)
+        ▼
+[7. Lookup Game (DIM_Game)] ──────────(No Match Output)────────────────────────────► [Ghi lỗi Lookup]
+        │ (Match Output)
+        ▼
+[8. Lookup Competition (DIM_Competition)] ──(No Match Output)──────────────────────► [Ghi lỗi Lookup]
+        │ (Match Output)
+        ▼
+[9. Lookup Time (DIM_Time)] ──────────(No Match Output)────────────────────────────► [Ghi lỗi Lookup]
+        │ (Match Output)
+        ▼
+[10. Multicast (Đối chiếu ngày & mã giải với DIM_Game)]
+   ├──(Nhánh đối chiếu)──► [Conditional Split (Kiểm tra lệch/thiếu)] ──────────────► [Ghi nhận sai lệch]
+   └──(Nhánh nạp chính)
+        │
+        ▼
+[11. Derived Column (Tính Opponent_Club_ID & Is_Home_Game, giữ NULL nếu không khớp 2 đội)]
+        │
+        ▼
+[12. Row Count] ──► [OLE DB Destination (dbo.FACT_Player_Match_Perf - Fast Load, Keep nulls, tắt Keep identity)]
 ```
 
 ---
 
-## 2. CHI TIẾT CẤU HÌNH TỪNG KHỐI (BLOCK BY BLOCK CONFIGURATION)
+## 2. CHI TIẾT CẤU HÌNH TỪNG BƯỚC
 
-### Khối 1: `Flat File Source` (Đọc tệp `appearances.csv`)
-* **Connection Manager**: `FF_Appearances` (Code page `65001 - UTF-8`, Text qualifier `"`).
-* **Selected Columns** (11 cột): `appearance_id`, `game_id`, `player_id`, `player_club_id`, `date` (hoặc `date_str`), `competition_id`, `goals`, `assists`, `minutes_played`, `yellow_cards`, `red_cards`.
-* **Output Column Length**: Thiết lập **100** cho tất cả các cột kiểu chuỗi (`appearance_id`, `date`, `competition_id`).
+### Bước 1: Tạo `Data Flow Task` và `Flat File Connection Manager` (`FF_Appearances`)
 
----
+1. Trong Control Flow, kéo **Data Flow Task** vào bên ngoài `Sequence Container: Load Dimensions` (nối bằng `Success` sau khi nạp đủ năm chiều), đổi tên thành **`FACT_Player_Match_Perf`** và mở tab **Data Flow**.
+2. Kéo **Flat File Source** vào vùng thiết kế, mở **Flat File Source Editor → Connection Manager → New…** để tạo **`FF_Appearances`**.
+3. Trong tab **General**: chọn `cleaned_appearances.csv` trong thư mục `ssis_input` (hoặc cấu hình `Expressions → ConnectionString` dùng tham số `InputFolder`), chọn **Delimited**, Code page **65001 (UTF-8)**, Text qualifier **`"`**, bật **Column names in the first data row**.
+4. Trong tab **Columns**: kiểm tra dấu phân cách cột `{Comma}` và dòng `{CR}{LF}`.
 
-### Khối 2: `Data Conversion` (Ép kiểu dữ liệu chuẩn 100 / 200)
+### Bước 2: Khai báo kiểu dữ liệu ở tab `Advanced` của `FF_Appearances`
 
-| Cột Nguồn | Output Alias | Data Type | Length | Ghi chú chuyển đổi |
-| :--- | :--- | :--- | :--- | :--- |
-| `appearance_id` | **`dc_appearance_id`** | Unicode string `[DT_WSTR]` | **100** | Mã lượt ra sân |
-| `game_id` | **`dc_game_id`** | Four-byte signed integer `[DT_I4]` | - | Mã trận đấu |
-| `player_id` | **`dc_player_id`** | Four-byte signed integer `[DT_I4]` | - | Mã cầu thủ |
-| `player_club_id` | **`dc_player_club_id`** | Four-byte signed integer `[DT_I4]` | - | Mã câu lạc bộ |
-| `date` / `date_str` | **`dc_date_str`** | Unicode string `[DT_WSTR]` | **100** | Chuỗi ngày đấu (`YYYY-MM-DD`) |
-| `competition_id` | **`dc_competition_id`** | Unicode string `[DT_WSTR]` | **100** | Mã giải đấu |
-| `goals` | **`dc_goals`** | Four-byte signed integer `[DT_I4]` | - | Số bàn thắng |
-| `assists` | **`dc_assists`** | Four-byte signed integer `[DT_I4]` | - | Số đường kiến tạo |
-| `minutes_played` | **`dc_minutes_played`** | Four-byte signed integer `[DT_I4]` | - | Phút thi đấu |
-| `yellow_cards` | **`dc_yellow_cards`** | Four-byte signed integer `[DT_I4]` | - | Số thẻ vàng |
-| `red_cards` | **`dc_red_cards`** | Four-byte signed integer `[DT_I4]` | - | Số thẻ đỏ |
+Tên cột đầu ra giữ nguyên theo CSV và được dùng trực tiếp ở các thành phần tiếp theo:
 
----
-
-### Khối 3: `Conditional Split` (Validation kiểm tra dữ liệu hợp lệ)
-* **Input Columns**: Tick ĐẦY ĐỦ 11 CỘT.
-* **Output Name**: `Valid_Appearance`
-* **Condition Expression**:
-  ```c
-  !ISNULL(dc_appearance_id) && LEN(TRIM(dc_appearance_id)) > 0 &&
-  !ISNULL(dc_game_id) && dc_game_id > 0 &&
-  !ISNULL(dc_player_id) && dc_player_id > 0 &&
-  !ISNULL(dc_player_club_id) && dc_player_club_id > 0 &&
-  !ISNULL(dc_competition_id) && LEN(TRIM(dc_competition_id)) > 0 &&
-  !ISNULL(dc_date_str) && LEN(TRIM(dc_date_str)) >= 10 &&
-  !ISNULL(dc_goals) && dc_goals >= 0 &&
-  !ISNULL(dc_assists) && dc_assists >= 0 &&
-  !ISNULL(dc_minutes_played) && dc_minutes_played >= 0 &&
-  !ISNULL(dc_yellow_cards) && dc_yellow_cards >= 0 &&
-  !ISNULL(dc_red_cards) && dc_red_cards >= 0
-  ```
-* **Default Output Name**: `Invalid_Appearance`
-
----
-
-### Khối 4: `Lookup Player` (Tra cứu Cầu thủ - DIM_Player)
-* **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
-* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Player]`**.
-* **Tab Columns**: Nối `dc_player_id` $\rightarrow$ `Player_ID`. Tích chọn `Player_ID` $\rightarrow$ Output Alias: **`lk_player_id`**.
-
----
-
-### Khối 5: `Lookup Club` (Tra cứu Câu lạc bộ Cầu thủ - DIM_Club)
-* **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
-* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Club]`**.
-* **Tab Columns**: Nối `dc_player_club_id` $\rightarrow$ `Club_ID`. Tích chọn `Club_ID` $\rightarrow$ Output Alias: **`lk_club_id`**.
-
----
-
-### Khối 6: `Lookup Competition` (Tra cứu Giải đấu - DIM_Competition)
-* **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
-* **Tab Connection**: Chọn bảng **`[dbo].[DIM_Competition]`**.
-* **Tab Columns**: Nối `dc_competition_id` $\rightarrow$ `Competition_ID`. Tích chọn `Competition_ID` $\rightarrow$ Output Alias: **`lk_competition_id`**.
-
----
-
-### Khối 7: `Lookup Game Info` (Tra cứu Trận đấu lấy Đội nhà & Đội khách)
-* **Mục đích:** Trong file nguồn `appearances.csv` chỉ chứa `game_id` và `player_club_id` (đội của cầu thủ), **KHÔNG CÓ** thông tin trận đó ai là Đội nhà, ai là Đội khách, hay Đội đối thủ là ai. Khối này tra cứu vào `DIM_Game` để lấy về **`Home_Club_ID`** và **`Away_Club_ID`**.
-* **Cấu hình chi tiết:**
-  * **Tab General**: Cache mode **`Full cache`**, Connection **`OLE DB`**, No matching entries **`Ignore failure`**.
-  * **Tab Connection**: Chọn tùy chọn **Use results of an SQL query**:
-    ```sql
-    SELECT Game_ID, Home_Club_ID, Away_Club_ID 
-    FROM dbo.DIM_Game
-    ```
-  * **Tab Columns**:
-    * Nối cột đầu vào `dc_game_id` $\rightarrow$ `Game_ID`.
-    * Tích chọn ô `Home_Club_ID` $\rightarrow$ Giữ nguyên Output Alias: **`Home_Club_ID`**.
-    * Tích chọn ô `Away_Club_ID` $\rightarrow$ Giữ nguyên Output Alias: **`Away_Club_ID`**.
-
-> 💡 **Ví dụ minh họa dễ hiểu:**  
-> Trận đấu `Game_ID = 555` giữa **Real Madrid (Home_Club_ID = 10)** và **Barcelona (Away_Club_ID = 20)**.  
-> * **Vinicius** (`player_club_id = 10`): Khối 7 nhả ra `Home_Club_ID = 10`, `Away_Club_ID = 20`. Tại Khối 8 (Derived Column), SSIS so sánh `player_club_id (10) == Home_Club_ID (10)` $\rightarrow$ **`Is_Home_Game = 1`** và đối thủ **`Opponent_Club_ID = 20 (Barcelona)`**.  
-> * **Lewandowski** (`player_club_id = 20`): Khối 7 nhả ra `Home_Club_ID = 10`, `Away_Club_ID = 20`. SSIS thấy `20 != 10` $\rightarrow$ **`Is_Home_Game = 0`** (sân khách) và đối thủ **`Opponent_Club_ID = 10 (Real Madrid)`**.
-
----
-
-#### Khối 8: `Derived Column` - Fact Calculations & Time_ID (ĐÚNG 5 CỘT BIẾN ĐỔI CHƯƠNG 1)
-* **Tên khối**: `Derived Column - Fact Calculations`
-* **Mục đích**: Chỉ tính toán và bóc tách **ĐÚNG 5 CỘT DỮ LIỆU TÍNH TOÁN (DERIVED)** đã quy định trong Chương 1 (`Time_ID`, `Goal_Contributions`, `Is_Starter`, `Is_Home_Game`, `Opponent_Club_ID`). Các cột ID khác (`lk_player_id`, `lk_club_id`, `lk_competition_id`, `dc_game_id`) được truyền thẳng từ khối Lookup/Source sang OLE DB Destination.
-
-| Derived Column Name | Derived Column | Expression | Data Type | Length |
-| :--- | :--- | :--- | :--- | :--- |
-| **`Time_ID`** | Add as new column | `ISNULL(dc_date_str) \|\| LEN(TRIM(dc_date_str)) < 10 ? 19000101 : (DT_I4)(SUBSTRING(dc_date_str, 1, 4) + SUBSTRING(dc_date_str, 6, 2) + SUBSTRING(dc_date_str, 9, 2))` | `[DT_I4]` | - |
-| **`Goal_Contributions`** | Add as new column | `dc_goals + dc_assists` | `[DT_I4]` | - |
-| **`Is_Starter`** | Add as new column | `dc_minutes_played >= 60` *(hoặc `dc_minutes_played >= 60 ? 1 : 0`)* | `[DT_BOOL]` | - |
-| **`Is_Home_Game`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID` *(hoặc `? 1 : 0`)* | `[DT_BOOL]` | - |
-| **`Opponent_Club_ID`** | Add as new column | `!ISNULL(Home_Club_ID) && dc_player_club_id == Home_Club_ID ? Away_Club_ID : Home_Club_ID` | `[DT_I4]` | - |
-
----
-
-### Khối 9: `OLE DB Destination` (Nạp dữ liệu vào bảng FACT_Player_Match_Perf)
-* **Connection Manager**: OLE DB Connection đến `DW_Football_Analytics` (hoặc `DW_Football_Transfermarkt`).
-* **Data Access Mode**: `Table or view - fast load`.
-* **Table**: `[dbo].[FACT_Player_Match_Perf]`.
-* **Cấu hình Fast Load quan trọng**:
-  * **Rows per batch**: `50000`
-  * **Maximum insert commit size**: `50000`
-  * Tick chọn: **`Table lock`** và **`Check constraints`**.
-* **Mappings (Ánh xạ chuẩn xác từng cột)**:
-
-| Cột Luồng SSIS (Input Column) | Cột Đích SQL Server (Target Column) | Kiểu Dữ Liệu CSDL |
+| Cột CSV | Kiểu dữ liệu SSIS | Cột đích hoặc cách sử dụng |
 | :--- | :--- | :--- |
-| `lk_player_id` *(từ Lookup Player)* | **`Player_ID`** | `INT` |
-| `lk_club_id` *(từ Lookup Club)* | **`Club_ID`** | `INT` |
-| `Opponent_Club_ID` *(từ Derived Column)* | **`Opponent_Club_ID`** | `INT` |
-| `lk_competition_id` *(từ Lookup Competition)* | **`Competition_ID`** | `NVARCHAR(100)` |
-| `dc_game_id` *(từ Data Conversion)* | **`Game_ID`** | `INT` |
-| `Time_ID` *(từ Derived Column)* | **`Time_ID`** | `INT` |
-| `dc_minutes_played` *(từ Data Conversion)* | **`Minutes_Played`** | `INT` |
-| `dc_goals` *(từ Data Conversion)* | **`Goals`** | `INT` |
-| `dc_assists` *(từ Data Conversion)* | **`Assists`** | `INT` |
-| `Goal_Contributions` *(từ Derived Column)* | **`Goal_Contributions`** | `INT` |
-| `dc_yellow_cards` *(từ Data Conversion)* | **`Yellow_Cards`** | `INT` |
-| `dc_red_cards` *(từ Data Conversion)* | **`Red_Cards`** | `INT` |
-| `Is_Starter` *(từ Derived Column)* | **`Is_Starter`** | `INT` / `BIT` |
-| `Is_Home_Game` *(từ Derived Column)* | **`Is_Home_Game`** | `INT` / `BIT` |
+| `appearance_id` | `DT_STR (100)` | `Source_Appearance_ID` |
+| `game_id`, `player_id`, `player_club_id` | `DT_I4` | Khóa đầu vào cho các Lookup |
+| `date` | `DT_DBDATE` | Đối chiếu với ngày từ `DIM_Game` |
+| `competition_id` | `DT_WSTR (100)` | Đối chiếu với mã giải từ `DIM_Game` |
+| `goals`, `assists`, `minutes_played`, `yellow_cards`, `red_cards` | `DT_I4` | `Goals`, `Assists`, `Minutes_Played`, `Yellow_Cards`, `Red_Cards` |
+
+*(Mã lượt ra sân giữ nguyên dạng chuỗi có dấu gạch dưới, ví dụ `3836749_129991`, dài 12–15 ký tự ASCII. Khi kiểm tra Preview cần phân biệt độ đo `0` có thật và ô thiếu cần giữ `NULL`).*
+
+### Bước 3: Kiểm tra Preview và cấu hình `Flat File Source`
+
+- Chọn **Preview** trong `FF_Appearances`, kiểm tra đúng 11 cột và các ô trống, rồi bấm **OK**.
+- Trong **Flat File Source Editor**:
+  - Bật **Retain null values from the source as null values in the data flow** và kiểm tra các cột đầu ra ở tab **Columns**. Nếu SSIS yêu cầu đồng bộ metadata, xác nhận và kiểm tra lại ánh xạ.
+  - Vào tab **Error Output**, đặt `Error` và `Truncation` thành **Redirect row** cho các cột cần kiểm soát, nối đầu ra lỗi sang đích ghi lỗi của luồng.
+
+### Bước 4: Tách dòng hợp lệ bằng `Conditional Split`
+
+- Nối đầu ra hợp lệ của `Flat File Source` vào **Conditional Split**.
+- Thêm dòng **Order 1** với **Output Name**: **`Valid_Appearances`**, nhập biểu thức:
+
+```c
+!ISNULL(appearance_id) && LEN(TRIM(appearance_id)) > 0
+&& !ISNULL(game_id) && game_id > 0
+&& !ISNULL(player_id) && player_id > 0
+&& !ISNULL(player_club_id) && player_club_id > 0
+&& (ISNULL(minutes_played) || minutes_played >= 0)
+&& (ISNULL(goals) || goals >= 0)
+&& (ISNULL(assists) || assists >= 0)
+&& (ISNULL(yellow_cards) || yellow_cards >= 0)
+&& (ISNULL(red_cards) || red_cards >= 0)
+```
+
+- Đặt **Default Output Name** là **`Rejected_Rows`** và nối sang đích ghi lý do kiểm tra.
+
+### Bước 5: Sắp xếp và xử lý dòng lặp (`Sort` + `Script Component`)
+
+1. Nối nhánh `Valid_Appearances` vào **Sort** (`Sort Input`).
+2. Chọn `appearance_id` làm cột sắp xếp tăng dần (`Ascending`). Dùng toàn bộ các cột đầu vào trong tập khóa sắp xếp và bật **Remove rows with duplicate sort values** để nhận diện và loại dòng lặp hoàn toàn.
+3. Nếu hai dòng cùng `appearance_id` nhưng khác nội dung, dùng **Script Component** sau `Sort` để gom các dòng liên tiếp theo `appearance_id`: chuyển nhóm một dòng tới `Lookup Player` và nhóm nhiều dòng tới nhánh rà soát trước khi chọn bản ghi; xử lý nhóm cuối khi luồng kết thúc.
+
+### Bước 6: Chuỗi 5 khối `Lookup` xác nhận khóa ngoại
+
+Tất cả 5 khối `Lookup` dùng chung thiết lập tại tab **General** và **Connection**:
+- **Cache mode**: `Full cache`
+- **Connection type**: `OLE DB connection manager` (`CM_DW_Football`)
+- **Specify how to handle rows with no matching entries**: **`Redirect rows to no match output`**
+- Với mọi **Lookup No Match Output**, nối sang nhánh ghi lỗi (lưu `appearance_id`, khóa tra cứu và tên phép tra).
+
+| Thứ tự | Tên khối Lookup | Bảng tra cứu | Khóa nối (`Input` $\rightarrow$ `Lookup`) | Cột đầu ra & Output Alias |
+| :---: | :--- | :--- | :--- | :--- |
+| 1 | `Lookup Player` | `dbo.DIM_Player` | `player_id` $\rightarrow$ `Player_ID` | `Player_ID` $\rightarrow$ `FK_Player_ID` |
+| 2 | `Lookup Club` | `dbo.DIM_Club` | `player_club_id` $\rightarrow$ `Club_ID` | `Club_ID` $\rightarrow$ `FK_Club_ID` |
+| 3 | `Lookup Game` | `dbo.DIM_Game` | `game_id` $\rightarrow$ `Game_ID` | `Game_ID` $\rightarrow$ `FK_Game_ID`<br>`Competition_ID` $\rightarrow$ `Game_Competition_ID`<br>`Date` $\rightarrow$ `Game_Date`<br>`Season` $\rightarrow$ `Game_Season`<br>`Home_Club_ID` $\rightarrow$ `Game_Home_Club_ID`<br>`Away_Club_ID` $\rightarrow$ `Game_Away_Club_ID` |
+| 4 | `Lookup Competition` | `dbo.DIM_Competition` | `Game_Competition_ID` $\rightarrow$ `Competition_ID` | `Competition_ID` $\rightarrow$ `FK_Competition_ID` |
+| 5 | `Lookup Time` | `dbo.DIM_Time` | `Game_Date` $\rightarrow$ `Full_Date` | `Time_ID` $\rightarrow$ `FK_Time_ID` |
+
+*(Nối **Lookup Match Output** của khối trước sang khối tiếp theo đúng theo thứ tự từ 1 đến 5).*
+
+### Bước 7: Đối chiếu ngày và mã giải từ hai nguồn
+
+- Sau `Lookup Time`, đối chiếu `date` và `competition_id` của lượt ra sân với `Game_Date` và `Game_Competition_ID` lấy từ `DIM_Game`.
+- Có thể dùng **Multicast** để giữ một nhánh nạp chính và một nhánh **Conditional Split** ghi lại các trường hợp thiếu hoặc khác nhau giữa hai nguồn.
+- Trong nhánh nạp chính, ngày (`FK_Time_ID`) và mã giải (`FK_Competition_ID`) dùng cho khóa fact lấy từ phép tra theo trận.
+
+### Bước 8: Tính mã đối thủ và vai trò sân nhà bằng `Derived Column`
+
+Nối nhánh nạp chính tới **Derived Column**, thêm 2 cột ở chế độ **`<add as new column>`**:
+
+| Cột mới | Expression |
+| :--- | :--- |
+| `Opponent_Club_ID` | `FK_Club_ID == Game_Home_Club_ID ? Game_Away_Club_ID : (FK_Club_ID == Game_Away_Club_ID ? Game_Home_Club_ID : NULL(DT_I4))` |
+| `Is_Home_Game` | `FK_Club_ID == Game_Home_Club_ID ? 1 : (FK_Club_ID == Game_Away_Club_ID ? 0 : NULL(DT_I4))` |
+
+*(Nếu CLB cầu thủ khác cả đội nhà và đội khách, giữ `NULL` ở cả hai trường và ghi nhận bằng nhánh đối soát. Không tính `Goal_Contributions` và `Is_Starter`).*
+
+### Bước 9: Kết nối `OLE DB Destination` và ánh xạ (`[dbo].[FACT_Player_Match_Perf]`)
+
+- Kéo **OLE DB Destination**, nối từ `Derived Column`.
+- **Connection Manager**: `CM_DW_Football`.
+- **Data access mode**: `Table or view - fast load`, chọn bảng **`[dbo].[FACT_Player_Match_Perf]`**.
+- Bật **Keep nulls** và **Check constraints**.
+- **Để trống ánh xạ `Appearance_ID` và giữ `Keep identity` tắt** để SQL Server tự sinh khóa chính.
+- **Mappings (13 cột)**:
+
+| Cột đầu ra trong Data Flow | Cột đích SQL Server |
+| :--- | :--- |
+| *(Không ánh xạ — SQL Server tự sinh `IDENTITY`)* | `Appearance_ID` |
+| `appearance_id` | `Source_Appearance_ID` |
+| `FK_Player_ID`, `FK_Club_ID` | `Player_ID`, `Club_ID` |
+| `FK_Competition_ID`, `FK_Game_ID`, `FK_Time_ID` | `Competition_ID`, `Game_ID`, `Time_ID` |
+| `Opponent_Club_ID`, `Is_Home_Game` | `Opponent_Club_ID`, `Is_Home_Game` |
+| `minutes_played`, `goals`, `assists` | `Minutes_Played`, `Goals`, `Assists` |
+| `yellow_cards`, `red_cards` | `Yellow_Cards`, `Red_Cards` |
+
+- Vào **Error Output**, nối nhánh lỗi đến đích ghi nhận. Khi chạy thử, đặt **Row Count** trước đích và ở các nhánh lỗi để kiểm tra số dòng.
 
 ---
 
-## 3. TẠI SAO GOM THÀNH 1 KHỐI DERIVED COLUMN LẠI TỐI ƯU HƠN?
+## 3. CHẠY LẠI CÙNG MỘT LÔ KHI GIỮ DỮ LIỆU
 
-1. **Gọn gàng & Trực quan:**  
-   Thay vì tách làm 2 khối (1 khối tính `Time_ID` trước Lookup, 1 khối tính chỉ số sau Lookup), việc gom tất cả vào **Khối 8** ngay trước `OLE DB Destination` giúp luồng SSIS giảm từ 11 khối xuống còn **9 khối**, kéo thả dễ dàng và không bị phân tán logic.
-2. **Loại bỏ tên biến `*_Final` dư thừa:**  
-   Trước đây phải đặt tên `Player_ID_Final`, `Club_ID_Final` để tránh trùng tên với cột Lookup `lk_player_id`. Bây giờ trong khối Derived Column duy nhất, ta đặt thẳng tên cột mới là `Player_ID`, `Club_ID`, `Time_ID` trùng khớp 100% với tên cột bảng đích trong SQL Server.
-3. **Hiệu năng cao hơn:**  
-   Mỗi khối Transformation trong SSIS Data Flow tiêu tốn thêm tài nguyên bộ nhớ đệm (buffer memory) để trung chuyển dữ liệu giữa các khối. Gom 2 khối Derived Column thành 1 khối giúp giảm 1 bước trung chuyển đệm, tăng tốc độ xử lý cho 1.89 triệu bản ghi.
+Khi giữ dữ liệu đã nạp (bỏ qua `Drop All Tables` và `Create All Tables`):
+
+1. Thêm bước `Lookup Source_Appearance_ID` tra cột `appearance_id` vào `dbo.FACT_Player_Match_Perf(Source_Appearance_ID)`.
+2. Đưa các mã đã có (`Match Output`) vào nhánh đếm riêng (`Row Count`).
+3. Chỉ chèn các mã chưa có (`No Match Output`) vào đích với ràng buộc `UNIQUE` trên `Source_Appearance_ID`.
+4. Đối chiếu lại số lượt ra sân và tổng độ đo sau lần chạy thứ hai để bảo đảm không nạp trùng.
 
 ---
 
-## 4. GIẢI THÍCH VỀ CỘT TIME_ID: CÓ CẦN DÙNG KHỐI LOOKUP TIME KHÔNG?
+## 4. ĐỐI SOÁT SỐ DÒNG VÀ ĐỘ ĐO TRONG SQL SERVER
 
-Có **2 phương án** thiết kế xử lý `Time_ID` tùy theo yêu cầu của bạn:
+- Mốc số dòng kỳ vọng: **210.747** lượt nếu tất cả các dòng hợp lệ; `Appearance_ID` tự sinh và mỗi `Source_Appearance_ID` chỉ xuất hiện một lần.
+- Đối chiếu số đầu vào với số đã nạp, số đã có (khi chạy lại), số lặp đã xử lý, số bị từ chối, khóa tham chiếu và số lượt sân nhà/sân khách bị thiếu.
 
-### Phương án A: Kỹ thuật Smart Surrogate Key (Khuyên dùng - Đã áp dụng ở Luồng 9 Khối trên)
-* **Nguyên lý:** Khóa `Time_ID` trong `DIM_Time` được lưu theo định dạng số nguyên `YYYYMMDD` (ví dụ: ngày `2023-05-15` $\rightarrow$ `20230515`).
-* **Cách thực hiện:** Khối Derived Column tự động cắt chuỗi ngày `dc_date_str` tạo ra `20230515`. Vì giá trị này **chắc chắn trùng 100%** với `Time_ID` trong `DIM_Time`, ta **KHÔNG CẦN khối `Lookup Time`**.
-* **Ưu điểm:** Giảm bớt 1 khối Lookup, tiết kiệm bộ nhớ RAM, chạy nhanh nhất.
+```sql
+-- Kiểm tra trùng Source_Appearance_ID
+SELECT Source_Appearance_ID, COUNT_BIG(*) AS So_Dong
+FROM dbo.FACT_Player_Match_Perf
+GROUP BY Source_Appearance_ID
+HAVING COUNT_BIG(*) > 1;
 
-### Phương án B: Nếu bắt buộc phải có khối Lookup Time (Theo yêu cầu đồ án/bài tập)
-* **Cách thực hiện:** Thêm khối `Lookup Time` chèn vào trước Khối Derived Column:
-  * **Lookup Column:** Nối chuỗi ngày `dc_date_str` (`2023-05-15`) sang cột **`Full_Date`** trong `DIM_Time`.
-  * **Output Column:** Tích chọn `Time_ID` $\rightarrow$ Output Alias: **`lk_time_id`**.
-  * **Tại Derived Column (Khối 8):** Tính `Time_ID` bằng biểu thức: `ISNULL(lk_time_id) ? 19000101 : lk_time_id`.
-* **Ưu điểm:** Đảm bảo 100% ngoại khóa `Time_ID` đều đi qua khối Lookup để kiểm tra sự tồn tại trong `DIM_Time`.
+-- Đối chiếu lượt ra sân và tổng độ đo theo giải đấu và mùa giải
+SELECT f.Competition_ID, g.Season, COUNT_BIG(*) AS Luot_Ra_San,
+       SUM(f.Minutes_Played) AS Phut, SUM(f.Goals) AS Ban,
+       SUM(f.Assists) AS Kien_Tao, SUM(f.Yellow_Cards) AS The_Vang,
+       SUM(f.Red_Cards) AS The_Do
+FROM dbo.FACT_Player_Match_Perf AS f
+JOIN dbo.DIM_Game AS g ON g.Game_ID = f.Game_ID
+GROUP BY f.Competition_ID, g.Season
+ORDER BY f.Competition_ID, g.Season;
+```
 
+- **Tổng tham chiếu trên 210.747 lượt ra sân**: **13.562.727** phút, **19.173** bàn, **14.739** kiến tạo, **28.694** thẻ vàng và **827** thẻ đỏ. Nếu có dòng bị từ chối, dùng số liệu từ nhánh lỗi để giải thích chênh lệch.
