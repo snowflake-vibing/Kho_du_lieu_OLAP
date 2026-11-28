@@ -1,95 +1,243 @@
-# HƯỚNG DẪN SSAS - PHẦN 3: THIẾT LẬP CUBE & ĐỊNH NGHĨA MEASURES
+# HƯỚNG DẪN SSAS - PHẦN 3: XÂY DỰNG CUBE & CALCULATED MEASURES
 
 ---
 
-## 1. MỤC TIÊU HUẤN LUYỆN
-Khởi tạo OLAP Cube **`DW_Football_Cube`** từ `FACT_Player_Match_Perf`, định nghĩa danh sách các **Measures (Độ đo)** cộng dồn và xây dựng các **Calculated Measures (Độ đo tính toán)** qua ngôn ngữ MDX.
+## 1. MỤC TIÊU
+
+Khởi tạo OLAP Cube **`DW Football Transfermarkt`** tách bạch **4 Measure Groups** theo đúng cấp độ dữ liệu (Grain) của Chương 1, định nghĩa **13 Base Measures** và khai báo bộ **Calculated Measures** tự chủ bằng MDX trong tab **Calculations**.
 
 ---
 
-## 2. BƯỚC 1: KHỞI TẠO CUBE `DW_Football_Cube`
+## 2. BƯỚC 1: KHỞI TẠO CUBE `DW Football Transfermarkt`
 
-1. Trong Solution Explorer, chuột phải vào **Cubes** $\rightarrow$ chọn **New Cube...**
-2. Nhấn **Next >** tại màn hình Welcome Wizard.
-3. Chọn **Use existing tables** $\rightarrow$ Nhấn **Next >**.
-4. Tại màn hình **Select Measure Group Tables**:
-   - Tick chọn duy nhất bảng **`FACT_Player_Match_Perf`**.
-   - Nhấn **Next >**.
-5. Tại màn hình **Select Measures**:
-   - Tick chọn các thuộc tính dùng làm Measure:
-     - `Minutes Played` (Hàm Sum)
-     - `Goals` (Hàm Sum)
-     - `Assists` (Hàm Sum)
-     - `Goal Contributions` (Hàm Sum)
-     - `Yellow Cards` (Hàm Sum)
-     - `Red Cards` (Hàm Sum)
-     - `Is Starter` (Hàm Sum)
-     - `Is Home Game` (Hàm Sum)
-     - `FACT Player Match Perf Count` (Hàm Count - Đếm số lượt ra sân)
-6. Tại màn hình **Select Existing Dimensions**:
-   - Tick chọn đầy đủ 5 Dimensions đã tạo: `DIM_Player`, `DIM_Club`, `DIM_Competition`, `DIM_Game`, `DIM_Time`.
-7. Đặt tên Cube: **`DW_Football_Cube`** $\rightarrow$ Nhấn **Finish**.
+1. Trong Solution Explorer, bấm chuột phải vào **Cubes** $\rightarrow$ chọn **New Cube...** $\rightarrow$ **Next >**.
+2. Chọn **Use existing tables** $\rightarrow$ **Next >**.
+3. Tại màn hình **Select Measure Group Tables**, tích chọn đồng thời 3 bảng chứa độ đo:
+   - `FACT_Player_Match_Perf` (cấp lượt ra sân — 210.747 dòng)
+   - `FACT_Club_Match_Official` (cấp đội – trận — 14.560 dòng)
+   - `DIM_Game` (cấp trận đấu — 7.280 dòng)
+4. Tại màn hình **Select Measures**: chỉ tích giữ các độ đo nghiệp vụ hợp lệ (bỏ các cột khóa ngoại, cờ `Is_Home_Game`, `Player_Age_At_Match`, `Season`).
+5. Tại màn hình **Select Existing Dimensions**: tích chọn đầy đủ 6 Dimensions đã tạo (`DIM_Club`, `DIM_Competition`, `DIM_Game`, `DIM_Player`, `DIM_Time`, `DIM_Appearance_Context`).
+6. Đặt tên Cube là **`DW Football Transfermarkt`** $\rightarrow$ nhấn **Finish**.
+
+### Tạo Measure Group thứ 4 cho Distinct Count (`FACT Player Distinct`)
+Theo quy chuẩn SSAS Multidimensional, phép đếm phân biệt (`DistinctCount`) bắt buộc nằm trên một Measure Group riêng biệt để phục vụ Câu 13 (đếm số cầu thủ duy nhất ra sân theo CLB):
+1. Trong tab **Cube Structure**, bấm chuột phải vào vùng Measures $\rightarrow$ chọn **New Measure...**.
+2. Chọn **Usage** = `Distinct count`, **Source table** = `FACT_Player_Match_Perf`, **Source column** = `Player_ID`.
+3. SSAS tự sinh Measure Group **`FACT Player Distinct`**; đặt tên độ đo là **`Distinct Player Count`**, `FormatString = #,##0`.
 
 ---
 
-## 3. BƯỚC 2: ĐỊNH NGHĨA VÀ ĐỔI TÊN MEASURES
+## 3. BƯỚC 2: DANH MỤC 13 BASE MEASURES THUỘC 4 MEASURE GROUPS
 
-Chỉnh sửa tiêu đề các Measure trong tab **Cube Structure** để hiển thị thân thiện trên báo cáo:
+| Measure Group | Bảng nguồn (DSV) | Tên độ đo (Measure) | Hàm tổng hợp | Format String | Cấp độ (Grain) |
+| :--- | :--- | :--- | :---: | :---: | :--- |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Minutes Played` | `Sum` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Goals` | `Sum` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Assists` | `Sum` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Yellow Cards` | `Sum` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Red Cards` | `Sum` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Match Perf` | `FACT_Player_Match_Perf` | `Appearance Count` | `Count` | `#,##0` | Lượt ra sân (210.747) |
+| `FACT Player Distinct` | `FACT_Player_Match_Perf` | `Distinct Player Count` | `DistinctCount` | `#,##0` | Cầu thủ duy nhất |
+| `FACT Club Match Official` | `FACT_Club_Match_Official` | `Official Team Goals` | `Sum` | `#,##0` | Đội – Trận (14.560) |
+| `FACT Club Match Official` | `FACT_Club_Match_Official` | `Official Team Match Count` | `Count` | `#,##0` | Đội – Trận (14.560) |
+| `DIM Game` | `DIM_Game` | `Official Match Count` | `Count` | `#,##0` | Trận đấu (7.280) |
+| `DIM Game` | `DIM_Game` | `Home Club Goals` | `Sum` | `#,##0` | Trận đấu (7.280) |
+| `DIM Game` | `DIM_Game` | `Away Club Goals` | `Sum` | `#,##0` | Trận đấu (7.280) |
+| `DIM Game` | `DIM_Game` | `Total Match Goals` | `Sum` | `#,##0` | Trận đấu (7.280) |
 
-| Tên Gốc trong SSAS | Tên Hiển Thị Rõ Ràng (Caption) | Aggregation Function | Format String |
-| :--- | :--- | :--- | :--- |
-| `Goals` | **`Total Goals`** | Sum | `#,##0` |
-| `Assists` | **`Total Assists`** | Sum | `#,##0` |
-| `Goal Contributions` | **`Total Goal Contributions`** | Sum | `#,##0` |
-| `Minutes Played` | **`Total Minutes Played`** | Sum | `#,##0` |
-| `Yellow Cards` | **`Total Yellow Cards`** | Sum | `#,##0` |
-| `Red Cards` | **`Total Red Cards`** | Sum | `#,##0` |
-| `Is Starter` | **`Total Starter Appearances`** | Sum | `#,##0` |
-| `Is Home Game` | **`Total Home Appearances`** | Sum | `#,##0` |
-| `FACT Player Match Perf Count` | **`Total Appearances`** | Count | `#,##0` |
+Đặt `NullProcessing = Preserve` cho các độ đo gốc kiểu `Sum` để không nhầm giá trị thiếu với số 0.
 
 ---
 
-## 4. BƯỚC 3: ĐỊNH NGHĨA CALCULATED MEASURES (MDX CALCULATIONS)
+## 4. BƯỚC 3: ĐỊNH NGHĨA CALCULATED MEASURES TRONG TAB `Calculations`
 
-Mở tab **Calculations** trong Cube Editor, thêm các câu lệnh tính toán MDX:
+Mọi Calculated Measure đều viết độc lập từ Base Measures gốc (không tạo dây chuyền phụ thuộc chéo dễ gãy) và bảo vệ phép chia cho 0 bằng `IIF`:
 
-### 1. Số phút thi đấu trung bình mỗi trận (Avg Minutes Per Match)
 ```mdx
-CREATE MEMBER CURRENTCUBE.[Measures].[Avg Minutes Per Match] AS
-    IIF([Measures].[Total Appearances] = 0, 0,
-        [Measures].[Total Minutes Played] / [Measures].[Total Appearances]
-    ),
-FORMAT_STRING = "#,##0.0",
-VISIBLE = 1,
-ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
-```
+// 1. Tổng đóng góp bàn thắng (Câu 3)
+CREATE MEMBER CURRENTCUBE.[Measures].[Goal Contributions] AS
+    [Measures].[Goals] + [Measures].[Assists],
+    FORMAT_STRING = "#,##0",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
 
-### 2. Tỷ lệ đóng góp bàn thắng (Goal Contribution Rate per 90 Mins)
-```mdx
-CREATE MEMBER CURRENTCUBE.[Measures].[Contributions Per 90 Mins] AS
-    IIF([Measures].[Total Minutes Played] = 0, 0,
-        ([Measures].[Total Goal Contributions] * 90.0) / [Measures].[Total Minutes Played]
+// 2. Thời lượng thi đấu trung bình mỗi lượt ra sân (Câu 4)
+CREATE MEMBER CURRENTCUBE.[Measures].[Avg Minutes Played] AS
+    IIF(
+        ISEMPTY([Measures].[Appearance Count])
+        OR [Measures].[Appearance Count] = 0,
+        NULL,
+        [Measures].[Minutes Played] / [Measures].[Appearance Count]
     ),
-FORMAT_STRING = "#,##0.00",
-VISIBLE = 1,
-ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
-```
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
 
-### 3. Tỷ lệ Đá chính (Starter Rate %)
-```mdx
-CREATE MEMBER CURRENTCUBE.[Measures].[Starter Rate Percent] AS
-    IIF([Measures].[Total Appearances] = 0, 0,
-        ([Measures].[Total Starter Appearances] * 1.0) / [Measures].[Total Appearances]
+// 3. Số bàn thắng trên 90 phút (Câu 8 mới)
+CREATE MEMBER CURRENTCUBE.[Measures].[Goals Per 90] AS
+    IIF(
+        ISEMPTY([Measures].[Minutes Played])
+        OR [Measures].[Minutes Played] = 0,
+        NULL,
+        ([Measures].[Goals] * 90.0) / [Measures].[Minutes Played]
     ),
-FORMAT_STRING = "Percent",
-VISIBLE = 1,
-ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+// 4. Đóng góp bàn thắng trên 90 phút (phân tích bổ trợ)
+CREATE MEMBER CURRENTCUBE.[Measures].[Goal Contributions Per 90] AS
+    IIF(
+        ISEMPTY([Measures].[Minutes Played])
+        OR [Measures].[Minutes Played] = 0,
+        NULL,
+        (([Measures].[Goals] + [Measures].[Assists]) * 90.0)
+            / [Measures].[Minutes Played]
+    ),
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+// 5. Thống kê chiều cao trên tập cầu thủ duy nhất hợp lệ (Câu 6)
+CREATE MEMBER CURRENTCUBE.[Measures].[Avg Height Cm] AS
+    AVG(
+        NONEMPTY(
+            EXISTING CrossJoin(
+                [DIM Player].[Player ID].[Player ID].MEMBERS,
+                FILTER(
+                    EXCEPT(
+                        [DIM Player].[Height In Cm].[Height In Cm].MEMBERS,
+                        { [DIM Player].[Height In Cm].[Unknown] }
+                    ),
+                    [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0
+                )
+            ),
+            [Measures].[Appearance Count]
+        ),
+        [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+    ),
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Max Height Cm] AS
+    MAX(
+        NONEMPTY(
+            EXISTING CrossJoin(
+                [DIM Player].[Player ID].[Player ID].MEMBERS,
+                FILTER(
+                    EXCEPT(
+                        [DIM Player].[Height In Cm].[Height In Cm].MEMBERS,
+                        { [DIM Player].[Height In Cm].[Unknown] }
+                    ),
+                    [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0
+                )
+            ),
+            [Measures].[Appearance Count]
+        ),
+        [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+    ),
+    FORMAT_STRING = "#,##0",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Min Height Cm] AS
+    MIN(
+        NONEMPTY(
+            EXISTING CrossJoin(
+                [DIM Player].[Player ID].[Player ID].MEMBERS,
+                FILTER(
+                    EXCEPT(
+                        [DIM Player].[Height In Cm].[Height In Cm].MEMBERS,
+                        { [DIM Player].[Height In Cm].[Unknown] }
+                    ),
+                    [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE > 0
+                )
+            ),
+            [Measures].[Appearance Count]
+        ),
+        [DIM Player].[Height In Cm].CURRENTMEMBER.MEMBER_VALUE
+    ),
+    FORMAT_STRING = "#,##0",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+// 6. Tỷ lệ phần trăm bàn thắng theo quốc tịch (Câu 7 - Pareto)
+CREATE MEMBER CURRENTCUBE.[Measures].[Pct Of Country Goals] AS
+    IIF(
+        ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All]) = 0,
+        NULL,
+        [Measures].[Goals]
+            / ([Measures].[Goals], [DIM Player].[Country Of Citizenship].[All])
+    ),
+    FORMAT_STRING = "0.00%",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+// 7. Sức chứa sân nhà dạng số học cho bảng CLB chủ nhà (Câu 11)
+CREATE MEMBER CURRENTCUBE.[Measures].[Stadium Seats Value] AS
+    IIF(
+        ISEMPTY([Measures].[Official Match Count]),
+        NULL,
+        MAX(
+            EXISTING EXCEPT(
+                [DIM Home Club].[Stadium Seats].[Stadium Seats].MEMBERS,
+                { [DIM Home Club].[Stadium Seats].[Unknown] }
+            ),
+            [DIM Home Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE
+        )
+    ),
+    FORMAT_STRING = "#,##0",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'DIM Game';
+
+// Trận có lượt ra sân trong ngữ cảnh CLB, sân và HLV hiện hành.
+CREATE MEMBER CURRENTCUBE.[Measures].[Covered Match Count] AS
+    COUNT(
+        NONEMPTY(
+            EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS,
+            [Measures].[Appearance Count]
+        )
+    ),
+    FORMAT_STRING = "#,##0",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Goals Per Match] AS
+    IIF(
+        [Measures].[Covered Match Count] = 0,
+        NULL,
+        [Measures].[Goals] / [Measures].[Covered Match Count]
+    ),
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Yellow Cards Per Match] AS
+    IIF(
+        [Measures].[Covered Match Count] = 0,
+        NULL,
+        [Measures].[Yellow Cards] / [Measures].[Covered Match Count]
+    ),
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Red Cards Per Match] AS
+    IIF(
+        [Measures].[Covered Match Count] = 0,
+        NULL,
+        [Measures].[Red Cards] / [Measures].[Covered Match Count]
+    ),
+    FORMAT_STRING = "#,##0.00",
+    VISIBLE = 1,
+    ASSOCIATED_MEASURE_GROUP = 'FACT Player Match Perf';
 ```
 
 ---
 
 ## 5. CHECKLIST KIỂM TRA THÀNH CÔNG
-- [x] Cube `DW_Football_Cube` khởi tạo thành công với Measure Group `FACT_Player_Match_Perf`.
-- [x] Định dạng Format String (`#,##0`, `Percent`, `#,##0.00`) gán chuẩn xác cho từng Measure.
-- [x] Thêm thành công 3 Calculated Measures bằng MDX trong tab Calculations.
+- [x] Cube `DW Football Transfermarkt` có đủ 4 Measure Groups và 13 Base Measures khớp hoàn toàn Chương 1 & Chương 3.
+- [x] Toàn bộ Calculated Measures bám sát 15 câu truy vấn mới của Chương 1 (bao gồm `Goals Per 90`, `Goal Contributions`, `Avg Minutes Played`, chiều cao trên cầu thủ duy nhất, tỷ trọng quốc tịch và sức chứa sân).
+- [x] Tất cả Calculated Measures viết tự chủ, xử lý đúng `NULL`, `Unknown` và chia cho 0.

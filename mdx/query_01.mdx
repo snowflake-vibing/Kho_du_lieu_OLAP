@@ -1,0 +1,25 @@
+/* ==============================================================================
+   Truy vấn MDX 01: Top 10 Vua dội bom Ngoại Hạng Anh mùa giải 2023/2024
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+SELECT
+    { [Measures].[Goals] } ON COLUMNS,
+    TOPCOUNT(
+        NONEMPTY(
+            [DIM Player].[Player ID].[Player ID].MEMBERS,
+            (
+                [Measures].[Goals],
+                [DIM Competition].[Competition ID].&[GB1],
+                [DIM Game].[Season].&[2023]
+            )
+        ),
+        10,
+        [Measures].[Goals]
+    ) ON ROWS
+FROM [DW Football Transfermarkt]
+WHERE (
+    [DIM Competition].[Competition ID].&[GB1],
+    [DIM Game].[Season].&[2023]
+);

@@ -2,55 +2,64 @@
 
 ---
 
-## 1. MỤC TIÊU HUẤN LUYỆN & CẤU HÌNH
-Tài liệu hướng dẫn khởi tạo dự án **SQL Server Analysis Services (SSAS Multidimensional Project)** trong Visual Studio (SSDT) và thiết lập kết nối **Data Source** tới cơ sở dữ liệu Kho dữ liệu `DW_Football_Analytics`.
+## 1. MỤC TIÊU & PHẠM VI
+
+Tài liệu hướng dẫn khởi tạo dự án **SQL Server Analysis Services (SSAS Multidimensional Project)** trong **Visual Studio 2022** và thiết lập kết nối **Data Source** tới cơ sở dữ liệu kho dữ liệu **`DW_Football_Transfermarkt`** đã được nạp từ quy trình SSIS (Chương 2).
+
+| Thành phần | Giá trị chuẩn hóa |
+| :--- | :--- |
+| **SQL Server Database (nguồn)** | `DW_Football_Transfermarkt` |
+| **SSAS Project / Database Name** | `SSAS_Football_Transfermarkt` |
+| **Data Source** | `DW_Football_Transfermarkt.ds` |
+| **Data Source View** | `DW_Football_Transfermarkt.dsv` |
+| **OLAP Cube** | `DW Football Transfermarkt` |
+
+> **Nâng cấp từ bản cũ (`Bài tập (1).docx`)?** Xem lộ trình chỉnh sửa chi tiết từng bước cho SSAS và 15 câu truy vấn MDX tại [ke_hoach_chinh_sua_ssas_mdx.md](./ke_hoach_chinh_sua_ssas_mdx.md).
 
 ---
 
 ## 2. QUY TRÌNH THỰC HIỆN TỪNG BƯỚC
 
-### Bước 1: Khởi tạo Project SSAS mới trong Visual Studio
-1. Mở **Visual Studio 2022 / SSDT**.
+### Bước 1: Khởi tạo Project SSAS mới trong Visual Studio 2022
+1. Mở **Visual Studio 2022** (đã cài tiện ích *Microsoft Analysis Services Projects*).
 2. Chọn **Create a new project**.
-3. Trong ô tìm kiếm, nhập `Analysis Services Multidimensional`.
-4. Chọn mẫu project: **Analysis Services Multidimensional and Data Mining Project**.
+3. Trong ô tìm kiếm, nhập `Analysis Services`.
+4. Chọn mẫu: **Analysis Services Multidimensional Project** (hoặc *Analysis Services Multidimensional and Data Mining Project* tùy phiên bản SSDT).
 5. Nhấn **Next**.
-6. Điền thông tin cấu hình:
-   - **Project name**: `DW_Football_SSAS`
+6. Điền thông tin cấu hình tại màn hình **Configure your new project**:
+   - **Project name**: `SSAS_Football_Transfermarkt`
    - **Location**: `D:\Kho_du_lieu_OLAP`
-   - Check vào ô *Place solution and project in the same directory*.
-7. Nhấn **Create** để tạo dự án.
+   - Tích chọn *Place solution and project in the same directory*.
+7. Nhấn **Create** để tạo dự án. Kiểm tra **Solution Explorer** đã hiển thị đầy đủ các thư mục `Data Sources`, `Data Source Views`, `Cubes`, `Dimensions`, `Roles`…
 
 ---
 
-### Bước 2: Khởi tạo Data Source kết nối Data Warehouse
-1. Trong cửa sổ **Solution Explorer**, nhấp chuột phải vào thư mục **Data Sources** $\rightarrow$ chọn **New Data Source...**
-2. Cửa sổ **Data Source Wizard** hiển thị $\rightarrow$ Nhấn **Next >**.
+### Bước 2: Khởi tạo Data Source kết nối `DW_Football_Transfermarkt`
+1. Trong **Solution Explorer**, nhấp chuột phải vào thư mục **Data Sources** $\rightarrow$ chọn **New Data Source...**
+2. Cửa sổ **Data Source Wizard** hiển thị $\rightarrow$ nhấn **Next >**.
 3. Tại màn hình **Select how to define the connection**:
    - Chọn **Create a data source based on an existing or new connection**.
    - Nhấn nút **New...** để mở hộp thoại **Connection Manager**.
 4. Thiết lập tham số kết nối SQL Server:
-   - **Provider**: `Native OLE DB\Microsoft OLE DB Driver for SQL Server` (hoặc `SQL Server Native Client 11.0`).
-   - **Server name**: `localhost` (hoặc tên máy tính chứa SQL Server, ví dụ: `DESKTOP-SQLSERVER`).
-   - **Authentication**: Chọn `Use Windows Authentication` (hoặc `Use SQL Server Authentication` nhập username/password SQL Server).
-   - **Select or enter a database name**: Chọn cơ sở dữ liệu **`DW_Football_Analytics`**.
-   - Nhấn **Test Connection** để đảm bảo kết nối thành công (`Test connection succeeded`).
-   - Nhấn **OK**.
-5. Quay lại cửa sổ Wizard, chọn kết nối vừa tạo $\rightarrow$ Nhấn **Next >**.
+   - **Provider**: `Native OLE DB\Microsoft OLE DB Driver for SQL Server` (hoặc `SQL Server Native Client`).
+   - **Server name**: `localhost` (hoặc tên instance SQL Server cục bộ chứa kho dữ liệu thực hành).
+   - **Authentication**: chọn `Use Windows Authentication`.
+   - **Select or enter a database name**: chọn **`DW_Football_Transfermarkt`**.
+   - Nhấn **Test Connection** để xác nhận `Test connection succeeded`, sau đó nhấn **OK**.
+5. Quay lại Wizard, chọn kết nối vừa tạo $\rightarrow$ nhấn **Next >**.
 
 ---
 
-### Bước 3: Cấu hình Impersonation Information (Xác thực tài khoản)
+### Bước 3: Cấu hình Impersonation Information & hoàn tất
 1. Tại màn hình **Impersonation Information**:
-   - Chọn tùy chọn **Use the service account** (sử dụng tài khoản dịch vụ của SSAS Engine) hoặc **Use credentials of the current user**.
+   - Chọn **Use the service account** để dịch vụ SSAS dùng tài khoản dịch vụ đọc dữ liệu từ SQL Server lúc Process (hoặc dùng Windows credentials có quyền `db_datareader` trên `DW_Football_Transfermarkt`).
 2. Nhấn **Next >**.
-3. Nhập tên Data Source Name: **`DS_DW_Football_Analytics`**.
-4. Nhấn **Finish** để hoàn tất wizard.
-5. Kiểm tra file `DS_DW_Football_Analytics.ds` đã xuất hiện dưới mục **Data Sources** trong Solution Explorer.
+3. Đặt **Data source name**: **`DW_Football_Transfermarkt`**, kiểm tra chuỗi kết nối ở khung **Preview** và nhấn **Finish**.
+4. Kiểm tra tệp `DW_Football_Transfermarkt.ds` đã xuất hiện trong thư mục **Data Sources** của Solution Explorer.
 
 ---
 
 ## 3. CHECKLIST KIỂM TRA THÀNH CÔNG
-- [x] Project `DW_Football_SSAS` tạo thành công trong Visual Studio.
-- [x] Data Source `DS_DW_Football_Analytics` được tạo và Test Connection thành công.
-- [x] Chuỗi kết nối chỉ định chính xác database `DW_Football_Analytics`.
+- [x] Project `SSAS_Football_Transfermarkt` được tạo bằng mẫu Multidimensional Project trong Visual Studio 2022.
+- [x] Data Source `DW_Football_Transfermarkt.ds` kiểm tra `Test Connection` thành công tới SQL Server.
+- [x] Chuỗi kết nối trỏ đúng cơ sở dữ liệu `DW_Football_Transfermarkt` (khớp Chương 2).

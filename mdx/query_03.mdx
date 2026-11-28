@@ -1,0 +1,27 @@
+/* ==============================================================================
+   Truy vấn MDX 03: Cầu thủ đạt trên 20 đóng góp bàn thắng (G+A > 20) mùa 2023/2024
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+SELECT
+    {
+        [Measures].[Minutes Played],
+        [Measures].[Goal Contributions]
+    } ON COLUMNS,
+    ORDER(
+        FILTER(
+            NONEMPTY(
+                [DIM Player].[Player ID].[Player ID].MEMBERS,
+                (
+                    [Measures].[Goal Contributions],
+                    [DIM Game].[Season].&[2023]
+                )
+            ),
+            [Measures].[Goal Contributions] > 20
+        ),
+        [Measures].[Goal Contributions],
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt]
+WHERE ( [DIM Game].[Season].&[2023] );

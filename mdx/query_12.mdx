@@ -1,0 +1,38 @@
+/* ==============================================================================
+   Truy vấn MDX 12: Thống kê thẻ vàng, thẻ đỏ, số trận và trung bình mỗi trận của từng CLB theo HLV tại trận và tháng
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` + `DIM Appearance Context`
+   ============================================================================== */
+
+WITH SET [ValidManagers] AS
+    EXCEPT(
+        [DIM Appearance Context].[Club Manager Name]
+            .[Club Manager Name].MEMBERS,
+        { [DIM Appearance Context].[Club Manager Name].[Unknown] }
+    )
+SELECT
+    {
+        [Measures].[Yellow Cards],
+        [Measures].[Red Cards],
+        [Measures].[Covered Match Count],
+        [Measures].[Yellow Cards Per Match],
+        [Measures].[Red Cards Per Match]
+    } ON COLUMNS,
+    ORDER(
+        NONEMPTY(
+            CrossJoin(
+                EXCEPT(
+                    [DIM Club].[Club ID].[Club ID].MEMBERS,
+                    { [DIM Club].[Club ID].[Unknown] }
+                ),
+                CrossJoin(
+                    [ValidManagers],
+                    [DIM Time].[Year Month Key].[Year Month Key].MEMBERS
+                )
+            ),
+            [Measures].[Appearance Count]
+        ),
+        [Measures].[Yellow Cards],
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt];

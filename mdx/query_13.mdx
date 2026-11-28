@@ -1,0 +1,26 @@
+/* ==============================================================================
+   Truy vấn MDX 13: Tổng số lượt ra sân và số lượng cầu thủ của các CLB theo quy mô đội hình
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` + `FACT Player Distinct`
+   ============================================================================== */
+
+SELECT
+    {
+        [Measures].[Appearance Count],
+        [Measures].[Distinct Player Count]
+    } ON COLUMNS,
+    ORDER(
+        NONEMPTY(
+            CrossJoin(
+                EXCEPT(
+                    [DIM Club].[Club ID].[Club ID].MEMBERS,
+                    { [DIM Club].[Club ID].[Unknown] }
+                ),
+                [DIM Club].[Squad Size].[Squad Size].MEMBERS
+            ),
+            [Measures].[Appearance Count]
+        ),
+        [Measures].[Appearance Count],
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt];

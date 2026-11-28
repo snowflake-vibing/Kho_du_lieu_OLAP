@@ -1,0 +1,34 @@
+/* ==============================================================================
+   Truy vấn MDX 15: Bàn thắng và thẻ phạt của cầu thủ trẻ sinh từ 01/01/2004 theo ngày thi đấu
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+WITH
+    SET [YouthPlayers2004] AS
+        FILTER(
+            EXCEPT(
+                [DIM Player].[Date Of Birth].[Date Of Birth].MEMBERS,
+                { [DIM Player].[Date Of Birth].[Unknown] }
+            ),
+            CDate([DIM Player].[Date Of Birth].CURRENTMEMBER.NAME)
+                >= CDate("2004-01-01")
+        )
+SELECT
+    {
+        [Measures].[Goals],
+        [Measures].[Yellow Cards],
+        [Measures].[Red Cards]
+    } ON COLUMNS,
+    ORDER(
+        NONEMPTY(
+            [DIM Time].[Full Date].[Full Date].MEMBERS,
+            [Measures].[Appearance Count]
+        ),
+        [Measures].[Goals],
+        BDESC
+    ) ON ROWS
+FROM (
+    SELECT [YouthPlayers2004] ON COLUMNS
+    FROM [DW Football Transfermarkt]
+);

@@ -1,0 +1,25 @@
+/* ==============================================================================
+   Truy vấn MDX 02: Top 10 tiền vệ kiến tạo nhiều nhất tại các giải Vô địch Quốc gia
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+SELECT
+    { [Measures].[Assists] } ON COLUMNS,
+    TOPCOUNT(
+        NONEMPTY(
+            [DIM Player].[Player ID].[Player ID].MEMBERS,
+            (
+                [Measures].[Assists],
+                [DIM Player].[Main Position].&[Midfield],
+                [DIM Competition].[Competition Type].&[domestic_league]
+            )
+        ),
+        10,
+        [Measures].[Assists]
+    ) ON ROWS
+FROM [DW Football Transfermarkt]
+WHERE (
+    [DIM Player].[Main Position].&[Midfield],
+    [DIM Competition].[Competition Type].&[domestic_league]
+);

@@ -1,0 +1,23 @@
+/* ==============================================================================
+   Truy vấn MDX 06: Chiều cao trung bình, bàn thắng và thẻ vàng theo vị trí thi đấu chính
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` + Tập cầu thủ duy nhất
+   ============================================================================== */
+
+SELECT
+    {
+        [Measures].[Avg Height Cm],
+        [Measures].[Max Height Cm],
+        [Measures].[Min Height Cm],
+        [Measures].[Goals],
+        [Measures].[Yellow Cards]
+    } ON COLUMNS,
+    ORDER(
+        EXCEPT(
+            [DIM Player].[Main Position].[Main Position].MEMBERS,
+            { [DIM Player].[Main Position].&[Missing] }
+        ),
+        [Measures].[Goals],
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt];

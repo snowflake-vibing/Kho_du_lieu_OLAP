@@ -1,0 +1,21 @@
+/* ==============================================================================
+   Truy vấn MDX 05: So sánh bàn thắng theo chân thuận (Foot) và vị trí chi tiết (Sub_Position)
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+SELECT
+    {
+        [DIM Player].[Foot].&[left],
+        [DIM Player].[Foot].&[right],
+        [DIM Player].[Foot].&[both]
+    } ON COLUMNS,
+    NON EMPTY ORDER(
+        EXCEPT(
+            [DIM Player].[Sub Position].[Sub Position].MEMBERS,
+            { [DIM Player].[Sub Position].[Unknown] }
+        ),
+        ( [Measures].[Goals], [DIM Player].[Foot].[All] ),
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt];

@@ -1,0 +1,28 @@
+/* ==============================================================================
+   Truy vấn MDX 08: Top 10 cầu thủ có số bàn thắng trên 90 phút cao nhất mùa 2023/24 (tối thiểu 900 phút)
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` (Lượt ra sân)
+   ============================================================================== */
+
+SELECT
+    {
+        [Measures].[Goals Per 90],
+        [Measures].[Goals],
+        [Measures].[Minutes Played]
+    } ON COLUMNS,
+    TOPCOUNT(
+        FILTER(
+            NONEMPTY(
+                [DIM Player].[Player ID].[Player ID].MEMBERS,
+                (
+                    [Measures].[Minutes Played],
+                    [DIM Game].[Season].&[2023]
+                )
+            ),
+            [Measures].[Minutes Played] >= 900
+        ),
+        10,
+        [Measures].[Goals Per 90]
+    ) ON ROWS
+FROM [DW Football Transfermarkt]
+WHERE ( [DIM Game].[Season].&[2023] );

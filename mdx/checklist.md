@@ -1,249 +1,89 @@
 # BẢNG ĐỐI CHIẾU & KIỂM ĐỊNH CHẤT LƯỢNG 15 CÂU TRUY VẤN MDX
-## (MDX Quality Audit, Function Coverage Matrix & Computational Complexity Checklist)
+## (MDX Quality Audit, Function Coverage Matrix & Complexity Checklist)
 
-> **Tài liệu kiểm định học thuật** dành cho đồ án môn học: **Kho Dữ Liệu & Phân Tích Dữ Liệu Kinh Doanh (OLAP / BI)**  
-> **Cơ sở dữ liệu:** Kho dữ liệu Bóng đá Châu Âu `DW_Football_Analytics`  
-> **Khối OLAP:** Cube `[DW Football Transfermarkt]` (SSAS Multidimensional Model)  
-> **Mục tiêu:** Cung cấp báo cáo đối chiếu toàn diện (Comprehensive Audit) nhằm chứng minh toàn bộ 15 câu truy vấn MDX đáp ứng đầy đủ yêu cầu khắt khe của giảng viên về: độ bao phủ hàm số MDX, tối ưu hóa thuật toán, xử lý dữ liệu thưa (Sparsity) và đánh giá độ phức tạp tính toán (Time & Space Complexity).
-
----
-
-## MỤC LỤC
-1. [Khung chuẩn đánh giá MDX dành cho Giảng viên / Hội đồng](#1-khung-chuẩn-đánh-giá-mdx-dành-cho-giảng-viên--hội-đồng)
-2. [Hệ thống phân loại toàn bộ các nhóm hàm MDX chuẩn](#2-hệ-thống-phân-loại-toàn-bộ-các-nhóm-hàm-mdx-chuẩn)
-3. [Ma trận đối chiếu độ phủ hàm: 15 Queries ↔ Danh mục hàm MDX](#3-ma-trận-đối-chiếu-độ-phủ-hàm-15-queries--danh-mục-hàm-mdx)
-4. [Kiểm định độ phức tạp tính toán & Động cơ SSAS (Complexity Audit)](#4-kiểm-định-độ-phức-tạp-tính-toán--động-cơ-ssas-complexity-audit)
-5. [Bảng Checklist chất lượng chi tiết từng câu truy vấn (15 Queries Quality Checklist)](#5-bảng-checklist-chất-lượng-chi-tiết-từng-câu-truy-vấn-15-queries-quality-checklist)
-6. [Bộ câu hỏi phản biện & Hướng dẫn bảo vệ trước Giảng viên khó tính](#6-bộ-câu-hỏi-phản-biện--hướng-dẫn-bảo-vệ-trước-giảng-viên-khó-tính)
+> **Cơ sở dữ liệu SQL Server:** `DW_Football_Transfermarkt` (7.280 trận, 210.747 lượt ra sân, 7.069 cầu thủ, 272 CLB, 13 giải đấu, 488 ngày)  
+> **SSAS Database / Cube:** `SSAS_Football_Transfermarkt` / `[DW Football Transfermarkt]` (4 Measure Groups, 9 Cube Dimensions)  
+> **Mục tiêu:** Kiểm định toàn diện 15 câu truy vấn MDX chuẩn theo Mục 1.3 Chương 1 ([Bao_cao_OLAP.docx](../bao-cao-olap/Bao_cao_OLAP.docx)) và Chương 3 ([Chuong_3_SSAS.docx](../bao-cao-olap/Chuong_3_SSAS.docx)).
 
 ---
 
-## 1. Khung chuẩn đánh giá MDX dành cho Giảng viên / Hội đồng
+## 1. Khung tiêu chuẩn đánh giá 15 câu truy vấn MDX
 
-Để đạt điểm tuyệt đối (Điểm A+) từ các giảng viên khó tính và cầu toàn, một bộ truy vấn MDX không thể chỉ "chạy ra kết quả" mà phải thỏa mãn nghiêm ngặt **6 tiêu chí đánh giá cốt lõi**:
-
-```mermaid
-flowchart TD
-    Core["TIÊU CHUẨN ĐÁNH GIÁ MDX CHẤT LƯỢNG CAO"]
-    
-    C1["1. Tính Đúng đắn Ngữ nghĩa<br><i>(OLAP Semantics & Multi-axis)</i>"]
-    C2["2. Xử lý Dữ liệu Thưa<br><i>(Sparsity & Non-Empty Handling)</i>"]
-    C3["3. Đa dạng Phép toán & Hàm số<br><i>(Set, Hierarchy, Stats, Logic)</i>"]
-    C4["4. Tối ưu Hiệu năng Thuật toán<br><i>(Min-Heap, Storage vs Formula Engine)</i>"]
-    C5["5. Đánh giá Độ phức tạp Định lượng<br><i>(Big-O Time & Space Complexity)</i>"]
-    C6["6. Tương thích Đa nền tảng<br><i>(SSMS, Cube Browser, Excel Pivot)</i>"]
-
-    Core --> C1
-    Core --> C2
-    Core --> C3
-    Core --> C4
-    Core --> C5
-    Core --> C6
-```
-
-### Thang đo Rubric chuẩn mực:
-* **Tiêu chí 1 - Tính đúng đắn ngữ nghĩa:** Tuân thủ chuẩn ISO/IEC 9075 và Microsoft Analysis Services MDX Syntax; định vị chính xác trục tọa độ (`ON COLUMNS`, `ON ROWS`), lát cắt `WHERE` và khối Cube `FROM`.
-* **Tiêu chí 2 - Xử lý Sparsity:** Tuyệt đối không quét ô rỗng (Sparse Cells); sử dụng triệt để từ khóa `NON EMPTY` trên trục và hàm `NONEMPTY()` tại mức tập hợp dữ liệu nguồn.
-* **Tiêu chí 3 - Độ phủ hàm số:** Bao quát đầy đủ các họ hàm đặc trưng của OLAP (Hàm tập hợp, Hàm lọc, Hàm phân cấp, Hàm thống kê số đo tính toán `WITH MEMBER`, Hàm logic điều kiện).
-* **Tiêu chí 4 - Tối ưu kiến trúc SSAS:** Tận dụng tối đa **Storage Engine (SE)** với chế độ *Block Computation* và bộ nhớ đệm nén, hạn chế tối đa việc để **Formula Engine (FE)** phải lặp qua từng ô (*Cell-by-cell evaluation*).
-* **Tiêu chí 5 - Minh bạch độ phức tạp:** Mọi câu truy vấn đều phải chứng minh công thức độ phức tạp thời gian $O(\dots)$ và không gian $O(\dots)$ rõ ràng trước và sau khi tối ưu.
-* **Tiêu chí 6 - Khả năng kiểm chứng thực tế:** Dễ dàng triển khai trên cả 3 công cụ: SSMS Script, Visual Studio SSDT Cube Browser và Microsoft Excel PivotTable.
+1. **Đúng cấp độ dữ liệu (Grain Consistency):** Phân tách dứt khoát giữa cấp lượt ra sân (`FACT Player Match Perf`, 210.747 dòng), cấp cầu thủ duy nhất (`FACT Player Distinct`), cấp đội – trận (`FACT Club Match Official`, 14.560 dòng) và cấp trận đấu (`DIM Game`, 7.280 dòng).
+2. **Định danh chính xác thực thể trùng tên:** Dùng thuộc tính khóa `[DIM Player].[Player ID]` (`KeyColumns = Player_ID`, `NameColumn = Player_Name`) để không gộp nhầm 51 tên cầu thủ bị trùng trên 108 hồ sơ trong `DIM_Player`.
+3. **Xử lý dữ liệu thưa (Sparsity):** Luôn bọc `NONEMPTY()` quanh tập nguồn hoặc tích `CrossJoin` trước khi truyền vào `TOPCOUNT`, `FILTER` hoặc `ORDER` để đẩy bước lọc xuống Storage Engine.
+4. **Xử lý NULL & Unknown an toàn:** Loại `[Unknown]` và `Missing` đúng ngữ cảnh (ví dụ `Player Age At Match`, `Club Manager Name`, `Height In Cm`, `Country Of Citizenship`), đồng thời giữ `Unknown` khi câu hỏi cần phản ánh đủ toàn kho (như 8 CLB bổ sung thiếu `Squad_Size` ở Câu 13).
+5. **Đồng quy 3 công cụ:** Mọi câu truy vấn đều cho cùng kết quả trên **Cube Browser (SSDT)** (chỉ dùng toán tử có thật trong SSDT như `Equal`, `Not Equal`, `In`, `Custom`), **Excel PivotTable** và **SSMS MDX**.
 
 ---
 
-## 2. Hệ thống phân loại toàn bộ các nhóm hàm MDX chuẩn
+## 2. Hệ thống 7 nhóm hàm & kỹ thuật MDX áp dụng
 
-Hệ thống hàm MDX trong Microsoft SQL Server Analysis Services được phân loại thành **7 nhóm nghiệp vụ chính**. Dưới đây là danh mục chi tiết:
-
-| Mã nhóm | Tên nhóm hàm MDX | Các hàm / Từ khóa tiêu biểu | Mục đích sử dụng trong OLAP |
+| Mã nhóm | Tên nhóm | Các hàm / Từ khóa sử dụng trong 15 câu | Vai trò |
 | :---: | :--- | :--- | :--- |
-| **G1** | **Tập hợp & Trích xuất (Set & Extract)** | `TOPCOUNT`, `BOTTOMCOUNT`, `TOPPERCENT`, `BOTTOMPERCENT`, `HEAD`, `TAIL`, `CROSSJOIN` (`*`), `EXCEPT` (`-`), `UNION` (`+`), `INTERSECT`, `GENERATE`, `EXTRACT` | Khởi tạo, cắt lát, tích đề-các hoặc loại trừ các tập hợp chiều dữ liệu. |
-| **G2** | **Lọc & Sắp xếp (Filter & Ordering)** | `FILTER`, `ORDER` (`BASC`, `BDESC`, `ASC`, `DESC`), `NONEMPTY`, `NON EMPTY` (Axis Keyword), `STRTOSET`, `STRTOTUPLE` | Lọc thành viên theo biểu thức logic số đo, sắp xếp phân cấp hoặc phá vỡ phân cấp (Break Hierarchy). |
-| **G3** | **Thành viên & Phân cấp (Navigation & Hierarchy)** | `.MEMBERS`, `.ALLMEMBERS`, `.CHILDREN`, `.PARENT`, `.DESCENDANTS`, `.SIBLINGS`, `.ANCESTOR`, `.CURRENTMEMBER`, `.PREVMEMBER`, `.NEXTMEMBER`, `.PARALLELPERIOD` | Điều hướng lên/xuống/ngang trong cây phân cấp chiều (Drill-down, Roll-up, so sánh kỳ trước). |
-| **G4** | **Tổng hợp & Thống kê (Aggregation & Statistics)** | `SUM`, `COUNT`, `AVG`, `MIN`, `MAX`, `MEDIAN`, `DISTINCTCOUNT`, `VAR`, `STDEV` | Thực hiện tính toán gộp số học trên các tập hợp tuple hoặc ô dữ liệu. |
-| **G5** | **Điều kiện & Logic (Conditional & Logical)** | `IIF`, `CASE ... WHEN ... THEN ... ELSE ... END`, `ISEMPTY`, `IS`, `COALESCEEMPTY` | Phân nhánh nghiệp vụ, xử lý ngoại lệ chia cho 0, gán giá trị mặc định khi dữ liệu rỗng. |
-| **G6** | **Thuộc tính & Chuỗi (Properties & Attributes)** | `.PROPERTIES`, `.MEMBER_CAPTION`, `.MEMBER_VALUE`, `MEMBERVALUE`, `NAME`, `KEY` | Trích xuất các thuộc tính thành viên (Member Attributes) không tham gia trực tiếp vào phân cấp chính. |
-| **G7** | **Tính toán & Ngữ cảnh (Calculations & Context)** | `WITH MEMBER`, `WITH SET`, `EXISTING`, `FORMAT_STRING`, `SOLVE_ORDER`, `SCOPE` | Khởi tạo thước đo ảo (Calculated Measures) và tập hợp đặt tên động trong phạm vi phiên truy vấn. |
+| **G1** | **Tập hợp & Tích** | `TOPCOUNT`, `TOPPERCENT`, `CROSSJOIN` (`*`), `EXCEPT` | Cắt Top-N, Pareto 80%, kết hợp đa chiều, loại thành viên `Unknown`/`Missing`. |
+| **G2** | **Lọc & Sắp xếp** | `FILTER`, `ORDER` (`BASC`, `BDESC`), `NONEMPTY`, `NON EMPTY` | Lọc ngưỡng số đo, sắp xếp phá vỡ phân cấp, loại bỏ ô thưa ở mức Storage Engine. |
+| **G3** | **Điều hướng thành viên** | `.MEMBERS`, `.CURRENTMEMBER` | Duyệt tập lá của thuộc tính, truy cập ngữ cảnh dòng/cột hiện hành. |
+| **G4** | **Tổng hợp & Đếm** | `SUM`, `AVG`, `MAX`, `MIN`, `DISTINCTCOUNT`, `COUNT` | Tổng hợp cộng dồn và đếm phân biệt trên từng Measure Group đúng grain. |
+| **G5** | **Logic & Kiểu ngày** | `IIF`, `ISEMPTY`, `CDate` | Bảo vệ chia cho 0, loại giá trị rỗng, so sánh ngày sinh chuẩn ISO. |
+| **G6** | **Thuộc tính & Giá trị** | `MEMBER_VALUE`, `.NAME` | Lấy giá trị số học (độ tuổi, chiều cao, sức chứa) và tên ngày sinh để so sánh. |
+| **G7** | **Tính toán & Ngữ cảnh** | `WITH SET`, `CREATE MEMBER`, `EXISTING`, Subcube `SELECT` | Calculated Measures tự chủ, chuyển đổi ngữ cảnh theo cầu thủ duy nhất. |
 
 ---
 
-## 3. Ma trận đối chiếu độ phủ hàm: 15 Queries ↔ Danh mục hàm MDX
+## 3. Ma trận đối chiếu 15 câu truy vấn MDX
 
-Bảng dưới đây đối chiếu chi tiết sự hiện diện của các nhóm hàm trong 15 câu truy vấn của dự án:
-
-| STT | File Truy Vấn | Tên Nghiệp Vụ Phân Tích | G1 (Set / Extract) | G2 (Filter / Sort) | G3 (Hierarchy Nav) | G4 (Aggregate / Stats) | G5 (Logic / Cond) | G6 (Properties) | G7 (Calculated / Context) |
+| Câu | Tên tệp | Nghiệp vụ trọng tâm | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **01** | [query_01.md](query_01.md) | Top 10 Vua dội bom Ngoại Hạng Anh mùa 2023/2024 | `TOPCOUNT` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **02** | [query_02.md](query_02.md) | Top 10 tiền vệ kiến tạo nhiều nhất giải VĐQG | `TOPCOUNT`, `CROSSJOIN` | `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **03** | [query_03.md](query_03.md) | Cầu thủ xuất sắc có trên 20 đóng góp bàn thắng (G+A) | - | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **04** | [query_04.md](query_04.md) | Hiệu suất bàn thắng & số phút TB theo độ tuổi | - | `ORDER (BASC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `COUNT`, `MEDIAN` | `CASE WHEN`, `IIF`, `ISEMPTY` | `MEMBERVALUE` | `WITH MEMBER` |
-| **05** | [query_05.md](query_05.md) | So sánh bàn thắng theo chân thuận & vị trí | `UNION`, `CROSSJOIN`, `EXCEPT` | `ORDER (DESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **06** | [query_06.md](query_06.md) | Chiều cao TB, Max/Min, bàn thắng & thẻ phạt theo vị trí | `EXCEPT` | `ORDER (BDESC)`, `FILTER` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `MAX`, `MIN`, `SUM` | `ISEMPTY` | - | `WITH MEMBER`, `EXISTING` |
-| **07** | [query_07.md](query_07.md) | Bàn thắng theo quốc tịch cầu thủ tại Anh (Pareto 80/20) | `TOPPERCENT`, `EXCEPT` | `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **08** | [query_08.md](query_08.md) | Top 15 "Siêu dự bị" ghi nhiều bàn nhất | `TOPCOUNT`, `BOTTOMCOUNT` | `FILTER`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
-| **09** | [query_09.md](query_09.md) | Hiệu năng Sân nhà vs Sân khách x Cuối tuần | `INTERSECT`, `TOPCOUNT`, `CROSSJOIN`, `EXCEPT` | `NON EMPTY` (Axis), `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | `IS` | - | - |
-| **10** | [query_10.md](query_10.md) | Bàn thắng Real Madrid theo Quý & Tăng trưởng QoQ | `EXCEPT`, `CROSSJOIN` | `ORDER (BDESC)`, `NONEMPTY` | `.CHILDREN`, `.DESCENDANTS`, `.PREVMEMBER`, `.CURRENTMEMBER`, `.MEMBERS` | `SUM` (Cube) | `IIF`, `ISEMPTY` | - | `WITH MEMBER`, Role-Playing Dim |
-| **11** | [query_11.md](query_11.md) | Số trận đấu tại SVĐ có sức chứa > 60.000 chỗ | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)` | `.MEMBERS`, `.CURRENTMEMBER` | `DISTINCTCOUNT`, `COUNT` | `COALESCEEMPTY` | `MEMBERVALUE` | `WITH MEMBER`, `EXISTING` |
-| **12** | [query_12.md](query_12.md) | Thẻ phạt theo HLV trưởng & Tháng trong năm | `GENERATE`, `TOPCOUNT`, `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` (Cube) | `ISEMPTY` | - | - |
-| **13** | [query_13.md](query_13.md) | Lực lượng cầu thủ ra sân theo quy mô đội hình | `CROSSJOIN`, `EXCEPT` | `ORDER (BASC)`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `DISTINCTCOUNT`, `COUNT` | - | `MEMBERVALUE` | `WITH MEMBER`, `EXISTING` |
-| **14** | [query_14.md](query_14.md) | Thống kê các trận cầu mưa bàn thắng ($\ge 5$ bàn) | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` (Cube) | - | - | - |
-| **15** | [query_15.md](query_15.md) | Hiệu suất & thẻ phạt lứa trẻ (sinh từ 2004) theo ngày | `CROSSJOIN`, `EXCEPT` | `FILTER`, `ORDER`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` (Cube) | `ISEMPTY` | `.PROPERTIES` | `WITH SET` |
+| **01** | [query_01.md](query_01.md) | Top 10 ghi bàn GB1 mùa 2023/2024 | `TOPCOUNT` | `NONEMPTY` | `.MEMBERS` | `SUM` | - | - | `Player ID` |
+| **02** | [query_02.md](query_02.md) | Top 10 tiền vệ kiến tạo giải VĐQG | `TOPCOUNT` | `NONEMPTY` | `.MEMBERS` | `SUM` | - | - | `Player ID` |
+| **03** | [query_03.md](query_03.md) | Cầu thủ có `Goal Contributions > 20` (2023/2024) | - | `FILTER`, `ORDER (BDESC)`, `NONEMPTY` | `.MEMBERS` | `SUM` | - | - | `Goal Contributions` |
+| **04** | [query_04.md](query_04.md) | Bàn thắng, kiến tạo, phút TB theo tuổi (2023) | `EXCEPT` | `FILTER`, `ORDER (BASC)`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM`, `AVG` | `ISEMPTY`, `IIF` | `MEMBER_VALUE` | `WITH SET`, `Avg Minutes Played` |
+| **05** | [query_05.md](query_05.md) | Bàn thắng theo `Foot × Sub_Position` | `EXCEPT` | `NON EMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM` | - | - | - |
+| **06** | [query_06.md](query_06.md) | Chiều cao TB/Max/Min, bàn thắng, thẻ vàng theo tuyến | `EXCEPT`, `CrossJoin` | `ORDER (BDESC)`, `FILTER`, `NONEMPTY` | `.MEMBERS`, `.CURRENTMEMBER` | `AVG`, `MAX`, `MIN`, `SUM` | - | `MEMBER_VALUE` | `EXISTING`, Calculated Height |
+| **07** | [query_07.md](query_07.md) | Bàn thắng theo quốc tịch tại Anh (+ Pareto 80%) | `EXCEPT` (`TOPPERCENT`) | `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM` | `IIF` | - | `Pct Of Country Goals` |
+| **08** | [query_08.md](query_08.md) | Top 10 `Goals Per 90` (`Minutes_Played ≥ 900`, 2023/24) | `TOPCOUNT` | `FILTER`, `NONEMPTY` | `.MEMBERS` | `SUM` | `IIF`, `ISEMPTY` | - | `Goals Per 90` |
+| **09** | [query_09.md](query_09.md) | Bàn, thẻ vàng & TB/trận Sân nhà vs Khách cuối tuần | `CrossJoin`, `EXCEPT` | `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM`, `COUNT` | `IIF`, `ISEMPTY` | - | `EXISTING`, `Covered Match Count`, `Goals/Yellow Per Match` |
+| **10** | [query_10.md](query_10.md) | Bàn chính thức Real Madrid (`418`, 216 bàn) theo quý & đối thủ | `CrossJoin`, `EXCEPT` | `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM`, `COUNT` | - | - | `FACT Club Match Official`, Role-Play, `Year Quarter Key` |
+| **11** | [query_11.md](query_11.md) | Đếm trận sân nhà của CLB sân `> 60.000` chỗ | `CrossJoin`, `EXCEPT` | `FILTER`, `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS`, `.CURRENTMEMBER` | `COUNT`, `MAX` | `ISEMPTY`, `IIF` | `MEMBER_VALUE` | `EXISTING`, `DIM Home Club` |
+| **12** | [query_12.md](query_12.md) | Thẻ phạt & TB/trận theo `Club × Manager × Year_Month_Key` | `CrossJoin`, `EXCEPT` | `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM`, `COUNT` | `IIF`, `ISEMPTY` | - | `WITH SET`, `EXISTING`, `Covered Match Count`, `Year Month Key` |
+| **13** | [query_13.md](query_13.md) | Lượt ra sân & số cầu thủ theo `Club × Squad_Size` | `CrossJoin`, `EXCEPT` | `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `COUNT`, `DISTINCTCOUNT` | - | - | `FACT Player Distinct` |
+| **14** | [query_14.md](query_14.md) | Trận đấu có tổng bàn thắng `≥ 5` qua vòng & SVĐ | `*`, `EXCEPT` | `FILTER`, `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS` | `SUM`, `COUNT` | - | - | `DIM Game` MG, Role-Play 2 đội |
+| **15** | [query_15.md](query_15.md) | Bàn thắng & thẻ phạt cầu thủ sinh từ `01/01/2004` theo ngày | `EXCEPT` | `FILTER`, `NONEMPTY`, `ORDER (BDESC)` | `.MEMBERS`, `.CURRENTMEMBER` | `SUM` | `CDate` | `.NAME` | `WITH SET`, Subcube `SELECT` |
 
 ---
 
-### Thống kê Định lượng Độ phủ Hàm (Coverage Statistics)
+## 4. Kiểm định độ phức tạp theo quy mô kho dữ liệu thực tế
 
-```
-+-------------------------------------------------------------------------------+
-| TỔNG SỐ HÀM & TỪ KHÓA MDX ĐƯỢC SỬ DỤNG: 35 hàm/từ khóa chuyên sâu             |
-| ĐỘ PHỦ CÁC HÀM CỐT LÕI CỦA 7 NHÓM: 100% HOÀN HẢO THEO CHUẨN ĐỒ ÁN XUẤT SẮC   |
-+-------------------------------------------------------------------------------+
-|  1. Nhóm Set & Extract (G1)       : TOPCOUNT, BOTTOMCOUNT, TOPPERCENT, UNION, |
-|                                     INTERSECT, CROSSJOIN, EXCEPT, GENERATE    |
-|  2. Nhóm Filter & Sort (G2)       : FILTER, ORDER (BASC, BDESC, DESC),        |
-|                                     NONEMPTY (Function), NON EMPTY (Keyword)  |
-|  3. Nhóm Hierarchy Navigation (G3): .MEMBERS, .CHILDREN, .DESCENDANTS,        |
-|                                     .PREVMEMBER, .CURRENTMEMBER               |
-|  4. Nhóm Aggregations (G4)        : SUM, AVG, MAX, MIN, MEDIAN, DISTINCTCOUNT,|
-|                                     COUNT                                     |
-|  5. Nhóm Logic & Conditions (G5)  : CASE WHEN, IIF, ISEMPTY, IS, COALESCEEMPTY|
-|  6. Nhóm Properties (G6)          : .PROPERTIES, MEMBERVALUE, NAME            |
-|  7. Nhóm Calculations (G7)        : WITH MEMBER, WITH SET, EXISTING,          |
-|                                     FORMAT_STRING                             |
-+-------------------------------------------------------------------------------+
-```
+Quy mô kho dữ liệu đã nạp từ Chương 2: `7.069` cầu thủ, `272` CLB, `13` giải đấu, `2` mùa (`2022`, `2023`), `488` ngày thi đấu, `7.280` trận đấu, `210.747` lượt ra sân.
 
----
-
-## 4. Kiểm định độ phức tạp tính toán & Động cơ SSAS (Complexity Audit)
-
-Một trong những lý do khiến giảng viên đánh giá thấp bài tập MDX là sinh viên không hiểu cơ chế thực thi bên dưới của hệ quản trị SSAS, dẫn đến câu truy vấn bị nghẽn cổ chai (Bottleneck). Bảng dưới đây chứng minh mức độ tối ưu hóa sâu của từng câu:
-
-### Bảng Ma trận Độ phức tạp Thời gian & Không gian:
-
-| Query | Không gian Cell gốc (Descartes) | Không gian sau Lọc (Sparse Reduction) | Chi phí Lưu trữ Kết quả | Độ phức tạp Thời gian (Time Complexity) | Giải thuật cốt lõi | Tận dụng SSAS Engine |
-| :---: | :--- | :--- | :---: | :---: | :--- | :--- |
-| **Q01** | $30.000 \times 20 \times 10 = 6 \times 10^6$ | $M \approx 250$ cầu thủ ghi bàn | $O(10)$ | $O(M \log 10)$ | Min-Heap Priority Queue | SE Bitmap Index + FE Heap |
-| **Q02** | $30.000 \times 4 \times 5 = 6 \times 10^5$ | $M \approx 400$ tiền vệ kiến tạo | $O(10)$ | $O(M \log 10)$ | Min-Heap Priority Queue | SE Block Scan + FE Heap |
-| **Q03** | $30.000 \times 10 = 3 \times 10^5$ | $M \approx 35$ cầu thủ $>20$ G+A | $O(M)$ | $O(N) + O(M \log M)$ | Sequential Filter + IntroSort | FE Evaluation Buffer |
-| **Q04** | $100 \text{ độ tuổi} \times 10 \text{ mùa}$ | $M \approx 30$ độ tuổi thực tế | $O(M)$ | $O(N_{\text{players}}) + O(M \log M)$ | Custom Case Logic + Array Sort | FE Calculated Measure |
-| **Q05** | $5 \text{ vị trí} \times 3 \text{ chân} = 15$ | 15 cặp vị trí - chân | $O(15)$ | $O(S_1 + S_2) + O(P \log P)$ | Set Union + Hierarchy Sort | FE Set Merging |
-| **Q06** | $4 \text{ vị trí chính} \times 30.000$ | 4 vị trí chính | $O(4)$ | $O(N_{\text{players}})$ | Dynamic Existing + Aggregations | FE Context Transition |
-| **Q07** | $150 \text{ quốc gia} \times 5 \text{ giải}$ | $K \approx 15$ quốc gia Top 80% | $O(K)$ | $O(M \log M) + O(K)$ | Cumulative Pareto Sum | FE Cumulative Sum |
-| **Q08** | $30.000 \times 2 \text{ starter}$ | $M \approx 120$ siêu dự bị | $O(15)$ | $O(S \log 15)$ | Min-Heap / Max-Heap Dual Sort | SE Slice + FE Priority Queue |
-| **Q09** | $400 \text{ CLB} \times 2 \times 2 = 1.600$ | $K \approx 18$ CLB giao thoa | $O(K)$ | $O(\lvert S_1 \rvert + \lvert S_2 \rvert)$ | Hash Set Intersection | FE Hash Intersect |
-| **Q10** | $400 \text{ đối thủ} \times 4 \text{ quý} = 1.600$ | $M \approx 60$ trận Real Madrid | $O(M)$ | $O(K \log K)$ | Hierarchy Tree Navigation | SE Partition + FE PrevMember |
-| **Q11** | $400 \text{ SVĐ} \times 50.000 \text{ trận}$ | $M \approx 25$ SVĐ $>60.000$ chỗ | $O(M)$ | $O(N_{\text{stadiums}}) + O(M \log M)$ | Coalesce Null + Distinct Count | FE Subcube Context |
-| **Q12** | $300 \text{ HLV} \times 12 \text{ tháng} = 3.600$ | $H \approx 300$ tháng cao điểm | $O(H)$ | $O(H \times T)$ | Set Iteration Projection | FE Generate Iteration |
-| **Q13** | $50 \text{ quy mô} \times 30.000 \text{ cầu thủ}$ | $M \approx 30$ quy mô đội hình | $O(M)$ | $O(N_{\text{clubs}}) + O(M \log M)$ | Subcube Existing Iteration | FE Calculated Measure |
-| **Q14** | $50.000 \text{ trận đấu}$ | $M \approx 450$ trận $\ge 5$ bàn | $O(M)$ | $O(N_{\text{games}}) + O(M \log M)$ | Fact Scan + IntroSort | SE Pre-aggregation Sum |
-| **Q15** | $30.000 \times 365 \text{ ngày} = 1.1 \times 10^7$ | $M \approx 180$ ngày có cầu thủ trẻ | $O(M)$ | $O(N_{\text{players}}) + O(M \log M)$ | UDF Property Parsing + Sort | FE Property Filter |
+| Query | Không gian lý thuyết (Cells) | Không gian thực tế sau lọc ($M$) | Bộ nhớ kết quả | Độ phức tạp thời gian | Động cơ SSAS tối ưu |
+| :---: | :--- | :--- | :---: | :--- | :--- |
+| **Q01** | $7.069 \times 13 \times 2 \approx 1,84 \times 10^5$ | $M \approx 260$ cầu thủ ghi bàn ở GB1 2023 | $O(10)$ | $O(M \log 10)$ | SE Bitmap Slice + FE Min-Heap |
+| **Q02** | $2.091 \times 3 = 6.273$ | Tiền vệ có kiến tạo ở VĐQG | $O(10)$ | $O(M \log 10)$ | SE Slice + FE Min-Heap |
+| **Q03** | $7.069 \times 2 = 14.138$ | $M = 99$ cầu thủ đạt `G+A > 20` | $O(99)$ | $O(N_{2023} + M \log M)$ | SE Agg + FE Filter & IntroSort |
+| **Q04** | $\sim 30 \times 3 = 90$ | $M = 28$ độ tuổi (15–42) năm 2023 | $O(28)$ | $O(M \log M)$ | SE Group-by + FE `Avg Minutes Played` |
+| **Q05** | $13 \times 3 = 39$ | 13 vị trí chi tiết × 3 chân thuận | $O(39)$ | $O(13 \log 13)$ | SE Pre-aggregation |
+| **Q06** | $4 \times 7.069 = 28.276$ | 4 tuyến chính (loại `Missing`) | $O(4)$ | $O(N_{\text{players}})$ | FE `EXISTING` Context Transition |
+| **Q07** | $\sim 140 \times 13$ | $M = 75$ quốc tịch tại Anh (Pareto 80% = 18) | $O(75)$ | $O(M \log M)$ | SE Slice + FE `ORDER` / `TOPPERCENT` |
+| **Q08** | $4.832$ cầu thủ mùa 2023 | $M = 2.960$ cầu thủ $\ge 900$ phút | $O(10)$ | $O(N_{2023} + M \log 10)$ | FE Filter + Min-Heap (`Goals Per 90`) |
+| **Q09** | $272 \times 2 \times 5 = 2.720$ cells | $M = 207$ CLB ra sân cuối tuần | $O(10M)$ | $O(M \log M)$ | SE Slice (`Is_Weekend=1`) + `Covered Match Count` (`EXISTING`) |
+| **Q10** | $8 \text{ quý} \times 272 \text{ đối thủ} = 2.176$ | $M = 92$ cặp quý – đối thủ (101 trận, 216 bàn) | $O(92)$ | $O(M \log M)$ | `FACT Club Match Official` + SE Slice |
+| **Q11** | $272$ CLB sân nhà | $M = 23$ CLB sân $> 60.000$ chỗ (993 trận) | $O(23)$ | $O(N_{\text{clubs}} + M \log M)$ | `DIM Game` MG + Role-Play `DIM Home Club` |
+| **Q12** | $272 \times 490 \times 23 \approx 3,07 \times 10^6$ | $M = 3.967$ tổ hợp (loại 2 trận thiếu HLV) | $O(M)$ | $O(M \log M)$ | `NONEMPTY` + `Covered Match Count` (`EXISTING`) |
+| **Q13** | $272 \times 30 \approx 8.160$ | $M = 235$ CLB có lượt ra sân | $O(235)$ | $O(M \log M)$ | `FACT Player Distinct` Bitmap Scan |
+| **Q14** | $7.280 \text{ trận} \times \text{các chiều}$ | $M = 1.196$ trận $\ge 5$ bàn (582/614 mùa) | $O(M)$ | $O(N_{\text{games}} + M \log M)$ | `FILTER` trước `*`, bọc `NONEMPTY` |
+| **Q15** | $7.069 \times 488 \approx 3,45 \times 10^6$ | $M = 441$ ngày (676 cầu thủ trẻ) | $O(441)$ | $O(D_{\text{dob}} + M \log M)$ | Subcube Filter + `NONEMPTY` |
 
 ---
 
-### Bóc tách Kiến trúc Thực thi: Storage Engine (SE) vs. Formula Engine (FE)
+## 5. Câu hỏi phản biện trọng tâm theo thiết kế mới
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as Client (SSMS / Excel / Web)
-    participant FE as SSAS Formula Engine (FE)
-    participant Cache as Dimension & Data Cache
-    participant SE as SSAS Storage Engine (SE)
-    participant Disk as Fact & Aggregation Partitions
-
-    Client->>FE: Gửi câu lệnh MDX Query
-    FE->>FE: Phân tích cú pháp (Parsing) & Xây dựng Cây thực thi (Execution Tree)
-    FE->>Cache: Kiểm tra kết quả trong Query Cache / Global Cache
-    alt Đã có trong Cache
-        Cache-->>FE: Trả về Subcube tính sẵn
-    else Chưa có trong Cache
-        FE->>SE: Gửi yêu cầu Subcube (Gửi kèm Slice & Filter Predicates)
-        SE->>Disk: Quét Partition & Đọc Aggregations bằng Bitmap Index (Block Mode)
-        Disk-->>SE: Trả về Khối dữ liệu nén (Data Chunks)
-        SE-->>FE: Trả về Tập tế bào nén (Compressed Cellset)
-    end
-    FE->>FE: Thực thi các hàm tính toán phức tạp (TOPCOUNT Heap, IIF, EXISTING)
-    FE-->>Client: Trả về Lưới dữ liệu đa chiều (Cellset / Grid Matrix)
-```
-
-#### Những điểm then chốt đã được tối ưu trong toàn bộ 15 câu:
-1. **Tránh bẫy Cell-by-Cell Evaluation:** Sử dụng hàm `NONEMPTY()` với biểu thức tuple thay vì dùng hàm `FILTER(..., Measure > 0)`. Khi dùng `NONEMPTY()`, SSAS đẩy việc lọc xuống trực tiếp cho **Storage Engine** quét nhanh gấp hàng trăm lần.
-2. **Tối ưu hàm xếp hạng bằng Min-Heap:** Thay vì áp dụng giải thuật sắp xếp toàn phần $O(N \log N)$ bằng `ORDER(..., BDESC)` rồi dùng `HEAD(..., 10)`, toàn bộ các câu Top-N (Q01, Q02, Q08) đều sử dụng hàm `TOPCOUNT()`, kích hoạt cơ chế hàng đợi ưu tiên (Priority Queue / Min-Heap) trên Formula Engine với độ phức tạp tối ưu tuyệt đối $O(N \log k)$.
-3. **Phá vỡ phân cấp đúng lúc (`BDESC` / `BASC`):** Sử dụng các cờ `BDESC` (Break Descending) và `BASC` (Break Ascending) trong hàm `ORDER()` để bỏ qua ràng buộc phân cấp cha-con tự nhiên, giúp sắp xếp phẳng các phần tử theo đúng giá trị số đo mà không bị gom nhóm sai kỳ vọng.
-
----
-
-## 5. Bảng Checklist chất lượng chi tiết từng câu truy vấn (15 Queries Quality Checklist)
-
-Bảng checklist dưới đây kiểm tra việc đáp ứng đầy đủ các tiêu chuẩn kỹ thuật cho từng tệp truy vấn trong thư mục `mdx/`:
-
-| Tệp Tài Liệu | Cú pháp Chuẩn SSAS | Lọc Dữ Liệu Thưa (NonEmpty) | Phân Tích Độ Phức Tạp (Time/Space) | Tương Đương SQL Đối Chiếu | Hướng Dẫn Đủ 3 Cách (CB/Excel/MDX) | Trạng Thái Đánh Giá |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| [query_01.md](query_01.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Heap) | ✅ Đạt ($O(M \log 10)$) | ✅ Đạt | ✅ Đạt (Chi tiết từng bước) | 🌟 **XUẤT SẮC (Mẫu chuẩn)** |
-| [query_02.md](query_02.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + CrossJoin) | ✅ Đạt ($O(M \log 10)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_03.md](query_03.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Filter) | ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_04.md](query_04.md) | ✅ Đạt | ✅ Đạt (`IIF` + `ISEMPTY`) | ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_05.md](query_05.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Except) | ✅ Đạt ($O(K \log K)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_06.md](query_06.md) | ✅ Đạt | ✅ Đạt (`EXISTING` + Except) | ✅ Đạt ($O(N_{\text{players}})$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_07.md](query_07.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Except) | ✅ Đạt ($O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_08.md](query_08.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Slicer) | ✅ Đạt ($O(M \log 15)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_09.md](query_09.md) | ✅ Đạt | ✅ Đạt (`NON EMPTY` Axis) | ✅ Đạt ($O(K)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_10.md](query_10.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Role-Play)| ✅ Đạt ($O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_11.md](query_11.md) | ✅ Đạt | ✅ Đạt (`EXISTING` + MemberVal)| ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_12.md](query_12.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + IsEmpty) | ✅ Đạt ($O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_13.md](query_13.md) | ✅ Đạt | ✅ Đạt (`EXISTING` + Distinct) | ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_14.md](query_14.md) | ✅ Đạt | ✅ Đạt (`NONEMPTY` + Sum Filter)| ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-| [query_15.md](query_15.md) | ✅ Đạt | ✅ Đạt (`PROPERTIES` + Set) | ✅ Đạt ($O(N) + O(M \log M)$) | ✅ Đạt | ✅ Đạt (Có hướng dẫn thực thi) | ⭐ **ĐẠT CHUẨN A+** |
-
----
-
-## 6. Bộ câu hỏi phản biện & Hướng dẫn bảo vệ trước Giảng viên khó tính
-
-Khi bảo vệ đồ án trước giảng viên hoặc hội đồng chuyên môn, bạn có thể tự tin trả lời trôi chảy các câu hỏi "gài bẫy" kinh điển sau:
-
-### Câu hỏi 1: "Tại sao trong Query 01 bạn lại bọc hàm `NONEMPTY()` bên trong `TOPCOUNT()` mà không để `TOPCOUNT()` tự chạy?"
-* **Câu trả lời chuẩn mực:**  
-  "Thưa Thầy/Cô, về mặt lý thuyết, hàm `TOPCOUNT(Set, 10, Measure)` có thể tự động bỏ qua các phần tử NULL nếu chúng xếp cuối bảng. Tuy nhiên, nếu không có `NONEMPTY()`, Formula Engine của SSAS buộc phải duyệt qua toàn bộ không gian của chiều Cầu thủ ($N \approx 30.000$ người). Khi bọc `NONEMPTY(..., ([Measures].[Goals], [DIM Competition].[GB1], [DIM Time].[2023/2024]))`, Storage Engine sẽ kích hoạt cơ chế Bitmap Index Scan để lọc trước ở tầng đĩa, thu hẹp tập hợp từ $30.000$ xuống chỉ còn $\approx 250$ cầu thủ thực sự có bàn thắng. Sau đó `TOPCOUNT` chỉ việc chạy thuật toán Min-Heap trên $250$ phần tử này, giúp giảm thời gian phản hồi từ $800\text{ms}$ xuống dưới $20\text{ms}$."
-
----
-
-### Câu hỏi 2: "Từ khóa `NON EMPTY` đặt trên trục (Axis) khác gì với hàm `NONEMPTY()` trong biểu thức tập hợp?"
-* **Câu trả lời chuẩn mực:**  
-  "Thưa Thầy/Cô, hai khái niệm này hoạt động ở hai tầng kiến trúc hoàn toàn khác nhau:
-  1. **Từ khóa `NON EMPTY` trên trục (ví dụ: `NON EMPTY [DIM Club]... ON ROWS`):** Hoạt động ở bước cuối cùng (*Post-evaluation filter*). SSAS vẫn phải tính toán toàn bộ lưới ma trận cell kết quả, sau đó mới quét các dòng/cột toàn số 0/rỗng để ẩn đi khỏi màn hình hiển thị.
-  2. **Hàm `NONEMPTY(Set1, Set2)`:** Hoạt động ngay từ bước khởi tạo tập hợp (*Pre-evaluation filter*). Nó loại bỏ các tuple rỗng trước khi đưa vào các hàm tốn kém tài nguyên như `ORDER()`, `TOPCOUNT()` hay `FILTER()`. Do đó, sử dụng hàm `NONEMPTY()` luôn mang lại hiệu năng cao hơn vượt trội."
-
----
-
-### Câu hỏi 3: "Sự khác biệt cốt lõi giữa cờ `DESC` và `BDESC` trong hàm `ORDER` là gì?"
-* **Câu trả lời chuẩn mực:**  
-  "Thưa Thầy/Cô, chữ 'B' viết tắt của **Break Hierarchy** (Phá vỡ cấu trúc phân cấp):
-  - Khi dùng **`DESC`**: SSAS bảo toàn phân cấp cha-con (Hierarchical Sort). Các nút con chỉ được sắp xếp nội bộ bên trong phạm vi nút cha của chúng.
-  - Khi dùng **`BDESC`**: SSAS phá vỡ toàn bộ cấu trúc cây phân cấp và trải phẳng tập hợp, sắp xếp tất cả các phần tử trên toàn bộ không gian chỉ dựa trên giá trị của biểu thức số đo. Trong các bài toán xếp hạng Top hiệu suất toàn hệ thống (như Query 03, Query 06, Query 07, Query 14), bắt buộc phải dùng `BDESC` để kết quả xếp hạng đúng chuẩn nghiệp vụ."
-
----
-
-### Câu hỏi 4: "Tại sao các bạn lại sử dụng từ khóa `EXISTING` trong các Calculated Measures (Query 06, Query 11, Query 13)?"
-* **Câu trả lời chuẩn mực:**  
-  "Thưa Thầy/Cô, từ khóa `EXISTING` dùng để ép buộc SSAS thực hiện **Chuyển đổi Ngữ cảnh (Context Transition)**. Nếu không có `EXISTING`, tập hợp được định nghĩa bên trong hàm tính toán sẽ lấy theo ngữ cảnh toàn cục (toàn bộ các thành viên trong Cube). Khi thêm `EXISTING`, tập hợp đó sẽ bị thu hẹp lại chỉ bao gồm các thành viên thuộc ngữ cảnh hiện tại của dòng/cột đang được duyệt (Current Member Context). Ví dụ trong Query 06, `EXISTING [DIM Player].[Player Name]...` đảm bảo hàm `AVG` chỉ tính trung bình chiều cao cho các cầu thủ thuộc đúng vị trí thi đấu đang hiển thị trên dòng đó."
-
----
-
-### Câu hỏi 5: "Liệu có nguy cơ bùng nổ không gian bộ nhớ (Combinatorial Explosion) khi dùng `CROSSJOIN` không và nhóm đã xử lý thế nào?"
-* **Câu trả lời chuẩn mực:**  
-  "Thưa Thầy/Cô, nguy cơ bùng nổ không gian là có thật nếu thực hiện tích Descartes giữa hai chiều có độ lực (Cardinality) lớn (ví dụ: Cầu thủ $\times$ Trận đấu tạo ra $30.000 \times 50.000 = 1.5 \times 10^9$ tuples). Nhóm đã triệt tiêu hoàn toàn rủi ro này bằng 2 giải pháp:
-  1. Chỉ thực hiện `CROSSJOIN` giữa một chiều lớn với một chiều rất nhỏ (ví dụ: Cầu thủ $\times 1$ thành viên vị trí duy nhất trong Query 02; hoặc CLB $\times 2$ trạng thái Sân nhà/Sân khách trong Query 09).
-  2. Luôn bọc ngoài `CROSSJOIN` bằng hàm `NONEMPTY()` kết hợp lát cắt ngữ cảnh để loại bỏ ngay lập tức các tuple không tồn tại dữ kiện trong bảng Fact."
-
----
-
-## 7. Kết luận & Khuyến nghị
-
-Toàn bộ **15 câu truy vấn MDX** trong thư mục [`mdx/`](.) đã được thiết kế, đối chuẩn và thẩm định kỹ lưỡng:
-* Đáp ứng đầy đủ **100% các nhóm hàm MDX chuẩn mực**.
-* Đảm bảo tính toán tối ưu với **độ phức tạp thời gian và không gian tối thiểu**.
-* Đồng bộ hoàn toàn với logic nghiệp vụ của hệ thống 15 câu truy vấn SQL tại [docs/15_queries.md](../docs/15_queries.md).
-* Cung cấp hướng dẫn thao tác chi tiết trên cả 3 nền tảng: **Cube Browser (Visual Studio)**, **Excel PivotTable** và **MDX Query Editor (SSMS)**.
-
-> 🏆 **Tài liệu này là minh chứng khoa học vững chắc giúp nhóm tự tin bảo vệ đồ án và đạt điểm số tuyệt đối từ giảng viên khó tính nhất.**
+1. **Tại sao phải tách 4 Measure Groups (`FACT Player Match Perf`, `FACT Player Distinct`, `FACT Club Match Official`, `DIM Game`)?**
+   - Vì một trận đấu có ~29 lượt ra sân và có thể có bàn phản lưới nhà của đối phương. Nếu đếm số trận (`Official Match Count` — Câu 11, 14) hoặc cộng tỷ số chính thức của Real Madrid (`Official Team Goals` — Câu 10: 216 bàn vs 210 bàn cá nhân) trực tiếp trên `FACT_Player_Match_Perf` sẽ bị nhân bản hoặc thiếu bàn phản lưới. Riêng `Distinct Player Count` (Câu 13) bắt buộc tách Measure Group riêng theo quy tắc của SSAS Multidimensional.
+2. **Tại sao dùng `[DIM Player].[Player ID]` làm trục truy vấn thay vì `[Player Name]`?**
+   - Trong 7.069 cầu thủ có **51 tên bị trùng trên 108 hồ sơ**. Đặt `KeyColumns = Player_ID` và `NameColumn = Player_Name` trên thuộc tính `Player ID` giúp báo cáo hiển thị tên dễ đọc mà vẫn bảo toàn định danh duy nhất (ví dụ Câu 3 giữ đúng 99 cầu thủ thay vì bị gộp nhầm thành 101).
+3. **Tại sao `Quarter`, `Month` trong `DIM_Time` và `Round` trong `DIM_Game` phải dùng khóa ghép?**
+   - Dữ liệu trải từ 2022–2024 nên `Quarter = 1` hay `Month = 10` lặp qua nhiều năm, và có **55 tên vòng đấu** (`1. Matchday`, `Final`…) lặp ở cả 2 mùa 2022 và 2023. Tạo `Year_Quarter_Key` (`[Year] * 10 + [Quarter]`) và `Year_Month_Key` (`[Year] * 100 + [Month]`) qua **Named Calculations trong DSV trên bảng `DIM_Time`**, kết hợp `(Season, Round)` làm `KeyColumns`, giúp phân cấp `Calendar Hierarchy` và `Season Round Hierarchy` không bị gộp nhầm giữa các năm/mùa.
+4. **Tại sao tính `Avg Height Cm` (Câu 6) phải dùng `EXISTING CrossJoin([Player ID], [Height In Cm])`?**
+   - Để đảm bảo chiều cao trung bình được tính trên **mỗi cầu thủ duy nhất có chiều cao hợp lệ** trong ngữ cảnh vị trí hiện hành (tránh bị trọng số hóa theo số lần ra sân của từng cầu thủ) và tự động bỏ qua `Unknown`/NULL.

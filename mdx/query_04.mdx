@@ -1,42 +1,37 @@
 /* ==============================================================================
-   Truy vấn MDX 04: Hiệu suất bàn thắng, kiến tạo & phút thi đấu theo độ tuổi
-   Database: SSAS_Football_Transfermarkt (hoặc DW_Football_SSAS)
-   Cube: [DW Football Transfermarkt]
-   Khai thác: WITH MEMBER, IIF, ROUND, FILTER, ORDER (BASC)
+   Truy vấn MDX 04: Hiệu suất ghi bàn, kiến tạo và phút thi đấu trung bình theo độ tuổi năm 2023
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `FACT Player Match Perf` + `DIM Appearance Context`
    ============================================================================== */
 
-WITH 
-    -- 1. Tính số phút trung bình mỗi lần ra sân
-    MEMBER [Measures].[Avg Minutes Played] AS
-        IIF(
-            IsEmpty([Measures].[FACT Player Match Perf Count]) OR [Measures].[FACT Player Match Perf Count] = 0,
-            NULL,
-            ROUND([Measures].[Minutes Played] / [Measures].[FACT Player Match Perf Count], 2)
-        ),
-        FORMAT_STRING = "#,##0.00"
-
+WITH SET [ValidAgeMembers] AS
+    EXCEPT(
+        [DIM Appearance Context].[Player Age At Match]
+            .[Player Age At Match].MEMBERS,
+        { [DIM Appearance Context].[Player Age At Match].[Unknown] }
+    )
 SELECT
-    -- Trục Cột: Các chỉ số hiệu suất thi đấu (Bàn thắng, Kiến tạo, Phút trung bình)
     {
         [Measures].[Goals],
         [Measures].[Assists],
         [Measures].[Avg Minutes Played]
     } ON COLUMNS,
-
-    -- Trục Dòng: Các độ tuổi hợp lệ, sắp xếp tăng dần từ 17 đến 45
     ORDER(
         FILTER(
-            [DIM Player].[Age].[Age].MEMBERS,
-            NOT ISEMPTY([DIM Player].[Age].CURRENTMEMBER.MEMBERVALUE) 
-            AND [DIM Player].[Age].CURRENTMEMBER.MEMBERVALUE > 0
+            NONEMPTY(
+                [ValidAgeMembers],
+                ( [Measures].[Appearance Count], [DIM Time].[Year].&[2023] )
+            ),
+            NOT ISEMPTY(
+                [DIM Appearance Context].[Player Age At Match]
+                    .CURRENTMEMBER.MEMBER_VALUE
+            )
+            AND [DIM Appearance Context].[Player Age At Match]
+                    .CURRENTMEMBER.MEMBER_VALUE > 0
         ),
-        [DIM Player].[Age].CURRENTMEMBER.MEMBERVALUE,
+        [DIM Appearance Context].[Player Age At Match]
+            .CURRENTMEMBER.MEMBER_VALUE,
         BASC
     ) ON ROWS
-
 FROM [DW Football Transfermarkt]
-
--- Lát cắt ngữ cảnh: Năm dương lịch 2023
-WHERE (
-    [DIM Time].[Year].[2023]
-);
+WHERE ( [DIM Time].[Year].&[2023] );

@@ -1,0 +1,34 @@
+/* ==============================================================================
+   Truy vấn MDX 14: Thống kê các trận đấu kịch tính có tổng bàn thắng từ 5 bàn trở lên
+   Database: SSAS_Football_Transfermarkt | Cube: [DW Football Transfermarkt]
+   Grain: `DIM Game` Measure Group (Trận đấu: 7.280 dòng)
+   ============================================================================== */
+
+SELECT
+    {
+        [Measures].[Home Club Goals],
+        [Measures].[Away Club Goals],
+        [Measures].[Total Match Goals]
+    } ON COLUMNS,
+    ORDER(
+        NONEMPTY(
+            FILTER(
+                [DIM Game].[Game ID].[Game ID].MEMBERS,
+                [Measures].[Total Match Goals] >= 5
+            )
+            * [DIM Game].[Round].[Round].MEMBERS
+            * [DIM Game].[Stadium].[Stadium].MEMBERS
+            * EXCEPT(
+                [DIM Home Club].[Club ID].[Club ID].MEMBERS,
+                { [DIM Home Club].[Club ID].[Unknown] }
+              )
+            * EXCEPT(
+                [DIM Away Club].[Club ID].[Club ID].MEMBERS,
+                { [DIM Away Club].[Club ID].[Unknown] }
+              ),
+            [Measures].[Official Match Count]
+        ),
+        [Measures].[Total Match Goals],
+        BDESC
+    ) ON ROWS
+FROM [DW Football Transfermarkt];

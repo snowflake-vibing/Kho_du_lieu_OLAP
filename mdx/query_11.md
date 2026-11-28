@@ -1,332 +1,115 @@
-# MDX Query 11: Số trận đấu diễn ra tại sân vận động có sức chứa > 60.000 khán giả
-## (Ứng dụng Xử lý Giá trị Rỗng COALESCEEMPTY & Đếm Duy nhất DISTINCTCOUNT)
+# MDX Query 11: Đếm số trận sân nhà của các CLB có sức chứa sân nhà trên 60.000 chỗ
+## (Truy vấn cấp trận trên `DIM Game` kết hợp Role-Playing `DIM Home Club`)
 
 ---
 
 ## 1. Nội dung truy vấn & Bối cảnh nghiệp vụ
 
-* **Nội dung truy vấn:** Thống kê danh sách các Sân vận động quy chuẩn quốc tế có sức chứa trên 60.000 chỗ ngồi (`Stadium_Seats >= 60.000`) cùng Câu lạc bộ chủ quản, tổng số bàn thắng ghi được và **số lượng trận đấu duy nhất** (`Distinct Matches Played`) đã từng tổ chức tại các sân đấu này. Ứng dụng hàm `COALESCEEMPTY` để làm sạch dữ liệu khuyết thiếu sức chứa và hàm `DISTINCTCOUNT` kết hợp `EXISTING` để loại trừ việc đếm trùng 22-30 cầu thủ ra sân trong cùng một trận.
-* **Đối tượng phân tích:** Sân vận động và Câu lạc bộ (`DIM_Club`), Trận đấu (`DIM_Game`), Hiệu suất thi đấu (`FACT_Player_Match_Perf`).
-* **Các thuộc tính & Thước đo tham gia:**
-  * Dimension Attributes: `[DIM Club].[Stadium Name]`, `[DIM Club].[Club Name]`, `[DIM Club].[Stadium Seats]`, `[DIM Game].[Game ID]`
-  * Cube Measures gốc: `[Measures].[Goals]`, `[Measures].[FACT Player Match Perf Count]`
-  * Calculated Measures: `[Measures].[Stadium Capacity Cleaned]`, `[Measures].[Distinct Matches Played]`
+* **Nội dung truy vấn (Mục 1.3 Chương 1):** 11. Đếm số trận sân nhà của các CLB có sức chứa sân nhà theo hồ sơ CLB trên 60.000 chỗ.
+  *[Thuộc tính: Game_ID, Home_Club_ID, Club_ID, Club_Name, Stadium_Name, Stadium_Seats]*
+* **Cấp độ dữ liệu (Grain):** `DIM Game` Measure Group (Trận đấu: 7.280 dòng)
+* **Đối tượng phân tích:** Trận đấu (`DIM_Game` Measure Group), CLB chủ nhà (`DIM_Home_Club`).
+* **Thuộc tính & Thước đo trong Cube:** `[DIM Home Club].[Club ID]`, `[DIM Home Club].[Stadium Name]`, `[DIM Home Club].[Stadium Seats]`, `[Measures].[Stadium Seats Value]`, `[Measures].[Official Match Count]`.
 
-### Đối chiếu câu lệnh T-SQL gốc (Relational Database)
+### Truy vấn T-SQL đối chiếu trên `DW_Football_Transfermarkt`
 ```sql
-USE DW_Football_Analytics;
+USE DW_Football_Transfermarkt;
 GO
 
-SELECT 
-    c.Stadium_Name,
+SELECT
+    c.Club_ID,
     c.Club_Name,
-    COALESCE(c.Stadium_Seats, 0) AS Stadium_Capacity,
-    COUNT(DISTINCT f.Game_SK) AS Distinct_Matches_Played,
-    SUM(f.Goals) AS Total_Goals
-FROM dbo.FACT_Player_Match_Perf f
-JOIN dbo.DIM_Club c ON f.Club_SK = c.Club_SK
-WHERE c.Stadium_Seats >= 60000 AND c.Stadium_Name IS NOT NULL
-GROUP BY c.Stadium_Name, c.Club_Name, c.Stadium_Seats
-ORDER BY Stadium_Capacity DESC;
+    c.Stadium_Name,
+    c.Stadium_Seats,
+    COUNT(g.Game_ID) AS Home_Games
+FROM dbo.DIM_Club AS c
+JOIN dbo.DIM_Game AS g ON g.Home_Club_ID = c.Club_ID
+WHERE c.Stadium_Seats > 60000
+GROUP BY c.Club_ID, c.Club_Name, c.Stadium_Name, c.Stadium_Seats
+ORDER BY c.Stadium_Seats DESC, Home_Games DESC;
 ```
 
 ---
 
-## 2. Hướng dẫn chi tiết 3 cách thực hiện (3 Execution Methods)
-
-Để trích xuất danh sách các siêu sân vận động và đếm số trận đấu duy nhất, người dùng có thể áp dụng linh hoạt **3 phương pháp**:
-
-```mermaid
-flowchart TD
-    Start["Khởi động Phân tích Sân vận động"] --> Choice{"Lựa chọn Phương pháp"}
-
-    Choice -->|"Cách 1: Trực quan Thiết kế"| CB["2.1. Cube Browser (Visual Studio / SSDT)"]
-    Choice -->|"Cách 2: Báo cáo Doanh nghiệp"| Excel["2.2. Excel PivotTable"]
-    Choice -->|"Cách 3: Lập trình Đa chiều"| MDX["2.3. Ngôn ngữ MDX (SSMS)"]
-
-    CB --> CB_Step["Mở .cube -> Tab Browser (Design Mode) -> Filter Stadium Seats >= 60.000 -> Kéo Stadium, Club vào Rows -> Execute (F5)"]
-    Excel --> Excel_Step["Data -> Get Data from SSAS -> PivotTable Fields -> Rows: Stadium, Club -> Values: Seats, Distinct Games -> Filter"]
-    MDX --> MDX_Step["SSMS Connect AS -> New MDX Query -> Soạn COALESCEEMPTY, DISTINCTCOUNT(EXISTING) -> Execute (F5)"]
-
-    CB_Step --> Finish["2.4. Nhận xét & Đối chiếu Kết quả Đồng nhất"]
-    Excel_Step --> Finish
-    MDX_Step --> Finish
-```
-
----
+## 2. Hướng dẫn thực thi đồng quy trên 3 công cụ
 
 ### 2.1. Sử dụng Cube Browser (Visual Studio / SSDT)
-
-Phương pháp này được thực hiện trực tiếp trong môi trường phát triển khối đa chiều (SQL Server Data Tools / Visual Studio).
-
-#### Bước 1: Mở giao diện Cube Designer & Tạo Calculated Measures
-1. Khởi động **Visual Studio**, mở Solution dự án SSAS (`SSIS_Football_Transfermarkt` hoặc `DW_Football_SSAS`).
-2. Mở tệp khối đa chiều **`DW_Football_Cube.cube`** → chuyển đến tab **`Calculations`**.
-3. Tạo 2 Calculated Members để làm sạch sức chứa và đếm số trận đấu duy nhất:
-   * **Thước đo 1 (`Stadium Capacity Cleaned`):**
-     * Name: `Stadium Capacity Cleaned` | Parent hierarchy: `Measures`
-     * Expression:
-       ```mdx
-       COALESCEEMPTY(
-           MAX(
-               EXISTING [DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS,
-               [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE
-           ),
-           0
-       )
-       ```
-     * Format String: `"#,##0 Chỗ"`
-     * Lưu ý: công thức cũ `COALESCEEMPTY([DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE, 0)` bị lỗi trong Browser/Excel: vì `Stadium Seats` không nằm trên Rows nên CURRENTMEMBER là `All` và ô trả về chữ `All` thay vì con số. `MAX(EXISTING ...)` lấy sức chứa của CLB/sân đang ở dòng hiện tại.
-   * **Thước đo 2 (`Distinct Matches Played`):**
-     * Name: `Distinct Matches Played` | Parent hierarchy: `Measures`
-     * Expression: `DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)`
-     * Format String: `#,##0`
-4. Chọn menu **Build** → **Deploy Solution** để nạp thước đo vào Cube.
-
-#### Bước 2: Chuyển sang Tab `Browser` & Kích hoạt `Design Mode`
-1. Nhấp chọn tab **`Browser`** (bấm nút **Reconnect** để nhận cấu trúc mới).
-2. Nhấp vào biểu tượng **`Design Mode`** để mở giao diện thiết kế đồ họa.
-
-#### Bước 3: Thiết lập Vùng Bộ lọc Sức chứa (Filter / Slicer Pane ở phía trên)
-Tại bảng lưới thiết lập bộ lọc phía trên, ta tạo 1 dòng lọc cho `Stadium Seats`:
-
-| Dòng lọc | Cột Dimension (Chọn gì) | Cột Hierarchy (Chọn gì) | Cột Operator (Chọn gì) | Cột Filter Expression (Ghi / Chọn gì) |
-| :---: | :--- | :--- | :---: | :--- |
-| **Dòng 1** | Nhấp chọn **`DIM Club`** | Nhấp chọn **`Stadium Seats`** | Bấm dropdown chọn **`Custom`** (Browser không có Greater Than; danh sách chỉ gồm Equal, Not Equal, In, Not In, Contains, Begins With, Range (Inclusive), Range (Exclusive), Custom) | Nhập biểu thức: `FILTER([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000)` |
-
-#### Bước 4: Kéo thả Thuộc tính và Thước đo vào Lưới Dữ liệu
-1. **Kéo Chiều Sân vận động & CLB (Rows):**
-   * Mở rộng chiều **`DIM Club`** → tìm thuộc tính **`Stadium Name`**: Kéo thả vào vùng Rows.
-   * Tìm tiếp thuộc tính **`Club Name`** trong `DIM Club`: Kéo thả vào ngay cạnh cột `Stadium Name`.
-2. **Kéo 3 Thước đo đã đồng bộ (Measures):**
-   * Mở rộng thư mục **`Measures`**:
-     * Kéo **`Stadium Capacity Cleaned`** thả vào cạnh cột `Club Name`.
-     * Kéo **`Distinct Matches Played`** thả vào tiếp theo.
-     * Kéo **`Goals`** thả vào cột cuối cùng.
-
-#### Bước 5: Thực thi truy vấn và Xem kết quả
-1. Nhấp chuột vào dòng chữ màu xanh **"Click to execute the query"** (hoặc bấm biểu tượng dấu chấm than đỏ **`! Execute`** / phím tắt **F5**).
-2. Lưới dữ liệu lập tức chạy và hiển thị đúng 3 cột thước đo theo từng sân vận động quy mô lớn.
-
-### 2.2. Sử dụng PivotTable trên Microsoft Excel
-
-Phương pháp này dành cho chuyên viên phân tích kinh doanh khai thác dữ liệu trực tiếp trên Excel.
-
-#### Bước 1: Khởi tạo kết nối tới SSAS Cube
-1. Khởi động **Microsoft Excel**, tạo một trang tính trống (**Blank Workbook**).
-2. Chọn thẻ tab **`Data`** → **`Get Data`** → **`From Database`** → **`From Analysis Services`**.
-3. Cửa sổ **Data Connection Wizard** xuất hiện: Nhập `localhost`, chọn **`Use Windows Authentication`** → Nhấn **Next >**.
-
-#### Bước 2: Chọn Database và Khối đa chiều
-1. Chọn cơ sở dữ liệu: **`DW_Football_SSAS`** → Chọn Cube: **`DW Football Transfermarkt`**.
-2. Nhấn **Finish** → Chọn **`PivotTable Report`** tại ô **`=$A$3`** → Nhấn **OK**.
-
-#### Bước 3: Thao tác kéo thả trong khung `PivotTable Fields`
-Quan sát khung danh sách trường **PivotTable Fields** ở góc phải màn hình Excel:
-
-| Vùng PivotTable (Kéo vào đâu) | Tên Trường dữ liệu | Vị trí thư mục nguồn |
-| :--- | :--- | :--- |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Stadium Name`** | Mở thư mục **`DIM Club`** → Kéo `Stadium Name` thả vào ô Rows. |
-| **Ô `Rows` (Dòng dữ liệu)** | **`Club Name`** | Mở thư mục **`DIM Club`** → Kéo `Club Name` thả vào ô Rows (nằm dưới `Stadium Name`). |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Stadium Capacity Cleaned`** | Mở thư mục **`Measures`** → Kéo `Stadium Capacity Cleaned` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Distinct Matches Played`** | Mở thư mục **`Measures`** → Kéo `Distinct Matches Played` thả vào ô Values. |
-| **Ô `Values` ($\\Sigma$ Thước đo)** | **`Goals`** | Mở thư mục **`Measures`** → Kéo `Goals` thả vào ô Values. |
-
-#### Bước 4: Thiết lập Bộ lọc Sức chứa >= 60.000 khán giả
-1. Nhấp chuột vào mũi tên lọc tại ô tiêu đề dòng **`Row Labels`** (ô `A4`).
-2. Di chuột vào mục **`Value Filters`** → chọn tiếp **`Greater Than Or Equal To...`**.
-3. Trong hộp thoại: Chọn lọc theo **`Stadium Capacity Cleaned`** $\ge$ **`60000`** → Nhấn **OK**.
-
-#### Bước 5: Trình bày bảng kết quả
-* Vào tab **`Design`** → **Report Layout** → chọn **`Show in Tabular Form`**.
-* Sắp xếp giảm dần theo số trận đấu duy nhất (`Distinct Matches Played`).
-
-### 2.3. Sử dụng Ngôn ngữ truy vấn MDX (SSMS)
-
-Phương pháp này mang lại khả năng tối ưu hóa tính toán cao nhất và kiểm soát toàn diện logic đa chiều với `COALESCEEMPTY` và `DISTINCTCOUNT(EXISTING ...)`.
-
-#### Bước 1: Mở trình soạn thảo truy vấn MDX
-1. Khởi động phần mềm **SQL Server Management Studio (SSMS)**.
-2. Tại hộp thoại kết nối máy chủ:
-   * **Server type:** Nhấp chọn **`Analysis Services`**.
-   * **Server name:** Nhập `localhost` (hoặc tên máy tính / instance SSAS).
-   * **Authentication:** Chọn **`Windows Authentication`**.
-   * Nhấn nút **Connect**.
-3. Trong cửa sổ **Object Explorer** (bên trái):
-   * Mở rộng thư mục **`Databases`** → mở rộng database **`DW_Football_SSAS`** → mở rộng thư mục **`Cubes`**.
-   * Nhấp chuột phải vào khối Cube **`DW Football Transfermarkt`** → chọn **`New Query`** → chọn **`MDX`**.
-4. Cửa sổ soạn thảo truy vấn MDX xuất hiện.
-
-#### Bước 2: Soạn thảo câu truy vấn MDX
-Nhập câu lệnh MDX hoàn chỉnh sau:
+- Mở tab **Browser** ở chế độ **Design Mode**.
+- Filter Pane: `DIM Home Club → Stadium Seats`, Operator = `Custom` (không dùng toán tử không tồn tại trong SSDT), dán biểu thức `FILTER` `> 60000` bên dưới.
+- Kéo `DIM Home Club → Club ID` và `Stadium Name` vào **Rows**; kéo `Stadium Seats Value` và `Official Match Count` vào **Values** → bấm **Click to execute the query**.
 
 ```mdx
-/* ==============================================================================
-   Truy vấn MDX 11: Số trận đấu diễn ra tại sân vận động có sức chứa > 60.000 khán giả
-   Khai thác: COALESCEEMPTY, DISTINCTCOUNT, EXISTING, FILTER, ORDER (BDESC)
-   Cube: [DW Football Transfermarkt]
-   ============================================================================== */
+FILTER(
+    EXCEPT(
+        [DIM Home Club].[Stadium Seats].[Stadium Seats].MEMBERS,
+        { [DIM Home Club].[Stadium Seats].[Unknown] }
+    ),
+    [DIM Home Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE > 60000
+)
+```
 
-WITH 
-    -- 1. Tập hợp các sân vận động quy mô lớn (sức chứa >= 60.000 chỗ)
-    SET [ValidStadiums] AS
+### 2.2. Sử dụng PivotTable trong Microsoft Excel
+> **Kết nối chuẩn:** Vào **Data $\rightarrow$ Get Data $\rightarrow$ From Database $\rightarrow$ From Analysis Services**, chọn server `localhost`, database `SSAS_Football_Transfermarkt`, Cube `DW Football Transfermarkt`.
+
+- Đặt PivotTable tại `Sheet1!$BB$3`.
+- Kéo `DIM Home Club → Club ID` và `Stadium Name` vào **Rows**; kéo `Stadium Seats Value` và `Official Match Count` vào **Values**.
+- Trên `Club ID`, chọn **Value Filters → Greater Than…** → `Stadium Seats Value > 60000`, sắp xếp giảm dần theo `Stadium Seats Value`.
+
+### 2.3. Sử dụng ngôn ngữ MDX trong SSMS (`query_11.mdx`)
+- Measure `[Measures].[Official Match Count]` thuộc Measure Group `DIM Game` đếm mỗi trận đúng 1 lần theo khóa `Home_Club_ID`.
+- Calculated Measure `[Measures].[Stadium Seats Value]` trích xuất sức chứa dạng số học qua `EXISTING EXCEPT(..., {[Unknown]})` mà không bao giờ trả về chuỗi `'All'`.
+
+```mdx
+SELECT
+    {
+        [Measures].[Stadium Seats Value],
+        [Measures].[Official Match Count]
+    } ON COLUMNS,
+    ORDER(
         FILTER(
             NONEMPTY(
                 CrossJoin(
-                    EXCEPT([DIM Club].[Stadium Name].[Stadium Name].MEMBERS, { [DIM Club].[Stadium Name].[All] }),
-                    EXCEPT([DIM Club].[Club Name].[Club Name].MEMBERS, { [DIM Club].[Club Name].[All] }),
-                    EXCEPT([DIM Club].[Stadium Seats].[Stadium Seats].MEMBERS, { [DIM Club].[Stadium Seats].[0], [DIM Club].[Stadium Seats].[All] })
+                    EXCEPT(
+                        [DIM Home Club].[Club ID].[Club ID].MEMBERS,
+                        { [DIM Home Club].[Club ID].[Unknown] }
+                    ),
+                    EXCEPT(
+                        [DIM Home Club].[Stadium Name].[Stadium Name].MEMBERS,
+                        { [DIM Home Club].[Stadium Name].[Unknown] }
+                    )
                 ),
-                [Measures].[FACT Player Match Perf Count]
+                [Measures].[Official Match Count]
             ),
-            [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE >= 60000
-        )
-
-    -- 2. Sức chứa sân vận động định dạng chuẩn
-    MEMBER [Measures].[Stadium Capacity Cleaned] AS
-        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
-        FORMAT_STRING = "#,##0 Chỗ"
-
-    -- 3. Đếm số trận đấu duy nhất diễn ra tại sân vận động
-    MEMBER [Measures].[Distinct Matches Played] AS
-        DISTINCTCOUNT(
-            EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS
+            [Measures].[Stadium Seats Value] > 60000
         ),
-        FORMAT_STRING = "#,##0"
-
-SELECT
-    -- Trục Cột: Sức chứa sân đã làm sạch, số trận duy nhất và tổng bàn thắng
-    {
-        [Measures].[Stadium Capacity Cleaned],
-        [Measures].[Distinct Matches Played],
-        [Measures].[Goals]
-    } ON COLUMNS,
-
-    -- Trục Dòng: Các sân vận động có sức chứa >= 60.000 chỗ, xếp giảm dần
-    ORDER(
-        [ValidStadiums],
-        [DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBER_VALUE,
+        [Measures].[Stadium Seats Value],
         BDESC
     ) ON ROWS
-
 FROM [DW Football Transfermarkt];
 ```
 
-**Bóc tách chi tiết từng mệnh đề truy vấn:**
-* **`COALESCEEMPTY([DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBERVALUE, 0)`**: Hàm kiểm tra giá trị đầu tiên khác rỗng. Nếu thuộc tính `Stadium Seats` bị NULL hoặc rỗng, hàm tự động gán giá trị mặc định là 0 để chống lỗi tính toán số học.
-* **`DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)`**: Đếm số lượng phần tử duy nhất (Distinct Game ID). Từ khóa `EXISTING` thực hiện chuyển đổi ngữ cảnh để tập hợp `Game ID` chỉ bao gồm các trận diễn ra tại đúng sân vận động và câu lạc bộ đang hiển thị trên dòng đó, ngăn chặn việc đếm trùng 22-30 cầu thủ mỗi trận.
-* **`CrossJoin([Stadium Name].MEMBERS, [Club Name].MEMBERS)`**: Kết hợp cặp thuộc tính Tên sân và Tên CLB chủ quản trên trục dòng.
-* **`FILTER(NONEMPTY(...), [Measures].[Stadium Capacity Cleaned] >= 60000)`**: Lọc các sân vận động đạt chuẩn quy mô trên 60.000 chỗ ngồi.
-* **`ORDER(..., [Measures].[Stadium Capacity Cleaned], BDESC) ON ROWS`**: Sắp xếp danh sách sân vận động theo sức chứa giảm dần toàn cục trên trục **HÀNG** (Axis 1).
-* **`FROM [DW Football Transfermarkt]`**: Khối Cube nguồn cần truy xuất dữ liệu.
+---
 
-#### Giải thích chi tiết cơ chế hoạt động của các hàm MDX:
+## 3. Bảng số liệu đối chiếu thực tế & Nhận xét
 
-1. **Hàm làm sạch ô rỗng `COALESCEEMPTY(«Value_1», «Value_2»[, ...])`**:
-   * **Cú pháp chuẩn:** `COALESCEEMPTY(Value_1, Value_2)`
-   * **Tham số thực tế trong truy vấn:**
-     * `Value_1`: `[DIM Club].[Stadium Seats].CURRENTMEMBER.MEMBERVALUE`.
-     * `Value_2`: `0`.
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Tương đương với hàm `COALESCE()` hoặc `ISNULL()` trong SQL.
-     * Hàm đánh giá giá trị sức chứa `Stadium Seats`; nếu dữ liệu bị rỗng (`NULL/Empty` do sân vận động chưa cập nhật thông tin sức chứa), hàm lập tức thay thế bằng giá trị mặc định là `0`.
-     * Nhờ đó, biểu thức lọc điều kiện `[Stadium Capacity Cleaned] >= 60000` ở phía sau luôn có giá trị số học hợp lệ để so sánh, tránh lỗi gián đoạn phép toán logic.
-   * **Kết quả trả về:** Giá trị số học nguyên vẹn của sức chứa sân đã được làm sạch.
+| STT | Club_ID | Club_Name | Stadium_Name | Stadium_Seats | Official_Match_Count |
+| :---: | ---: | :--- | :--- | ---: | ---: |
+| 1 | 418 | Real Madrid | Santiago Bernabéu | 83.186 | 50 |
+| 2 | 16 | Borussia Dortmund | SIGNAL IDUNA PARK | 81.365 | 45 |
+| 3 | 6646 | Fatih Karagümrük | Atatürk Olimpiyat | 77.563 | 37 |
+| 4 | 5 | AC Milan | Giuseppe Meazza | 75.923 | 50 |
+| 5 | 46 | Inter Milan | Giuseppe Meazza | 75.923 | 48 |
+| 6 | 27 | Bayern Munich | Allianz Arena | 75.000 | 45 |
+| 7 | 985 | Manchester United | Old Trafford | 74.879 | 47 |
+| 8 | 44 | Hertha BSC | Olympiastadion Berlin | 74.667 | 17 |
+| 9 | 150 | Real Betis Balompié | La Cartuja | 71.374 | 46 |
+| 10 | 12 | Associazione Sportiva Roma | Olimpico di Roma | 70.634 | 52 |
 
-2. **Hàm đếm duy nhất `DISTINCTCOUNT(«Set»)` kết hợp từ khóa `EXISTING`**:
-   * **Cú pháp chuẩn:** `DISTINCTCOUNT(EXISTING [DIM Game].[Game ID].[Game ID].MEMBERS)`
-   * **Cơ chế hoạt động kỹ thuật:**
-     * Bảng sự kiện `FACT_Player_Match_Perf` ghi nhận hiệu suất ở mức độ chi tiết của từng cầu thủ ra sân (trung bình mỗi trận đấu có từ 22 đến 30 dòng bản ghi).
-     * Nếu sử dụng hàm đếm thông thường `COUNT`, số lượng trận đấu sẽ bị phóng đại gấp 22-30 lần.
-     * Hàm `DISTINCTCOUNT` duyệt qua tập hợp các mã trận đấu `Game ID` và chỉ đếm các giá trị phân biệt duy nhất.
-     * Từ khóa `EXISTING` kích hoạt cơ chế chuyển đổi ngữ cảnh (**Context Transition**): ép tập hợp `Game ID` chỉ bao gồm các trận đấu thực sự diễn ra tại đúng sân vận động và câu lạc bộ đang hiển thị trên dòng hiện hành, mang lại số lượng trận đấu thực tế chính xác tuyệt đối.
-   * **Kết quả trả về:** Số lượng trận đấu duy nhất đã diễn ra trên từng sân vận động.
-
-3. **Hàm `FILTER(NONEMPTY(...), Cleaned Capacity >= 60000)`**:
-   * **Cơ chế:** Lọc lấy các sân vận động đạt chuẩn quy mô siêu sân đấu với sức chứa từ 60.000 khán giả trở lên và sắp xếp giảm dần toàn cục bằng `ORDER(..., BDESC)`.
-
-
-#### Bước 3: Thực thi truy vấn và Đọc kết quả
-1. Kiểm tra trên thanh công cụ xem ô chọn database đã trỏ chính xác về `DW_Football_SSAS`.
-2. Nhấn nút **`! Execute`** trên thanh công cụ (hoặc nhấn phím tắt **`F5`**).
-3. Đọc dữ liệu tại khung bên dưới:
-   * **Tab `Results`:** Hiển thị 16 siêu sân vận động của bóng đá Châu Âu cùng sức chứa, số trận đã diễn ra và tổng bàn thắng.
-   * **Tab `Messages`:** Hiển thị thông báo `Execution completed successfully.` kèm thời gian thực thi chi tiết.
+> **Nhận xét đối chiếu:** Có đúng **23 CLB** có sân nhà `> 60.000` chỗ với tổng **993 trận sân nhà** (Real Madrid dẫn đầu sức chứa 83.186 chỗ; AS Roma nhiều trận sân nhà nhất: 52 trận). Dùng `DIM Home Club` đảm bảo tách đúng các CLB dùng chung sân như AC Milan/Inter Milan hay AS Roma/Lazio.
 
 ---
 
-### 2.4. Nhận xét & Đối chiếu kết quả (Comparison & Validation)
+## 4. Đánh giá hiệu năng & Độ phức tạp thuật toán
 
-1. **Tính chính xác và Nhất quán của Dữ liệu:**
-   * Cả 3 cách tiếp cận (duyệt trực quan qua **Cube Browser trong SSDT**, lập bảng phân tích qua **PivotTable trong Excel**, và viết truy vấn trực tiếp bằng **ngôn ngữ MDX trong SSMS**) đều trả về cùng một kết quả duy nhất và chuẩn xác tuyệt đối: Có 16 sân vận động đạt tiêu chuẩn trên 60.000 chỗ ngồi. Dẫn đầu là Camp Nou (99.354 chỗ, 38 trận, 134 bàn), Wembley Stadium (90.000 chỗ, 18 trận, 58 bàn), và Signal Iduna Park (81.365 chỗ, 36 trận, 132 bàn).
-   * Thước đo `Distinct Matches Played` tận dụng hàm `DISTINCTCOUNT` kết hợp `EXISTING` giúp đếm chính xác số trận đấu duy nhất mà không bị nhân bản theo số lượng bản ghi ra sân của cầu thủ trong Fact Table.
-
-2. **So sánh Ưu - Nhược điểm của từng phương thức:**
-
-| Phương thức | Ưu điểm nổi bật | Hạn chế | Đối tượng người dùng phù hợp |
-| :--- | :--- | :--- | :--- |
-| **Cube Browser (SSDT)** | Thao tác lọc toán tử `>= 60000` cực kỳ nhanh chóng trên giao diện; xác minh dữ liệu chiều CLB ngay lập tức. | Chưa hỗ trợ hiển thị hàm `DISTINCTCOUNT` động trên lưới nếu chưa tạo sẵn Measure Group riêng cho Game. | Kỹ sư BI, Nhà phát triển khối Cube SSAS. |
-| **Excel PivotTable** | Giao diện đồ họa quen thuộc; hỗ trợ định dạng số có dấu phân cách hàng nghìn (`99,354 Chỗ`) dễ nhìn. | Cần kích hoạt Data Model (Power Pivot) nếu muốn dùng tính năng `Distinct Count` trong Excel PivotTable. | Chuyên viên tổ chức sự kiện thể thao, Quản lý cơ sở vật chất sân đấu. |
-| **Ngôn ngữ MDX (SSMS)** | Giải quyết triệt để bài toán đếm phần tử duy nhất trong ngữ cảnh bằng `DISTINCTCOUNT(EXISTING ...)`; xử lý sạch NULL bằng `COALESCEEMPTY`. | Cần hiểu sâu về cơ chế Context Transition giữa các Dimension khác nhau qua Fact Table. | Kỹ sư Dữ liệu (Data Engineer), Quản trị viên CSDL (DBA). |
-
----
-
-## 3. Bảng Kết quả Truy vấn Dự kiến (Expected Output)
-
-Sau khi hoàn thành bất kỳ phương pháp nào trong 3 cách trên, kết quả trả về hiển thị toàn bộ 23 dòng dữ liệu thực tế từ khối Cube OLAP:
-
-| STT | Sân Vận Động (`Stadium Name`) | Câu Lạc Bộ Chủ Quản (`Club Name`) | Sức Chứa Chuẩn Hóa (`Stadium Capacity`) | Số Trận Đã Diễn Ra (`Distinct Matches`) | Tổng Bàn Thắng (`Goals`) |
-| :---: | :--- | :--- | :---: | :---: | :---: |
-| **1** | **Santiago Bernabéu** | Real Madrid | 83,186 Chỗ | 101 | 210 |
-| **2** | **SIGNAL IDUNA PARK** | Borussia Dortmund | 81,365 Chỗ | 89 | 177 |
-| **3** | **Atatürk Olimpiyat** | Fatih Karagümrük | 77,563 Chỗ | 72 | 118 |
-| **4** | **Giuseppe Meazza** | AC Milan | 75,923 Chỗ | 100 | 169 |
-| **5** | **Giuseppe Meazza** | Inter Milan | 75,923 Chỗ | 97 | 184 |
-| **6** | **Allianz Arena** | Bayern Munich | 75,000 Chỗ | 90 | 225 |
-| **7** | **Old Trafford** | Manchester United | 74,879 Chỗ | 94 | 145 |
-| **8** | **Olympiastadion Berlin** | Hertha BSC | 74,667 Chỗ | 34 | 40 |
-| **9** | **La Cartuja** | Real Betis Balompié | 71,374 Chỗ | 90 | 111 |
-| **10** | **Olimpico di Roma** | Associazione Sportiva Roma | 70,634 Chỗ | 105 | 156 |
-| **11** | **Olimpico di Roma** | Società Sportiva Lazio S.p.A. | 70,634 Chỗ | 90 | 122 |
-| **12** | **Riyadh Air Metropolitano** | Atlético de Madrid | 70,460 Chỗ | 92 | 160 |
-| **13** | **Estádio da Luz** | SL Benfica | 68,100 Chỗ | 90 | 192 |
-| **14** | **Orange Vélodrome** | Olympique Marseille | 67,394 Chỗ | 92 | 145 |
-| **15** | **Tottenham Hotspur Stadium** | Tottenham Hotspur | 62,850 Chỗ | 84 | 145 |
-| **16** | **Spotify Camp Nou** | FC Barcelona | 62,657 Chỗ | 94 | 179 |
-| **17** | **London Stadium** | West Ham United | 62,500 Chỗ | 86 | 115 |
-| **18** | **Veltins-Arena** | FC Schalke 04 | 62,271 Chỗ | 34 | 32 |
-| **19** | **Anfield** | Liverpool FC | 61,276 Chỗ | 94 | 198 |
-| **20** | **Etihad Stadium** | Manchester City | 61,000 Chỗ | 99 | 245 |
-| **21** | **Emirates Stadium** | Arsenal FC | 60,704 Chỗ | 94 | 199 |
-| **22** | **MHPArena Stuttgart** | VfB Stuttgart | 60,449 Chỗ | 68 | 123 |
-| **23** | **Celtic Park** | Celtic FC | 60,411 Chỗ | 78 | 186 |
-
-
-
----
-
-## 4. Các hàm MDX sử dụng & Chi tiết cú pháp
-
-| Tên hàm | Cú pháp chuẩn | Vai trò trong truy vấn |
-| :--- | :--- | :--- |
-| **`COALESCEEMPTY`** | `COALESCEEMPTY(Exp1, Exp2, ...)` | Trả về giá trị đầu tiên khác rỗng. Dùng để gán giá trị mặc định 0 nếu thuộc tính sức chứa sân bị NULL. |
-| **`DISTINCTCOUNT`** | `DISTINCTCOUNT(Set_Expression)` | Đếm số lượng phần tử duy nhất (Distinct Game ID) trong không gian trận đấu thực tế, loại trừ việc đếm trùng 22-30 cầu thủ trong cùng một trận. |
-| **`EXISTING`** | `EXISTING Set` | Ép chuyển đổi ngữ cảnh để tập hợp `Game ID` chỉ bao gồm các trận diễn ra tại CLB và Sân vận động đang hiển thị trên dòng đó. |
-| **`FILTER`** | `FILTER(Set, Condition)` | Lọc các sân vận động có sức chứa quy chuẩn trên 60.000 chỗ ngồi. |
-| **`ORDER` (BDESC)** | `ORDER(Set, Measure, BDESC)` | Sắp xếp danh sách sân vận động theo sức chứa giảm dần trên toàn cục. |
-
----
-
-## 5. Đánh giá độ phức tạp thuật toán và tối ưu hóa SSAS
-
-### 1. Phân tích Độ phức tạp Không gian (Space Complexity)
-* **Số sân vận động $>60.000$ chỗ tại Châu Âu:** Chỉ khoảng $S \approx 16 - 25$ sân vận động nổi tiếng.
-* **Bộ nhớ RAM sử dụng:** Cực kỳ nhỏ (dưới $3\text{ KB}$ RAM).
-
-### 2. Phân tích Độ phức tạp Thời gian (Time Complexity)
-* **Chi phí tính `DISTINCTCOUNT`:** $O(N_{\text{stadiums}} \times G)$ với $G$ là số trận trung bình mỗi sân ($\approx 20 - 50$ trận).
-* **Tổng thời gian phản hồi:** Khoảng **$10\text{ ms} - 25\text{ ms}$**.
-
-### 3. Cơ chế hoạt động của Động cơ SSAS (Storage Engine vs Formula Engine)
-* **Storage Engine (SE):** Quét các phân vùng chứa dữ liệu sân vận động, lọc các bản ghi có `Stadium_Seats >= 60000`, tổng hợp số bàn thắng `Goals`.
-* **Formula Engine (FE):** Nhận diện từ khóa `EXISTING`, duyệt tập hợp các `Game_SK` duy nhất gắn với từng sân vận động qua hàm `DISTINCTCOUNT`, định dạng chuỗi `#,#0 Chỗ` và gửi Cellset về client.
+* **Không gian sau lọc:** $272 \text{ CLB} \rightarrow M = 23$ CLB đạt ngưỡng `> 60.000` chỗ.
+* **Độ phức tạp thời gian:** $O(N_{\text{clubs}} + M \log M)$ trên `DIM Game` Measure Group; bộ nhớ kết quả $O(23)$.

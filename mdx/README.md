@@ -1,66 +1,55 @@
 # BỘ CÂU TRUY VẤN NGHIỆP VỤ ĐA CHIỀU MDX (MULTIDIMENSIONAL EXPRESSIONS)
 
-Tài liệu này tổng hợp danh sách các câu truy vấn nghiệp vụ đa chiều (MDX Queries) được thiết kế và tối ưu riêng cho **Cube `[DW Football Transfermarkt]`** (thuộc hệ thống Kho dữ liệu bóng đá Châu Âu `DW_Football_Analytics`).
+Tài liệu này tổng hợp đầy đủ **15 câu truy vấn nghiệp vụ đa chiều (MDX Queries)** được chuẩn hóa đồng bộ với Chương 1 ([Bao_cao_OLAP.docx](../bao-cao-olap/Bao_cao_OLAP.docx)) và Chương 3 ([Chuong_3_SSAS.docx](../bao-cao-olap/Chuong_3_SSAS.docx)), triển khai trên **Cube `[DW Football Transfermarkt]`** thuộc SSAS Database **`SSAS_Football_Transfermarkt`** (nguồn SQL Server **`DW_Football_Transfermarkt`**).
 
-Các truy vấn được chuyển đổi tương đương và nâng cao từ 15 câu truy vấn T-SQL tại [docs/15_queries.md](file:///d:/Kho_du_lieu_OLAP/docs/15_queries.md), tận dụng triệt để kiến trúc OLAP phân cấp đa chiều, tiền tính toán (Pre-aggregations), Bitmap Indexing và Block Computation của Microsoft SQL Server Analysis Services (SSAS).
-
-Theo yêu cầu môn học (tối thiểu 10 câu truy vấn), nhóm đã tinh chọn **10 câu truy vấn xuất sắc nhất** đại diện cho đầy đủ các phép toán OLAP và kỹ thuật MDX chuyên sâu để đưa vào báo cáo nghiệm thu chính thức. Các câu còn lại được lưu trữ tại thư mục [archive/](file:///d:/Kho_du_lieu_OLAP/mdx/archive/).
+Cả 15 câu truy vấn (gồm cả 5 câu trước đây từng nằm ở `archive/`) hiện được đặt tập trung trực tiếp trong thư mục `mdx/`, mỗi câu gồm đầy đủ tệp hướng dẫn `.md` (T-SQL đối chiếu, Cube Browser, Excel PivotTable, MDX, bảng kết quả thực tế từ `football/cleaned_data/new_version/`, độ phức tạp) và tệp thực thi `.mdx`.
 
 ---
 
-## 📚 GIÁO TRÌNH LÝ THUYẾT & NỀN TẢNG MDX (TUTORIAL)
+## 📚 TÀI LIỆU LIÊN QUAN
 
-Để nắm vững toàn bộ kiến trúc không gian siêu khối, cú pháp toán học, phân biệt chuyên sâu giữa SQL vs MDX, cơ chế Formula Engine/Storage Engine và bộ câu hỏi phản biện lý thuyết, vui lòng xem tài liệu chi tiết tại:
-👉 **[mdx/tutorial/README.md](file:///d:/Kho_du_lieu_OLAP/mdx/tutorial/README.md)**: **Giáo trình Lý thuyết & Thực hành Truy vấn Đa chiều MDX từ A đến Z**
-
----
-
-## 🌟 BẢNG TỔNG HỢP 10 CÂU TRUY VẤN MDX CHÍNH THỨC NỘP BÁO CÁO
-
-| STT | File Tài Liệu | Mục tiêu nghiệp vụ MDX | Thao tác OLAP | Các hàm MDX cốt lõi |
-| :---: | :--- | :--- | :---: | :--- |
-| **01** | [query_01.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_01.md) | Top 10 Vua dội bom Ngoại Hạng Anh mùa 2023/2024 | **Slice & Pivot** | `TOPCOUNT`, `NON EMPTY`, `MEMBERS` |
-| **02** | [query_03.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_03.md) | Cầu thủ xuất sắc có trên 20 đóng góp bàn thắng (G+A > 20) | **Slice & Filter** | `FILTER`, `ORDER (BDESC)`, `WITH MEMBER` |
-| **03** | [query_04.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_04.md) | Hiệu suất bàn thắng & số phút TB theo 3 thế hệ độ tuổi | **Calculated Logic** | `WITH MEMBER`, cấu trúc `CASE WHEN`, `AVG` |
-| **04** | [query_05.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_05.md) | So sánh bàn thắng theo chân thuận & vị trí chi tiết | **Dice & Union** | Phép hợp tập hợp `UNION`, `CROSSJOIN` |
-| **05** | [query_06.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_06.md) | Chiều cao trung bình, bàn thắng và thẻ phạt theo vị trí chính | **Aggregate Analysis** | `AVG`, `MAX`, `MIN`, `EXISTING`, `ORDER` |
-| **06** | [query_07.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_07.md) | Bàn thắng theo quốc tịch theo nguyên lý Pareto 80/20 | **Pareto Ranking** | `TOPPERCENT`, `ORDER (BDESC)` |
-| **07** | [query_09.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_09.md) | Hiệu năng Sân nhà vs Sân khách x Cuối tuần vs Ngày thường | **Dice & Intersect** | Phép giao tập hợp `INTERSECT`, `CROSSJOIN` |
-| **08** | [query_10.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_10.md) | Bàn thắng Real Madrid & tăng trưởng qua các Quý (QoQ) | **Time Intelligence** | `PREVMEMBER`, `DESCENDANTS`, Time Hierarchy |
-| **09** | [query_11.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_11.md) | Số trận đấu tại các SVĐ có sức chứa > 60.000 khán giả | **Cleansing & Distinct** | `COALESCEEMPTY`, `DISTINCTCOUNT`, `EXISTING` |
-| **10** | [query_12.md](file:///d:/Kho_du_lieu_OLAP/mdx/query_12.md) | Tháng nhận thẻ phạt kỷ lục phân theo Huấn luyện viên trưởng | **Advanced Group-by** | `GENERATE`, `TOPCOUNT` lồng nhau |
+- 👉 **[tutorial/README.md](./tutorial/README.md)**: Giáo trình Lý thuyết & Thực hành Truy vấn Đa chiều MDX.
+- 👉 **[checklist.md](./checklist.md)**: Bảng đối chiếu, độ phủ hàm và kiểm định chất lượng 15 câu truy vấn MDX.
+- 👉 **[../ssas/ssas_overview.md](../ssas/ssas_overview.md)**: Bộ hướng dẫn dựng SSAS Project `SSAS_Football_Transfermarkt` từ Data Source, DSV, Dimensions đến Cube & Deploy.
+- 👉 **[../ssas/ke_hoach_chinh_sua_ssas_mdx.md](../ssas/ke_hoach_chinh_sua_ssas_mdx.md)**: Kế hoạch chỉnh sửa chi tiết SSAS & MDX từ bản cũ sang bản mới (10 câu cũ $\rightarrow$ 15 câu mới).
 
 ---
 
-## 📦 KHO LƯU TRỮ CÁC CÂU TRUY VẤN DỰ PHÒNG (ARCHIVE)
+## 🌟 BẢNG TỔNG HỢP 15 CÂU TRUY VẤN MDX CHÍNH THỨC
 
-Các câu truy vấn nghiên cứu bổ trợ không nằm trong 10 câu chính thức được lưu trữ an toàn tại thư mục [mdx/archive/](file:///d:/Kho_du_lieu_OLAP/mdx/archive/):
+| STT | Hướng dẫn chi tiết | Tệp `.mdx` | Measure Group (Grain) | Thao tác OLAP | Hàm / Kỹ thuật MDX cốt lõi |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| **01** | [query_01.md](./query_01.md) | [query_01.mdx](./query_01.mdx) | `FACT Player Match Perf` | Slice & Top-N | `TOPCOUNT`, `NONEMPTY`, `Player ID` |
+| **02** | [query_02.md](./query_02.md) | [query_02.mdx](./query_02.mdx) | `FACT Player Match Perf` | Slice & Top-N | `TOPCOUNT`, `NONEMPTY`, `.MEMBERS` |
+| **03** | [query_03.md](./query_03.md) | [query_03.mdx](./query_03.mdx) | `FACT Player Match Perf` | Slice & Filter | `FILTER`, `ORDER (BDESC)`, `Goal Contributions` |
+| **04** | [query_04.md](./query_04.md) | [query_04.mdx](./query_04.mdx) | `FACT Player Match Perf` + `Context` | Slice & Avg | `WITH SET`, `EXCEPT`, `ORDER (BASC)`, `Avg Minutes Played` |
+| **05** | [query_05.md](./query_05.md) | [query_05.mdx](./query_05.mdx) | `FACT Player Match Perf` | Dice & Pivot | `EXCEPT`, `NON EMPTY`, `ORDER (BDESC)` |
+| **06** | [query_06.md](./query_06.md) | [query_06.mdx](./query_06.mdx) | `FACT Player Match Perf` | Aggregate | `AVG`, `MAX`, `MIN`, `EXISTING`, `CrossJoin` |
+| **07** | [query_07.md](./query_07.md) | [query_07.mdx](./query_07.mdx) | `FACT Player Match Perf` | Slice & Pareto | `EXCEPT`, `NONEMPTY`, `ORDER (BDESC)`, (`TOPPERCENT`) |
+| **08** | [query_08.md](./query_08.md) | [query_08.mdx](./query_08.mdx) | `FACT Player Match Perf` | Threshold & Top-N | `TOPCOUNT`, `FILTER`, `Goals Per 90` |
+| **09** | [query_09.md](./query_09.md) | [query_09.mdx](./query_09.mdx) | `FACT Player Match Perf` + `Context` | Slice & Pivot | `CrossJoin`, `NONEMPTY`, `Covered Match Count`, `Goals/Yellow Per Match` |
+| **10** | [query_10.md](./query_10.md) | [query_10.mdx](./query_10.mdx) | `FACT Club Match Official` | Role-Playing & Slice | `CrossJoin`, `NONEMPTY`, `Year Quarter Key`, `DIM Opponent Club` |
+| **11** | [query_11.md](./query_11.md) | [query_11.mdx](./query_11.mdx) | `DIM Game` + `DIM Home Club` | Match Aggregation | `FILTER`, `EXISTING`, `Stadium Seats Value` |
+| **12** | [query_12.md](./query_12.md) | [query_12.mdx](./query_12.mdx) | `FACT Player Match Perf` + `Context` | Multi-Dim Slice | `WITH SET`, `CrossJoin`, `Covered Match Count`, `Year Month Key` |
+| **13** | [query_13.md](./query_13.md) | [query_13.mdx](./query_13.mdx) | `FACT Player Match Perf` + `Distinct` | Distinct Count | `DistinctCount(Player_ID)`, `CrossJoin`, `NONEMPTY` |
+| **14** | [query_14.md](./query_14.md) | [query_14.mdx](./query_14.mdx) | `DIM Game` + `Home/Away Club` | Match Filter | `FILTER`, `*`, `NONEMPTY`, `Total Match Goals` |
+| **15** | [query_15.md](./query_15.md) | [query_15.mdx](./query_15.mdx) | `FACT Player Match Perf` | Date-Range Slice | `WITH SET`, `CDate`, `FILTER`, Subcube `SELECT` |
 
-* [query_02.md](file:///d:/Kho_du_lieu_OLAP/mdx/archive/query_02.md): Top 10 tiền vệ kiến tạo nhiều nhất tại các giải VĐQG (`TOPCOUNT`, `CROSSJOIN`).
-* [query_08.md](file:///d:/Kho_du_lieu_OLAP/mdx/archive/query_08.md): Danh sách các "Siêu dự bị" ghi bàn nhiều nhất khi vào sân thay người (`TOPCOUNT`, `BOTTOMCOUNT`).
-* [query_13.md](file:///d:/Kho_du_lieu_OLAP/mdx/archive/query_13.md): Khảo sát lực lượng cầu thủ thực tế ra sân theo quy mô đội hình (`DISTINCTCOUNT`, `EXISTING`).
-* [query_14.md](file:///d:/Kho_du_lieu_OLAP/mdx/archive/query_14.md): Thống kê các trận cầu mưa bàn thắng ($\ge 5$ bàn) qua các vòng đấu (`FILTER`, `CROSSJOIN`).
-* [query_15.md](file:///d:/Kho_du_lieu_OLAP/mdx/archive/query_15.md): Theo dõi phong độ & thẻ phạt của lứa cầu thủ trẻ (sinh từ 2004) theo ngày (`WITH SET`, `PROPERTIES`).
+> **Lưu ý lược đồ DSV & Calculated Measures mới nhất:** Hai thuộc tính kỳ (`Year_Quarter_Key`, `Year_Month_Key`) trên `DIM_Time` được tạo bằng **Named Calculations trong SSAS DSV** (`[Year] * 10 + [Quarter]` và `[Year] * 100 + [Month]`) thay vì cột vật lý trong SQL Server; khi chạy T-SQL đối chiếu cho Câu 10 và Câu 12 cần tính inline trong `SELECT`/`GROUP BY`. Cube đồng thời định nghĩa sẵn `Covered Match Count`, `Goals Per Match`, `Yellow Cards Per Match` và `Red Cards Per Match` phục vụ Câu 09 và Câu 12.
+>
+> Các tài liệu nháp cũ của phiên bản lược đồ trước đã được chuyển vào [`archive/legacy_v1/`](./archive/legacy_v1/) để lưu vết lịch sử.
 
 ---
 
 ## HƯỚNG DẪN THỰC THI TRÊN SQL SERVER ANALYSIS SERVICES (SSAS)
 
 1. **Khởi động SQL Server Management Studio (SSMS):**
-   * Server Type: Chọn **Analysis Services**.
-   * Server Name: Nhập địa chỉ máy chủ SSAS của bạn (ví dụ: `localhost` hoặc `DESKTOP-XXX\SSAS`).
-   * Authentication: Windows Authentication.
+   - Server Type: **Analysis Services**
+   - Server Name: `localhost` (hoặc tên instance SSAS cục bộ)
+   - Authentication: **Windows Authentication**
 2. **Chọn Database & Cube:**
-   * Trong cửa sổ **Object Explorer**, mở rộng nhánh `Databases` $\to$ Chọn database triển khai Cube (ví dụ: `SSAS_Football_Transfermarkt`).
-   * Mở rộng nhánh `Cubes` $\to$ Chuột phải vào Cube **`DW Football Transfermarkt`** $\to$ Chọn **New Query** $\to$ **MDX**.
+   - Mở rộng `Databases` $\rightarrow$ chọn **`SSAS_Football_Transfermarkt`**.
+   - Mở rộng `Cubes` $\rightarrow$ bấm chuột phải vào **`DW Football Transfermarkt`** $\rightarrow$ **New Query** $\rightarrow$ **MDX**.
 3. **Thực thi truy vấn:**
-   * Mở từng file trong thư mục `mdx/` (từ `query_01.md` đến `query_12.md`), sao chép đoạn mã trong mục **Mã truy vấn MDX chuẩn**.
-   * Dán vào cửa sổ Editor của SSMS và nhấn **Execute (F5)**.
-   * Kết quả sẽ được hiển thị ngay lập tức dưới dạng lưới ma trận ô dữ liệu (OLAP Grid).
-
----
-
-## 📑 BÁO CÁO KIỂM ĐỊNH HỌC THUẬT & ĐỐI CHIẾU HÀM MDX (QUALITY CHECKLIST)
-
-Toàn bộ hệ thống truy vấn đã được kiểm định khắt khe tại tài liệu:
-👉 **[checklist.md](file:///d:/Kho_du_lieu_OLAP/mdx/checklist.md)**: **Bảng đối chiếu & Kiểm định chất lượng các câu truy vấn MDX**
+   - Mở trực tiếp tệp `query_01.mdx` đến `query_15.mdx` (hoặc sao chép từ `query_01.md` đến `query_15.md`).
+   - Dán vào cửa sổ MDX Query Editor và nhấn **Execute (`F5`)**.
